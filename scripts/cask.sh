@@ -1,57 +1,94 @@
 #!/bin/sh
 
-brew tap caskroom/cask
-brew tap caskroom/versions
+printMsg "BREW" "Tapping repositories..."
+
+brew tap dart-lang/dart
+brew tap dteoh/sqa
+brew tap homebrew/cask
+brew tap homebrew/cask-drivers
+brew tap homebrew/cask-fonts
+brew tap homebrew/cask-versions
+brew tap homebrew/core
+brew tap homebrew/services
+brew tap buo/cask-upgrade
+
+printMsg "BREW" "Installing casks..."
 
 # Browsers
-brew cask install google-chrome-beta
 brew cask install google-chrome-canary
-brew cask install firefox
+brew cask install firefox-nightly
 
 # Development
-brew cask install visual-studio-code
-brew cask install atom
+brew cask install visual-studio-code-insiders
 brew cask install iterm2-nightly
-brew cask install hyper
-brew cask install phpstorm
-brew cask install dash
-brew cask install postman
-brew cask install sequel-pro
-brew cask install docker
-brew cask install aws-vault
-brew cask install ngrok
+brew cask install android-studio-preview
+brew cask install java8
+brew cask install reactotron
+brew cask install jetbrains-toolbox
+brew cask install imageoptim
+brew cask install figma
+brew cask install zeplin
+
 
 # Communication
-brew cask install slack
-brew cask install whatsapp
-brew cask install teamviewer
+brew cask install franz
 
 # Cloud
-brew cask install dropbox
 brew cask install google-backup-and-sync
+
+# Games
+steam
+league-of-legends
 
 # Productivity
 brew cask install alfred
 brew cask install kap
-brew cask install 1password
-brew cask install openoffice
+brew cask install hammerspoon
+brew cask install spectacle
+brew cask install slowquitapps
 
 # Media
-brew cask install plex-media-server
-brew cask install catch
 brew cask install spotify
-brew cask install transmission
+brew cask install spotmenu
+brew cask install subtitle-master
+brew cask install vlc
+brew cask install mplayerx
+
+# Quicklook extensions
+brew cask install qlcolorcode
+brew cask install qlimagesize
+brew cask install qlmarkdown
+brew cask install qlstephen
+brew cask install qlvideo
+brew cask install quicklook-json
 
 # Mac OS Enhancements
-brew cask install bartender
-brew cask install spectacle
 brew cask install the-unarchiver
-brew tap buo/cask-upgrade
+
+# Fonts
+brew cask install font-fira-code
+brew cask install font-hack
 
 # Other
-brew cask install font-hack-nerd-font
+brew cask install android-file-transfer
+brew cask install appcleaner
+brew cask install captin
+brew cask install caption
+brew cask install clover-configurator
+brew cask install flux
+brew cask install monity-helper
+brew cask install shifty
+brew cask install the-unarchiver
+brew cask install typora
+brew cask install unified-remote
 
-# Install Mac App Store apps
-mas Bear, id: 1091189122
-mas Spark, id: 1176895641
-mas Xcode, id: 497799835
+printSuccess "BREW" "Installed with success..."
+
+printMsg "MAC APPS" "Installing App Store Apps..."
+
+mas install 495945638 # Wake Up Time
+mas install 948176063 # Boom 2
+mas install 497799835 # Xcode
+mas install 915542151 # Monity
+
+printSuccess "MAC APPS" "Installed with success..."
