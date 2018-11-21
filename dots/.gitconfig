@@ -1,124 +1,181 @@
-# Git configuration.
-
 [user]
-	name = Jack Harrison-Sherlock
-	email = jack@harrisonsherlock.com
+	name = Marcos
+	email = marcosvmmoura@gmail.com
 
-[branch "master"]
-    remote = origin
-    merge = refs/heads/master
-
-[color]
-    branch = always
-    diff = always
-    grep = always
-    interactive = always
-    pager = true
-    showbranch = auto
-    status = auto
-    ui = always
-
-[color "interactive"]
-    error = red bold
-
-[color "branch"]
-    current = yellow reverse
-    local = yellow
-    remote = green
-
-[color "diff"]
-    meta = yellow
-    frag = magenta
-    old = red
-    new = green
-    whitespace = white reverse
-
-[color "status"]
-    added = yellow
-    changed = green
-    untracked = cyan
-    branch = magenta
-
-[core]
-    pager = less -FRSX
-    whitespace = fix,-indent-with-non-tab,trailing-space,cr-at-eol
-	editor = nano
-
-[diff]
-    tool = vimdiff
-
-[difftool]
-    prompt = false
-
-[merge]
-	tool = vimdiff
+[filter "lfs"]
+  clean = git-lfs clean %f
+  smudge = git-lfs smudge %f
+  required = true
 
 [alias]
-    # branch
-    b  = branch
-    bc = checkout -b
-    bl = branch -v
-    bL = branch -av
-    bx = branch -d
-    bX = branch -D
-    bm = branch -m
-    bM = branch -M
-    bs = show-branch
-    bS = show-branch -a
-    # checkout
-    co  = checkout
-    # fetch
-    f   = fetch
-    fm  = pull
-    fo  = fetch origin
-    # merge
-    m   = merge
-    mom = merge origin/master
-    # push
-    p   = push
-    pa  = push --all
-    pt  = push --tags
-    # commit
-    c      = commit -v
-    ca     = commit --all -v
-    cm     = commit --message
-    cam    = commit --all --message
-    # diff
-    d    = diff          # Diff working dir to index
-    ds   = diff --staged # Diff index to HEAD
-    dc   = diff --staged # Diff index to HEAD
-    dh   = diff HEAD     # Diff working dir and index to HEAD
-    hub  = browse
-    # index
-    s  = status
-    a  = add
-    ia = add
-    ir = reset
-    # remote
-    re  = remote
-    rel = remote --verbose
-    rea = remote add
-    rex = remote rm
-    rem = remote rename
+	# List aliases
+	aliases = config --get-regexp alias
+
+  # View abbreviated SHA, description, and history graph of the latest 20 commits
+  l = log --pretty=oneline -n 20 --graph --abbrev-commit
+
+  # View the current working tree status using the short format
+  s = status
+  ss = status -s
+
+  # Show the diff between the latest commit and the current state
+  d = !"git diff-index --quiet HEAD -- || clear; git diff --patch-with-stat"
+
+  # Pull in remote changes for the current repository and all its submodules
+  p = !"git pull; git submodule foreach git pull origin master"
+
+  # Push to origin
+  po = push origin HEAD
+
+  # Clone a repository including all submodules
+  c = clone --recursive
+
+  # Commit all changes
+  ca = !git add -A && git commit -m
+
+  # Switch to a branch, creating it if necessary
+  go = "!f() { git checkout -b \"$1\" 2> /dev/null || git checkout \"$1\"; }; f"
+
+  # Show verbose output about tags, branches or remotes
+  tags = tag -l
+  branches = branch -a
+  remotes = remote -v
+
+  # Amend the currently staged files to the latest commit
+  amend = commit --amend --reuse-message=HEAD
+
+  # Credit an author on the latest commit
+  credit = "!f() { git commit --amend --author \"$1 <$2>\" -C HEAD; }; f"
+
+  # Create BitBucket PR
+  pr = bb pull-request --yes
+
+  # Find branches containing commit
+  fb = "!f() { git branch -a --contains $1; }; f"
+
+  # Find commits by source code
+  fc = "!f() { git log --pretty=format:'%C(yellow)%h  %Cblue%ad  %Creset%s%Cgreen  [%cn] %Cred%d' --decorate --date=short -S$1; }; f"
+
+  # Find commits by commit message
+  fm = "!f() { git log --pretty=format:'%C(yellow)%h  %Cblue%ad  %Creset%s%Cgreen  [%cn] %Cred%d' --decorate --date=short --grep=$1; }; f"
+
+  # Remove branches that have already been merged with master
+  # a.k.a. ‘delete merged’
+  dm = "!git branch --merged | egrep -v '(master|release|develop)' | xargs -n 1 git branch -d"
+
+  # List contributors with number of commits
+  contributors = shortlog --summary --numbered
+
+  # Shortcut to commit with message
+  cm = commit -m
+
+  # Shortcut to commit with message
+  m = merge --no-ff
+
+  # Checkout branch
+  ck = checkout
+  ckb = checkout -b
+
+  # Get log graph
+  graph = log --graph
+
+  # Last 10 commits
+  last = log -n 10
+
+  # Discard local changes
+  discard = checkout -- .
+
+  # Show unmerged commits
+  suc = "!f() { git log --oneline --no-merges $1..; }; f"
+
+[apply]
+  whitespace = fix
 
 [push]
-    default = matching
+  default = current
+  followTags = true
+
 [mergetool]
+  keepTemporaries = false
   prompt = false
-[github]
-  user = jackharrisonsherlock
-[grep]
-  lineNumber = true
-[fetch]
-  prune = true
-[rebase]
-  autosquash = true
-[commit]
-  template = ~/.gitmessage
-[credential]
-	helper = osxkeychain
 
-# [url "git@github.com:"]
-#    insteadOf = https://github.com/
+[merge]
+  # Include summaries of merged commits in newly created merge commit messages
+  log = true
+  tool = meld
 
-	excludesfile = /Users/jackharrison-sherlock/.gitignore_global
+[help]
+  autocorrect = 1
+
+[diff]
+  renames = copies
+
+[diff "bin"]
+  textconv = hexdump -v -C
+
+[color]
+	ui = true
+
+[color "status"]
+  added = cyan bold
+  branch = cyan bold
+  changed = magenta bold
+  deleted = red bold
+  untracked = yellow bold
+
+[color "branch"]
+  current = yellow reverse
+  local = yellow
+  remote = green
+
+[color "diff"]
+	meta = yellow
+	frag = magenta bold
+	old = red bold
+	new = green bold
+	commit = yellow bold
+	whitespace = red reverse
+
+[color "diff-highlight"]
+	oldNormal = red bold
+	oldHighlight = red bold 52
+	newNormal = green bold
+	newHighlight = green bold 22
+
+[core]
+	pager = diff-so-fancy | less --tabs=4 -RFX
+  attributesfile = ~/.gitattributes
+  editor = vim
+  excludesfile = ~/.gitignore
+  precomposeunicode = false
+  trustctime = false
+  untrackedCache = true
+  whitespace = space-before-tab,-indent-with-non-tab,trailing-space
+
+[format]
+  pretty = %Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset
+  graph = true
+
+[advice]
+  statusHints = false
+
+[log]
+  abbrevCommit = true
+
+# URL shorthands
+
+[url "git@github.com:"]
+  insteadOf = "gh:"
+  pushInsteadOf = "github:"
+  pushInsteadOf = "git://github.com/"
+
+[url "git://github.com/"]
+  insteadOf = "github:"
+
+[url "git@gist.github.com:"]
+  insteadOf = "gst:"
+  pushInsteadOf = "gist:"
+  pushInsteadOf = "git://gist.github.com/"
+
+[url "git://gist.github.com/"]
+  insteadOf = "gist:"

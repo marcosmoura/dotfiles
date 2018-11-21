@@ -1,11 +1,13 @@
 #!/bin/sh
 
-source ./scripts/homebrew.sh
-source ./scripts/macos.sh
+source ./setup.sh
+source ./scripts/brew.sh
 source ./scripts/cask.sh
+source ./scripts/macos.sh
 source ./scripts/symlinks.sh
 source ./scripts/zsh.sh
-
-echo "Sourcing .zshrc ..."
+source ./scripts/development.sh
+source ./scripts/update.sh
 source "$HOME/.zshrc"
-echo "Installation complete!"
+
+printSuccess "DONE" "Installation complete..."

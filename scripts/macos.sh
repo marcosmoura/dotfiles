@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+printMsg "MACOS" "Configuring system..."
+
 # ~/.macos — https://mths.be/macos
 
 # Close any open System Preferences panes, to prevent them from overriding
@@ -16,12 +18,6 @@ while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
 # General UI/UX                                                               #
 ###############################################################################
 
-# Hide the menu bar
-defaults write NSGlobalDomain _HIHideMenuBar -bool true
-
-# Set standby delay to 24 hours (default is 1 hour)
-sudo pmset -a standbydelay 86400
-
 # Disable the sound effects on boot
 sudo nvram SystemAudioVolume=" "
 
@@ -29,11 +25,10 @@ sudo nvram SystemAudioVolume=" "
 defaults write NSGlobalDomain NSTableViewDefaultSizeMode -int 1
 
 # Always show scrollbars
-defaults write NSGlobalDomain AppleShowScrollBars -string "WhenScrolling"
-# Possible values: `WhenScrolling`, `Automatic` and `Always`
+defaults write NSGlobalDomain AppleShowScrollBars -string "Automatic"
 
 # Increase window resize speed for Cocoa applications
-defaults write NSGlobalDomain NSWindowResizeTime -float 0.001
+defaults write NSGlobalDomain NSWindowResizeTime -float 0.1
 
 # Expand save panel by default
 defaults write NSGlobalDomain NSNavPanelExpandedStateForSaveMode -bool true
@@ -65,22 +60,12 @@ defaults write com.apple.systempreferences NSQuitAlwaysKeepsWindows -bool false
 # Disable automatic termination of inactive apps
 defaults write NSGlobalDomain NSDisableAutomaticTermination -bool true
 
-
 # Set Help Viewer windows to non-floating mode
 defaults write com.apple.helpviewer DevMode -bool true
 
 # Reveal IP address, hostname, OS version, etc. when clicking the clock
 # in the login window
 sudo defaults write /Library/Preferences/com.apple.loginwindow AdminHostInfo HostName
-
-# Restart automatically if the computer freezes
-sudo systemsetup -setrestartfreeze on
-
-# Check for software updates daily, not just once per week
-defaults write com.apple.SoftwareUpdate ScheduleFrequency -int 1
-
-# Disable Notification Center and remove the menu bar icon
-launchctl unload -w /System/Library/LaunchAgents/com.apple.notificationcenterui.plist 2> /dev/null
 
 # Disable automatic capitalization as it’s annoying when typing code
 defaults write NSGlobalDomain NSAutomaticCapitalizationEnabled -bool false
@@ -115,7 +100,7 @@ sudo tmutil disablelocal
 # you might lose unsaved changes. Having the RAM backed up to disk means that you
 # will always be able to resume.
 
-sudo pmset -a hibernatemode 3
+sudo pmset -a hibernatemode 0
 
 # Disable the sudden motion sensor as it’s not useful for SSDs
 sudo pmset -a sms 0
@@ -139,6 +124,7 @@ defaults write NSGlobalDomain AppleKeyboardUIMode -int 3
 # Use scroll gesture with the Ctrl (^) modifier key to zoom
 defaults write com.apple.universalaccess closeViewScrollWheelToggle -bool true
 defaults write com.apple.universalaccess HIDScrollZoomModifierMask -int 262144
+
 # Follow the keyboard focus while zoomed in
 defaults write com.apple.universalaccess closeViewZoomFollowsFocus -bool true
 
@@ -147,10 +133,10 @@ defaults write NSGlobalDomain ApplePressAndHoldEnabled -bool false
 
 # Set a faster keyboard repeat rate
 defaults write NSGlobalDomain KeyRepeat -int 1
-defaults write NSGlobalDomain InitialKeyRepeat -int 12
+defaults write NSGlobalDomain InitialKeyRepeat -int 10
 
 # Set the timezone; see `systemsetup -listtimezones` for other values
-sudo systemsetup -settimezone "NZ" > /dev/null
+sudo systemsetup -settimezone "America/Sao_Paulo" > /dev/null
 
 # Stop iTunes from responding to the keyboard media keys
 launchctl unload -w /System/Library/LaunchAgents/com.apple.rcd.plist 2> /dev/null
@@ -198,7 +184,7 @@ defaults write com.apple.finder ShowRemovableMediaOnDesktop -bool true
 defaults write NSGlobalDomain AppleShowAllExtensions -bool true
 
 # Finder: hide status bar
-defaults write com.apple.finder ShowStatusBar -bool false
+defaults write com.apple.finder ShowStatusBar -bool true
 
 # Finder: hide path bar
 defaults write com.apple.finder ShowPathbar -bool false
@@ -268,9 +254,6 @@ defaults write com.apple.finder FXPreferredViewStyle -string "Nlsv"
 # Disable the warning before emptying the Trash
 defaults write com.apple.finder WarnOnEmptyTrash -bool false
 
-# Enable AirDrop over Ethernet and on unsupported Macs running Lion
-defaults write com.apple.NetworkBrowser BrowseAllInterfaces -bool true
-
 # Show the ~/Library folder
 chflags nohidden ~/Library
 
@@ -289,7 +272,7 @@ defaults write com.apple.finder FXInfoPanesExpanded -dict \
 defaults write com.apple.dock mouse-over-hilite-stack -bool true
 
 # Set the icon size of Dock items to 40 pixels
-defaults write com.apple.dock tilesize -int 40
+defaults write com.apple.dock tilesize -int 38
 
 # Change minimize/maximize window effect
 defaults write com.apple.dock mineffect -string "scale"
@@ -312,11 +295,11 @@ defaults write com.apple.dock persistent-apps -array ""
 defaults write com.apple.dock launchanim -bool false
 
 # Speed up Mission Control animations
-defaults write com.apple.dock expose-animation-duration -float 0.12
+defaults write com.apple.dock expose-animation-duration -float 0.1
 
 # Don’t group windows by application in Mission Control
 # (i.e. use the old Exposé behavior instead)
-defaults write com.apple.dock expose-group-by-app -bool false
+defaults write com.apple.dock expose-group-by-app -bool true
 
 # Disable Dashboard
 defaults write com.apple.dashboard mcx-disabled -bool true
@@ -331,7 +314,7 @@ defaults write com.apple.dock mru-spaces -bool false
 defaults write com.apple.dock autohide-delay -float 0
 
 # Automatically hide and show the Dock
-defaults write com.apple.dock autohide -bool true
+defaults write com.apple.dock autohide -bool false
 
 # Reset Launchpad, but keep the desktop wallpaper intact
 find "${HOME}/Library/Application Support/Dock" -name "*-*.db" -maxdepth 1 -delete
@@ -341,7 +324,7 @@ find "${HOME}/Library/Application Support/Dock" -name "*-*.db" -maxdepth 1 -dele
 ###############################################################################
 
 # Hide Spotlight tray-icon (and subsequent helper)
- sudo chmod 600 /System/Library/CoreServices/Search.bundle/Contents/MacOS/Search
+sudo chmod 600 /System/Library/CoreServices/Search.bundle/Contents/MacOS/Search
 
 # Disable Spotlight indexing for any volume that gets mounted and has not yet been indexed before.
 # Use `sudo mdutil -i off "/Volumes/foo"` to stop indexing any volume.
@@ -461,15 +444,6 @@ defaults write com.apple.messageshelper.MessageController SOInputLineSettings -d
 defaults write com.apple.messageshelper.MessageController SOInputLineSettings -dict-add "continuousSpellCheckingEnabled" -bool false
 
 ###############################################################################
-# Google Chrome & Google Chrome Canary                                        #
-###############################################################################
-
-# Allow installing user scripts via GitHub Gist or Userscripts.org
-defaults write com.google.Chrome ExtensionInstallSources -array "https://gist.githubusercontent.com/" "http://userscripts.org/*"
-defaults write com.google.Chrome.canary ExtensionInstallSources -array "https://gist.githubusercontent.com/" "http://userscripts.org/*"
-
-
-###############################################################################
 # Kill affected applications                                                  #
 ###############################################################################
 
@@ -478,4 +452,5 @@ for app in "Activity Monitor" "Address Book" "Calendar" "Contacts" "cfprefsd" \
 	"Terminal" "Transmission" "iCal"; do
 	killall "${app}" > /dev/null 2>&1
 done
-echo "Done. Note that some of these changes require a logout/restart to take effect."
+
+printSuccess "MACOS" "Done. Restart the computer..."
