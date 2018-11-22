@@ -15,6 +15,7 @@ yarn global add create-react-app
 yarn global add gtop
 yarn global add lerna
 yarn global add n
+yarn global add pure-prompt
 yarn global add react-native-cli
 yarn global add typescript
 yarn global add vtop
@@ -23,6 +24,7 @@ printMsg "DEVELOPMENT" "Setting up Node..."
 sudo n latest
 
 printMsg "DEVELOPMENT" "Installing Ruby Gems..."
+rbenv install $RBENV_VERSION
 gem install colorls
 gem install bundler
 gem install CFPropertyList

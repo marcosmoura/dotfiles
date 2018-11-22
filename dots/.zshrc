@@ -25,7 +25,7 @@ eval "$(thefuck --alias)"
 
 # rbenv
 eval "$(rbenv init -)"
-export RBENV_VERSION=2.5.1
+export RBENV_VERSION=2.5.3
 
 # Path
 export ANDROID_HOME=$HOME/Library/Android/sdk
