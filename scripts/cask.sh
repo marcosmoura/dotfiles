@@ -62,6 +62,7 @@ brew cask install captin
 brew cask install caption
 brew cask install clover-configurator
 brew cask install flux
+brew cask install hwsensors
 brew cask install monity-helper
 brew cask install shifty
 brew cask install the-unarchiver
