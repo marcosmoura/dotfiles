@@ -1,7 +1,11 @@
-zsh-users/zsh-completions
-zsh-users/zsh-autosuggestions
-zsh-users/zsh-syntax-highlighting
+Tarrasch/zsh-bd
 chrissicool/zsh-256color
-robbyrussell/oh-my-zsh path:plugins/z
+djui/alias-tips
+marzocchi/zsh-notify
 robbyrussell/oh-my-zsh path:plugins/git
-robbyrussell/oh-my-zsh path:plugins/yarn
+buonomo/yarn-completion
+robbyrussell/oh-my-zsh path:plugins/z
+sinetoami/antibody-completion
+zdharma/fast-syntax-highlighting
+zsh-users/zsh-autosuggestions
+zsh-users/zsh-completions

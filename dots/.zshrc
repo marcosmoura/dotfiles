@@ -54,7 +54,7 @@ export MANPAGER="less -X";
 export XDG_CONFIG_HOME="$HOME/.config"
 
 # Call SSH files
-export SSH_KEY_PATH="~/.ssh/id_rsa"
+export SSH_KEY_PATH="$HOME/.ssh/id_rsa"
 
 # Terminal with 256 colors
 TERM=xterm-256color

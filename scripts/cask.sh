@@ -37,8 +37,8 @@ brew cask install franz
 brew cask install google-backup-and-sync
 
 # Games
-steam
-league-of-legends
+brew cask install steam
+brew cask install league-of-legends
 
 # Productivity
 brew cask install alfred
