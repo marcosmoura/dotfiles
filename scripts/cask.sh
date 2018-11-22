@@ -3,20 +3,19 @@
 printMsg "BREW" "Installing casks..."
 
 # Browsers
-brew cask install google-chrome-canary
 brew cask install firefox-nightly
+brew cask install google-chrome-canary
 
 # Development
-brew cask install visual-studio-code-insiders
-brew cask install iterm2-nightly
 brew cask install android-studio-preview
-brew cask install java8
-brew cask install reactotron
-brew cask install jetbrains-toolbox
-brew cask install imageoptim
 brew cask install figma
+brew cask install imageoptim
+brew cask install iterm2-nightly
+brew cask install java8
+brew cask install jetbrains-toolbox
+brew cask install reactotron
+brew cask install visual-studio-code-insiders
 brew cask install zeplin
-
 
 # Communication
 brew cask install franz
@@ -25,22 +24,23 @@ brew cask install franz
 brew cask install google-backup-and-sync
 
 # Games
-brew cask install steam
 brew cask install league-of-legends
+brew cask install steam
 
 # Productivity
 brew cask install alfred
-brew cask install kap
 brew cask install hammerspoon
-brew cask install spectacle
+brew cask install kap
 brew cask install slowquitapps
+brew cask install spectacle
 
 # Media
+brew cask install mplayerx
 brew cask install spotify
 brew cask install spotmenu
 brew cask install subtitle-master
+brew cask install transmission
 brew cask install vlc
-brew cask install mplayerx
 
 # Quicklook extensions
 brew cask install qlcolorcode
@@ -72,9 +72,9 @@ printSuccess "BREW" "Installed with success..."
 
 printMsg "MAC APPS" "Installing App Store Apps..."
 
-mas install 495945638 # Wake Up Time
 mas install 948176063 # Boom 2
-mas install 497799835 # Xcode
 mas install 915542151 # Monity
+mas install 495945638 # Wake Up Time
+mas install 497799835 # Xcode
 
 printSuccess "MAC APPS" "Installed with success..."
