@@ -56,6 +56,7 @@ brew cask install the-unarchiver
 # Fonts
 brew cask install font-fira-code
 brew cask install font-hack
+brew cask install font-hack-nerd-font
 
 # Other
 brew cask install android-file-transfer
