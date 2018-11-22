@@ -50,9 +50,6 @@ brew cask install qlstephen
 brew cask install qlvideo
 brew cask install quicklook-json
 
-# Mac OS Enhancements
-brew cask install the-unarchiver
-
 # Fonts
 brew cask install font-fira-code
 brew cask install font-hack
