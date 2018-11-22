@@ -1,7 +1,7 @@
 #!/bin/sh
 
 symlink_dotfile() {
-  ln -sfv $(grealpath $1) "$HOME/$1"
+  ln -sfvF $(grealpath $1) "$HOME/$1"
 }
 
 printMsg "DOTFILES" "Creating symlinks..."
