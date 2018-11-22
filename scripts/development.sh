@@ -25,7 +25,6 @@ sudo n latest
 
 printMsg "DEVELOPMENT" "Installing Ruby Gems..."
 rbenv install $RBENV_VERSION
-gem install colorls
 gem install bundler
 gem install CFPropertyList
 gem install cocoapods

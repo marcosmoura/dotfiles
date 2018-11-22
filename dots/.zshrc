@@ -13,9 +13,6 @@ source $ZSH/oh-my-zsh.sh
 test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
 source $HOME/.zsh_plugins.sh
 
-# Colorls
-source $(dirname $(gem which colorls))/tab_complete.sh
-
 # Load aliases and functions
 source $HOME/.zsh_aliases
 source $HOME/.zsh_functions
