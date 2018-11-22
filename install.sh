@@ -7,7 +7,7 @@ source ./scripts/macos.sh
 source ./scripts/symlinks.sh
 source ./scripts/zsh.sh
 source ./scripts/development.sh
+source ~/.zshrc
 source ./scripts/update.sh
-source "$HOME/.zshrc"
 
 printSuccess "DONE" "Installation complete..."

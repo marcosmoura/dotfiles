@@ -39,24 +39,24 @@ brew install watchman
 brew install yarn
 
 # Install more recent versions of some OS X tools.
-brew tap homebrew/dupes
 brew install grep --with-default-names
 
 # Install terminal tools
 brew install bash
 brew install coreutils
 brew install exa
+brew install getantibody/tap/antibody
 brew install gnu-sed
 brew install icu4c
 brew install ncurses
 brew install ngrep
 brew install openssh
 brew install openssl
+brew install terminal-notifier
 brew install thefuck
 brew install tree
 brew install z
 brew install zsh
-brew install getantibody/tap/antibody
 
 # Git
 brew install diff-so-fancy
