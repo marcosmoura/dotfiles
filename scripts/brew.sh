@@ -15,6 +15,7 @@ printMsg "BREW" "Tapping repositories..."
 brew tap buo/cask-upgrade
 brew tap dart-lang/dart
 brew tap dteoh/sqa
+brew tap githubutilities/tap
 brew tap homebrew/cask
 brew tap homebrew/cask-drivers
 brew tap homebrew/cask-fonts
