@@ -50,10 +50,6 @@ alias la="ls -laFh -s type --group-directories-first --git"
 # List only directories
 alias lsd="ls -lFh | grep --color=never '^d'"
 
-# ColorLS
-alias lc='colorls -lA --sd'
-alias lca='lc -la'
-
 # Always enable colored `grep` output
 # Note: `GREP_OPTIONS="--color=auto"` is deprecated, hence the alias usage.
 alias grep='grep --color=auto'
