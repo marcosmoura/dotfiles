@@ -12,6 +12,7 @@ while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
 printMsg "DEVELOPMENT" "Installing Yarn Packages..."
 yarn global add @vue/cli
 yarn global add create-react-app
+yarn global add eslint
 yarn global add gtop
 yarn global add lerna
 yarn global add n
