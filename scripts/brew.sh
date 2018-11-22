@@ -10,6 +10,18 @@ else
   printSuccess "HOMEBREW" "Already installed..."
 fi
 
+printMsg "BREW" "Tapping repositories..."
+
+brew tap dart-lang/dart
+brew tap dteoh/sqa
+brew tap homebrew/cask
+brew tap homebrew/cask-drivers
+brew tap homebrew/cask-fonts
+brew tap homebrew/cask-versions
+brew tap homebrew/core
+brew tap homebrew/services
+brew tap buo/cask-upgrade
+
 brew -v update
 brew upgrade --force-bottle --cleanup
 
@@ -33,8 +45,6 @@ brew install python
 brew install python@2
 brew install rbenv
 brew install ruby
-brew install ruby-build
-brew install sqlite
 brew install watchman
 brew install yarn
 
@@ -43,11 +53,9 @@ brew install grep --with-default-names
 
 # Install terminal tools
 brew install bash
-brew install coreutils
 brew install exa
 brew install getantibody/tap/antibody
 brew install gnu-sed
-brew install icu4c
 brew install ncurses
 brew install ngrep
 brew install openssh
