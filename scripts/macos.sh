@@ -449,7 +449,7 @@ defaults write com.apple.messageshelper.MessageController SOInputLineSettings -d
 
 for app in "Activity Monitor" "Address Book" "Calendar" "Contacts" "cfprefsd" \
 	"Dock" "Finder" "Mail" "Messages" "Safari" "SystemUIServer" \
-	"Terminal" "Transmission" "iCal"; do
+	"Transmission" "iCal"; do
 	killall "${app}" > /dev/null 2>&1
 done
 
