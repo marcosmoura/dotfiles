@@ -57,6 +57,7 @@ alias fgrep='fgrep --color=auto'
 alias egrep='egrep --color=auto'
 
 # sudo editors
+alias vim='nvim'
 alias svim='sudo vim'
 alias snano='sudo nano'
 
