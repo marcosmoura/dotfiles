@@ -20,7 +20,7 @@ alias updateYarn='yarn cache clean --force; yarn global upgrade --latest; echo "
 alias updateNode='sudo n latest; echo "\n$(tput setaf 2)Node updated!\n"'
 alias cleanBrew='brew cleanup; brew prune; echo "\n$(tput setaf 2)Brew cleared!\n"'
 alias updateBrew='brew -v update; brew upgrade --force-bottle --cleanup; cleanBrew; brew doctor; echo "\n$(tput setaf 2)Brew updated!\n"'
-alias updateCasks='updateBrew; brew cask outdated | xargs brew cask install --force; cleanBrew; echo "\n$(tput setaf 2)Casks updated!\n"'
+alias updateCasks='updateBrew; brew cu -a; cleanBrew; echo "\n$(tput setaf 2)Casks updated!\n"'
 
 # Detect which `ls` flavor is in use
 if ls --color > /dev/null 2>&1; then # GNU `ls`
