@@ -35,6 +35,11 @@ brew install moreutils
 
 # Install development tools
 brew install cocoapods
+brew install --HEAD usbmuxd
+brew unlink usbmuxd
+brew link usbmuxd
+brew install --HEAD libimobiledevice
+brew install ideviceinstaller
 brew install dart
 brew install go
 brew install ideviceinstaller
