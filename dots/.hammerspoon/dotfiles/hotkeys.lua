@@ -1,6 +1,6 @@
-local hotkey = require "hs.hotkey"
-local window = require "hs.window"
-local applyWindowLayout = require "dotfiles.layout"
+local hotkey = require 'hs.hotkey'
+local window = require 'hs.window'
+local applyWindowLayout = require 'dotfiles.layout'
 
 function focus ()
   hotkey.bind({'cmd', 'alt', 'ctrl'}, 'up', window.focusWindowNorth)

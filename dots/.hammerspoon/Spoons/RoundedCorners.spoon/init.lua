@@ -7,11 +7,11 @@ local obj = {}
 obj.__index = obj
 
 -- Metadata
-obj.name = "RoundedCorners"
-obj.version = "1.0"
-obj.author = "Chris Jones <cmsj@tenshu.net>"
-obj.homepage = "https://github.com/Hammerspoon/Spoons"
-obj.license = "MIT - https://opensource.org/licenses/MIT"
+obj.name = 'RoundedCorners'
+obj.version = '1.0'
+obj.author = 'Chris Jones <cmsj@tenshu.net>'
+obj.homepage = 'https://github.com/Hammerspoon/Spoons'
+obj.license = 'MIT - https://opensource.org/licenses/MIT'
 
 obj.corners = {}
 obj.screenWatcher = nil
@@ -29,12 +29,12 @@ obj.radius = 6
 --- RoundedCorners.level
 --- Variable
 --- Controls which level of the screens the corners are drawn at. See `hs.canvas.windowLevels` for more information. Defaults to `screenSaver + 1`
-obj.level = hs.canvas.windowLevels["screenSaver"] + 1
+obj.level = hs.canvas.windowLevels['screenSaver'] + 1
 
 -- Internal function used to find our location, so we know where to load files from
 local function script_path()
-    local str = debug.getinfo(2, "S").source:sub(2)
-    return str:match("(.*/)")
+    local str = debug.getinfo(2, 'S').source:sub(2)
+    return str:match('(.*/)')
 end
 obj.spoonPath = script_path()
 
@@ -113,10 +113,10 @@ function obj:render()
         }
         for _,data in pairs(cornerData) do
             self.corners[#self.corners+1] = hs.canvas.new({x=data.frame.x,y=data.frame.y,w=radius,h=radius}):appendElements(
-                { action="build", type="rectangle", },
-                { action="clip", type="circle", center=data.center, radius=radius, reversePath=true, },
-                { action="fill", type="rectangle", frame={x=0, y=0, w=radius, h=radius, }, fillColor={ alpha=1, }},
-                { type="resetClip", }
+                { action='build', type='rectangle', },
+                { action='clip', type='circle', center=data.center, radius=radius, reversePath=true, },
+                { action='fill', type='rectangle', frame={x=0, y=0, w=radius, h=radius, }, fillColor={ alpha=1, }},
+                { type='resetClip', }
             ):behavior(hs.canvas.windowBehaviors.canJoinAllSpaces):level(self.level):show()
         end
     end)

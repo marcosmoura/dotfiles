@@ -11,14 +11,14 @@
     ],
     "Variable" : [
       {
-        "name" : "watch_paths",
+        "doc" : "List of directories to watch for changes, defaults to hs.configdir",
         "stripped_doc" : [
           "List of directories to watch for changes, defaults to hs.configdir"
         ],
+        "def" : "ReloadConfiguration.watch_paths",
         "parameters" : [
 
         ],
-        "doc" : "List of directories to watch for changes, defaults to hs.configdir",
         "notes" : [
 
         ],
@@ -27,34 +27,31 @@
         "returns" : [
 
         ],
-        "def" : "ReloadConfiguration.watch_paths",
+        "name" : "watch_paths",
         "desc" : "List of directories to watch for changes, defaults to hs.configdir"
       }
     ],
     "stripped_doc" : [
 
     ],
-    "type" : "Module",
-    "desc" : "Adds a hotkey to reload the hammerspoon configuration, and a pathwatcher to automatically reload on changes.",
     "Deprecated" : [
 
     ],
+    "type" : "Module",
+    "desc" : "Adds a hotkey to reload the hammerspoon configuration, and a pathwatcher to automatically reload on changes.",
     "Constructor" : [
-
-    ],
-    "Field" : [
 
     ],
     "items" : [
       {
-        "name" : "watch_paths",
+        "doc" : "List of directories to watch for changes, defaults to hs.configdir",
         "stripped_doc" : [
           "List of directories to watch for changes, defaults to hs.configdir"
         ],
+        "def" : "ReloadConfiguration.watch_paths",
         "parameters" : [
 
         ],
-        "doc" : "List of directories to watch for changes, defaults to hs.configdir",
         "notes" : [
 
         ],
@@ -63,20 +60,20 @@
         "returns" : [
 
         ],
-        "def" : "ReloadConfiguration.watch_paths",
+        "name" : "watch_paths",
         "desc" : "List of directories to watch for changes, defaults to hs.configdir"
       },
       {
-        "name" : "bindHotkeys",
+        "doc" : "Binds hotkeys for ReloadConfiguration\n\nParameters:\n * mapping - A table containing hotkey modifier\/key details for the following items:\n  * reloadConfiguration - This will cause the configuration to be reloaded",
         "stripped_doc" : [
           "Binds hotkeys for ReloadConfiguration",
           ""
         ],
+        "def" : "ReloadConfiguration:bindHotkeys(mapping)",
         "parameters" : [
           " * mapping - A table containing hotkey modifier\/key details for the following items:",
           "  * reloadConfiguration - This will cause the configuration to be reloaded"
         ],
-        "doc" : "Binds hotkeys for ReloadConfiguration\n\nParameters:\n * mapping - A table containing hotkey modifier\/key details for the following items:\n  * reloadConfiguration - This will cause the configuration to be reloaded",
         "notes" : [
 
         ],
@@ -85,19 +82,19 @@
         "returns" : [
 
         ],
-        "def" : "ReloadConfiguration:bindHotkeys(mapping)",
+        "name" : "bindHotkeys",
         "desc" : "Binds hotkeys for ReloadConfiguration"
       },
       {
-        "name" : "start",
+        "doc" : "Start ReloadConfiguration\n\nParameters:\n * None",
         "stripped_doc" : [
           "Start ReloadConfiguration",
           ""
         ],
+        "def" : "ReloadConfiguration:start()",
         "parameters" : [
           " * None"
         ],
-        "doc" : "Start ReloadConfiguration\n\nParameters:\n * None",
         "notes" : [
 
         ],
@@ -106,58 +103,61 @@
         "returns" : [
 
         ],
+        "name" : "start",
+        "desc" : "Start ReloadConfiguration"
+      }
+    ],
+    "doc" : "Adds a hotkey to reload the hammerspoon configuration, and a pathwatcher to automatically reload on changes.\n\nDownload: [https:\/\/github.com\/Hammerspoon\/Spoons\/raw\/master\/Spoons\/ReloadConfiguration.spoon.zip](https:\/\/github.com\/Hammerspoon\/Spoons\/raw\/master\/Spoons\/ReloadConfiguration.spoon.zip)",
+    "Method" : [
+      {
+        "doc" : "Binds hotkeys for ReloadConfiguration\n\nParameters:\n * mapping - A table containing hotkey modifier\/key details for the following items:\n  * reloadConfiguration - This will cause the configuration to be reloaded",
+        "stripped_doc" : [
+          "Binds hotkeys for ReloadConfiguration",
+          ""
+        ],
+        "def" : "ReloadConfiguration:bindHotkeys(mapping)",
+        "parameters" : [
+          " * mapping - A table containing hotkey modifier\/key details for the following items:",
+          "  * reloadConfiguration - This will cause the configuration to be reloaded"
+        ],
+        "notes" : [
+
+        ],
+        "signature" : "ReloadConfiguration:bindHotkeys(mapping)",
+        "type" : "Method",
+        "returns" : [
+
+        ],
+        "name" : "bindHotkeys",
+        "desc" : "Binds hotkeys for ReloadConfiguration"
+      },
+      {
+        "doc" : "Start ReloadConfiguration\n\nParameters:\n * None",
+        "stripped_doc" : [
+          "Start ReloadConfiguration",
+          ""
+        ],
         "def" : "ReloadConfiguration:start()",
+        "parameters" : [
+          " * None"
+        ],
+        "notes" : [
+
+        ],
+        "signature" : "ReloadConfiguration:start()",
+        "type" : "Method",
+        "returns" : [
+
+        ],
+        "name" : "start",
         "desc" : "Start ReloadConfiguration"
       }
     ],
     "Command" : [
 
     ],
-    "doc" : "Adds a hotkey to reload the hammerspoon configuration, and a pathwatcher to automatically reload on changes.\n\nDownload: [https:\/\/github.com\/Hammerspoon\/Spoons\/raw\/master\/Spoons\/ReloadConfiguration.spoon.zip](https:\/\/github.com\/Hammerspoon\/Spoons\/raw\/master\/Spoons\/ReloadConfiguration.spoon.zip)",
-    "Method" : [
-      {
-        "name" : "bindHotkeys",
-        "stripped_doc" : [
-          "Binds hotkeys for ReloadConfiguration",
-          ""
-        ],
-        "parameters" : [
-          " * mapping - A table containing hotkey modifier\/key details for the following items:",
-          "  * reloadConfiguration - This will cause the configuration to be reloaded"
-        ],
-        "doc" : "Binds hotkeys for ReloadConfiguration\n\nParameters:\n * mapping - A table containing hotkey modifier\/key details for the following items:\n  * reloadConfiguration - This will cause the configuration to be reloaded",
-        "notes" : [
+    "Field" : [
 
-        ],
-        "signature" : "ReloadConfiguration:bindHotkeys(mapping)",
-        "type" : "Method",
-        "returns" : [
-
-        ],
-        "def" : "ReloadConfiguration:bindHotkeys(mapping)",
-        "desc" : "Binds hotkeys for ReloadConfiguration"
-      },
-      {
-        "name" : "start",
-        "stripped_doc" : [
-          "Start ReloadConfiguration",
-          ""
-        ],
-        "parameters" : [
-          " * None"
-        ],
-        "doc" : "Start ReloadConfiguration\n\nParameters:\n * None",
-        "notes" : [
-
-        ],
-        "signature" : "ReloadConfiguration:start()",
-        "type" : "Method",
-        "returns" : [
-
-        ],
-        "def" : "ReloadConfiguration:start()",
-        "desc" : "Start ReloadConfiguration"
-      }
     ],
     "name" : "ReloadConfiguration"
   }

@@ -8,11 +8,11 @@ local obj = {}
 obj.__index = obj
 
 -- Metadata
-obj.name = "ReloadConfiguration"
-obj.version = "1.0"
-obj.author = "Jon Lorusso <jonlorusso@gmail.com>"
-obj.homepage = "https://github.com/Hammerspoon/Spoons"
-obj.license = "MIT - https://opensource.org/licenses/MIT"
+obj.name = 'ReloadConfiguration'
+obj.version = '1.0'
+obj.author = 'Jon Lorusso <jonlorusso@gmail.com>'
+obj.homepage = 'https://github.com/Hammerspoon/Spoons'
+obj.license = 'MIT - https://opensource.org/licenses/MIT'
 
 
 --- ReloadConfiguration.watch_paths

@@ -1,9 +1,9 @@
-local alert = require "hs.alert"
-local application = require "hs.application"
-local canvas = require "hs.canvas"
-local console = require "hs.console"
-local hotkey = require "hs.hotkey"
-local window = require "hs.window"
+local alert = require 'hs.alert'
+local application = require 'hs.application'
+local canvas = require 'hs.canvas'
+local console = require 'hs.console'
+local hotkey = require 'hs.hotkey'
+local window = require 'hs.window'
 
 function initialSetup ()
   console.clearConsole()
@@ -24,13 +24,13 @@ end
 
 function configureRoundedCorners ()
   RoundedCorners = hs.loadSpoon('RoundedCorners')
-  RoundedCorners.radius = 16
+  RoundedCorners.radius = 8
   RoundedCorners.level = canvas.windowLevels.assistiveTechHigh + 1
   RoundedCorners:start()
 end
 
 function configureWindow ()
-  window.animationDuration = 0.15
+  window.animationDuration = 0.175
   window.setFrameCorrectness = false
   window.setShadows(true)
 end
