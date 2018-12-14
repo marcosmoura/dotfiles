@@ -7,6 +7,7 @@ local window = require 'hs.window'
 
 function initialSetup ()
   console.clearConsole()
+  console.darkMode(true)
   application.enableSpotlightForNameSearches(true)
   hs.autoLaunch(true)
   hs.automaticallyCheckForUpdates(true)
