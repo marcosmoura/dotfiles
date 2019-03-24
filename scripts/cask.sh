@@ -7,6 +7,8 @@ brew cask install firefox-nightly
 brew cask install google-chrome-canary
 
 # Development
+brew cask install android-ndk
+brew cask install android-sdk
 brew cask install android-studio-preview
 brew cask install figma
 brew cask install imageoptim
@@ -49,6 +51,9 @@ brew cask install qlmarkdown
 brew cask install qlstephen
 brew cask install qlvideo
 brew cask install quicklook-json
+brew cask install quicklookase
+brew cask install suspicious-package
+brew cask install webpquicklook
 
 # Fonts
 brew cask install font-fira-code
