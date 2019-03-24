@@ -47,4 +47,7 @@ pip3 install pip
 pip3 install setuptools
 pip3 install wheel
 
+printMsg "DEVELOPMENT" "Installing Android SDK..."
+sdkmanager --update
+
 printMsg "SYSTEM" "Update completed!"
