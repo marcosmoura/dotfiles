@@ -16,9 +16,7 @@
           "Controls whether corners are drawn on all screens or just the primary screen. Defaults to true"
         ],
         "def" : "RoundedCorners.allScreens",
-        "parameters" : [
-
-        ],
+        "desc" : "Controls whether corners are drawn on all screens or just the primary screen. Defaults to true",
         "notes" : [
 
         ],
@@ -28,7 +26,9 @@
 
         ],
         "name" : "allScreens",
-        "desc" : "Controls whether corners are drawn on all screens or just the primary screen. Defaults to true"
+        "parameters" : [
+
+        ]
       },
       {
         "doc" : "Controls the radius of the rounded corners, in points. Defaults to 6",
@@ -36,9 +36,7 @@
           "Controls the radius of the rounded corners, in points. Defaults to 6"
         ],
         "def" : "RoundedCorners.radius",
-        "parameters" : [
-
-        ],
+        "desc" : "Controls the radius of the rounded corners, in points. Defaults to 6",
         "notes" : [
 
         ],
@@ -48,7 +46,9 @@
 
         ],
         "name" : "radius",
-        "desc" : "Controls the radius of the rounded corners, in points. Defaults to 6"
+        "parameters" : [
+
+        ]
       },
       {
         "doc" : "Controls which level of the screens the corners are drawn at. See `hs.canvas.windowLevels` for more information. Defaults to `screenSaver + 1`",
@@ -56,9 +56,7 @@
           "Controls which level of the screens the corners are drawn at. See `hs.canvas.windowLevels` for more information. Defaults to `screenSaver + 1`"
         ],
         "def" : "RoundedCorners.level",
-        "parameters" : [
-
-        ],
+        "desc" : "Controls which level of the screens the corners are drawn at. See `hs.canvas.windowLevels` for more information. Defaults to `screenSaver + 1`",
         "notes" : [
 
         ],
@@ -68,16 +66,18 @@
 
         ],
         "name" : "level",
-        "desc" : "Controls which level of the screens the corners are drawn at. See `hs.canvas.windowLevels` for more information. Defaults to `screenSaver + 1`"
+        "parameters" : [
+
+        ]
       }
     ],
     "stripped_doc" : [
 
     ],
+    "type" : "Module",
     "Deprecated" : [
 
     ],
-    "type" : "Module",
     "desc" : "Give your screens rounded corners",
     "Constructor" : [
 
@@ -89,9 +89,7 @@
           "Controls whether corners are drawn on all screens or just the primary screen. Defaults to true"
         ],
         "def" : "RoundedCorners.allScreens",
-        "parameters" : [
-
-        ],
+        "desc" : "Controls whether corners are drawn on all screens or just the primary screen. Defaults to true",
         "notes" : [
 
         ],
@@ -101,7 +99,9 @@
 
         ],
         "name" : "allScreens",
-        "desc" : "Controls whether corners are drawn on all screens or just the primary screen. Defaults to true"
+        "parameters" : [
+
+        ]
       },
       {
         "doc" : "Controls which level of the screens the corners are drawn at. See `hs.canvas.windowLevels` for more information. Defaults to `screenSaver + 1`",
@@ -109,9 +109,7 @@
           "Controls which level of the screens the corners are drawn at. See `hs.canvas.windowLevels` for more information. Defaults to `screenSaver + 1`"
         ],
         "def" : "RoundedCorners.level",
-        "parameters" : [
-
-        ],
+        "desc" : "Controls which level of the screens the corners are drawn at. See `hs.canvas.windowLevels` for more information. Defaults to `screenSaver + 1`",
         "notes" : [
 
         ],
@@ -121,7 +119,9 @@
 
         ],
         "name" : "level",
-        "desc" : "Controls which level of the screens the corners are drawn at. See `hs.canvas.windowLevels` for more information. Defaults to `screenSaver + 1`"
+        "parameters" : [
+
+        ]
       },
       {
         "doc" : "Controls the radius of the rounded corners, in points. Defaults to 6",
@@ -129,9 +129,7 @@
           "Controls the radius of the rounded corners, in points. Defaults to 6"
         ],
         "def" : "RoundedCorners.radius",
-        "parameters" : [
-
-        ],
+        "desc" : "Controls the radius of the rounded corners, in points. Defaults to 6",
         "notes" : [
 
         ],
@@ -141,7 +139,9 @@
 
         ],
         "name" : "radius",
-        "desc" : "Controls the radius of the rounded corners, in points. Defaults to 6"
+        "parameters" : [
+
+        ]
       },
       {
         "doc" : "Starts RoundedCorners\n\nParameters:\n * None\n\nReturns:\n * The RoundedCorners object\n\nNotes:\n * This will draw the rounded screen corners and start watching for changes in screen sizes\/layouts, reacting accordingly",
@@ -150,10 +150,7 @@
           ""
         ],
         "def" : "RoundedCorners:start()",
-        "parameters" : [
-          " * None",
-          ""
-        ],
+        "desc" : "Starts RoundedCorners",
         "notes" : [
           " * This will draw the rounded screen corners and start watching for changes in screen sizes\/layouts, reacting accordingly"
         ],
@@ -164,7 +161,10 @@
           ""
         ],
         "name" : "start",
-        "desc" : "Starts RoundedCorners"
+        "parameters" : [
+          " * None",
+          ""
+        ]
       },
       {
         "doc" : "Stops RoundedCorners\n\nParameters:\n * None\n\nReturns:\n * The RoundedCorners object\n\nNotes:\n * This will remove all rounded screen corners and stop watching for changes in screen sizes\/layouts",
@@ -173,10 +173,7 @@
           ""
         ],
         "def" : "RoundedCorners:stop()",
-        "parameters" : [
-          " * None",
-          ""
-        ],
+        "desc" : "Stops RoundedCorners",
         "notes" : [
           " * This will remove all rounded screen corners and stop watching for changes in screen sizes\/layouts"
         ],
@@ -187,10 +184,12 @@
           ""
         ],
         "name" : "stop",
-        "desc" : "Stops RoundedCorners"
+        "parameters" : [
+          " * None",
+          ""
+        ]
       }
     ],
-    "doc" : "Give your screens rounded corners\n\nDownload: [https:\/\/github.com\/Hammerspoon\/Spoons\/raw\/master\/Spoons\/RoundedCorners.spoon.zip](https:\/\/github.com\/Hammerspoon\/Spoons\/raw\/master\/Spoons\/RoundedCorners.spoon.zip)",
     "Method" : [
       {
         "doc" : "Starts RoundedCorners\n\nParameters:\n * None\n\nReturns:\n * The RoundedCorners object\n\nNotes:\n * This will draw the rounded screen corners and start watching for changes in screen sizes\/layouts, reacting accordingly",
@@ -199,10 +198,7 @@
           ""
         ],
         "def" : "RoundedCorners:start()",
-        "parameters" : [
-          " * None",
-          ""
-        ],
+        "desc" : "Starts RoundedCorners",
         "notes" : [
           " * This will draw the rounded screen corners and start watching for changes in screen sizes\/layouts, reacting accordingly"
         ],
@@ -213,7 +209,10 @@
           ""
         ],
         "name" : "start",
-        "desc" : "Starts RoundedCorners"
+        "parameters" : [
+          " * None",
+          ""
+        ]
       },
       {
         "doc" : "Stops RoundedCorners\n\nParameters:\n * None\n\nReturns:\n * The RoundedCorners object\n\nNotes:\n * This will remove all rounded screen corners and stop watching for changes in screen sizes\/layouts",
@@ -222,10 +221,7 @@
           ""
         ],
         "def" : "RoundedCorners:stop()",
-        "parameters" : [
-          " * None",
-          ""
-        ],
+        "desc" : "Stops RoundedCorners",
         "notes" : [
           " * This will remove all rounded screen corners and stop watching for changes in screen sizes\/layouts"
         ],
@@ -236,12 +232,16 @@
           ""
         ],
         "name" : "stop",
-        "desc" : "Stops RoundedCorners"
+        "parameters" : [
+          " * None",
+          ""
+        ]
       }
     ],
     "Command" : [
 
     ],
+    "doc" : "Give your screens rounded corners\n\nDownload: [https:\/\/github.com\/Hammerspoon\/Spoons\/raw\/master\/Spoons\/RoundedCorners.spoon.zip](https:\/\/github.com\/Hammerspoon\/Spoons\/raw\/master\/Spoons\/RoundedCorners.spoon.zip)",
     "Field" : [
 
     ],

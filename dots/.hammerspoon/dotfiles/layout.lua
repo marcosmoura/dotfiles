@@ -41,5 +41,5 @@ return function ()
   setupManualWindows(windowLayout)
 
   layout.apply(windowLayout)
-  alert.show('Layout Applied!', 1)
+  alert.show('Layout Applied!', 2)
 end
