@@ -1,6 +1,6 @@
 [user]
-	name = Marcos
-	email = marcosvmmoura@gmail.com
+  name = Marcos
+  email = marcosvmmoura@gmail.com
 
 [filter "lfs"]
   clean = git-lfs clean %f
@@ -8,11 +8,14 @@
   required = true
 
 [alias]
-	# List aliases
-	aliases = config --get-regexp alias
+  # List aliases
+  aliases = config --get-regexp alias
 
-  # View abbreviated SHA, description, and history graph of the latest 20 commits
-  l = log --pretty=oneline -n 20 --graph --abbrev-commit
+  # View abbreviated SHA, author, date and description of the latest 15 commits
+  l = log -n 15 --abbrev-commit --all --color --pretty=format:'%n%C(yellow bold)%h %C(green bold)<%an> %C(blue bold)%cr%C(red bold)%d %n%C(reset)%s'
+
+  # View abbreviated SHA, description, and history graph of the latest 35 commits
+  ls = log --oneline -n 35 --graph --abbrev-commit --all --decorate --color
 
   # View the current working tree status using the short format
   s = status
@@ -114,7 +117,7 @@
   textconv = hexdump -v -C
 
 [color]
-	ui = true
+  ui = true
 
 [color "status"]
   added = cyan bold
@@ -129,21 +132,21 @@
   remote = green
 
 [color "diff"]
-	meta = yellow
-	frag = magenta bold
-	old = red bold
-	new = green bold
-	commit = yellow bold
-	whitespace = red reverse
+  meta = yellow
+  frag = magenta bold
+  old = red bold
+  new = green bold
+  commit = yellow bold
+  whitespace = red reverse
 
 [color "diff-highlight"]
-	oldNormal = red bold
-	oldHighlight = red bold 52
-	newNormal = green bold
-	newHighlight = green bold 22
+  oldNormal = red bold
+  oldHighlight = red bold 52
+  newNormal = green bold
+  newHighlight = green bold 22
 
 [core]
-	pager = diff-so-fancy | less --tabs=4 -RFX
+  pager = diff-so-fancy | less --tabs=4 -RFX
   attributesfile = ~/.gitattributes
   editor = vim
   excludesfile = ~/.gitignore
