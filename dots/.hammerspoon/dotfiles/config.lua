@@ -20,18 +20,21 @@ end
 
 function configureAlert ()
   alert.defaultStyle.strokeColor = { white = 0, alpha = 0.75 }
-  alert.defaultStyle.textSize = 24
+  alert.defaultStyle.textSize = 20
+  alert.defaultStyle.radius = 16
+  alert.defaultStyle.fadeInDuration = 0.225
+  alert.defaultStyle.fadeOutDuration = 0.225
 end
 
 function configureRoundedCorners ()
   RoundedCorners = hs.loadSpoon('RoundedCorners')
-  RoundedCorners.radius = 8
+  RoundedCorners.radius = 12
   RoundedCorners.level = canvas.windowLevels.assistiveTechHigh + 1
   RoundedCorners:start()
 end
 
 function configureWindow ()
-  window.animationDuration = 0.175
+  window.animationDuration = 0.225
   window.setFrameCorrectness = false
   window.setShadows(true)
 end
