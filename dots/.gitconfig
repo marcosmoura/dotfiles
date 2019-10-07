@@ -28,7 +28,7 @@
   p = !"git pull; git submodule foreach git pull origin master"
 
   # Push to origin
-  po = push origin HEAD
+  po = push -u
 
   # Clone a repository including all submodules
   c = clone --recursive
