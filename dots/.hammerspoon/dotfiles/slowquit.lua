@@ -7,7 +7,7 @@ local killedIt = false
 
 function pressedQ ()
   killedIt = false
-  alert.show('⌘Q', { fadeInDuration = 0 }, 1)
+  alert.show('⌘Q', { fadeInDuration = 0 }, 0.75)
   timer.usleep(1000000 * delay)
 end
 
@@ -16,9 +16,9 @@ function repeatQ ()
     return
   end
 
+  alert.closeAll()
   application.frontmostApplication():kill()
   killedIt = true
-  alert.closeAll()
 end
 
 return function ()
