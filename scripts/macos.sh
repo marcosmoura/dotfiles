@@ -154,7 +154,7 @@ defaults write NSGlobalDomain KeyRepeat -int 1
 defaults write NSGlobalDomain InitialKeyRepeat -int 10
 
 # Set the timezone; see `systemsetup -listtimezones` for other values
-sudo systemsetup -settimezone "America/Sao_Paulo" > /dev/null
+sudo systemsetup -settimezone "Europe/Amsterdam" > /dev/null
 
 # Stop iTunes from responding to the keyboard media keys
 launchctl unload -w /System/Library/LaunchAgents/com.apple.rcd.plist 2> /dev/null
