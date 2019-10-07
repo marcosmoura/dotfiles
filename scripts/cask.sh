@@ -26,7 +26,6 @@ brew cask install franz
 brew cask install google-backup-and-sync
 
 # Games
-brew cask install league-of-legends
 brew cask install steam
 
 # Productivity
@@ -70,7 +69,6 @@ brew cask install monity-helper
 brew cask install notion
 brew cask install shifty
 brew cask install the-unarchiver
-brew cask install typora
 brew cask install unified-remote
 
 printSuccess "BREW" "Installed with success..."
