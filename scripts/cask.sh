@@ -34,12 +34,10 @@ brew cask install alfred
 brew cask install hammerspoon
 brew cask install kap
 brew cask install slowquitapps
-brew cask install spectacle
 
 # Media
 brew cask install mplayerx
 brew cask install spotify
-brew cask install spotmenu
 brew cask install subtitle-master
 brew cask install transmission
 brew cask install vlc
