@@ -25,11 +25,10 @@ function setupMaximizedWindows (windowLayout)
 end
 
 function setupManualWindows (windowLayout)
-  setupTilingWindow(windowLayout, 'Franz', 560, 257, 1440, 900)
+  setupTilingWindow(windowLayout, 'Franz', 560, 270, 1440, 900)
   setupTilingWindow(windowLayout, 'Finder', 16, 38, 1024, 600)
   setupTilingWindow(windowLayout, 'Wake Up Time', 240, 880, 848, 524)
   setupTilingWindow(windowLayout, 'Calendar', 1056, 38, 1488, 1336)
-  setupTilingWindow(windowLayout, 'Agenda', 752, 38, 1792, 1330)
 end
 
 return function ()
