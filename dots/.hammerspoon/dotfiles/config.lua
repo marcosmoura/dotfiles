@@ -35,7 +35,7 @@ function configureRoundedCorners ()
 end
 
 function configureWindow ()
-  window.animationDuration = 0.225
+  window.animationDuration = 0.125
   window.setFrameCorrectness = false
   window.setShadows(true)
 end
