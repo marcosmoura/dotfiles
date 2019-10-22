@@ -78,7 +78,7 @@ printMsg "MAC APPS" "Installing App Store Apps..."
 mas install 948176063  # Boom 2
 mas install 915542151  # Monity
 mas install 495945638  # Wake Up Time
-mas install 1186187538 # Ethernet Status
+mas install 1319778037 # iStats Menu
 mas install 497799835  # Xcode
 
 printSuccess "MAC APPS" "Installed with success..."
