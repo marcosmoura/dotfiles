@@ -1,10 +1,10 @@
 Tarrasch/zsh-bd
 chrissicool/zsh-256color
 djui/alias-tips
-marzocchi/zsh-notify
+robbyrussell/oh-my-zsh
 robbyrussell/oh-my-zsh path:plugins/git
-buonomo/yarn-completion
 robbyrussell/oh-my-zsh path:plugins/z
+buonomo/yarn-completion
 sinetoami/antibody-completion
 zdharma/fast-syntax-highlighting
 zsh-users/zsh-autosuggestions

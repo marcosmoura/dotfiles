@@ -1,7 +1,6 @@
 # Setup oh-my-zsh
 export ZSH_CACHE_DIR=$HOME/.zsh
-export ZSH=$HOME/.oh-my-zsh
-export UPDATE_ZSH_DAYS=10
+export ZSH="$(antibody home)/https-COLON--SLASH--SLASH-github.com-SLASH-robbyrussell-SLASH-oh-my-zsh"
 
 ZSH_THEME=""
 ENABLE_CORRECTION="false"
@@ -10,7 +9,6 @@ HIST_STAMPS="dd/mm/yyyy"
 
 # Call Oh My ZSH
 source $ZSH/oh-my-zsh.sh
-test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
 source $HOME/.zsh_plugins.sh
 
 # Load aliases and functions
@@ -22,31 +20,16 @@ eval "$(thefuck --alias)"
 
 # rbenv
 eval "$(rbenv init -)"
-export RBENV_VERSION=2.6.3
+export RBENV_VERSION=2.6.5
 
 # Path
-export ANDROID_HOME=$HOME/Library/Android/sdk
-export PATH=$PATH:$HOME/flutter/bin
-export PATH=$PATH:$ANDROID_HOME/tools
-export PATH=$PATH:$ANDROID_HOME/tools/bin
-export PATH=$PATH:$ANDROID_HOME/platform-tools
 export PATH=/usr/local/sbin:$PATH
 export PATH=/usr/local/bin:$PATH
 export PATH=$HOME/.rbenv/shims:$PATH
-
-# android
-export GRADLE_HOME=/usr/local/opt/gradle
-export ANDROID_HOME=$HOME/Library/Android/sdk
-export ANDROID_SDK_ROOT=$ANDROID_HOME
-export ANDROID_NDK_HOME=/usr/local/share/android-ndk
-
-export PATH=$GRADLE_HOME/bin:$PATH
-export PATH=$ANDROID_HOME/tools:$PATH
-export PATH=$ANDROID_HOME/platform-tools:$PATH
-export PATH=$ANDROID_HOME/build-tools/19.1.0:$PATH
+export PATH="$(yarn global bin):$PATH"
 
 # Preferred editor for local and remote sessions
-export EDITOR="vim"
+export EDITOR="nvim"
 
 # Prefer US English and use UTF-8.
 export LANG="en_US.UTF-8";
