@@ -10,12 +10,6 @@ function mkd() {
 }
 
 
-# Open Chrome Canary
-chrome () {
-  open -a "/Applications/Google\ Chrome\ Canary.app/Contents/MacOS/Google\ Chrome\ Canary" "$1"
-}
-
-
 # Time tracking
 function tt() {
   currentDate=`date +%s`;
