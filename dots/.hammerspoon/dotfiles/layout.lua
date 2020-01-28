@@ -9,15 +9,16 @@ end
 
 function setupMaximizedWindows (windowLayout)
   local maximized = {
-    'iTerm2',
     'Code - Insiders',
-    'WebStorm',
-    'Google Chrome',
-    'Firefox Nightly',
-    'Spotify',
-    'Notion',
     'Figma',
-    'Netflix'
+    'Firefox Nightly',
+    'Google Chrome',
+    'iTerm2',
+    'Netflix',
+    'Notion',
+    'Spotify',
+    'Steam',
+    'WebStorm',
   }
 
   for i, app in ipairs(maximized) do
@@ -26,10 +27,10 @@ function setupMaximizedWindows (windowLayout)
 end
 
 function setupManualWindows (windowLayout)
-  setupTilingWindow(windowLayout, 'Franz', 560, 270, 1440, 900)
-  setupTilingWindow(windowLayout, 'Finder', 16, 38, 1024, 600)
-  setupTilingWindow(windowLayout, 'Wake Up Time', 240, 880, 848, 524)
   setupTilingWindow(windowLayout, 'Calendar', 1056, 38, 1488, 1336)
+  setupTilingWindow(windowLayout, 'Finder', 16, 38, 1024, 600)
+  setupTilingWindow(windowLayout, 'Franz', 560, 270, 1440, 900)
+  setupTilingWindow(windowLayout, 'Wake Up Time', 240, 880, 848, 524)
 end
 
 return function ()
