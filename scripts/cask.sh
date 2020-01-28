@@ -30,9 +30,11 @@ brew cask install steam
 
 # Productivity
 brew cask install alfred
+brew cask install autumn
 brew cask install hammerspoon
+brew cask install hiddenbar
 brew cask install kap
-brew cask install slowquitapps
+brew cask install muzzle
 
 # Media
 brew cask install mplayerx
@@ -53,9 +55,11 @@ brew cask install suspicious-package
 brew cask install webpquicklook
 
 # Fonts
+brew cask install font-cascadia-mono
 brew cask install font-fira-code
-brew cask install font-hack
 brew cask install font-hack-nerd-font
+brew cask install font-hack
+brew cask install font-jetbrains-mono
 
 # Other
 brew cask install android-file-transfer
@@ -63,9 +67,7 @@ brew cask install appcleaner
 brew cask install captin
 brew cask install caption
 brew cask install clover-configurator
-brew cask install flux
 brew cask install hwsensors
-brew cask install monity-helper
 brew cask install notion
 brew cask install shifty
 brew cask install the-unarchiver
@@ -76,7 +78,6 @@ printSuccess "BREW" "Installed with success..."
 printMsg "MAC APPS" "Installing App Store Apps..."
 
 mas install 948176063  # Boom 2
-mas install 915542151  # Monity
 mas install 495945638  # Wake Up Time
 mas install 1319778037 # iStats Menu
 mas install 497799835  # Xcode
