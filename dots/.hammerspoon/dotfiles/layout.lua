@@ -16,6 +16,7 @@ function setupMaximizedWindows (windowLayout)
     'Firefox Nightly',
     'Spotify',
     'Notion',
+    'Figma',
     'Netflix'
   }
 
