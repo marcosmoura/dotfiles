@@ -35,13 +35,14 @@ brew cask install hammerspoon
 brew cask install hiddenbar
 brew cask install kap
 brew cask install muzzle
+brew cask install numi
 
 # Media
+brew cask install iina
 brew cask install mplayerx
 brew cask install spotify
 brew cask install subtitle-master
 brew cask install transmission
-brew cask install vlc
 
 # Quicklook extensions
 brew cask install qlcolorcode
@@ -57,8 +58,8 @@ brew cask install webpquicklook
 # Fonts
 brew cask install font-cascadia-mono
 brew cask install font-fira-code
-brew cask install font-hack-nerd-font
 brew cask install font-hack
+brew cask install font-hack-nerd-font
 brew cask install font-jetbrains-mono
 
 # Other
@@ -68,6 +69,7 @@ brew cask install captin
 brew cask install caption
 brew cask install clover-configurator
 brew cask install hwsensors
+brew cask install notion
 brew cask install notion
 brew cask install shifty
 brew cask install the-unarchiver
@@ -80,6 +82,7 @@ printMsg "MAC APPS" "Installing App Store Apps..."
 mas install 948176063  # Boom 2
 mas install 495945638  # Wake Up Time
 mas install 1319778037 # iStats Menu
+mas install 1116599239 # NordVPN
 mas install 497799835  # Xcode
 
 printSuccess "MAC APPS" "Installed with success..."
