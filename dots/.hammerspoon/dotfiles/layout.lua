@@ -1,6 +1,8 @@
 local alert = require 'hs.alert'
+local spaces = require 'hs.spaces'
 local geometry = require 'hs.geometry'
 local layout = require 'hs.layout'
+
 local monitorName = 'Optix AG32CQ'
 
 function setupTilingWindow (windowLayout, app, x, y, w, h)
@@ -14,11 +16,9 @@ function setupMaximizedWindows (windowLayout)
     'Firefox Nightly',
     'Google Chrome',
     'iTerm2',
-    'Netflix',
     'Notion',
     'Spotify',
     'Steam',
-    'WebStorm',
   }
 
   for i, app in ipairs(maximized) do
@@ -28,17 +28,27 @@ end
 
 function setupManualWindows (windowLayout)
   setupTilingWindow(windowLayout, 'Calendar', 1056, 38, 1488, 1336)
-  setupTilingWindow(windowLayout, 'Finder', 16, 38, 1024, 600)
+  setupTilingWindow(windowLayout, 'Finder', 16, 38, 1024, 660)
+  setupTilingWindow(windowLayout, 'NordVPN IKE', 16, 714, 1024, 658)
   setupTilingWindow(windowLayout, 'Franz', 560, 270, 1440, 900)
-  setupTilingWindow(windowLayout, 'Wake Up Time', 240, 880, 848, 524)
 end
 
-return function ()
+function applyLayout ()
   local windowLayout = {}
 
   setupMaximizedWindows(windowLayout)
   setupManualWindows(windowLayout)
 
   layout.apply(windowLayout)
+end
+
+local spacesWatcher = spaces.watcher.new(applyLayout)
+
+spacesWatcher.stop(spacesWatcher)
+spacesWatcher.start(spacesWatcher)
+
+return function ()
+  applyLayout()
+
   alert.show('Layout Applied!', 1.5)
 end
