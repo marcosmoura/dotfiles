@@ -1,5 +1,6 @@
 #!/bin/sh
 
+reset
 printMsg "ZSH" "Setting up..."
 
 # Check if zsh is in list of accepted shells

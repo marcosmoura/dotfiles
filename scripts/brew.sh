@@ -1,6 +1,7 @@
 #!/bin/sh
 
 # Check for homebrew and install if needed
+reset
 printMsg "HOMEBREW" "Installing..."
 
 which -s brew
@@ -58,7 +59,9 @@ brew install yarn
 brew install grep --with-default-names
 
 # Install terminal tools
+brew install bandwhich
 brew install bash
+brew install bat
 brew install exa
 brew install getantibody/tap/antibody
 brew install gnu-sed
@@ -67,8 +70,10 @@ brew install ncurses
 brew install ngrep
 brew install openssh
 brew install openssl
+brew install starship
 brew install terminal-notifier
 brew install thefuck
+brew install tokei
 brew install tree
 brew install z
 brew install zsh

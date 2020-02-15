@@ -10,4 +10,5 @@ source ./scripts/development.sh
 source ~/.zshrc
 source ./scripts/update.sh
 
+reset
 printSuccess "DONE" "Installation complete..."

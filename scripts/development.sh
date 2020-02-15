@@ -1,5 +1,6 @@
 #!/bin/sh
 
+reset
 printMsg "DEVELOPMENT" "Installing devtools..."
 
 # Ask for the administrator password upfront
@@ -30,6 +31,7 @@ rbenv install $RBENV_VERSION
 gem install bundler
 gem install CFPropertyList
 gem install cocoapods
+gem install colorls
 gem install openssl
 gem install rake
 gem install rdoc

@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+reset
 printMsg "MACOS" "Configuring system..."
 
 # ~/.macos — https://mths.be/macos
