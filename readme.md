@@ -1,11 +1,16 @@
-<p align="center"><strong>.dotfiles</strong></p>
-<p align="center"><img src="https://cl.ly/sxJ0/1.png" height="550"></p>
+<!-- <p align="center">
+  <a href="https://vuematerial.io/" target="_blank">
+    <img width="150" src="https://vuematerial.io/assets/logo-color.png">
+  </a>
+</p> -->
+
+<p align="center">.dotfiles</p>
 
 ## Installation
 
 ```
-$ git clone https://github.com/marcosmoura/dotfiles.git ~/dotfiles
-$ cd ~/dotfiles
+$ git clone https://github.com/marcosmoura/dotfiles.git
+$ cd ./dotfiles
 $ chmod +x install.sh
 $ ./install.sh
 ```

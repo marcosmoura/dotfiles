@@ -11,3 +11,7 @@ function printMsg {
 function printSuccess {
   echo "$PURPLE\n❯ $CYAN[$1]$GREEN $2\n$RESET"
 }
+
+function reset {
+  echo "\n$RESET"
+}

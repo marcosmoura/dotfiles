@@ -1,5 +1,6 @@
 #!/bin/sh
 
+reset
 printMsg "SYSTEM" "Updating OSX..."
 
 updateOs

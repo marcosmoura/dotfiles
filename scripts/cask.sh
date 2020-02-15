@@ -1,5 +1,6 @@
 #!/bin/sh
 
+reset
 printMsg "BREW" "Installing casks..."
 
 # Browsers
@@ -14,7 +15,6 @@ brew cask install figma
 brew cask install imageoptim
 brew cask install iterm2-nightly
 brew cask install java8
-brew cask install jetbrains-toolbox
 brew cask install reactotron
 brew cask install visual-studio-code-insiders
 brew cask install zeplin
