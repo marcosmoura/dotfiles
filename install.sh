@@ -9,6 +9,7 @@ source ./scripts/zsh.sh
 source ./scripts/development.sh
 source ~/.zshrc
 source ./scripts/update.sh
+source ./scripts/postinstall.sh
 
 reset
 printSuccess "DONE" "Installation complete..."
