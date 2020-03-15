@@ -1,7 +1,7 @@
 # Setup oh-my-zsh
 export ZSH_CACHE_DIR=$HOME/.zsh
 export ZSH=$HOME/.oh-my-zsh
-export UPDATE_ZSH_DAYS=10
+export ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=#888"
 
 ZSH_THEME=""
 ENABLE_CORRECTION="false"
