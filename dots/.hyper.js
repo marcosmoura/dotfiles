@@ -14,7 +14,7 @@ module.exports = {
     showWindowControls: false,
     copyOnSelect: true,
 
-    padding: '24px 32px',
+    padding: '16px 32px',
 
     foregroundColor,
     borderColor: 'transparent',
