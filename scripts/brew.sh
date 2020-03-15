@@ -41,6 +41,8 @@ brew unlink usbmuxd
 brew link usbmuxd
 brew install --HEAD libimobiledevice
 brew install dart
+brew install deno
+brew install fx
 brew install go
 brew install gradle
 brew install ideviceinstaller
