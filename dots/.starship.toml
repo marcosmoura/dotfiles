@@ -6,6 +6,9 @@
   symbol = " "
   disabled = true
 
+[directory]
+  truncation_length = 8
+
 [aws]
   symbol = " "
 
