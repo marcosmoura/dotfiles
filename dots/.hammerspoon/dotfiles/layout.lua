@@ -15,7 +15,7 @@ function setupMaximizedWindows (windowLayout)
     'Figma',
     'Firefox Nightly',
     'Google Chrome',
-    'iTerm2',
+    'Hyper',
     'Notion',
     'Spotify',
     'Steam',
