@@ -16,7 +16,7 @@ sudo -v
 while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
 
 ###############################################################################
-# General UI/UX                                                               #
+# General UI/UX
 ###############################################################################
 
 # Disable the sound effects on boot
@@ -102,7 +102,7 @@ defaults write NSGlobalDomain NSAutomaticQuoteSubstitutionEnabled -bool false
 defaults write NSGlobalDomain NSAutomaticSpellingCorrectionEnabled -bool false
 
 ###############################################################################
-# SSD-specific tweaks                                                         #
+# SSD-specific tweaks
 ###############################################################################
 
 # Disable local Time Machine snapshots
@@ -125,7 +125,7 @@ sudo pmset -a hibernatemode 0
 sudo pmset -a sms 0
 
 ###############################################################################
-# Trackpad, mouse, keyboard, Bluetooth accessories, and input                 #
+# Trackpad, mouse, keyboard, Bluetooth accessories, and input
 ###############################################################################
 
 # Trackpad: enable tap to click for this user and for the login screen
@@ -158,7 +158,7 @@ defaults write NSGlobalDomain InitialKeyRepeat -int 10
 sudo systemsetup -settimezone "Europe/Amsterdam" > /dev/null
 
 ###############################################################################
-# Screen                                                                      #
+# Screen
 ###############################################################################
 
 # Require password immediately after sleep or screen saver begins
@@ -178,7 +178,7 @@ defaults write NSGlobalDomain AppleFontSmoothing -int 2
 sudo defaults write /Library/Preferences/com.apple.windowserver DisplayResolutionEnabled -bool true
 
 ###############################################################################
-# Finder                                                                      #
+# Finder
 ###############################################################################
 
 # Finder: allow quitting via ⌘ + Q; doing so will also hide desktop icons
@@ -278,7 +278,7 @@ defaults write com.apple.finder FXInfoPanesExpanded -dict \
 	Privileges -bool true
 
 ###############################################################################
-# Dock, Dashboard, and hot corners                                            #
+# Dock, Dashboard, and hot corners
 ###############################################################################
 
 # Enable highlight hover effect for the grid view of a stack (Dock)
@@ -333,7 +333,7 @@ defaults write com.apple.dock autohide -bool false
 find "${HOME}/Library/Application Support/Dock" -name "*-*.db" -maxdepth 1 -delete
 
 ###############################################################################
-# Spotlight                                                                   #
+# Spotlight
 ###############################################################################
 
 # Hide Spotlight tray-icon (and subsequent helper)
@@ -369,7 +369,7 @@ sudo mdutil -i on / > /dev/null
 sudo mdutil -E / > /dev/null
 
 ###############################################################################
-# Terminal & iTerm 2                                                          #
+# Terminal
 ###############################################################################
 
 # Only use UTF-8 in Terminal.app
@@ -380,11 +380,8 @@ defaults write com.apple.terminal StringEncodings -array 4
 #defaults write com.apple.terminal FocusFollowsMouse -bool true
 #defaults write org.x.X11 wm_ffm -bool true
 
-# Don’t display the annoying prompt when quitting iTerm
-defaults write com.googlecode.iterm2 PromptOnQuit -bool false
-
 ###############################################################################
-# Time Machine                                                                #
+# Time Machine
 ###############################################################################
 
 # Prevent Time Machine from prompting to use new hard drives as backup volume
@@ -394,7 +391,7 @@ defaults write com.apple.TimeMachine DoNotOfferNewDisksForBackup -bool true
 hash tmutil &> /dev/null && sudo tmutil disablelocal
 
 ###############################################################################
-# Activity Monitor                                                            #
+# Activity Monitor
 ###############################################################################
 
 # Show the main window when launching Activity Monitor
@@ -411,7 +408,7 @@ defaults write com.apple.ActivityMonitor SortColumn -string "CPUUsage"
 defaults write com.apple.ActivityMonitor SortDirection -int 0
 
 ###############################################################################
-# Address Book, Dashboard, iCal, TextEdit, and Disk Utility                   #
+# Address Book, Dashboard, iCal, TextEdit, and Disk Utility
 ###############################################################################
 
 # Enable the debug menu in Address Book
@@ -434,7 +431,7 @@ defaults write com.apple.DiskUtility DUDebugMenuEnabled -bool true
 defaults write com.apple.DiskUtility advanced-image-options -bool true
 
 ###############################################################################
-# Mac App Store                                                               #
+# Mac App Store
 ###############################################################################
 
 # Enable the WebKit Developer Tools in the Mac App Store
@@ -444,7 +441,7 @@ defaults write com.apple.appstore WebKitDeveloperExtras -bool true
 defaults write com.apple.appstore ShowDebugMenu -bool true
 
 ###############################################################################
-# Messages                                                                    #
+# Messages
 ###############################################################################
 
 # Disable automatic emoji substitution (i.e. use plain text smileys)
@@ -457,7 +454,7 @@ defaults write com.apple.messageshelper.MessageController SOInputLineSettings -d
 defaults write com.apple.messageshelper.MessageController SOInputLineSettings -dict-add "continuousSpellCheckingEnabled" -bool false
 
 ###############################################################################
-# Kill affected applications                                                  #
+# Kill affected applications
 ###############################################################################
 
 for app in "Activity Monitor" "Address Book" "Calendar" "Contacts" "cfprefsd" \

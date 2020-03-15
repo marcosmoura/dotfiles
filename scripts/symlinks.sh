@@ -12,6 +12,7 @@ symlink_dotfile .alacritty.yml
 symlink_dotfile .editorconfig
 symlink_dotfile .gitconfig
 symlink_dotfile .hammerspoon
+symlink_dotfile .hyper.js
 symlink_dotfile .ssh-config
 symlink_dotfile .starship.toml
 symlink_dotfile .vuerc
@@ -19,6 +20,7 @@ symlink_dotfile .zsh_aliases
 symlink_dotfile .zsh_functions
 symlink_dotfile .zsh_plugins
 symlink_dotfile .zshrc
+symlink_dotfile prettier.config.js
 
 # SSH
 mkdir "$HOME/.ssh"
