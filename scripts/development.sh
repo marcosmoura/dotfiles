@@ -13,31 +13,21 @@ pod setup
 
 printMsg "DEVELOPMENT" "Installing Yarn Packages..."
 yarn global add @vue/cli
-yarn global add create-react-app
 yarn global add eslint
 yarn global add gtop
 yarn global add lerna
-yarn global add n
-yarn global add pure-prompt
-yarn global add react-native-cli
 yarn global add typescript
 yarn global add vtop
-
-printMsg "DEVELOPMENT" "Setting up Node..."
-sudo n latest
 
 printMsg "DEVELOPMENT" "Installing Ruby Gems..."
 rbenv install $RBENV_VERSION
 gem install bundler
-gem install CFPropertyList
-gem install cocoapods
 gem install colorls
 gem install openssl
 gem install rake
 gem install rdoc
 gem install rubygems-update
 gem install sqlite3
-gem install xcodeproj
 
 printMsg "DEVELOPMENT" "Installing Pip Packages..."
 pip install pip

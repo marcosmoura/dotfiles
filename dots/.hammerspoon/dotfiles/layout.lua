@@ -28,8 +28,7 @@ end
 
 function setupManualWindows (windowLayout)
   setupTilingWindow(windowLayout, 'Calendar', 1056, 38, 1488, 1336)
-  setupTilingWindow(windowLayout, 'Finder', 16, 38, 1024, 660)
-  setupTilingWindow(windowLayout, 'NordVPN IKE', 16, 714, 1024, 658)
+  setupTilingWindow(windowLayout, 'Finder', 16, 38, 1024, 1336)
   setupTilingWindow(windowLayout, 'Franz', 560, 270, 1440, 900)
 end
 

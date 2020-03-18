@@ -8,13 +8,8 @@ brew cask install firefox-nightly
 brew cask install google-chrome-canary
 
 # Development
-brew cask install android-ndk
-brew cask install android-sdk
-brew cask install android-studio-preview
 brew cask install figma
 brew cask install imageoptim
-brew cask install java8
-brew cask install reactotron
 brew cask install visual-studio-code-insiders
 brew cask install zeplin
 
@@ -38,10 +33,10 @@ brew cask install numi
 
 # Media
 brew cask install iina
-brew cask install mplayerx
 brew cask install spotify
 brew cask install subtitle-master
 brew cask install transmission
+brew cask install vlc
 
 # Quicklook extensions
 brew cask install qlcolorcode
@@ -67,8 +62,7 @@ brew cask install appcleaner
 brew cask install captin
 brew cask install caption
 brew cask install clover-configurator
-brew cask install hwsensors
-brew cask install notion
+brew cask install mullvadvpn
 brew cask install notion
 brew cask install shifty
 brew cask install the-unarchiver
@@ -81,7 +75,6 @@ printMsg "MAC APPS" "Installing App Store Apps..."
 mas install 948176063  # Boom 2
 mas install 495945638  # Wake Up Time
 mas install 1319778037 # iStats Menu
-mas install 1116599239 # NordVPN
 mas install 497799835  # Xcode
 
 printSuccess "MAC APPS" "Installed with success..."
