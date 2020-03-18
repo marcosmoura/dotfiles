@@ -35,18 +35,10 @@ brew install findutils
 brew install moreutils
 
 # Install development tools
-brew install cocoapods
-brew install --HEAD usbmuxd
-brew unlink usbmuxd
-brew link usbmuxd
-brew install --HEAD libimobiledevice
 brew install dart
 brew install deno
 brew install fx
 brew install go
-brew install gradle
-brew install ideviceinstaller
-brew install ios-deploy
 brew install lua
 brew install node
 brew install perl
@@ -67,7 +59,6 @@ brew install bat
 brew install exa
 brew install getantibody/tap/antibody
 brew install gnu-sed
-brew install midnight-commander
 brew install ncurses
 brew install ngrep
 brew install openssh
@@ -93,7 +84,6 @@ brew install speedtest-cli
 brew install tldr
 brew install vim
 brew install wget
-brew install wifi-password
 
 brew cleanup
 brew prune
