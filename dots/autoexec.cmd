@@ -24,3 +24,4 @@ open /Applications/TotalFinder.app;
 open /Applications/TotalSpaces2.app;
 open /Applications/Visual\ Studio\ Code\ -\ Insiders.app;
 open /System/Applications/Calendar.app;
+ssh-add ~/.ssh/personal;
