@@ -22,9 +22,10 @@ symlink_dotfile .zsh_plugins
 symlink_dotfile .zshrc
 symlink_dotfile prettier.config.js
 
-# SSH
-mkdir "$HOME/.ssh"
-ln -sfv $(grealpath ssh-config) "$HOME/.ssh/config"
+# Startup
+symlink_dotfile autoexec.cmd
+chmod +x "$HOME/autoexec.cmd"
+
 popd
 
 printSuccess "DOTFILES" "Created with success..."
