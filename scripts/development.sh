@@ -16,6 +16,7 @@ yarn global add @vue/cli
 yarn global add eslint
 yarn global add gtop
 yarn global add lerna
+yarn global add prettier
 yarn global add typescript
 yarn global add vtop
 
