@@ -65,7 +65,7 @@ module.exports = {
         jump_prefix: 'meta'
       },
       showIndicators: false,
-      inactivePaneOpacity: 0.5
+      inactivePaneOpacity: 0.7
     },
 
     hypercwd: {
@@ -88,7 +88,7 @@ module.exports = {
       }
 
       .term_fit:not(.term_active) > .term_fit:not(.term_term) {
-        opacity: .4;
+        opacity: .5;
       }
     `
   },
