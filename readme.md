@@ -1,7 +1,5 @@
 <p align="center">
-  <a href="https://vuematerial.io/" target="_blank">
-    <img src="screenshot.png">
-  </a>
+  <img src="screenshot.png" alt="My personal macOS dotfiles">
 </p>
 
 <h2 align="center">.dotfiles</h2>
