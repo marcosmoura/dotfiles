@@ -29,25 +29,9 @@ eval "$(rbenv init -)"
 export RBENV_VERSION=2.6.3
 
 # Path
-export ANDROID_HOME=$HOME/Library/Android/sdk
-export PATH=$PATH:$HOME/flutter/bin
-export PATH=$PATH:$ANDROID_HOME/tools
-export PATH=$PATH:$ANDROID_HOME/tools/bin
-export PATH=$PATH:$ANDROID_HOME/platform-tools
 export PATH=/usr/local/sbin:$PATH
 export PATH=/usr/local/bin:$PATH
 export PATH=$HOME/.rbenv/shims:$PATH
-
-# android
-export GRADLE_HOME=/usr/local/opt/gradle
-export ANDROID_HOME=$HOME/Library/Android/sdk
-export ANDROID_SDK_ROOT=$ANDROID_HOME
-export ANDROID_NDK_HOME=/usr/local/share/android-ndk
-
-export PATH=$GRADLE_HOME/bin:$PATH
-export PATH=$ANDROID_HOME/tools:$PATH
-export PATH=$ANDROID_HOME/platform-tools:$PATH
-export PATH=$ANDROID_HOME/build-tools/19.1.0:$PATH
 
 # Preferred editor for local and remote sessions
 export EDITOR="vim"
@@ -61,6 +45,9 @@ export LESS_TERMCAP_md="${yellow}";
 
 # Don’t clear the screen after quitting a manual page.
 export MANPAGER="less -X";
+
+# Define bat config
+export BAT_CONFIG_PATH="$HOME/.batconfig";
 
 # Call SSH files
 export SSH_KEY_PATH="$HOME/.ssh/personal"
