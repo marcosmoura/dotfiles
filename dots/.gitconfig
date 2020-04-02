@@ -146,7 +146,7 @@
   newHighlight = green bold 22
 
 [core]
-  pager = diff-so-fancy | less --tabs=4 -RFX
+  pager = diff-so-fancy | less --tabs=2 -RFX
   attributesfile = ~/.gitattributes
   editor = vim
   excludesfile = ~/.gitignore

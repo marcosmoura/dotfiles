@@ -56,9 +56,12 @@ brew install grep --with-default-names
 brew install bandwhich
 brew install bash
 brew install bat
+brew install eth-p/software/bat-extras
 brew install exa
 brew install getantibody/tap/antibody
+brew install git-delta
 brew install gnu-sed
+brew install ncdu
 brew install ncurses
 brew install ngrep
 brew install openssh

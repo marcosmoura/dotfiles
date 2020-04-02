@@ -1,14 +1,16 @@
-<!-- <p align="center">
+<p align="center">
   <a href="https://vuematerial.io/" target="_blank">
-    <img width="150" src="https://vuematerial.io/assets/logo-color.png">
+    <img src="screenshot.png">
   </a>
-</p> -->
+</p>
 
-<p align="center">.dotfiles</p>
+<h2 align="center">.dotfiles</h2>
+<p align="center">My personal macOS dotfiles</p>
 
-## Installation
 
-```
+### Installation
+
+``` shell
 $ git clone https://github.com/marcosmoura/dotfiles.git
 $ cd ./dotfiles
 $ chmod +x install.sh

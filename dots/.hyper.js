@@ -1,29 +1,23 @@
+const black = '#555'
+const blue = '#57c7ff'
+const cyan = '#9aedfe'
+const green = '#5af78e'
+const magenta = '#ff6ac1'
+const red = '#ff5c57'
+const white = '#f1f1f0'
+const yellow = '#f3f99d'
 const foregroundColor = '#eff0eb'
 const lightBlack = '#888'
-const white = '#f1f1f0'
-const red = '#ff5c57'
-const green = '#5af78e'
-const yellow = '#f3f99d'
-const blue = '#57c7ff'
-const magenta = '#ff6ac1'
-const cyan = '#9aedfe'
 
 module.exports = {
   config: {
-    updateChannel: 'canary',
-    showWindowControls: false,
     copyOnSelect: true,
+    updateChannel: 'canary',
 
     padding: '16px 32px',
 
-    foregroundColor,
-    borderColor: 'transparent',
-    selectionColor: 'rgba(151, 151, 155, 0.2)',
-
-    cursorColor: '#97979b',
-    cursorAccentColor: '#888',
-    cursorShape: 'BEAM',
     cursorBlink: true,
+    cursorShape: 'BEAM',
 
     fontFamily: '"JetBrains Mono", "Hack Nerd Font", "Fira Code", Hack, monospace',
     fontSize: 17,
@@ -31,26 +25,26 @@ module.exports = {
     lineHeight: 1.3,
 
     hypest: {
-      hideControls: true,
-      accentColor: 'blue',
-      darkmode: true,
       borders: false,
+      darkmode: true,
+      hideControls: true,
       colors: {
-        red,
-        green,
-        yellow,
+        black,
         blue,
-        magenta,
         cyan,
+        green,
+        magenta,
+        red,
         white,
+        yellow,
         lightBlack,
-        lightRed: red,
-        lightGreen: green,
-        lightYellow: yellow,
         lightBlue: blue,
-        lightMagenta: magenta,
         lightCyan: cyan,
-        lightWhite: foregroundColor
+        lightGreen: green,
+        lightMagenta: magenta,
+        lightRed: red,
+        lightWhite: foregroundColor,
+        lightYellow: yellow
       }
     },
 
