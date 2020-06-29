@@ -5,7 +5,7 @@ const green = '#5af78e'
 const magenta = '#ff6ac1'
 const red = '#ff5c57'
 const white = '#f1f1f0'
-const yellow = '#f3f99d'
+const yellow = '#ffff8a'
 const foregroundColor = '#eff0eb'
 const lightBlack = '#888'
 
