@@ -98,6 +98,9 @@
   default = current
   followTags = true
 
+[pull]
+  rebase = true
+
 [mergetool]
   keepTemporaries = false
   prompt = false
