@@ -38,6 +38,7 @@ brew install moreutils
 brew install dart
 brew install deno
 brew install fx
+brew install glow
 brew install go
 brew install lua
 brew install node
