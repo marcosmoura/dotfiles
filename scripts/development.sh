@@ -9,8 +9,6 @@ sudo -v
 # Keep-alive: update existing `sudo` time stamp until `.osx` has finished
 while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
 
-pod setup
-
 printMsg "DEVELOPMENT" "Installing Yarn Packages..."
 yarn global add @vue/cli
 yarn global add eslint
@@ -32,16 +30,9 @@ gem install rubygems-update
 gem install sqlite3
 
 printMsg "DEVELOPMENT" "Installing Pip Packages..."
-pip install pip
-pip install setuptools
-pip install six
-pip install wheel
-
-pip3 install pip
+python3 -m pip install --upgrade pip
 pip3 install setuptools
+pip3 install six
 pip3 install wheel
-
-printMsg "DEVELOPMENT" "Installing Android SDK..."
-sdkmanager --update
 
 printMsg "SYSTEM" "Update completed!"

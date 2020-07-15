@@ -9,6 +9,7 @@ brew cask install google-chrome-canary
 
 # Development
 brew cask install figma
+brew cask install hyper
 brew cask install imageoptim
 brew cask install visual-studio-code-insiders
 brew cask install zeplin
@@ -62,6 +63,7 @@ brew cask install appcleaner
 brew cask install captin
 brew cask install caption
 brew cask install clover-configurator
+brew cask install lyricsx
 brew cask install mullvadvpn
 brew cask install notion
 brew cask install shifty
