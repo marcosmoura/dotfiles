@@ -1,6 +1,8 @@
-# Setup oh-my-zsh
+autoload -Uz compinit
+compinit -i
+
+# Setup zsh
 export ZSH_CACHE_DIR=$HOME/.zsh
-export ZSH=$HOME/.oh-my-zsh
 export ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=#888"
 
 ZSH_THEME=""
@@ -13,9 +15,7 @@ export STARSHIP_CONFIG=$HOME/.starship.toml
 eval "$(starship init zsh)"
 
 # zsh plugins
-source $ZSH/oh-my-zsh.sh
 source $HOME/.zsh_plugins.sh
-source $(dirname $(gem which colorls))/tab_complete.sh
 
 # Load aliases and functions
 source $HOME/.zsh_aliases
@@ -25,8 +25,8 @@ source $HOME/.zsh_functions
 eval "$(thefuck --alias)"
 
 # rbenv
+export RBENV_VERSION=2.7.1
 eval "$(rbenv init -)"
-export RBENV_VERSION=2.6.3
 
 # Path
 export PATH=/usr/local/sbin:$PATH
