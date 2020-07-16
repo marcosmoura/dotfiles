@@ -1,6 +1,7 @@
 buonomo/yarn-completion
 chrissicool/zsh-256color
 djui/alias-tips
+robbyrussell/oh-my-zsh
 robbyrussell/oh-my-zsh path:plugins/git
 robbyrussell/oh-my-zsh path:plugins/z
 sinetoami/antibody-completion
