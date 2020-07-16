@@ -23,8 +23,8 @@ symlink_dotfile .zshrc
 symlink_dotfile prettier.config.js
 
 # Startup
-symlink_dotfile autoexec.cmd
-chmod +x "$HOME/autoexec.cmd"
+symlink_dotfile autoexec.sh
+chmod +x "$HOME/autoexec.sh"
 
 popd
 
