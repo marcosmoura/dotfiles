@@ -18,7 +18,6 @@ function setupMaximizedWindows (windowLayout)
     'Hyper',
     'Notion',
     'Spotify',
-    'Steam',
   }
 
   for i, app in ipairs(maximized) do
@@ -29,7 +28,9 @@ end
 function setupManualWindows (windowLayout)
   setupTilingWindow(windowLayout, 'Calendar', 1056, 38, 1488, 1336)
   setupTilingWindow(windowLayout, 'Finder', 16, 38, 1024, 1336)
-  setupTilingWindow(windowLayout, 'Franz', 560, 270, 1440, 900)
+  setupTilingWindow(windowLayout, 'WhatsApp', 560, 270, 1440, 900)
+  setupTilingWindow(windowLayout, 'Discord', 560, 270, 1440, 900)
+  setupTilingWindow(windowLayout, 'Steam', 560, 270, 1440, 900)
 end
 
 function applyLayout ()
