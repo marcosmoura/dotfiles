@@ -15,7 +15,8 @@ brew cask install visual-studio-code-insiders
 brew cask install zeplin
 
 # Communication
-brew cask install franz
+brew cask install discord
+brew cask install whatsapp
 
 # Cloud
 brew cask install google-backup-and-sync
@@ -62,10 +63,10 @@ brew cask install android-file-transfer
 brew cask install appcleaner
 brew cask install captin
 brew cask install caption
-brew cask install clover-configurator
 brew cask install lyricsx
 brew cask install mullvadvpn
 brew cask install notion
+brew cask install opencore-configurator
 brew cask install shifty
 brew cask install the-unarchiver
 brew cask install unified-remote
