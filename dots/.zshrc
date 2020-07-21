@@ -29,12 +29,21 @@ export LS_COLORS="no=00:fi=00:di=01;34:ln=01;36:pi=40;33:so=01;35:do=01;35:bd=40
 # Setup zsh
 autoload -U compinit && compinit
 export ZSH_CACHE_DIR=$HOME/.zsh
+export ZSH=$(antibody home)/https-COLON--SLASH--SLASH-github.com-SLASH-robbyrussell-SLASH-oh-my-zsh # Temporary fix
 export ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=#888"
 
 ZSH_THEME=""
 ENABLE_CORRECTION="false"
 COMPLETION_WAITING_DOTS="false"
 HIST_STAMPS="dd/mm/yyyy"
+
+# rbenv
+export RBENV_VERSION=2.7.1
+eval "$(rbenv init -)"
+
+# Setup starship prompt
+export STARSHIP_CONFIG=$HOME/.starship.toml
+eval "$(starship init zsh)"
 
 # zsh plugins
 source $HOME/.zsh_plugins.sh
@@ -44,11 +53,3 @@ eval "$(thefuck --alias)"
 # Load aliases and functions
 source $HOME/.zsh_aliases
 source $HOME/.zsh_functions
-
-# rbenv
-export RBENV_VERSION=2.7.1
-eval "$(rbenv init -)"
-
-# Setup starship prompt
-export STARSHIP_CONFIG=$HOME/.starship.toml
-eval "$(starship init zsh)"
