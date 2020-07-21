@@ -9,7 +9,6 @@ open -g /Applications/Google\ Chrome\ Canary.app;
 open -g /Applications/Hammerspoon.app;
 open -g /Applications/Hidden\ Bar.app;
 open -g /Applications/Hyper.app;
-open -g /Applications/iStat\ Menus.app;
 open -g /Applications/Kap.app;
 open -g /Applications/LyricsX.app;
 open -g /Applications/Mullvad\ VPN.app;
