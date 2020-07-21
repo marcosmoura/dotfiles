@@ -59,6 +59,7 @@ brew cask install font-hack-nerd-font
 brew cask install font-jetbrains-mono
 
 # Other
+brew cask install adguard
 brew cask install android-file-transfer
 brew cask install appcleaner
 brew cask install captin
