@@ -11,13 +11,8 @@ end
 
 function setupMaximizedWindows (windowLayout)
   local maximized = {
-    'Code - Insiders',
-    'Figma',
     'Firefox Nightly',
-    'Google Chrome',
-    'Hyper',
-    'Notion',
-    'Spotify',
+    'Google Chrome'
   }
 
   for i, app in ipairs(maximized) do
@@ -26,8 +21,6 @@ function setupMaximizedWindows (windowLayout)
 end
 
 function setupManualWindows (windowLayout)
-  setupTilingWindow(windowLayout, 'Calendar', 1056, 38, 1488, 1336)
-  setupTilingWindow(windowLayout, 'Finder', 16, 38, 1024, 1336)
   setupTilingWindow(windowLayout, 'WhatsApp', 560, 270, 1440, 900)
   setupTilingWindow(windowLayout, 'Discord', 560, 270, 1440, 900)
   setupTilingWindow(windowLayout, 'Steam', 560, 270, 1440, 900)
