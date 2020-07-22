@@ -1,5 +1,4 @@
 open -g /Applications/Alfred\ 4.app;
-open -g /Applications/Autumn.app;
 open -g /Applications/Backup\ and\ sync.app;
 open -g /Applications/Boom\ 2.app;
 open -g /Applications/Captin.app;

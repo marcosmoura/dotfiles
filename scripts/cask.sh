@@ -26,7 +26,7 @@ brew cask install steam
 
 # Productivity
 brew cask install alfred
-brew cask install autumn
+brew cask install amethyst
 brew cask install hammerspoon
 brew cask install hiddenbar
 brew cask install kap
@@ -70,14 +70,12 @@ brew cask install notion
 brew cask install opencore-configurator
 brew cask install shifty
 brew cask install the-unarchiver
-brew cask install unified-remote
 
 printSuccess "BREW" "Installed with success..."
 
 printMsg "MAC APPS" "Installing App Store Apps..."
 
 mas install 948176063  # Boom 2
-mas install 495945638  # Wake Up Time
 mas install 1319778037 # iStats Menu
 mas install 497799835  # Xcode
 
