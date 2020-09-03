@@ -34,5 +34,6 @@ python3 -m pip install --upgrade pip
 pip3 install setuptools
 pip3 install six
 pip3 install wheel
+pip3 install psutil
 
 printMsg "SYSTEM" "Update completed!"
