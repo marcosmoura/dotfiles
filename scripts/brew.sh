@@ -67,6 +67,7 @@ brew install ncurses
 brew install ngrep
 brew install openssh
 brew install openssl
+brew install osx-cpu-temp
 brew install starship
 brew install terminal-notifier
 brew install thefuck
