@@ -4,72 +4,72 @@ reset
 printMsg "BREW" "Installing casks..."
 
 # Browsers
-brew cask install firefox-nightly
-brew cask install google-chrome-canary
+brew cask install --no-quarantine firefox-nightly
+brew cask install --no-quarantine google-chrome-canary
 
 # Development
-brew cask install figma
-brew cask install hyper
-brew cask install imageoptim
-brew cask install visual-studio-code-insiders
-brew cask install zeplin
+brew cask install --no-quarantine figma
+brew cask install --no-quarantine hyper
+brew cask install --no-quarantine imageoptim
+brew cask install --no-quarantine visual-studio-code-insiders
+brew cask install --no-quarantine zeplin
 
 # Communication
-brew cask install discord
-brew cask install whatsapp
+brew cask install --no-quarantine discord
+brew cask install --no-quarantine whatsapp
 
 # Cloud
-brew cask install google-backup-and-sync
+brew cask install --no-quarantine google-backup-and-sync
 
 # Games
-brew cask install steam
+brew cask install --no-quarantine steam
 
 # Productivity
-brew cask install alfred
-brew cask install amethyst
-brew cask install hammerspoon
-brew cask install hiddenbar
-brew cask install kap
-brew cask install muzzle
-brew cask install numi
+brew cask install --no-quarantine alfred
+brew cask install --no-quarantine amethyst
+brew cask install --no-quarantine hammerspoon
+brew cask install --no-quarantine hiddenbar
+brew cask install --no-quarantine kap
+brew cask install --no-quarantine muzzle
+brew cask install --no-quarantine numi
 
 # Media
-brew cask install iina
-brew cask install spotify
-brew cask install subtitle-master
-brew cask install transmission
-brew cask install vlc
+brew cask install --no-quarantine iina
+brew cask install --no-quarantine spotify
+brew cask install --no-quarantine subtitle-master
+brew cask install --no-quarantine transmission
+brew cask install --no-quarantine vlc
 
 # Quicklook extensions
-brew cask install qlcolorcode
-brew cask install qlimagesize
-brew cask install qlmarkdown
-brew cask install qlstephen
-brew cask install qlvideo
-brew cask install quicklook-json
-brew cask install quicklookase
-brew cask install suspicious-package
-brew cask install webpquicklook
+brew cask install --no-quarantine qlcolorcode
+brew cask install --no-quarantine qlimagesize
+brew cask install --no-quarantine qlmarkdown
+brew cask install --no-quarantine qlstephen
+brew cask install --no-quarantine qlvideo
+brew cask install --no-quarantine quicklook-json
+brew cask install --no-quarantine quicklookase
+brew cask install --no-quarantine suspicious-package
+brew cask install --no-quarantine webpquicklook
 
 # Fonts
-brew cask install font-cascadia-mono
-brew cask install font-fira-code
-brew cask install font-hack
-brew cask install font-hack-nerd-font
-brew cask install font-jetbrains-mono
+brew cask install --no-quarantine font-cascadia-mono
+brew cask install --no-quarantine font-fira-code
+brew cask install --no-quarantine font-hack
+brew cask install --no-quarantine font-hack-nerd-font
+brew cask install --no-quarantine font-jetbrains-mono
 
 # Other
-brew cask install adguard
-brew cask install android-file-transfer
-brew cask install appcleaner
-brew cask install captin
-brew cask install caption
-brew cask install lyricsx
-brew cask install mullvadvpn
-brew cask install notion
-brew cask install opencore-configurator
-brew cask install shifty
-brew cask install the-unarchiver
+brew cask install --no-quarantine adguard
+brew cask install --no-quarantine android-file-transfer
+brew cask install --no-quarantine appcleaner
+brew cask install --no-quarantine captin
+brew cask install --no-quarantine caption
+brew cask install --no-quarantine lyricsx
+brew cask install --no-quarantine mullvadvpn
+brew cask install --no-quarantine notion
+brew cask install --no-quarantine opencore-configurator
+brew cask install --no-quarantine shifty
+brew cask install --no-quarantine the-unarchiver
 
 printSuccess "BREW" "Installed with success..."
 
