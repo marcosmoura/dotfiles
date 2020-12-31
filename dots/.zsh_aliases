@@ -11,7 +11,7 @@ alias sudo='sudo '
 alias code='code-insiders '
 
 # Update and Cleanup env
-alias updateOs='updateRb; updateNpm; updateYarn; updateCasks; updateZsh; echo "\n$(tput setaf 2)Everything updated!\n"'
+alias updateOs='updateRb; updateCasks; updateNpm; updateYarn; updateZsh; echo "\n$(tput setaf 2)Everything updated!\n"'
 alias updateOsFull='updateOsx; updateOs;'
 alias updateOsx='sudo softwareupdate -i -a; mas upgrade; echo "\n$(tput setaf 2)OS Updated!\n"'
 alias updateRb='gem update --system; gem update --no-document; gem cleanup; echo "\n$(tput setaf 2)Ruby gems updated!\n"'
