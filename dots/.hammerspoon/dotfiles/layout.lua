@@ -12,6 +12,7 @@ end
 function setupMaximizedWindows (windowLayout)
   local maximized = {
     'Firefox Nightly',
+    'Safari',
     'Google Chrome'
   }
 
