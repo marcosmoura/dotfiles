@@ -26,10 +26,10 @@ brew cask install --no-quarantine steam
 
 # Productivity
 brew cask install --no-quarantine alfred
-brew cask install --no-quarantine amethyst
 brew cask install --no-quarantine hammerspoon
 brew cask install --no-quarantine hiddenbar
 brew cask install --no-quarantine kap
+brew cask install --no-quarantine koekeishiya/formulae/yabai
 brew cask install --no-quarantine muzzle
 brew cask install --no-quarantine numi
 

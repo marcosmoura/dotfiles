@@ -1,0 +1,100 @@
+sudo yabai --uninstall-sa
+sudo yabai --install-sa
+yabai -m signal --add event=dock_did_restart action="sudo yabai --load-sa"
+
+
+## Global settings
+yabai -m config mouse_follows_focus           on
+yabai -m config focus_follows_mouse           off
+yc window_placement                           first_child
+yc window_topmost                             on
+yabai -m config split_ratio                   0.5
+yabai -m config mouse_modifier                fn
+yabai -m config mouse_action1                 move
+yabai -m config mouse_action2                 resize
+
+
+## General space settings
+yabai -m config layout                        bsp
+yabai -m config top_padding                   16
+yabai -m config bottom_padding                16
+yabai -m config left_padding                  16
+yabai -m config right_padding                 16
+yabai -m config window_gap                    16
+
+
+## Specific space settings
+yabai -m config --space 4 layout float
+yabai -m config --space 5 layout float
+
+
+## Label spaces
+yabai -m space 1 --label terminal
+yabai -m space 2 --label code
+yabai -m space 3 --label browser
+yabai -m space 4 --label whatsapp
+yabai -m space 5 --label discord
+yabai -m space 6 --label music
+yabai -m space 7 --label notion
+yabai -m space 8 --label design
+yabai -m space 9 --label misc
+yabai -m space 10 --label games
+
+
+## Screen 1 (Terminal)
+yabai -m rule --add label="Hyper" app="^Hyper$" space="terminal"
+yabai -m rule --add label="iTerm 2" app="^iTerm 2$" space="terminal"
+yabai -m rule --add label="Terminal" app="^Terminal$" space="terminal"
+
+
+## Screen 2 (Code)
+yabai -m rule --add label="VSCode" app="^Visual Studio Code$" space="code"
+
+
+## Screen 3 (Browser)
+yabai -m rule --add label="Chrome" app="^Google Chrome$" space="browser"
+yabai -m rule --add label="Firefox" app="^Firefox$" space="browser"
+yabai -m rule --add label="Safari" app="^Safari$" space="browser"
+
+
+## Screen 4 (WhatsApp)
+yabai -m rule --add label="WhatsApp" app="^WhatsApp$" space="whatsapp"
+
+
+## Screen 5 (Discord)
+yabai -m rule --add label="Discord" app="^Discord$" space="discord"
+
+
+## Screen 6 (Music)
+yabai -m rule --add label="Spotify" app="^Spotify$" space="music"
+yabai -m rule --add label="Tone Room" app="^Tone Room$" space="music"
+
+
+## Screen 7 (Notion)
+yabai -m rule --add label="Notion" app="^Notion$" space="notion"
+
+
+## Screen 8 (Design)
+yabai -m rule --add label="Figma" app="^Figma$" space="design"
+
+
+## Screen 9 (Misc)
+yabai -m rule --add label="Calendar" app="^Calendar$" space="misc"
+yabai -m rule --add label="Finder" app="^Finder$" space="misc"
+
+
+## Screen 9 (Games)
+yabai -m rule --add label="Steam" app="^Steam$" space="games"
+
+
+## Unmanaged windows
+yabai -m rule --add app='Contexts' manage=off layer=above
+yabai -m rule --add app='IINA' manage=off layer=above
+yabai -m rule --add app='Numi' manage=off layer=above
+yabai -m rule --add app="^Calculator$" manage=off layer=above
+yabai -m rule --add app="^Steam$" space=games manage=off layer=above
+yabai -m rule --add app="^System Preferences$" manage=off layer=above
+yabai -m rule --add label="Preview" app="Preview" manage=off layer=above
+yabai -m rule --add title='Opening' manage=off layer=above
+yabai -m rule --add title='Preferences' manage=off layer=above
+yabai -m rule --add title="(Copy|Bin|About This Mac|Info)" manage=off layer=above
