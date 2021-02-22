@@ -4,10 +4,10 @@ yabai -m signal --add event=dock_did_restart action="sudo yabai --load-sa"
 
 
 ## Global settings
-yabai -m config mouse_follows_focus           on
+yabai -m config mouse_follows_focus           off
 yabai -m config focus_follows_mouse           off
-yc window_placement                           first_child
-yc window_topmost                             on
+yabai -m config window_placement              first_child
+yabai -m config window_topmost                on
 yabai -m config split_ratio                   0.5
 yabai -m config mouse_modifier                fn
 yabai -m config mouse_action1                 move
