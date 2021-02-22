@@ -16,6 +16,7 @@ symlink_dotfile .hyper.js
 symlink_dotfile .ssh-config
 symlink_dotfile .starship.toml
 symlink_dotfile .vuerc
+symlink_dotfile .yabairc
 symlink_dotfile .zsh_aliases
 symlink_dotfile .zsh_functions
 symlink_dotfile .zsh_plugins
