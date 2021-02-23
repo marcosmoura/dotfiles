@@ -5,33 +5,16 @@ local layout = require 'hs.layout'
 
 local monitorName = 'Optix AG32CQ'
 
-function setupTilingWindow (windowLayout, app, x, y, w, h)
+function setWindowPosition (windowLayout, app, x, y, w, h)
   table.insert(windowLayout, {app, nil, monitorName, nil, geometry.rect(x, y, w, h), nil})
-end
-
-function setupMaximizedWindows (windowLayout)
-  local maximized = {
-    'Firefox Nightly',
-    'Safari',
-    'Google Chrome'
-  }
-
-  for i, app in ipairs(maximized) do
-    table.insert(windowLayout, { app, nil, monitorName, layout.maximized, nil })
-  end
-end
-
-function setupManualWindows (windowLayout)
-  setupTilingWindow(windowLayout, 'WhatsApp', 560, 270, 1440, 900)
-  setupTilingWindow(windowLayout, 'Discord', 560, 270, 1440, 900)
-  setupTilingWindow(windowLayout, 'Steam', 560, 270, 1440, 900)
 end
 
 function applyLayout ()
   local windowLayout = {}
 
-  setupMaximizedWindows(windowLayout)
-  setupManualWindows(windowLayout)
+  setWindowPosition(windowLayout, 'WhatsApp', 560, 270, 1440, 900)
+  setWindowPosition(windowLayout, 'Discord', 560, 270, 1440, 900)
+  setWindowPosition(windowLayout, 'Steam', 560, 270, 1440, 900)
 
   layout.apply(windowLayout)
 end

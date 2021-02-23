@@ -21,5 +21,3 @@ open -g /Applications/WhatsApp.app;
 open -g /System/Applications/Calendar.app;
 
 ssh-add ~/.ssh/personal;
-brew services start yabai
-sudo yabai --load-sa
