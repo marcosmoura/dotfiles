@@ -75,8 +75,9 @@ printSuccess "BREW" "Installed with success..."
 
 printMsg "MAC APPS" "Installing App Store Apps..."
 
-mas install 948176063  # Boom 2
 mas install 1319778037 # iStats Menu
 mas install 497799835  # Xcode
+mas install 948176063  # Boom 2
+mas install 980888073  # Crypto Pro
 
 printSuccess "MAC APPS" "Installed with success..."
