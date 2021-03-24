@@ -1086,7 +1086,7 @@
 	<key>TabFlashAnimationDuration</key>
 	<real>0.27500000596046448</real>
 	<key>TabStyleWithAutomaticOption</key>
-	<integer>1</integer>
+	<integer>5</integer>
 	<key>TabViewType</key>
 	<integer>1</integer>
 	<key>TerminalMargin</key>
