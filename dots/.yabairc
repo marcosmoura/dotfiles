@@ -44,6 +44,7 @@ yabai -m config --space discord layout float
 ## Screen 1 (Terminal)
 yabai -m rule --add label="Hyper" app="^Hyper$" space="terminal"
 yabai -m rule --add label="iTerm 2" app="^iTerm 2$" space="terminal"
+yabai -m rule --add label="iTerm" app="^iTerm$" space="terminal"
 yabai -m rule --add label="Terminal" app="^Terminal$" space="terminal"
 
 

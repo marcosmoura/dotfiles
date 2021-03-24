@@ -11,6 +11,7 @@ brew cask install --no-quarantine google-chrome-canary
 brew cask install --no-quarantine figma
 brew cask install --no-quarantine hyper
 brew cask install --no-quarantine imageoptim
+brew cask install --no-quarantine iterm2
 brew cask install --no-quarantine visual-studio-code-insiders
 brew cask install --no-quarantine zeplin
 
