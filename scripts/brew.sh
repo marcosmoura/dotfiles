@@ -35,8 +35,10 @@ brew install findutils
 brew install moreutils
 
 # Install development tools
+brew install cocoapods
 brew install dart
 brew install deno
+brew install flutter
 brew install fx
 brew install glow
 brew install go
@@ -47,6 +49,8 @@ brew install python
 brew install python@2
 brew install rbenv
 brew install ruby
+brew install rust
+brew install rustup-init
 brew install watchman
 brew install yarn
 
@@ -73,6 +77,7 @@ brew install terminal-notifier
 brew install thefuck
 brew install tokei
 brew install tree
+brew install vivid
 brew install z
 brew install zsh
 
