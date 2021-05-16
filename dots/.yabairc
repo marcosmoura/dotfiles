@@ -27,16 +27,18 @@ yabai -m config window_gap                    16
 yabai -m space 1 --label terminal
 yabai -m space 2 --label code
 yabai -m space 3 --label browser
-yabai -m space 4 --label whatsapp
-yabai -m space 5 --label discord
-yabai -m space 6 --label music
-yabai -m space 7 --label notion
-yabai -m space 8 --label design
-yabai -m space 9 --label misc
-yabai -m space 10 --label games
+yabai -m space 4 --label password
+yabai -m space 5 --label whatsapp
+yabai -m space 6 --label discord
+yabai -m space 7 --label music
+yabai -m space 8 --label notion
+yabai -m space 9 --label design
+yabai -m space 10 --label misc
+yabai -m space 11 --label games
 
 
 ## Specific space settings
+yabai -m config --space password layout float
 yabai -m config --space whatsapp layout float
 yabai -m config --space discord layout float
 
@@ -58,33 +60,37 @@ yabai -m rule --add label="Firefox" app="^Firefox$" space="browser"
 yabai -m rule --add label="Safari" app="^Safari$" space="browser"
 
 
-## Screen 4 (WhatsApp)
+## Screen 4 (Password Manager)
+yabai -m rule --add label="Chrome" app="^Keeper Password Manager$" space="password"
+
+
+## Screen 5 (WhatsApp)
 yabai -m rule --add label="WhatsApp" app="^WhatsApp$" space="whatsapp"
 
 
-## Screen 5 (Discord)
+## Screen 6 (Discord)
 yabai -m rule --add label="Discord" app="^Discord$" space="discord"
 
 
-## Screen 6 (Music)
+## Screen 7 (Music)
 yabai -m rule --add label="Spotify" app="^Spotify$" space="music"
 yabai -m rule --add label="Tone Room" app="^Tone Room$" space="music"
 
 
-## Screen 7 (Notion)
+## Screen 8 (Notion)
 yabai -m rule --add label="Notion" app="^Notion$" space="notion"
 
 
-## Screen 8 (Design)
+## Screen 9 (Design)
 yabai -m rule --add label="Figma" app="^Figma$" space="design"
 
 
-## Screen 9 (Misc)
+## Screen 10 (Misc)
 yabai -m rule --add label="Calendar" app="^Calendar$" space="misc"
 yabai -m rule --add label="Finder" app="^Finder$" space="misc"
 
 
-## Screen 9 (Games)
+## Screen 11 (Games)
 yabai -m rule --add label="Steam" app="^Steam$" space="games"
 
 
