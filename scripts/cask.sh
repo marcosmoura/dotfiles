@@ -28,6 +28,7 @@ brew install --no-quarantine whatsapp
 
 # Cloud
 brew install --no-quarantine google-backup-and-sync
+brew install --no-quarantine keeper-password-manager
 
 # Games
 brew install --no-quarantine steam
