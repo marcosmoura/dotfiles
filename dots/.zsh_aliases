@@ -19,7 +19,7 @@ alias updateNpm='sudo npm cache clean -f; npm install npm -g; npm update -g; ech
 alias updateYarn='yarn cache clean --force; yarn global upgrade --latest; echo "\n$(tput setaf 2)Yarn updated!\n"'
 alias updateZsh='antibody bundle < ~/.zsh_plugins > ~/.zsh_plugins.sh; omz update; antibody update; echo "\n$(tput setaf 2)zsh updated!\n"'
 alias cleanBrew='brew cleanup; echo "\n$(tput setaf 2)Brew cleared!\n"'
-alias updateBrew='brew -v update; brew upgrade --force-bottle; cleanBrew; brew doctor; echo "\n$(tput setaf 2)Brew updated!\n"'
+alias updateBrew='brew -v update; brew upgrade; cleanBrew; brew doctor; echo "\n$(tput setaf 2)Brew updated!\n"'
 alias updateCasks='updateBrew; brew cu -a; cleanBrew; echo "\n$(tput setaf 2)Casks updated!\n"'
 
 # Detect which `ls` flavor is in use
