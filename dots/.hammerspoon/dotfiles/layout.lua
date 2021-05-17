@@ -13,8 +13,7 @@ function applyLayout ()
   local windowLayout = {}
 
   setWindowPosition(windowLayout, 'Discord', 560, 270, 1440, 900)
-  setWindowPosition(windowLayout, 'Keeper Password Manager', 560, 270, 1440, 900)
-  setWindowPosition(windowLayout, 'WhatsApp', 560, 270, 1440, 900)
+  setWindowPosition(windowLayout, 'Steam', 560, 270, 1440, 900)
   setWindowPosition(windowLayout, 'WhatsApp', 560, 270, 1440, 900)
 
   layout.apply(windowLayout)
