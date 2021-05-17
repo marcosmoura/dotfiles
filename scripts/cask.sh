@@ -25,19 +25,21 @@ brew install --no-quarantine font-jetbrains-mono
 # Communication
 brew install --no-quarantine discord
 brew install --no-quarantine whatsapp
+brew install --no-quarantine zoom
 
 # Cloud
 brew install --no-quarantine google-backup-and-sync
-brew install --no-quarantine keeper-password-manager
 
 # Games
 brew install --no-quarantine steam
 
 # Productivity
 brew install --no-quarantine alfred
+brew install --no-quarantine bitwarden
 brew install --no-quarantine hammerspoon
 brew install --no-quarantine hiddenbar
 brew install --no-quarantine kap
+brew install --no-quarantine keeper-password-manager
 brew install --no-quarantine koekeishiya/formulae/yabai
 brew install --no-quarantine muzzle
 brew install --no-quarantine numi
