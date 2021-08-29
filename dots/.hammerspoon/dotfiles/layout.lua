@@ -2,19 +2,31 @@ local alert = require 'hs.alert'
 local spaces = require 'hs.spaces'
 local geometry = require 'hs.geometry'
 local layout = require 'hs.layout'
+local screen = require 'hs.screen'
 
-local monitorName = 'Optix AG32CQ'
+local monitor = screen.mainScreen()
+local mainScreenSizes = monitor:fullFrame()
+local screenWidth = mainScreenSizes.w
+local screenHeight = mainScreenSizes.h
 
-function setWindowPosition (windowLayout, app, x, y, w, h)
-  table.insert(windowLayout, {app, nil, monitorName, nil, geometry.rect(x, y, w, h), nil})
+function setWindowPosition (windowLayout, app, w, h)
+  w = w or 1440
+  h = h or 900
+
+  local left = screenWidth / 2 - w / 2
+  local top = screenHeight / 2 - h / 2 - 16
+
+  table.insert(windowLayout, {app, nil, monitor, nil, geometry.rect(left, top, w, h), nil})
 end
 
 function applyLayout ()
   local windowLayout = {}
 
-  setWindowPosition(windowLayout, 'Discord', 560, 270, 1440, 900)
-  setWindowPosition(windowLayout, 'Steam', 560, 270, 1440, 900)
-  setWindowPosition(windowLayout, 'WhatsApp', 560, 270, 1440, 900)
+  setWindowPosition(windowLayout, 'Bitwarden')
+  setWindowPosition(windowLayout, 'Keeper Password Manager')
+  setWindowPosition(windowLayout, 'Discord')
+  setWindowPosition(windowLayout, 'Steam')
+  setWindowPosition(windowLayout, 'WhatsApp')
 
   layout.apply(windowLayout)
 end
