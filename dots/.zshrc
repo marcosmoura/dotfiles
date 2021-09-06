@@ -40,7 +40,7 @@ COMPLETION_WAITING_DOTS="false"
 HIST_STAMPS="dd/mm/yyyy"
 
 # rbenv
-export RBENV_VERSION=3.0.0
+export RBENV_VERSION=3.0.2
 eval "$(rbenv init -)"
 
 # Setup starship prompt
