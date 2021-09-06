@@ -49,7 +49,6 @@ eval "$(starship init zsh)"
 
 # zsh plugins
 source $HOME/.zsh_plugins.sh
-source $(dirname $(gem which colorls))/tab_complete.sh
 eval "$(thefuck --alias)"
 
 # Load aliases and functions
