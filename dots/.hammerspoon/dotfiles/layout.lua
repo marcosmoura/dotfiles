@@ -23,7 +23,6 @@ function applyLayout ()
   local windowLayout = {}
 
   setWindowPosition(windowLayout, 'Bitwarden')
-  setWindowPosition(windowLayout, 'Keeper Password Manager')
   setWindowPosition(windowLayout, 'Discord')
   setWindowPosition(windowLayout, 'Steam')
   setWindowPosition(windowLayout, 'WhatsApp')

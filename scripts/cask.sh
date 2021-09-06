@@ -19,13 +19,13 @@ brew install --no-quarantine zeplin
 # Fonts
 brew install --no-quarantine font-cascadia-mono
 brew install --no-quarantine font-fira-code
+brew install --no-quarantine font-inter
 brew install --no-quarantine font-hack-nerd-font
 brew install --no-quarantine font-jetbrains-mono
 
 # Communication
 brew install --no-quarantine discord
 brew install --no-quarantine whatsapp
-brew install --no-quarantine zoom
 
 # Cloud
 brew install --no-quarantine google-backup-and-sync
@@ -34,12 +34,10 @@ brew install --no-quarantine google-backup-and-sync
 brew install --no-quarantine steam
 
 # Productivity
-brew install --no-quarantine alfred
 brew install --no-quarantine bitwarden
 brew install --no-quarantine hammerspoon
 brew install --no-quarantine hiddenbar
 brew install --no-quarantine kap
-brew install --no-quarantine keeper-password-manager
 brew install --no-quarantine koekeishiya/formulae/yabai
 brew install --no-quarantine muzzle
 brew install --no-quarantine numi
@@ -80,6 +78,5 @@ printMsg "MAC APPS" "Installing App Store Apps..."
 
 mas install 1319778037 # iStats Menu
 mas install 497799835  # Xcode
-mas install 948176063  # Boom 2
 
 printSuccess "MAC APPS" "Installed with success..."

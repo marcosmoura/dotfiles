@@ -34,10 +34,8 @@ brew install findutils
 brew install moreutils
 
 # Install development tools
-brew install cocoapods
 brew install dart
 brew install deno
-brew install flutter
 brew install fx
 brew install glow
 brew install go
