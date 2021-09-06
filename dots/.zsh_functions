@@ -1,5 +1,5 @@
 # Simple calculator
-function c() {
+function calc() {
   while true; do read i; echo $[$i]; done
 }
 
@@ -54,22 +54,6 @@ function targz() {
   "${cmd}" -v "${tmpFile}" || return 1;
   [ -f "${tmpFile}" ] && rm "${tmpFile}";
   echo "${tmpFile}.gz created successfully.";
-}
-
-
-# Determine size of a file or total size of a directory
-function fs() {
-  if du -b /dev/null > /dev/null 2>&1; then
-    local arg=-sbh;
-  else
-    local arg=-sh;
-  fi
-
-  if [[ -n "$@" ]]; then
-    du $arg -- "$@";
-  else
-    du $arg .[^.]* ./*;
-  fi;
 }
 
 # `o` with no arguments opens the current directory, otherwise opens the given
