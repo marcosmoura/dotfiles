@@ -59,9 +59,6 @@ alias snano='sudo nano'
 # Go to git root
 alias groot='cd `git rev-parse --show-toplevel`'
 
-# Better find
-alias find='fd -X bat'
-
 # Better du
 alias du='ncdu --color dark -rr -x --exclude .git --exclude node_modules'
 
