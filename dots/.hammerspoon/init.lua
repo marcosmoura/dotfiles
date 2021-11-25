@@ -1,11 +1,11 @@
 local alert = require("hs.alert")
 local config = require("dotfiles.config")
-local hotkeys = require("dotfiles.hotkeys")
+local slowquit = require("dotfiles.slowquit")
 local watcher = require("dotfiles.watcher")
 local window = require("dotfiles.window")
 
 config()
-hotkeys()
+slowquit()
 watcher()
 window()
 alert.show("Hammerspoon at your service!", 1.5)

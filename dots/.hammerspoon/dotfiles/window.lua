@@ -1,15 +1,22 @@
 local alert = require("hs.alert")
+local hotkey = require("hs.hotkey")
+local screen = require("hs.screen")
 local stackline = require("stackline")
 local window = require("hs.window")
-local application = require("hs.application")
-local hotkey = require("hs.hotkey")
-local logger = require("hs.logger")
-local spaces = require("hs.spaces")
 
+local centered = {
+	horizontal = {
+		w = 1440,
+		h = 900,
+	},
+	vertical = {
+		w = 1280,
+		h = 2000,
+	},
+}
 local gapSize = 16
 local margin = gapSize / 2
 local menubarSize = 24
-local log = logger.new("layout", "info")
 local module = {}
 local appLayout = {}
 
@@ -48,15 +55,15 @@ appLayout["WhatsApp"] = {
 	layout = "centered",
 }
 
-function getFocusedWindow()
+local function getFocusedWindow()
 	return window.focusedWindow()
 end
 
-function getScreenFrame()
+local function getScreenFrame()
 	return getFocusedWindow():screen():frame()
 end
 
-function getWindowFrame()
+local function getWindowFrame()
 	return getFocusedWindow():frame()
 end
 
@@ -67,8 +74,8 @@ end
 -- |                  |
 -- |                  |
 -- +------------------+
-function module.rightTop(window)
-	window = window or getFocusedWindow()
+function module.rightTop(win)
+	win = win or getFocusedWindow()
 
 	local frame = getScreenFrame()
 	local width = frame.w / 2 - gapSize - margin
@@ -79,7 +86,7 @@ function module.rightTop(window)
 	frame.w = width
 	frame.h = height
 
-	window:setFrame(frame)
+	win:setFrame(frame)
 end
 
 -- +------------------+
@@ -89,8 +96,8 @@ end
 -- |         | HERE | |
 -- |         +------+ |
 -- +------------------+
-function module.rightDown(window)
-	window = window or getFocusedWindow()
+function module.rightDown(win)
+	win = win or getFocusedWindow()
 
 	local frame = getScreenFrame()
 	local width = frame.w / 2 - gapSize - margin
@@ -101,7 +108,7 @@ function module.rightDown(window)
 	frame.w = width
 	frame.h = height
 
-	window:setFrame(frame)
+	win:setFrame(frame)
 end
 
 -- +------------------+
@@ -111,8 +118,8 @@ end
 -- |                  |
 -- |                  |
 -- +------------------+
-function module.leftTop(window)
-	window = window or getFocusedWindow()
+function module.leftTop(win)
+	win = win or getFocusedWindow()
 
 	local frame = getScreenFrame()
 	local width = frame.w / 2 - gapSize - margin
@@ -123,7 +130,7 @@ function module.leftTop(window)
 	frame.w = width
 	frame.h = height
 
-	window:setFrame(frame)
+	win:setFrame(frame)
 end
 
 -- +------------------+
@@ -133,8 +140,8 @@ end
 -- | | HERE |         |
 -- | +------+         |
 -- +------------------+
-function module.leftDown(window)
-	window = window or getFocusedWindow()
+function module.leftDown(win)
+	win = win or getFocusedWindow()
 
 	local frame = getScreenFrame()
 	local width = frame.w / 2 - gapSize - margin
@@ -145,7 +152,7 @@ function module.leftDown(window)
 	frame.w = width
 	frame.h = height
 
-	window:setFrame(frame)
+	win:setFrame(frame)
 end
 
 -- +------------------+
@@ -155,8 +162,8 @@ end
 -- |         |      | |
 -- |         +------+ |
 -- +------------------+
-function module.right(window)
-	window = window or getFocusedWindow()
+function module.right(win)
+	win = win or getFocusedWindow()
 
 	local frame = getScreenFrame()
 	local width = frame.w / 2 - gapSize - margin
@@ -167,7 +174,7 @@ function module.right(window)
 	frame.w = width
 	frame.h = height
 
-	window:setFrame(frame)
+	win:move(frame, win:screen())
 end
 
 -- +------------------+
@@ -177,8 +184,8 @@ end
 -- | |      |         |
 -- | +------+         |
 -- +------------------+
-function module.left(window)
-	window = window or getFocusedWindow()
+function module.left(win)
+	win = win or getFocusedWindow()
 
 	local frame = getScreenFrame()
 	local width = frame.w / 2 - gapSize - margin
@@ -189,7 +196,7 @@ function module.left(window)
 	frame.w = width
 	frame.h = height
 
-	window:setFrame(frame)
+	win:setFrame(frame)
 end
 
 -- +------------------+
@@ -199,8 +206,8 @@ end
 -- | |              | |
 -- | +--------------+ |
 -- +------------------+
-function module.maximized(window)
-	window = window or getFocusedWindow()
+function module.maximized(win)
+	win = win or getFocusedWindow()
 
 	local frame = getScreenFrame()
 
@@ -209,7 +216,7 @@ function module.maximized(window)
 	frame.w = frame.w - gapSize * 2
 	frame.h = frame.h - gapSize * 2
 
-	window:setFrame(frame)
+	win:setFrame(frame)
 end
 
 -- +------------------+
@@ -219,29 +226,42 @@ end
 -- |   +----------+   |
 -- |                  |
 -- +------------------+
-function module.centered(window, ignoreSize)
-	window = window or getFocusedWindow()
+function module.centered(win, ignoreSize)
+	win = win or getFocusedWindow()
 
-	local width = 1440
-	local height = 900
 	local frame = getWindowFrame()
+	local width = centered.horizontal.w
+	local height = centered.horizontal.h
+
+	if frame.w <= centered.horizontal.w then
+		width = centered.vertical.w
+		height = centered.vertical.h
+	end
 
 	if not ignoreSize then
 		frame.w = width
 		frame.h = height
 	end
 
-	window:setFrame(frame)
-	window:centerOnScreen(window:screen(), true)
+	win:setFrame(frame)
+	win:centerOnScreen(win:screen(), true)
 
 	frame = getWindowFrame()
 
 	frame.y = frame.y - menubarSize / 2
-	window:setFrame(frame)
-	window:centerOnScreen(window:screen(), true)
+	win:setFrame(frame)
+	win:centerOnScreen(win:screen(), true)
 end
 
-function setAppLayout(appName, window)
+local function moveWindowToDisplay(displayNumber)
+	local displays = screen.allScreens()
+
+	return function()
+		getFocusedWindow():moveToScreen(displays[displayNumber], false, true)
+	end
+end
+
+local function setAppLayout(appName, win)
 	if not appName then
 		appName = getFocusedWindow():application():name()
 	end
@@ -252,27 +272,12 @@ function setAppLayout(appName, window)
 		local fn = module[appConfig.layout]
 
 		if fn then
-			fn(window, appConfig.ignoreSize)
+			fn(win, appConfig.ignoreSize)
 		end
 	end
 end
 
-function onAppEvent(appName, eventType)
-	if eventType == application.watcher.activated then
-		setAppLayout(appName)
-	end
-
-	if eventType == application.watcher.launched then
-		setAppLayout(appName)
-	end
-end
-
-local appWatcher = application.watcher.new(onAppEvent)
-local spacesWatcher = spaces.watcher.new(function()
-	setAppLayout()
-end)
-
-function applyWindowLayout()
+local function applyWindowLayout()
 	stackline:init()
 	stackline.config:set("appearance.showIcons", false)
 	stackline.config:set("appearance.offset.y", 4)
@@ -280,18 +285,13 @@ function applyWindowLayout()
 	stackline.config:set("appearance.fadeDuration", 0.25)
 	stackline.config:set("appearance.dimmer", 4)
 
-	appWatcher.stop(appWatcher)
-	appWatcher.start(appWatcher)
-
-	spacesWatcher.stop(spacesWatcher)
-	spacesWatcher.start(spacesWatcher)
-
 	alert.show("Layout Applied!", 1.5)
 end
 
 return function()
 	local main = { "cmd", "option" }
-	local alt = { "cmd", "alt", "ctrl" }
+	local alt = { "cmd", "option", "shift" }
+	local screen = { "ctrl", "option", "cmd" }
 
 	hotkey.bind(alt, "L", applyWindowLayout)
 
@@ -304,6 +304,9 @@ return function()
 	hotkey.bind(alt, "left", module.leftDown)
 	hotkey.bind(alt, "right", module.rightTop)
 	hotkey.bind(alt, "down", module.rightDown)
+
+	hotkey.bind(screen, "right", moveWindowToDisplay(1))
+	hotkey.bind(screen, "left", moveWindowToDisplay(2))
 
 	applyWindowLayout()
 	setAppLayout()
