@@ -1,14 +1,5 @@
-local hotkey = require 'hs.hotkey'
-local window = require 'hs.window'
-local applyWindowLayout = require 'dotfiles.layout'
-local slowQuitApps = require 'dotfiles.slowquit'
-local masterHotkey = {'cmd', 'alt', 'ctrl'}
+local slowQuitApps = require("dotfiles.slowquit")
 
-function reloadWindowLayout ()
-  hotkey.bind(masterHotkey, 'L', applyWindowLayout)
-end
-
-return function ()
-  reloadWindowLayout()
-  slowQuitApps()
+return function()
+	slowQuitApps()
 end
