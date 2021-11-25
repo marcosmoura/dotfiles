@@ -1,0 +1,3 @@
+[submodule "dots/.hammerspoon/stackline"]
+	path = dots/.hammerspoon/stackline
+	url = https://github.com/AdamWagner/stackline.git
