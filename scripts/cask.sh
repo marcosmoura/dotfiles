@@ -65,6 +65,7 @@ brew install --no-quarantine adguard
 brew install --no-quarantine appcleaner
 brew install --no-quarantine captin
 brew install --no-quarantine caption
+brew install --no-quarantine displaperture
 brew install --no-quarantine lyricsx
 brew install --no-quarantine mullvadvpn
 brew install --no-quarantine notion
