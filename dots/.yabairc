@@ -24,30 +24,22 @@ yabai -m config window_gap                    16
 
 
 ## Label spaces
-yabai -m space 1 --label terminal
-yabai -m space 2 --label code
-yabai -m space 3 --label browser
-yabai -m space 4 --label notion
-yabai -m space 5 --label password
-yabai -m space 6 --label whatsapp
-yabai -m space 7 --label discord
-yabai -m space 8 --label music
-yabai -m space 9 --label design
-yabai -m space 10 --label misc
-yabai -m space 11 --label games
+yabai -m space 1 --label code
+yabai -m space 2 --label browser
+yabai -m space 3 --label music
+yabai -m space 4 --label whatsapp
+yabai -m space 5 --label discord
+yabai -m space 6 --label design
+yabai -m space 7 --label misc
+yabai -m space 8 --label games
+yabai -m space 9 --label terminal
+yabai -m space 10 --label tools
 
 
 ## Specific space settings
 yabai -m config --space password layout float
 yabai -m config --space whatsapp layout float
 yabai -m config --space discord layout float
-
-
-## Screen (Terminal)
-yabai -m rule --add label="Hyper" app="^Hyper$" space="terminal"
-yabai -m rule --add label="iTerm 2" app="^iTerm 2$" space="terminal"
-yabai -m rule --add label="iTerm" app="^iTerm$" space="terminal"
-yabai -m rule --add label="Terminal" app="^Terminal$" space="terminal"
 
 
 ## Screen (Code)
@@ -60,12 +52,9 @@ yabai -m rule --add label="Firefox" app="^Firefox$" space="browser"
 yabai -m rule --add label="Safari" app="^Safari$" space="browser"
 
 
-## Screen (Notion)
-yabai -m rule --add label="Notion" app="^Notion$" space="notion"
-
-
-## Screen (Password Manager)
-yabai -m rule --add label="Bitwarden" app="^Bitwarden$" space="password"
+## Screen (Music)
+yabai -m rule --add label="Spotify" app="^Spotify$" space="music"
+yabai -m rule --add label="Tone Room" app="^Tone Room$" space="music"
 
 
 ## Screen (WhatsApp)
@@ -74,11 +63,6 @@ yabai -m rule --add label="WhatsApp" app="^WhatsApp$" space="whatsapp"
 
 ## Screen (Discord)
 yabai -m rule --add label="Discord" app="^Discord$" space="discord"
-
-
-## Screen (Music)
-yabai -m rule --add label="Spotify" app="^Spotify$" space="music"
-yabai -m rule --add label="Tone Room" app="^Tone Room$" space="music"
 
 
 ## Screen (Design)
@@ -92,6 +76,17 @@ yabai -m rule --add label="Finder" app="^Finder$" space="misc"
 
 ## Screen (Games)
 yabai -m rule --add label="Steam" app="^Steam$" space="games"
+
+
+## Screen (Terminal)
+yabai -m rule --add label="iTerm 2" app="^iTerm 2$" space="terminal"
+yabai -m rule --add label="iTerm" app="^iTerm$" space="terminal"
+yabai -m rule --add label="Terminal" app="^Terminal$" space="terminal"
+
+
+## Screen (Tools)
+yabai -m rule --add label="Notion" app="^Notion$" space="tools"
+yabai -m rule --add label="Bitwarden" app="^Bitwarden$" space="tools"
 
 
 ## Unmanaged windows
