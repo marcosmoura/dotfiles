@@ -12,7 +12,7 @@ alias code='code-insiders '
 alias c='code-insiders '
 
 # Update and Cleanup env
-alias resetTermColors='echo "$(tput init)"'
+alias resetTermColors='echo "$(tput sgr0)"'
 alias greenTermColors='echo "$(tput setaf 2)"'
 
 alias updateRb='resetTermColors; gem update --system; gem update --no-document; gem cleanup; greenTermColors; echo "Ruby gems updated!"'
@@ -22,8 +22,8 @@ alias updateZsh='resetTermColors; antibody bundle < ~/.zsh_plugins > ~/.zsh_plug
 alias updateBrew='resetTermColors; brew -v update; brew upgrade; brew cleanup; brew doctor; greenTermColors; echo "Brew updated!"'
 
 alias updateOs='updateRb; updateBrew; updateNpm; updateYarn; updateZsh; greenTermColors; echo "Everything updated!"; resetTermColors'
-alias updateOsFull='updateOsx; updateOs; resetTermColors'
 alias updateOsx='sudo softwareupdate -i -a; mas upgrade; greenTermColors; echo "OS Updated!"; resetTermColors'
+alias updateOsFull='updateOsx; updateOs; resetTermColors'
 
 # View HTTP traffic
 alias sniff="sudo ngrep -d 'en1' -t '^(GET|POST) ' 'tcp and port 80'"
