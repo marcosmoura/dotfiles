@@ -11,8 +11,8 @@ pushd ./dots
 symlink_dotfile .alacritty.yml
 symlink_dotfile .editorconfig
 symlink_dotfile .gitconfig
-symlink_dotfile .hammerspoon
-symlink_dotfile .hyper.js
+symlink_dotfile .phoenix.debug.js
+symlink_dotfile .phoenix.js
 symlink_dotfile .ssh-config
 symlink_dotfile .starship.toml
 symlink_dotfile .vuerc

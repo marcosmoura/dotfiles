@@ -1,0 +1,50 @@
+{
+  "name": "phoenix-config",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Phoenix Config",
+  "bugs": {
+    "url": "https://github.com/marcosmoura/dotfiles/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/marcosmoura/dotfiles"
+  },
+  "license": "MIT",
+  "author": {
+    "name": "marcosmoura",
+    "email": "marcosvmmoura@gmail.com"
+  },
+  "sideEffects": false,
+  "scripts": {
+    "build": "webpack --config webpack.prod.js",
+    "clean-install": "rm -rf node_modules yarn.lock && yarn",
+    "dev": "webpack --watch --config webpack.dev.js",
+    "lint": "yarn lint:prettier && yarn lint:ts",
+    "lint:prettier": "prettier --write '**/*.{md,json,js,ts,d.ts}'",
+    "lint:ts": "tsc --noEmit"
+  },
+  "dependencies": {
+    "just-extend": "^6.0.1",
+    "just-split": "^3.0.1",
+    "p-queue": "^7.1.0",
+    "popmotion": "^11.0.0"
+  },
+  "devDependencies": {
+    "@trivago/prettier-plugin-sort-imports": "^3.1.1",
+    "@types/node": "^16.11.10",
+    "fork-ts-checker-webpack-plugin": "^6.4.2",
+    "prettier": "^2.5.0",
+    "prettier-plugin-packagejson": "^2.2.15",
+    "ts-loader": "^9.2.6",
+    "tslib": "^2.3.1",
+    "typescript": "^4.5.2",
+    "typings": "^2.1.1",
+    "webpack": "^5.64.4",
+    "webpack-cli": "^4.9.1",
+    "webpack-merge": "^5.8.0"
+  },
+  "engines": {
+    "node": ">= 16.0"
+  }
+}

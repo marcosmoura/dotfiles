@@ -35,7 +35,6 @@ brew install --no-quarantine steam
 
 # Productivity
 brew install --no-quarantine bitwarden
-brew install --no-quarantine hammerspoon
 brew install --no-quarantine hiddenbar
 brew install --no-quarantine kap
 brew install --no-quarantine koekeishiya/formulae/yabai
