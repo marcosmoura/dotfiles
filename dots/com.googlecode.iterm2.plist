@@ -1148,7 +1148,7 @@
 				<key>Has Toolbelt</key>
 				<false/>
 				<key>Height</key>
-				<real>1327</real>
+				<real>2503</real>
 				<key>Hide After Opening</key>
 				<false/>
 				<key>Hiding Toolbelt Should Resize Window</key>
@@ -1160,7 +1160,7 @@
 				<key>Saved Window Type</key>
 				<integer>12</integer>
 				<key>Screen</key>
-				<integer>0</integer>
+				<integer>1</integer>
 				<key>Scroller Width</key>
 				<real>0.0</real>
 				<key>Selected Tab Index</key>
@@ -1511,7 +1511,7 @@
 												<real>0.93725490196078431</real>
 											</dict>
 											<key>Guid</key>
-											<string>4869166D-C686-4FE5-BF3C-E8DD6035881D</string>
+											<string>89B33541-965C-4819-B1B6-0348DA33CA63</string>
 											<key>Horizontal Spacing</key>
 											<real>1</real>
 											<key>Idle Code</key>
@@ -2118,11 +2118,14 @@
 											<string>~/Projects</string>
 										</dict>
 										<key>Columns</key>
-										<integer>120</integer>
+										<integer>134</integer>
 										<key>Commands</key>
 										<array/>
 										<key>Directories</key>
 										<array>
+											<string>/Users/marcosmoura/Projects</string>
+											<string>/Users/marcosmoura/Projects</string>
+											<string>/Users/marcosmoura/Projects</string>
 											<string>/Users/marcosmoura/Projects</string>
 										</array>
 										<key>Environment</key>
@@ -2157,7 +2160,7 @@
 											<string>Shell Launcher</string>
 										</dict>
 										<key>Rows</key>
-										<integer>44</integer>
+										<integer>42</integer>
 										<key>Session GUID</key>
 										<string>68EACD87-2A48-470F-9F9F-F3F49F7B3A6D</string>
 										<key>Short Lived Single Use</key>
@@ -2181,9 +2184,9 @@
 									<key>frame</key>
 									<dict>
 										<key>height</key>
-										<real>1327</real>
+										<real>1251</real>
 										<key>width</key>
-										<real>1264</real>
+										<real>1408</real>
 										<key>x</key>
 										<real>0.0</real>
 										<key>y</key>
@@ -2527,7 +2530,7 @@
 												<real>0.93725490196078431</real>
 											</dict>
 											<key>Guid</key>
-											<string>964E5E69-B5CA-417C-889A-02EE903804BF</string>
+											<string>971FECA6-E1F0-49C7-AD0F-796C409A3F3B</string>
 											<key>Horizontal Spacing</key>
 											<real>1</real>
 											<key>Idle Code</key>
@@ -3134,12 +3137,11 @@
 											<string>~/Projects</string>
 										</dict>
 										<key>Columns</key>
-										<integer>119</integer>
+										<integer>134</integer>
 										<key>Commands</key>
 										<array/>
 										<key>Directories</key>
 										<array>
-											<string>/Users/marcosmoura/Projects</string>
 											<string>/Users/marcosmoura/Projects</string>
 											<string>/Users/marcosmoura/Projects</string>
 										</array>
@@ -3175,9 +3177,9 @@
 											<string>Shell Launcher</string>
 										</dict>
 										<key>Rows</key>
-										<integer>44</integer>
+										<integer>42</integer>
 										<key>Session GUID</key>
-										<string>A7318BE6-F8C3-4E4F-96FE-81FE1D9CF6F8</string>
+										<string>AB37C7FA-2995-401D-9295-E684E1BEDD71</string>
 										<key>Short Lived Single Use</key>
 										<false/>
 										<key>Should Expect Current Dir Updates</key>
@@ -3199,13 +3201,13 @@
 									<key>frame</key>
 									<dict>
 										<key>height</key>
-										<real>1327</real>
+										<real>1251</real>
 										<key>width</key>
-										<real>1263</real>
+										<real>1408</real>
 										<key>x</key>
-										<real>1265</real>
-										<key>y</key>
 										<real>0.0</real>
+										<key>y</key>
+										<real>1252</real>
 									</dict>
 								</dict>
 							</array>
@@ -3214,16 +3216,16 @@
 							<key>frame</key>
 							<dict>
 								<key>height</key>
-								<real>1327</real>
+								<real>2503</real>
 								<key>width</key>
-								<real>2528</real>
+								<real>1408</real>
 								<key>x</key>
 								<real>0.0</real>
 								<key>y</key>
 								<real>0.0</real>
 							</dict>
 							<key>isVertical</key>
-							<true/>
+							<false/>
 						</dict>
 						<key>Tab GUID</key>
 						<string>D0C5D18C-1CE5-4463-AA0E-A2B81520336D</string>
@@ -3259,13 +3261,13 @@
 				<key>Use Transparency</key>
 				<true/>
 				<key>Width</key>
-				<real>2528</real>
+				<real>1408</real>
 				<key>Window Type</key>
 				<integer>12</integer>
 				<key>X Origin</key>
-				<real>16</real>
+				<real>-1424</real>
 				<key>Y Origin</key>
-				<real>73</real>
+				<real>-778</real>
 			</dict>
 		</array>
 	</dict>
