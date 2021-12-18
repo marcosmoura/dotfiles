@@ -17,17 +17,18 @@ brew install --no-quarantine visual-studio-code-insiders
 brew install --no-quarantine zeplin
 
 # Fonts
-brew install --no-quarantine font-cascadia-mono
 brew install --no-quarantine font-fira-code
-brew install --no-quarantine font-inter
 brew install --no-quarantine font-hack-nerd-font
+brew install --no-quarantine font-inter
 brew install --no-quarantine font-jetbrains-mono
+brew install --no-quarantine font-jetbrains-mono-nerd-font
 
 # Communication
 brew install --no-quarantine discord
 brew install --no-quarantine whatsapp
 
 # Cloud
+brew install --no-quarantine cryptomator
 brew install --no-quarantine google-backup-and-sync
 
 # Games

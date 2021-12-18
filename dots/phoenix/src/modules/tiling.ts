@@ -2,14 +2,19 @@ import extend from 'just-extend'
 import split from 'just-split'
 import Queue from 'p-queue'
 
-import { gapSize, margin, maxGridCells, keybindings, blacklistedWindows } from '@/config'
+import { alert } from '@/components/alert'
+import { gapSize, maxGridCells, keybindings, blacklistedWindows } from '@/config'
 import { animateToFrame } from '@/utils/animate'
 import { addEventListener } from '@/utils/event'
+import { FramePosition, getFrameSizeByPosition } from '@/utils/frame'
 import { onKeyPress } from '@/utils/key'
+import { clearObject } from '@/utils/object'
+
+import { setWindowCentered, setWindowMaximized } from './windows'
 
 export type TilingLayout = {
   mode: 'column' | 'row' | 'maximized' | 'centered' | 'grid'
-  frame?: 'top' | 'right' | 'bottom' | 'left' | 'full'
+  frame?: FramePosition
   maxGridCells?: 2 | 3 | 4 | 5
 }
 export type AppLayout = {
@@ -29,41 +34,10 @@ const ruleCache: { [rule: string]: AppLayout } = {}
 const appCache: { [appName: string]: AppLayout } = {}
 const tilingQueue = new Queue({ concurrency: 1, autoStart: true })
 
-function getFrameSize(screen: Screen, frame: TilingLayout['frame']): Rectangle {
-  const mainFrame = screen.flippedVisibleFrame()
-  let width = 0
-  let height = 0
-  let x = 0
-  let y = 0
-
-  if (['right', 'left'].includes(frame)) {
-    width = mainFrame.width / 2 - gapSize - margin
-    height = mainFrame.height - gapSize * 2
-    y = mainFrame.y + gapSize
-
-    if (frame === 'right') {
-      x = mainFrame.x + width + gapSize * 2
-    } else {
-      x = mainFrame.x + gapSize
-    }
-  } else if (['top', 'bottom'].includes(frame)) {
-    width = mainFrame.width - gapSize * 2
-    height = mainFrame.height / 2 - gapSize - margin
-    x = mainFrame.x + gapSize
-
-    if (frame === 'top') {
-      y = mainFrame.y + gapSize
-    } else {
-      y = mainFrame.y + height + gapSize * 2
-    }
-  } else {
-    width = mainFrame.width - gapSize * 2
-    height = mainFrame.height - gapSize * 2
-    x = mainFrame.x + gapSize
-    y = mainFrame.y + gapSize
-  }
-
-  return { width, height, x, y }
+function clearTilingCache() {
+  clearObject(ruleCache)
+  clearObject(appCache)
+  tilingQueue.clear()
 }
 
 function setAppToColumns(app: App, tiling: TilingLayout) {
@@ -72,7 +46,7 @@ function setAppToColumns(app: App, tiling: TilingLayout) {
   if (windows.length) {
     const numOfWindows = windows.length
     const appScreen = windows[0].screen()
-    const screenFrame = getFrameSize(appScreen, tiling.frame)
+    const screenFrame = getFrameSizeByPosition(appScreen, tiling.frame)
 
     windows.forEach((window, index) => {
       const width = (screenFrame.width - gapSize * (numOfWindows - 1)) / numOfWindows
@@ -91,7 +65,7 @@ function setAppToRows(app: App, tiling: TilingLayout) {
   if (windows.length) {
     const numOfWindows = windows.length
     const appScreen = windows[0].screen()
-    const screenFrame = getFrameSize(appScreen, tiling.frame)
+    const screenFrame = getFrameSizeByPosition(appScreen, tiling.frame)
 
     windows.forEach((window, index) => {
       const width = screenFrame.width
@@ -108,10 +82,9 @@ function setAppMaximized(app: App, tiling: TilingLayout) {
   const windows = app.windows({ visible: true })
 
   if (windows.length) {
-    const appScreen = windows[0].screen()
-    const screenFrame = getFrameSize(appScreen, tiling.frame)
+    const screenFrame = getFrameSizeByPosition(windows[0].screen(), tiling.frame)
 
-    windows.forEach((window) => animateToFrame(window, screenFrame))
+    windows.forEach((window) => setWindowMaximized(window, screenFrame))
   }
 }
 
@@ -119,21 +92,9 @@ function setAppCentered(app: App, tiling: TilingLayout) {
   const windows = app.windows({ visible: true })
 
   if (windows.length) {
-    const appScreen = windows[0].screen()
-    const screenFrame = getFrameSize(appScreen, tiling.frame)
-    let targetWidth = 1440
-    let targetHeight = 900
+    const screenFrame = getFrameSizeByPosition(windows[0].screen(), tiling.frame)
 
-    windows.forEach((window) => {
-      const windowFrame = window.frame()
-      const isWindowSmaller = windowFrame.width < targetWidth && windowFrame.height < targetHeight
-      const width = isWindowSmaller ? windowFrame.width : targetWidth
-      const height = isWindowSmaller ? windowFrame.height : targetHeight
-      const x = screenFrame.x + screenFrame.width / 2 - width / 2
-      const y = screenFrame.y + screenFrame.height / 2 - height / 2
-
-      animateToFrame(window, { width, height, x, y })
-    })
+    windows.forEach((window) => setWindowCentered(window, screenFrame))
   }
 }
 
@@ -142,7 +103,7 @@ function setAppToGrid(app: App, { frame, maxGridCells }: TilingLayout) {
 
   if (windows.length) {
     const appScreen = windows[0].screen()
-    const screenFrame = getFrameSize(appScreen, frame)
+    const screenFrame = getFrameSizeByPosition(appScreen, frame)
     const gridDimension = windows.length > Math.round(maxGridCells * 1.4) ? maxGridCells : 2
     const grid = split(windows, gridDimension)
     const rows = grid.length
@@ -177,12 +138,7 @@ function getMatchedApp(appName: string) {
   return matchedApps
 }
 
-function applyLayoutToApp(
-  app: App,
-  space: number = defaultOptions.space,
-  tiling: TilingLayout = defaultOptions.tiling,
-  shouldFocus: boolean = false,
-) {
+function addAppToSpace(app: App, space: number) {
   const allSpaces = Space.all()
   let targetSpace = null
 
@@ -198,10 +154,19 @@ function applyLayoutToApp(
     targetSpace = allSpaces[space - 1]
   }
 
-  if (shouldFocus) {
-    targetSpace.removeWindows(app.windows())
-    app.focus()
-    targetSpace.addWindows(app.windows())
+  targetSpace.removeWindows(app.windows())
+  app.focus()
+  targetSpace.addWindows(app.windows())
+}
+
+function applyLayoutToApp(
+  app: App,
+  space: number = defaultOptions.space,
+  tiling: TilingLayout = defaultOptions.tiling,
+  shouldFocus: boolean = false,
+) {
+  if (process.env.NODE_ENV === 'production' && shouldFocus) {
+    addAppToSpace(app, space)
   }
 
   appCache[app.name()] = { space, tiling }
@@ -246,14 +211,14 @@ function addTilingRule(query: string, opts: AppLayout = defaultOptions) {
             setTimeout(() => {
               applyLayoutToApp(app, options.space, options.tiling, true)
               resolve(true)
-            }, 100)
+            }, 25)
           }),
       )
     })
   }
 }
 
-function redoAppLayout(app: App) {
+function redoAppLayout(app: App, forceFocus: boolean = false) {
   const appName = app.name()
 
   if (isAppBlacklisted(appName)) {
@@ -263,11 +228,11 @@ function redoAppLayout(app: App) {
   const options = appCache[appName]
 
   if (options) {
-    applyLayoutToApp(app, options.space, options.tiling)
+    applyLayoutToApp(app, options.space, options.tiling, forceFocus)
   } else {
     Object.entries(ruleCache).forEach(([cachedRule, options]) => {
       if (appName.match(cachedRule)) {
-        applyLayoutToApp(app, options.space, options.tiling)
+        applyLayoutToApp(app, options.space, options.tiling, forceFocus)
       }
     })
   }
@@ -277,6 +242,29 @@ function redoSpaceLayout() {
   Space.active()
     .windows()
     .forEach((window) => redoAppLayout(window.app()))
+}
+
+function redoAllLayouts() {
+  alert('Reloading layouts')
+
+  const apps = {}
+
+  Space.all().forEach((space) => {
+    tilingQueue.add(
+      () =>
+        new Promise((resolve) => {
+          setTimeout(() => {
+            const windows = space.windows()
+
+            windows
+              .filter((window) => apps[window.app().name()])
+              .forEach((window) => redoAppLayout(window.app(), true))
+
+            resolve(true)
+          }, 25)
+        }),
+    )
+  })
 }
 
 function toggleWindowLayout(options: TilingLayout) {
@@ -303,18 +291,19 @@ function setupTiling() {
   // ['appDidLaunch', 'appDidTerminate', 'appDidShow', 'appDidHide','appDidActivate', ],
   // ['windowDidUnminimize', 'windowDidMinimize', 'windowDidOpen', 'windowDidClose'],
 
-  addEventListener(['appDidLaunch', 'appDidTerminate'], redoAppLayout)
+  addEventListener(['appDidLaunch', 'appDidTerminate'], (app) => redoAppLayout(app))
   addEventListener(['windowDidUnminimize', 'windowDidMinimize'], redoSpaceLayout)
   addEventListener('spaceDidChange', redoSpaceLayout)
   addEventListener('screensDidChange', redoSpaceLayout)
 
   onKeyPress(...keybindings.reloadSpace, redoSpaceLayout)
+  onKeyPress(...keybindings.reloadLayout, redoAllLayouts)
   onKeyPress(...keybindings.toggleMaximized, toggleWindowLayout({ mode: 'maximized' }))
   onKeyPress(...keybindings.toggleGrid, toggleWindowLayout({ mode: 'grid' }))
   onKeyPress(...keybindings.toggleColumn, toggleWindowLayout({ mode: 'column' }))
   onKeyPress(...keybindings.toggleRow, toggleWindowLayout({ mode: 'row' }))
 }
 
-export { addTilingRule }
+export { addTilingRule, clearTilingCache }
 
 export default setupTiling
