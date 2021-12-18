@@ -1,89 +1,59 @@
-import { gapSize, margin, keybindings } from '@/config'
+import { keybindings } from '@/config'
 import { animateToFrame } from '@/utils/animate'
+import {
+  getScreenFrame,
+  getFrameWithGaps,
+  getFrameSizeByPosition,
+  FramePosition,
+} from '@/utils/frame'
 import { onKeyPress } from '@/utils/key'
 
-function setWindowToTop(window: Window = Window.focused()) {
-  const screenFrame = window.screen().flippedVisibleFrame()
-  const width = screenFrame.width - gapSize * 2
-  const height = screenFrame.height / 2 - gapSize - margin
-
-  animateToFrame(window, {
-    width,
-    height,
-    x: screenFrame.x + gapSize,
-    y: screenFrame.y + gapSize,
-  })
-}
-
-function setWindowToRight(window: Window = Window.focused()) {
-  const screenFrame = window.screen().flippedVisibleFrame()
-  const width = screenFrame.width / 2 - gapSize - margin
-  const height = screenFrame.height - gapSize * 2
-
-  animateToFrame(window, {
-    width,
-    height,
-    x: screenFrame.x + width + gapSize * 2,
-    y: screenFrame.y + gapSize,
-  })
-}
-
-function setWindowToBottom(window: Window = Window.focused()) {
-  const screenFrame = window.screen().flippedVisibleFrame()
-  const width = screenFrame.width - gapSize * 2
-  const height = screenFrame.height / 2 - gapSize - margin
-
-  animateToFrame(window, {
-    width,
-    height,
-    x: screenFrame.x + gapSize,
-    y: screenFrame.y + screenFrame.height / 2 + margin,
-  })
-}
-
-function setWindowToLeft(window: Window = Window.focused()) {
-  const screenFrame = window.screen().flippedVisibleFrame()
-  const width = screenFrame.width / 2 - gapSize - margin
-  const height = screenFrame.height - gapSize * 2
-
-  animateToFrame(window, {
-    width,
-    height,
-    x: screenFrame.x + gapSize,
-    y: screenFrame.y + gapSize,
-  })
-}
-
-function setWindowMaximized(window: Window = Window.focused()) {
-  const screenFrame = window.screen().flippedVisibleFrame()
-  const width = screenFrame.width - gapSize * 2
-  const height = screenFrame.height - gapSize * 2
-
-  animateToFrame(window, {
-    width,
-    height,
-    x: screenFrame.x + gapSize,
-    y: screenFrame.y + gapSize,
-  })
-}
-
-function setWindowCentered(window: Window = Window.focused()) {
-  const screenFrame = window.screen().flippedVisibleFrame()
-  const windowFrame = window.frame()
-  let width = 1440
-  let height = 900
-
-  if (windowFrame.width < width && windowFrame.width < height) {
-    width = windowFrame.width
-    height = windowFrame.height
+function getDefaults(window?: Window, frame?: Rectangle) {
+  return {
+    window: window || Window.focused(),
+    frame: frame || getFrameWithGaps(getScreenFrame()),
   }
+}
 
-  animateToFrame(window, {
-    width,
-    height,
-    x: screenFrame.x + screenFrame.width / 2 - width / 2,
-    y: screenFrame.y + screenFrame.height / 2 - height / 2,
-  })
+function setWindowToPosition(position?: FramePosition, win?: Window, frame?: Rectangle) {
+  const { window } = getDefaults(win)
+  const screenFrame = frame || getFrameSizeByPosition(window.screen(), position)
+
+  animateToFrame(window, screenFrame)
+}
+
+function setWindowToTop(window?: Window) {
+  setWindowToPosition('top', window)
+}
+
+function setWindowToRight(window?: Window) {
+  setWindowToPosition('right', window)
+}
+
+function setWindowToBottom(window?: Window) {
+  setWindowToPosition('bottom', window)
+}
+
+function setWindowToLeft(window?: Window) {
+  setWindowToPosition('left', window)
+}
+
+function setWindowMaximized(window?: Window, frame?: Rectangle) {
+  setWindowToPosition('full', window, frame)
+}
+
+function setWindowCentered(win?: Window, screenFrame?: Rectangle) {
+  const { window, frame } = getDefaults(win, screenFrame)
+  const targetWidth = 1920
+  const targetHeight = 1080
+  const windowFrame = window.frame()
+  const isWindowSmaller = windowFrame.width < targetWidth && windowFrame.height < targetHeight
+  const width = isWindowSmaller ? windowFrame.width : targetWidth
+  const height = isWindowSmaller ? windowFrame.height : targetHeight
+  const x = frame.x + frame.width / 2 - width / 2
+  const y = frame.y + frame.height / 2 - height / 2
+
+  animateToFrame(window, { width, height, x, y })
 }
 
 function setupScreenShortcuts() {
@@ -96,3 +66,4 @@ function setupScreenShortcuts() {
 }
 
 export default setupScreenShortcuts
+export { setWindowCentered, setWindowMaximized }

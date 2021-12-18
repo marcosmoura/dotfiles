@@ -19,6 +19,7 @@ export const keybindings: Keybindings = {
 
   reloadConfig: ['r', hyperAlt],
   reloadSpace: ['l', hyperShift],
+  reloadLayout: ['l', hyperAltShift],
 
   toggleMaximized: ['m', hyperShift],
   toggleGrid: ['g', hyperShift],
