@@ -16,6 +16,13 @@ chrome () {
 }
 
 
+# Start NZXT Kraken
+kraken () {
+  liquidctl initialize all;
+  liquidctl --match kraken set pump speed 20 30 45 60 50 70 60 80 70 100;
+}
+
+
 # Time tracking
 function tt() {
   currentDate=`date +%s`;
@@ -55,6 +62,7 @@ function targz() {
   [ -f "${tmpFile}" ] && rm "${tmpFile}";
   echo "${tmpFile}.gz created successfully.";
 }
+
 
 # `o` with no arguments opens the current directory, otherwise opens the given
 # location

@@ -109,11 +109,13 @@
   # Include summaries of merged commits in newly created merge commit messages
   log = true
   tool = meld
+  conflictstyle = diff3
 
 [help]
   autocorrect = 1
 
 [diff]
+  colorMoved = default
   renames = copies
 
 [diff "bin"]
@@ -149,7 +151,7 @@
   newHighlight = green bold 22
 
 [core]
-  pager = diff-so-fancy | less --tabs=2 -RFX
+  pager = delta
   attributesfile = ~/.gitattributes
   editor = vim
   excludesfile = ~/.gitignore
@@ -188,3 +190,11 @@
 
 [init]
 	defaultBranch = main
+
+[delta]
+  navigate = true
+  side-by-side = true
+  line-numbers = true
+
+[interactive]
+  diffFilter = delta --color-only

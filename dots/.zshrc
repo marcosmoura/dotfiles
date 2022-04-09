@@ -2,6 +2,8 @@
 export PATH=/usr/local/sbin:$PATH
 export PATH=/usr/local/bin:$PATH
 export PATH=$HOME/.rbenv/shims:$PATH
+export PATH=$HOME/.yarn/bin:$PATH
+export PATH=$HOME/.config/yarn/global/node_modules/.bin:$PATH
 
 # Preferred editor for local and remote sessions
 export EDITOR="vim"
@@ -46,6 +48,9 @@ eval "$(rbenv init -)"
 # Setup starship prompt
 export STARSHIP_CONFIG=$HOME/.starship.toml
 eval "$(starship init zsh)"
+
+# Load tools
+eval "$(zoxide init zsh)"
 
 # zsh plugins
 source $HOME/.zsh_plugins.sh

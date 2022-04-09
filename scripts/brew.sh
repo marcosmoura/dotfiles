@@ -24,7 +24,8 @@ brew tap homebrew/core
 brew tap homebrew/services
 
 brew -v update
-brew upgrade --force-bottle --cleanup
+brew upgrade --force-bottle
+brew cleanup
 
 printSuccess "HOMEBREW" "Installing packages..."
 
@@ -36,7 +37,9 @@ brew install moreutils
 # Install development tools
 brew install dart
 brew install deno
+brew install dust
 brew install fx
+brew install fzf
 brew install glow
 brew install go
 brew install lua
@@ -76,7 +79,7 @@ brew install thefuck
 brew install tokei
 brew install tree
 brew install vivid
-brew install z
+brew install zoxide
 brew install zsh
 
 # Git
@@ -94,6 +97,5 @@ brew install vim
 brew install wget
 
 brew cleanup
-brew prune
 
 printSuccess "HOMEBREW" "Installed with success..."

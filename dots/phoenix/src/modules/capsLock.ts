@@ -1,27 +1,29 @@
 import { alert } from '@/components/alert'
 import { onKeyPress } from '@/utils/key'
 
+function getAlertMessage(pressed: boolean) {
+  let prefix = 'Caps'
+
+  if (pressed) {
+    return `${prefix} On`
+  }
+
+  return `${prefix} Off`
+}
+
 function capsLock() {
   let capsAlert: Modal
   let pressed = false
 
-  function getMessage() {
-    if (pressed) {
-      return 'On'
-    }
-
-    return 'Off'
-  }
-
   onKeyPress('capslock', [], () => {
+    pressed = !pressed
+
     if (capsAlert) {
-      capsAlert.text = getMessage()
+      capsAlert.text = getAlertMessage(pressed)
       capsAlert.show()
     } else {
-      capsAlert = alert(getMessage())
+      capsAlert = alert(getAlertMessage(pressed))
     }
-
-    pressed = !pressed
   })
 }
 

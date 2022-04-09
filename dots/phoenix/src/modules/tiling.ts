@@ -16,6 +16,7 @@ export type TilingLayout = {
   mode: 'column' | 'row' | 'maximized' | 'centered' | 'grid'
   frame?: FramePosition
   maxGridCells?: 2 | 3 | 4 | 5
+  maxWidth?: number
 }
 export type AppLayout = {
   space?: number
@@ -154,9 +155,11 @@ function addAppToSpace(app: App, space: number) {
     targetSpace = allSpaces[space - 1]
   }
 
-  targetSpace.removeWindows(app.windows())
-  app.focus()
-  targetSpace.addWindows(app.windows())
+  if (targetSpace) {
+    targetSpace.removeWindows(app.windows())
+    app.focus()
+    targetSpace.addWindows(app.windows())
+  }
 }
 
 function applyLayoutToApp(
@@ -288,11 +291,14 @@ function toggleWindowLayout(options: TilingLayout) {
 }
 
 function setupTiling() {
-  // ['appDidLaunch', 'appDidTerminate', 'appDidShow', 'appDidHide','appDidActivate', ],
-  // ['windowDidUnminimize', 'windowDidMinimize', 'windowDidOpen', 'windowDidClose'],
-
-  addEventListener(['appDidLaunch', 'appDidTerminate'], (app) => redoAppLayout(app))
-  addEventListener(['windowDidUnminimize', 'windowDidMinimize'], redoSpaceLayout)
+  addEventListener(
+    ['appDidLaunch', 'appDidTerminate', 'appDidShow', 'appDidHide', 'appDidActivate'],
+    (app) => redoAppLayout(app),
+  )
+  addEventListener(
+    ['windowDidUnminimize', 'windowDidMinimize', 'windowDidOpen', 'windowDidClose'],
+    redoSpaceLayout,
+  )
   addEventListener('spaceDidChange', redoSpaceLayout)
   addEventListener('screensDidChange', redoSpaceLayout)
 
@@ -304,6 +310,6 @@ function setupTiling() {
   onKeyPress(...keybindings.toggleRow, toggleWindowLayout({ mode: 'row' }))
 }
 
-export { addTilingRule, clearTilingCache }
+export { addTilingRule, clearTilingCache, toggleWindowLayout }
 
 export default setupTiling
