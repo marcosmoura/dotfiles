@@ -1,102 +1,113 @@
-sudo yabai --uninstall-sa
-sudo yabai --install-sa
-yabai -m signal --add event=dock_did_restart action="sudo yabai --load-sa"
-
+alias yabai_rule='yabai -m rule --add '
+alias yabai_config='yabai -m config '
+alias yabai_space='yabai -m space '
+alias yabai_unmanage='yabai_rule manage=off layer=above '
 
 ## Global settings
-yabai -m config mouse_follows_focus           off
-yabai -m config focus_follows_mouse           off
-yabai -m config window_placement              first_child
-yabai -m config window_topmost                on
-yabai -m config split_ratio                   0.5
-yabai -m config mouse_modifier                fn
-yabai -m config mouse_action1                 move
-yabai -m config mouse_action2                 resize
+yabai_config auto_balance                  off
+yabai_config focus_follows_mouse           off
+yabai_config mouse_action1                 move
+yabai_config mouse_action2                 resize
+yabai_config mouse_follows_focus           off
+yabai_config mouse_modifier                fn
+yabai_config split_ratio                   0.5
+yabai_config window_placement              first_child
+yabai_config window_topmost                on
 
 
 ## General space settings
-yabai -m config layout                        bsp
-yabai -m config top_padding                   16
-yabai -m config bottom_padding                16
-yabai -m config left_padding                  16
-yabai -m config right_padding                 16
-yabai -m config window_gap                    16
+yabai_config layout                        bsp
+yabai_config top_padding                   16
+yabai_config bottom_padding                16
+yabai_config left_padding                  16
+yabai_config right_padding                 16
+yabai_config window_gap                    16
 
 
 ## Label spaces
-yabai -m space 1 --label code
-yabai -m space 2 --label browser
-yabai -m space 3 --label music
-yabai -m space 4 --label whatsapp
-yabai -m space 5 --label discord
-yabai -m space 6 --label design
-yabai -m space 7 --label misc
-yabai -m space 8 --label games
-yabai -m space 9 --label terminal
-yabai -m space 10 --label tools
+yabai_space 1 --label code
+yabai_space 2 --label browser
+yabai_space 3 --label communication
+yabai_space 4 --label mail
+yabai_space 5 --label music
+yabai_space 6 --label terminal
+yabai_space 7 --label productivity
+yabai_space 8 --label finder
+yabai_space 9 --label design
 
 
-## Specific space settings
-yabai -m config --space password layout float
-yabai -m config --space whatsapp layout float
-yabai -m config --space discord layout float
+## Spaces layouts
+yabai_config --space browser layout stack
+yabai_config --space communication layout float
+yabai_config --space terminal layout stack
 
 
-## Screen (Code)
-yabai -m rule --add label="VSCode" app="^Visual Studio Code$" space="code"
+## Space - Code
+yabai_rule label="Visual Studio Code" app="^Visual Studio Code - Insiders$" space="code"
+yabai_rule label="Simulator" app="^Simulator$" space="code"
+yabai_rule label="Xcode" app="^Xcode$" space="code"
 
 
-## Screen (Browser)
-yabai -m rule --add label="Chrome" app="^Google Chrome$" space="browser"
-yabai -m rule --add label="Firefox" app="^Firefox$" space="browser"
-yabai -m rule --add label="Safari" app="^Safari$" space="browser"
+## Space - Browser
+yabai_rule label="Chrome" app="^Google Chrome$" space="browser"
+yabai_rule label="Edge" app="^Microsoft Edge" space="browser"
+yabai_rule label="Firefox" app="^Firefox" space="browser"
+yabai_rule label="Safari" app="^Safari$" space="browser"
 
 
-## Screen (Music)
-yabai -m rule --add label="Spotify" app="^Spotify$" space="music"
-yabai -m rule --add label="Tone Room" app="^Tone Room$" space="music"
+## Space - Communication
+yabai_rule label="WhatsApp" app="^WhatsApp$" space="communication"
+yabai_rule label="Discord" app="^Discord$" space="communication"
+yabai_rule label="Microsoft Teams" app="^Microsoft Teams$" space="communication"
+yabai_unmanage label="Microsoft Teams" app="^Microsoft Teams$" space="communication"
 
 
-## Screen (WhatsApp)
-yabai -m rule --add label="WhatsApp" app="^WhatsApp$" space="whatsapp"
+## Space - Mail
+yabai_rule label="Outlook" app="^Outlook$" space="mail"
+yabai_rule label="Calendar" app="^Calendar$" space="calendar"
 
 
-## Screen (Discord)
-yabai -m rule --add label="Discord" app="^Discord$" space="discord"
+## Space - Music
+yabai_rule label="Spotify" app="^Spotify$" space="music"
 
 
-## Screen (Design)
-yabai -m rule --add label="Figma" app="^Figma$" space="design"
+## Space - Terminal
+yabai_rule label="iTerm 2" app="^iTerm 2$" space="terminal"
+yabai_rule label="iTerm" app="^iTerm$" space="terminal"
+yabai_rule label="Terminal" app="^Terminal$" space="terminal"
 
 
-## Screen (Misc)
-yabai -m rule --add label="Calendar" app="^Calendar$" space="misc"
-yabai -m rule --add label="Finder" app="^Finder$" space="misc"
+## Space - Productivity
+yabai_rule label="Notion" app="^Notion$" space="productivity"
+yabai_rule label="Bitwarden" app="^Bitwarden$" space="productivity"
 
 
-## Screen (Games)
-yabai -m rule --add label="Steam" app="^Steam$" space="games"
+## Space - Finder
+yabai_rule label="Finder" app="^Finder$" space="finder"
 
 
-## Screen (Terminal)
-yabai -m rule --add label="iTerm 2" app="^iTerm 2$" space="terminal"
-yabai -m rule --add label="iTerm" app="^iTerm$" space="terminal"
-yabai -m rule --add label="Terminal" app="^Terminal$" space="terminal"
-
-
-## Screen (Tools)
-yabai -m rule --add label="Notion" app="^Notion$" space="tools"
-yabai -m rule --add label="Bitwarden" app="^Bitwarden$" space="tools"
+## Space - Design
+yabai_rule label="Figma" app="^Figma$" space="design"
 
 
 ## Unmanaged windows
-yabai -m rule --add app='Contexts' manage=off layer=above
-yabai -m rule --add app='IINA' manage=off layer=above
-yabai -m rule --add app='Numi' manage=off layer=above
-yabai -m rule --add app="^Calculator$" manage=off layer=above
-yabai -m rule --add app="^Steam$" space=games manage=off layer=above
-yabai -m rule --add app="^System Preferences$" manage=off layer=above
-yabai -m rule --add label="Preview" app="Preview" manage=off layer=above
-yabai -m rule --add title='Opening' manage=off layer=above
-yabai -m rule --add title='Preferences' manage=off layer=above
-yabai -m rule --add title="(Copy|Bin|About This Mac|Info)" manage=off layer=above
+yabai_unmanage app="Activity Monitor"
+yabai_unmanage app="AdGuard"
+yabai_unmanage app="App Store"
+yabai_unmanage app="Calculator"
+yabai_unmanage app="Console"
+yabai_unmanage app="Contexts"
+yabai_unmanage app="Dictionary"
+yabai_unmanage app="Displaperture"
+yabai_unmanage app="Kap"
+yabai_unmanage app="LyricsX"
+yabai_unmanage app="Preview"
+yabai_unmanage title="^(General|(Tab|Password|Website|Extension)s|AutoFill|Se(arch|curity)|Privacy|Advance)$" manage=off
+yabai_unmanage app="Stats"
+yabai_unmanage app="System Information"
+yabai_unmanage app="System Preferences"
+yabai_unmanage app="VoiceOver Utility"
+yabai_unmanage label="Software Update"
+yabai_unmanage title="(Copy|Bin|About This Mac|Info)"
+yabai_unmanage title="^(Opening)"
+yabai_unmanage title="^Exports"

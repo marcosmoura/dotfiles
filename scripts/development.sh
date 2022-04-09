@@ -21,7 +21,6 @@ yarn global add vtop
 printMsg "DEVELOPMENT" "Installing Ruby Gems..."
 rbenv install $RBENV_VERSION
 gem install bundler
-gem install iStats
 gem install openssl
 gem install rake
 gem install rdoc

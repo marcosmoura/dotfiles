@@ -41,6 +41,7 @@ brew install --no-quarantine kap
 brew install --no-quarantine koekeishiya/formulae/yabai
 brew install --no-quarantine muzzle
 brew install --no-quarantine numi
+brew install --no-quarantine phoenix
 
 # Media
 brew install --no-quarantine audio-hijack
@@ -77,7 +78,12 @@ printSuccess "BREW" "Installed with success..."
 
 printMsg "MAC APPS" "Installing App Store Apps..."
 
-mas install 1319778037 # iStats Menu
-mas install 497799835  # Xcode
+mas install 1294126402  # HEIC converter
+mas install 1470584107  # Dato
+mas install 1594183810  # Shortery
+mas install 1596706466  # Speediness
+mas install 1604176982  # One thing
+mas install 1611378436  # Pure Paste
+mas install 497799835   # Xcode
 
 printSuccess "MAC APPS" "Installed with success..."

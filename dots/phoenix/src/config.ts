@@ -33,4 +33,6 @@ export const keybindings: Keybindings = {
   alignToBottom: ['down', hyper],
   alignToRight: ['right', hyper],
   alignToLeft: ['left', hyper],
+
+  lockScreen: ['l', hyperAlt],
 }
