@@ -66,4 +66,4 @@ function setupScreenShortcuts() {
 }
 
 export default setupScreenShortcuts
-export { setWindowCentered, setWindowMaximized }
+export { setWindowCentered, setWindowMaximized, setWindowToPosition }

@@ -1,6 +1,7 @@
 import { gapSize, margin } from '@/config'
 
 type FramePosition = 'top' | 'right' | 'bottom' | 'left' | 'full'
+type Frame = Rectangle
 
 function getScreenFrame(screen: Screen = Window.focused().screen()): Rectangle {
   return screen.flippedVisibleFrame()
@@ -36,4 +37,4 @@ function getFrameSizeByPosition(screen: Screen, position: FramePosition): Rectan
   return { width, height, x, y }
 }
 
-export { getFrameSizeByPosition, getScreenFrame, getFrameWithGaps, FramePosition }
+export { getFrameSizeByPosition, getScreenFrame, getFrameWithGaps, FramePosition, Frame }

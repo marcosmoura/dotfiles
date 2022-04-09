@@ -38,6 +38,11 @@ function setupTilingLayout() {
     space: 5,
   })
 
+  addTilingRule('Discord', {
+    ...centeredLayout,
+    space: 5,
+  })
+
   addTilingRule('(Copy|Bin|About This Mac|Info)', centeredLayout)
   addTilingRule('Activity Monitor', centeredLayout)
   addTilingRule('Calculator', centeredLayout)
