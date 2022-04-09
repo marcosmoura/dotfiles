@@ -6,15 +6,16 @@ import { alert } from '@/components/alert'
 import { gapSize, maxGridCells, keybindings, blacklistedWindows } from '@/config'
 import { animateToFrame } from '@/utils/animate'
 import { addEventListener } from '@/utils/event'
-import { FramePosition, getFrameSizeByPosition } from '@/utils/frame'
+import { Frame, FramePosition, getFrameSizeByPosition } from '@/utils/frame'
 import { onKeyPress } from '@/utils/key'
 import { clearObject } from '@/utils/object'
 
-import { setWindowCentered, setWindowMaximized } from './windows'
+import { setWindowCentered, setWindowMaximized, setWindowToPosition } from './windows'
 
 export type TilingLayout = {
-  mode: 'column' | 'row' | 'maximized' | 'centered' | 'grid'
-  frame?: FramePosition
+  mode: 'column' | 'row' | 'maximized' | 'centered' | 'grid' | 'floating'
+  frame?: Frame
+  position?: FramePosition
   maxGridCells?: 2 | 3 | 4 | 5
   maxWidth?: number
 }
@@ -27,7 +28,7 @@ const defaultOptions: AppLayout = {
   space: 0,
   tiling: {
     mode: 'grid',
-    frame: 'full',
+    position: 'full',
     maxGridCells,
   },
 }
@@ -47,7 +48,7 @@ function setAppToColumns(app: App, tiling: TilingLayout) {
   if (windows.length) {
     const numOfWindows = windows.length
     const appScreen = windows[0].screen()
-    const screenFrame = getFrameSizeByPosition(appScreen, tiling.frame)
+    const screenFrame = getFrameSizeByPosition(appScreen, tiling.position)
 
     windows.forEach((window, index) => {
       const width = (screenFrame.width - gapSize * (numOfWindows - 1)) / numOfWindows
@@ -66,7 +67,7 @@ function setAppToRows(app: App, tiling: TilingLayout) {
   if (windows.length) {
     const numOfWindows = windows.length
     const appScreen = windows[0].screen()
-    const screenFrame = getFrameSizeByPosition(appScreen, tiling.frame)
+    const screenFrame = getFrameSizeByPosition(appScreen, tiling.position)
 
     windows.forEach((window, index) => {
       const width = screenFrame.width
@@ -83,7 +84,7 @@ function setAppMaximized(app: App, tiling: TilingLayout) {
   const windows = app.windows({ visible: true })
 
   if (windows.length) {
-    const screenFrame = getFrameSizeByPosition(windows[0].screen(), tiling.frame)
+    const screenFrame = getFrameSizeByPosition(windows[0].screen(), tiling.position)
 
     windows.forEach((window) => setWindowMaximized(window, screenFrame))
   }
@@ -93,18 +94,30 @@ function setAppCentered(app: App, tiling: TilingLayout) {
   const windows = app.windows({ visible: true })
 
   if (windows.length) {
-    const screenFrame = getFrameSizeByPosition(windows[0].screen(), tiling.frame)
+    const screenFrame = getFrameSizeByPosition(windows[0].screen(), tiling.position)
 
     windows.forEach((window) => setWindowCentered(window, screenFrame))
   }
 }
 
-function setAppToGrid(app: App, { frame, maxGridCells }: TilingLayout) {
+function setAppFloating(app: App, tiling: TilingLayout) {
+  const windows = app.windows({ visible: true })
+
+  if (windows.length) {
+    if (tiling.frame) {
+      windows.forEach((window) => setWindowToPosition(null, window, tiling.frame))
+    } else {
+      setAppCentered(app, tiling)
+    }
+  }
+}
+
+function setAppToGrid(app: App, { position, maxGridCells }: TilingLayout) {
   const windows = app.windows({ visible: true })
 
   if (windows.length) {
     const appScreen = windows[0].screen()
-    const screenFrame = getFrameSizeByPosition(appScreen, frame)
+    const screenFrame = getFrameSizeByPosition(appScreen, position)
     const gridDimension = windows.length > Math.round(maxGridCells * 1.4) ? maxGridCells : 2
     const grid = split(windows, gridDimension)
     const rows = grid.length
@@ -193,6 +206,10 @@ function applyLayoutToApp(
 
     case 'grid':
       setAppToGrid(app, tiling)
+      break
+
+    case 'floating':
+      setAppFloating(app, tiling)
       break
 
     default:
