@@ -10,6 +10,10 @@ alias reloadYabai='launchctl kickstart -k "gui/${UID}/homebrew.mxcl.yabai"'
 # Enable aliases to be sudo’ed
 alias sudo='sudo '
 
+# Fix python3
+alias python='/usr/local/bin/python3'
+alias pip='/usr/local/bin/pip3'
+
 # ALias to VSCode
 alias code='code-insiders '
 alias c='code-insiders '

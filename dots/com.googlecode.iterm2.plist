@@ -131,6 +131,10 @@
 	<real>0.27500000596046448</real>
 	<key>IRMemory</key>
 	<integer>4</integer>
+	<key>NeverWarnAboutShortLivedSessions_86FB2C15-F474-4E9B-9EE0-EA9933A5EFEF</key>
+	<true/>
+	<key>NeverWarnAboutShortLivedSessions_86FB2C15-F474-4E9B-9EE0-EA9933A5EFEF_selection</key>
+	<integer>0</integer>
 	<key>NeverWarnAboutSpaces</key>
 	<true/>
 	<key>NeverWarnAboutSpaces_selection</key>
@@ -1126,6 +1130,8 @@
 	<false/>
 	<key>SeparateWindowTitlePerTab</key>
 	<true/>
+	<key>ShowFullScreenTabBar</key>
+	<false/>
 	<key>ShowPaneTitles</key>
 	<false/>
 	<key>SmartPlacement</key>
@@ -3287,11 +3293,15 @@
 	<true/>
 	<key>WordCharacters</key>
 	<string>/-+\~_.-</string>
+	<key>disableMetalWhenUnplugged</key>
+	<false/>
 	<key>findMode_iTerm</key>
 	<integer>0</integer>
 	<key>kCPKSelectionViewPreferredModeKey</key>
 	<integer>0</integer>
 	<key>kCPKSelectionViewShowHSBTextFieldsKey</key>
+	<false/>
+	<key>preferIntegratedGPU</key>
 	<false/>
 </dict>
 </plist>

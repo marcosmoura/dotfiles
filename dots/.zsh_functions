@@ -19,7 +19,10 @@ chrome () {
 # Start NZXT Kraken
 kraken () {
   liquidctl initialize all;
-  liquidctl --match kraken set pump speed 20 30 45 60 50 70 60 80 70 100;
+  liquidctl --match "Kraken" set pump speed 20 30 40 60 50 70 60 80 70 100
+  liquidctl --match "Smart Device" set fan1 speed 60
+  liquidctl --match "Smart Device" set fan2 speed 60
+  liquidctl --match "Smart Device" set fan3 speed 60
 }
 
 

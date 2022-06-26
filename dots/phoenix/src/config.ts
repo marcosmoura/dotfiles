@@ -8,7 +8,7 @@ export const hyperAltShift: Phoenix.ModifierKey[] = [...hyperAlt, 'shift']
 export const animationDuration: number = 0.25
 export const modalDuration: number = 1.25
 
-export const blacklistedWindows = ['LyricsX', 'Displaperture', 'Console']
+export const blacklistedWindows = ['Displaperture', 'Console']
 export const gapSize = 16
 export const margin = gapSize / 2
 export const maxGridCells = 3

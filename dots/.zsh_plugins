@@ -6,6 +6,6 @@ robbyrussell/oh-my-zsh path:plugins/git
 robbyrussell/oh-my-zsh path:plugins/z
 sinetoami/antibody-completion
 Tarrasch/zsh-bd
-zdharma/fast-syntax-highlighting
+marcosmoura/fast-syntax-highlighting
 zsh-users/zsh-autosuggestions
 zsh-users/zsh-completions

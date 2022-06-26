@@ -39,8 +39,6 @@ brew install --no-quarantine bitwarden
 brew install --no-quarantine hiddenbar
 brew install --no-quarantine kap
 brew install --no-quarantine koekeishiya/formulae/yabai
-brew install --no-quarantine muzzle
-brew install --no-quarantine numi
 brew install --no-quarantine phoenix
 
 # Media
@@ -67,12 +65,12 @@ brew install --no-quarantine appcleaner
 brew install --no-quarantine captin
 brew install --no-quarantine caption
 brew install --no-quarantine displaperture
-brew install --no-quarantine lyricsx
 brew install --no-quarantine mullvadvpn
 brew install --no-quarantine notion
 brew install --no-quarantine opencore-configurator
 brew install --no-quarantine shifty
 brew install --no-quarantine the-unarchiver
+brew install --no-quarantine windscribe
 
 printSuccess "BREW" "Installed with success..."
 
