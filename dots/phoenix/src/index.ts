@@ -48,13 +48,13 @@ function setupTilingLayout() {
   addTilingRule('Calculator', centeredLayout)
   addTilingRule('Contexts', centeredLayout)
   addTilingRule('IINA', centeredLayout)
-  addTilingRule('Numi', centeredLayout)
   addTilingRule('Opening', centeredLayout)
   addTilingRule('Preferences', centeredLayout)
   addTilingRule('Preview', centeredLayout)
   addTilingRule('Steam', centeredLayout)
   addTilingRule('System Preferences', centeredLayout)
   addTilingRule('Tone Room', centeredLayout)
+  addTilingRule('VLC', centeredLayout)
 }
 
 setupTilingLayout()
