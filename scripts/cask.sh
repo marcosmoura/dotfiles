@@ -14,7 +14,6 @@ brew install --no-quarantine inkscape
 brew install --no-quarantine iterm2
 brew install --no-quarantine sf-symbols
 brew install --no-quarantine visual-studio-code-insiders
-brew install --no-quarantine zeplin
 
 # Fonts
 brew install --no-quarantine font-fira-code
@@ -29,10 +28,7 @@ brew install --no-quarantine whatsapp
 
 # Cloud
 brew install --no-quarantine cryptomator
-brew install --no-quarantine google-backup-and-sync
-
-# Games
-brew install --no-quarantine steam
+brew install --no-quarantine google-drive
 
 # Productivity
 brew install --no-quarantine bitwarden
@@ -42,10 +38,9 @@ brew install --no-quarantine koekeishiya/formulae/yabai
 brew install --no-quarantine phoenix
 
 # Media
-brew install --no-quarantine audio-hijack
+brew install --no-quarantine caption
 brew install --no-quarantine iina
 brew install --no-quarantine spotify
-brew install --no-quarantine subtitle-master
 brew install --no-quarantine transmission
 brew install --no-quarantine vlc
 
@@ -63,12 +58,10 @@ brew install --no-quarantine webpquicklook
 brew install --no-quarantine adguard
 brew install --no-quarantine appcleaner
 brew install --no-quarantine captin
-brew install --no-quarantine caption
 brew install --no-quarantine displaperture
 brew install --no-quarantine mullvadvpn
 brew install --no-quarantine notion
 brew install --no-quarantine opencore-configurator
-brew install --no-quarantine shifty
 brew install --no-quarantine the-unarchiver
 brew install --no-quarantine windscribe
 
@@ -77,10 +70,7 @@ printSuccess "BREW" "Installed with success..."
 printMsg "MAC APPS" "Installing App Store Apps..."
 
 mas install 1294126402  # HEIC converter
-mas install 1470584107  # Dato
-mas install 1594183810  # Shortery
 mas install 1596706466  # Speediness
-mas install 1604176982  # One thing
 mas install 1611378436  # Pure Paste
 mas install 497799835   # Xcode
 
