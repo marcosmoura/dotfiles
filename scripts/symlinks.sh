@@ -8,6 +8,7 @@ reset
 printMsg "DOTFILES" "Creating symlinks..."
 
 pushd ./dots
+
 symlink_dotfile .alacritty.yml
 symlink_dotfile .editorconfig
 symlink_dotfile .gitconfig
@@ -23,10 +24,6 @@ symlink_dotfile .zsh_plugins
 symlink_dotfile .zshrc
 symlink_dotfile prettier.config.js
 symlink_dotfile syntax-theme.ini
-
-# Startup
-symlink_dotfile autoexec.sh
-chmod +x "$HOME/autoexec.sh"
 
 popd
 
