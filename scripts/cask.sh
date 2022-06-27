@@ -62,6 +62,7 @@ brew install --no-quarantine displaperture
 brew install --no-quarantine mullvadvpn
 brew install --no-quarantine notion
 brew install --no-quarantine opencore-configurator
+brew install --no-quarantine stats
 brew install --no-quarantine the-unarchiver
 brew install --no-quarantine windscribe
 
