@@ -59,6 +59,7 @@ brew install --no-quarantine adguard
 brew install --no-quarantine appcleaner
 brew install --no-quarantine captin
 brew install --no-quarantine displaperture
+brew install --no-quarantine keepingyouawake
 brew install --no-quarantine mullvadvpn
 brew install --no-quarantine notion
 brew install --no-quarantine opencore-configurator
