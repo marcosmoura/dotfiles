@@ -88,6 +88,7 @@ brew install git
 
 # Other
 brew install curl
+brew install liquidctl
 brew install mas
 brew install neofetch
 brew install neovim
