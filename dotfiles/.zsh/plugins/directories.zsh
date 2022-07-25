@@ -20,8 +20,11 @@ alias ~="cd ~"
 # Always use color output for `ls`
 alias ls="exa -a -s type --group-directories-first --git --icons --color always"
 
-# List all files colorized in long format, including dot files
+# List all files colorized in long format
 alias la="ls -laFh"
+
+# List all files colorized in short format
+alias ll='ls -lh'
 
 # List only directories
 alias lsd="ls -lD"
