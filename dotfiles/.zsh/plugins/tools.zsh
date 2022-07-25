@@ -1,5 +1,12 @@
 #!/usr/bin/env zsh
 
+# Microsoft Defender
+alias killMicrosoftDefender="launchctl unload /Library/LaunchAgents/com.microsoft.wdav.tray.plist"
+alias loadMicrosoftDefender="launchctl load /Library/LaunchAgents/com.microsoft.wdav.tray.plist"
+
+# Lock computer
+alias afk='open -a /System/Library/CoreServices/ScreenSaverEngine.app'
+
 # Start NZXT Kraken
 kraken () {
   liquidctl initialize all;
