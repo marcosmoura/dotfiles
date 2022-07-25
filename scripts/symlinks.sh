@@ -1,30 +1,21 @@
-#!/bin/sh
+print_start "Linking dotfiles\n"
 
-symlink_dotfile() {
+create_symlink() {
   ln -sfvF $(grealpath $1) "$HOME/$1"
 }
 
-reset
-printMsg "DOTFILES" "Creating symlinks..."
+shopt -s dotglob
 
-pushd ./dots
+pushd ./dotfiles > /dev/null
 
-symlink_dotfile .alacritty.yml
-symlink_dotfile .editorconfig
-symlink_dotfile .gitconfig
-symlink_dotfile .phoenix.debug.js
-symlink_dotfile .phoenix.js
-symlink_dotfile .ssh-config
-symlink_dotfile .starship.toml
-symlink_dotfile .vuerc
-symlink_dotfile .yabairc
-symlink_dotfile .zsh_aliases
-symlink_dotfile .zsh_functions
-symlink_dotfile .zsh_plugins
-symlink_dotfile .zshrc
-symlink_dotfile prettier.config.js
-symlink_dotfile syntax-theme.ini
+for file in *; do
+  rm -rf "$HOME/$file"
+  create_symlink "$(basename "$file")" > /dev/null 2>&1
+  print_purple "📁 Linked $file"
+done
 
-popd
+shopt -u dotglob
 
-printSuccess "DOTFILES" "Created with success..."
+popd > /dev/null
+
+print_success "Everything linked! \n"
