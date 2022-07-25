@@ -1,8 +1,22 @@
-[nodejs]
-  disabled = true
+"$schema" = 'https://starship.rs/config-schema.json'
 
-[ruby]
-  disabled = true
+right_format = """$time"""
 
 [directory]
-  truncation_length = 8
+truncation_length = 8
+
+[time]
+disabled = false
+time_format = "%R"
+format = '[♥](bold red) [$time](cyan)'
+
+[git_status]
+ahead = "⇡${count}"
+diverged = "⇕⇡${ahead_count}⇣${behind_count}"
+behind = "⇣${count}"
+
+[ruby]
+disabled = true
+
+[nodejs]
+disabled = true

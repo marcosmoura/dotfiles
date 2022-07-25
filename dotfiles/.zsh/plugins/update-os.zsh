@@ -1,6 +1,6 @@
 #!/usr/bin/env zsh
 
-zsh-defer source ~/.zsh/utils.sh
+source ~/.zsh/utils.sh
 
 function updateRuby {
   print_start "Updating Ruby \n"
@@ -8,6 +8,7 @@ function updateRuby {
   export RBENV_VERSION=$(rbenv install -l -s | grep -v - | tail -1)
   rbenv install -s $RBENV_VERSION
   eval "$(rbenv init - zsh)"
+  rbenv global $RBENV_VERSION
 
 
   print_progress "Updating Gems \n"
