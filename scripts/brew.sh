@@ -1,17 +1,19 @@
-#!/bin/sh
-
-# Check for homebrew and install if needed
-reset
-printMsg "HOMEBREW" "Installing..."
+print_start "Installing Homebrew"
 
 which -s brew
 if [[ $? != 0 ]] ; then
-  yes | /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
-else
-  printSuccess "HOMEBREW" "Already installed..."
+  print_progress "Installing Homebrew"
+  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+  print_text "\n"
 fi
 
-printMsg "BREW" "Tapping repositories..."
+print_progress "Updating brew\n"
+
+brew -v update
+brew upgrade --force-bottle
+
+
+print_progress "Tapping repositories\n"
 
 brew tap dart-lang/dart
 brew tap dteoh/sqa
@@ -23,80 +25,87 @@ brew tap homebrew/cask-versions
 brew tap homebrew/core
 brew tap homebrew/services
 
-brew -v update
-brew upgrade --force-bottle
-brew cleanup
 
-printSuccess "HOMEBREW" "Installing packages..."
+print_progress "Core utilities\n"
 
-# GNU core utilities
+brew install bash
 brew install coreutils
 brew install findutils
+brew install grep --with-default-names
 brew install moreutils
+brew install ncurses
+brew install openssh
+brew install openssl
 
-# Install development tools
+
+print_progress "Programming languages\n"
+
 brew install dart
 brew install deno
-brew install dust
-brew install fx
-brew install fzf
-brew install glow
 brew install go
 brew install lua
-brew install node
 brew install perl
-brew install python
-brew install python@2
-brew install rbenv
-brew install ruby
 brew install rust
 brew install rustup-init
+
+
+print_progress "Programming tools\n"
+
+brew install cocoapods
 brew install watchman
-brew install yarn
 
-# Install more recent versions of some OS X tools.
-brew install grep --with-default-names
 
-# Install terminal tools
-brew install bandwhich
-brew install bash
+print_progress "Terminal tools\n"
+
 brew install bat
+brew install dust
 brew install eth-p/software/bat-extras
 brew install exa
 brew install fd
-brew install getantibody/tap/antibody
+brew install fx
+brew install fzf
 brew install git-delta
+brew install glow
 brew install gnu-sed
 brew install ncdu
-brew install ncurses
-brew install ngrep
-brew install openssh
-brew install openssl
-brew install osx-cpu-temp
 brew install starship
 brew install terminal-notifier
-brew install thefuck
-brew install tokei
 brew install tree
 brew install vivid
 brew install zoxide
-brew install zsh
 
-# Git
-brew install diff-so-fancy
-brew install git
 
-# Other
-brew install curl
+print_progress "Terminal apps\n"
+brew install bandwhich
+brew install koekeishiya/formulae/yabai
 brew install liquidctl
-brew install mas
-brew install neofetch
-brew install neovim
-brew install speedtest-cli
-brew install tldr
-brew install vim
-brew install wget
+brew install osx-cpu-temp
+brew install tokei
+
+
+print_progress "Fonts\n"
+
+brew install --cask font-fira-code
+brew install --cask font-hack-nerd-font
+brew install --cask font-inter
+brew install --cask font-jetbrains-mono
+brew install --cask font-jetbrains-mono-nerd-font
+
+
+print_progress "QuickLook extensions\n"
+
+brew install --no-quarantine qlcolorcode
+brew install --no-quarantine qlimagesize
+brew install --no-quarantine qlmarkdown
+brew install --no-quarantine qlstephen
+brew install --no-quarantine qlvideo
+brew install --no-quarantine quicklook-json
+brew install --no-quarantine quicklookase
+brew install --no-quarantine webpquicklook
+
+
+print_progress "Cleaning up\n"
 
 brew cleanup
 
-printSuccess "HOMEBREW" "Installed with success..."
+print_success "Homebrew installed! \n"
