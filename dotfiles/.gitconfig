@@ -64,7 +64,10 @@
 
   # Remove branches that have already been merged with master
   # a.k.a. ‘delete merged’
-  dm = "!git branch --merged | egrep -v '(master|release|develop)' | xargs -n 1 git branch -d"
+  dm = "!git branch --merged | egrep -v '(main|release|develop)' | xargs -n 1 git branch -d"
+
+  # Remove all "gone" branches
+  dg = "!git fetch -p && git branch -vv | awk '/: gone]/{print $1}' | xargs git branch -d"
 
   # List contributors with number of commits
   contributors = shortlog --summary --numbered

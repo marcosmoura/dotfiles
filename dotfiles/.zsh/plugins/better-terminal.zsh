@@ -15,9 +15,6 @@ alias vim='nvim'
 alias svim='sudo vim'
 alias snano='sudo nano'
 
-# Go to git root
-alias groot='cd `git rev-parse --show-toplevel`'
-
 # Better du
 alias du='dust -x -X .git -X node_modules'
 
