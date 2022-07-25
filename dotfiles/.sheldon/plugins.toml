@@ -26,12 +26,12 @@ use = ["{{ name }}.zsh"]
 [plugins.ohmyzsh-lib]
 github = "ohmyzsh/ohmyzsh"
 dir = "lib"
-use = ["{completion,git,history}.zsh"]
+use = ["{completion,git,history,key-bindings,directories}.zsh"]
 
 [plugins.ohmyzsh-plugins]
 github = "ohmyzsh/ohmyzsh"
 dir = "plugins"
-use = ["{git,zoxide}/*.plugin.zsh"]
+use = ["{zoxide,aliases,cp,dircycle}/*.plugin.zsh"]
 
 
 # Other plugins
