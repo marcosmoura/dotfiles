@@ -1,9 +1,7 @@
-[package]
-  symbol = " "
+[nodejs]
   disabled = true
 
-[nodejs]
-  symbol = " "
+[ruby]
   disabled = true
 
 [directory]

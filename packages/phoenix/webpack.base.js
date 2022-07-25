@@ -1,4 +1,4 @@
-const { resolve, sep } = require('path')
+const { resolve, sep, join } = require('path')
 const webpack = require('webpack')
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin')
 
@@ -12,7 +12,7 @@ module.exports = {
     '.phoenix.debug.js': './src/index.ts',
   },
   output: {
-    path: getPath('..'),
+    path: getPath(join('..', '..', 'dotfiles')),
     filename: '[name]',
   },
   node: {
@@ -32,7 +32,7 @@ module.exports = {
         type: 'asset/resource',
         generator: {
           emit: false,
-          publicPath: getPath('src') + sep,
+          publicPath: join(getPath('src'), sep),
           filename: 'assets/[name][ext]',
         },
       },

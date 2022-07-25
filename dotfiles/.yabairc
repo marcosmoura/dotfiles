@@ -27,9 +27,9 @@ yabai_config window_gap                    16
 ## Label spaces
 yabai_space 1 --label code
 yabai_space 2 --label browser
-yabai_space 3 --label communication
-yabai_space 4 --label mail
-yabai_space 5 --label music
+yabai_space 3 --label music
+yabai_space 4 --label communication
+yabai_space 5 --label events
 yabai_space 6 --label terminal
 yabai_space 7 --label productivity
 yabai_space 8 --label finder
@@ -41,6 +41,10 @@ yabai_config --space browser layout stack
 yabai_config --space communication layout float
 yabai_config --space terminal layout stack
 
+
+
+#### Screen 1
+####################################################################################################
 
 ## Space - Code
 yabai_rule label="Visual Studio Code" app="^Visual Studio Code - Insiders$" space="code"
@@ -62,14 +66,18 @@ yabai_rule label="Microsoft Teams" app="^Microsoft Teams$" space="communication"
 yabai_unmanage label="Microsoft Teams" app="^Microsoft Teams$" space="communication"
 
 
-## Space - Mail
-yabai_rule label="Outlook" app="^Outlook$" space="mail"
-yabai_rule label="Calendar" app="^Calendar$" space="calendar"
+## Space - Events
+yabai_rule label="Outlook" app="^Outlook$" space="events"
+yabai_rule label="Calendar" app="^Calendar$" space="events"
 
 
 ## Space - Music
 yabai_rule label="Spotify" app="^Spotify$" space="music"
 
+
+
+#### Screen 1
+####################################################################################################
 
 ## Space - Terminal
 yabai_rule label="iTerm 2" app="^iTerm 2$" space="terminal"
