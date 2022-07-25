@@ -1,25 +1,25 @@
-#!/bin/sh
+print_start "Installing zsh"
 
-reset
-printMsg "ZSH" "Setting up..."
+ZSH_DIR=$(which zsh)
 
-# Check if zsh is in list of accepted shells
-if grep -Fxq "/usr/local/bin/zsh" /etc/shells > /dev/null 2>&1; then
-  printSuccess "ZSH" "Already in the list of accepted shells..."
-else
-  printMsg "ZSH" "Adding to list of accepted shells..."
-  sudo sh -c 'echo "/usr/local/bin/zsh" >> /etc/shells'
+if ! brew ls --versions zsh > /dev/null; then
+  brew install zsh
 fi
 
-# Check if zsh is default shell
-if echo $SHELL | grep /bin/bash > /dev/null 2>&1; then
-  printMsg "ZSH" "Setting as default shell..."
-  chsh -s /usr/local/bin/zsh
-else
-  printSuccess "ZSH" "Already the default shell..."
+if ! grep -Fxq $ZSH_DIR /etc/shells; then
+  print_progress "Adding zsh to /etc/shells"
+  sudo sh -c 'echo $ZSH_DIR >> /etc/shells'
 fi
 
-antibody bundle < ~/.zsh_plugins > ~/.zsh_plugins.sh
-antibody update
+if ! echo $SHELL | grep -Fxq $ZSH_DIR; then
+  print_progress "Setting as default shell"
+  chsh -s $ZSH_DIR
+fi
 
-printMsg "ZSH" "Configured with success!"
+if ! brew ls --versions sheldon > /dev/null; then
+  brew install sheldon
+  sheldon lock --reinstall
+fi
+
+
+print_success "zsh installed! \n"
