@@ -59,6 +59,10 @@ yabai_rule label="Firefox" app="^Firefox" space="browser"
 yabai_rule label="Safari" app="^Safari$" space="browser"
 
 
+## Space - Music
+yabai_rule label="Spotify" app="^Spotify$" space="music"
+
+
 ## Space - Communication
 yabai_rule label="WhatsApp" app="^WhatsApp$" space="communication"
 yabai_rule label="Discord" app="^Discord$" space="communication"
@@ -69,10 +73,6 @@ yabai_unmanage label="Microsoft Teams" app="^Microsoft Teams$" space="communicat
 ## Space - Events
 yabai_rule label="Outlook" app="^Outlook$" space="events"
 yabai_rule label="Calendar" app="^Calendar$" space="events"
-
-
-## Space - Music
-yabai_rule label="Spotify" app="^Spotify$" space="music"
 
 
 
