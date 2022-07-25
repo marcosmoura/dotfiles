@@ -1,11 +1,12 @@
 shell = "zsh"
 
 
-# Template
+# compinit
 # ----------------------
 
-[templates]
-defer = { value = 'zsh-defer source "{{ file }}"', each = true }
+[plugins.compinit]
+local = "~/.zsh/plugins"
+use = ["compinit.zsh"]
 
 
 # Completions
@@ -19,71 +20,46 @@ github = "zsh-users/zsh-autosuggestions"
 use = ["{{ name }}.zsh"]
 
 
-# Quickly loaded plugins
+# omz plugins
 # ----------------------
-
-[plugins.history]
-github = "ohmyzsh/ohmyzsh"
-dir = "lib"
-
-
-# Deferred plugins
-# ----------------------
-
-[plugins.zsh-defer]
-github = "romkatv/zsh-defer"
 
 [plugins.ohmyzsh-lib]
 github = "ohmyzsh/ohmyzsh"
 dir = "lib"
-use = ["{completion,git,key-bindings,termsupport,theme-and-appearance}.zsh"]
-apply = ["defer"]
+use = ["{completion,git,history}.zsh"]
 
 [plugins.ohmyzsh-plugins]
 github = "ohmyzsh/ohmyzsh"
 dir = "plugins"
-use = ["{pod,git,zoxide,yarn}/*.plugin.zsh"]
-apply = ["defer"]
+use = ["{git,zoxide}/*.plugin.zsh"]
+
+
+# Other plugins
+# ----------------------
 
 [plugins.zoxide]
 github = 'ajeetdsouza/zoxide'
 use = ["{{ name }}.plugin.zsh"]
-apply = ["defer"]
 
 [plugins.syntax-highlight]
 github = 'marcosmoura/fast-syntax-highlighting'
-apply = ["defer"]
 
 [plugins.256color]
 github = 'chrissicool/zsh-256color'
-apply = ["defer"]
 
 [plugins.zsh-you-should-use]
 github = "MichaelAquilina/zsh-you-should-use"
-apply = ["defer"]
 
-[plugins.zsh-bd]
-github = 'Tarrasch/zsh-bd'
-apply = ["defer"]
-
-[plugins.compinit]
-local = "~/.zsh/plugins"
-use = ["compinit.zsh"]
-apply = ["defer"]
+[plugins.forgit]
+github = 'wfxr/forgit'
 
 [plugins.yarn-completion]
 github = 'chrisands/zsh-yarn-completions'
-apply = ["defer"]
 
 
 # Dotfiles
 # ----------------------
 
-[plugins.dotfiles-fast]
-local = "~/.zsh/plugins"
-use = ["{colors}.zsh"]
-
 [plugins.dotfiles]
 local = "~/.zsh/plugins"
 use = ["*.zsh", "!{compinit,colors}.zsh"]
-apply = ["defer"]
