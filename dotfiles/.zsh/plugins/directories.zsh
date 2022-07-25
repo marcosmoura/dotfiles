@@ -3,15 +3,18 @@
 setopt auto_pushd
 setopt pushd_ignore_dups
 setopt pushdminus
+setopt autocd
 
 # So these commands can be executed with sudo
 alias sudo="sudo "
 
 # Quickly move to folder
-alias -g ...='../..'
-alias -g ....='../../..'
-alias -g .....='../../../..'
-alias -g ......='../../../../..'
+alias ..='cd ..'
+alias ...='cd ../..'
+alias ....='cd ../../..'
+alias .....='cd ../../../..'
+alias ......='cd ../../../../..'
+alias .......='cd ../../../../../..'
 alias ~="cd ~"
 
 # Always use color output for `ls`
