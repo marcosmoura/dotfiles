@@ -1,12 +1,12 @@
 import IconWindow from '@/assets/icon-window.png'
-import { modalDuration, animationDuration } from '@/config'
+import { modalDuration, animation, animationDuration } from '@/config'
 
 type Falsy = false | 0 | '' | null | undefined
 
 function createAlert(text: string, icon: string | Falsy = IconWindow) {
   const modal = new Modal()
 
-  modal.animationDuration = animationDuration
+  modal.animationDuration = animation ? animationDuration : 0
   modal.duration = modalDuration
   modal.text = text
   modal.weight = 24
