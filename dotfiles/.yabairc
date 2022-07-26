@@ -61,6 +61,7 @@ yabai_rule label="Safari" app="^Safari$" space="browser"
 
 ## Space - Music
 yabai_rule label="Spotify" app="^Spotify$" space="music"
+yabai_rule label="Music" app="^Music$" space="music"
 
 
 ## Space - Communication
