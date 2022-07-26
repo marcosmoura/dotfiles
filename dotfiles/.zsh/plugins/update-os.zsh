@@ -74,7 +74,7 @@ function updateBrew {
 }
 
 function updateAll {
-  print_start "Updating everything"
+  print_green "💻 Updating everything"
 
   updateRuby
   updatePackages
@@ -86,7 +86,7 @@ function updateAll {
 }
 
 function updateMacos {
-  print_start "Updating macOS \n"
+  print_text "Updating macOS \n"
 
   sudo softwareupdate -i -a
   mas upgrade
