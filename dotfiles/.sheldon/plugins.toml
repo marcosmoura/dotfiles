@@ -4,6 +4,9 @@ shell = "zsh"
 # compinit
 # ----------------------
 
+[plugins.async]
+github = 'mafredri/zsh-async'
+
 [plugins.compinit]
 local = "~/.zsh/plugins"
 use = ["compinit.zsh"]
@@ -39,7 +42,6 @@ use = ["{zoxide,aliases,cp,dircycle}/*.plugin.zsh"]
 
 [plugins.zoxide]
 github = 'ajeetdsouza/zoxide'
-use = ["{{ name }}.plugin.zsh"]
 
 [plugins.syntax-highlight]
 github = 'marcosmoura/fast-syntax-highlighting'
