@@ -1,6 +1,9 @@
 "$schema" = 'https://starship.rs/config-schema.json'
 
-right_format = """$time"""
+format = "$all $fill $jobs$time$line_break$character"
+
+[fill]
+symbol = " "
 
 [directory]
 truncation_length = 8
