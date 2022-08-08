@@ -58,6 +58,7 @@ function updateZsh {
   export SNAZZY_COLORS=$(vivid generate snazzy)
   export LS_COLORS=$SNAZZY_COLORS
   echo $SNAZZY_COLORS > ~/.zsh/static/snazzy-colors.txt
+  fast-theme ~/syntax-theme.ini
 
   print_success "Plugins updated! \n"
 }
