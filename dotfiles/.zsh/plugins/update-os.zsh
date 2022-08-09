@@ -61,6 +61,8 @@ function updateZsh {
   echo $SNAZZY_COLORS > ~/.zsh/static/snazzy-colors.txt
   fast-theme ~/syntax-theme.ini
 
+  exec $SHELL -l
+
   print_success "Plugins updated! \n"
 }
 
