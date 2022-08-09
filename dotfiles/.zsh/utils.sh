@@ -48,3 +48,7 @@ function print_info {
 function print_success {
   print_green "\n✅ $1"
 }
+
+function print_error {
+  print_red "\n❌ $1"
+}

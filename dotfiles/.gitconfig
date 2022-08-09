@@ -27,6 +27,9 @@
   # Pull in remote changes for the current repository and all its submodules
   p = !"git pull; git submodule foreach git pull origin master"
 
+  # Rebase remote fork onto the current branch
+  rf = !zsh -c 'source ~/.zsh/plugins/git.zsh && rebaseFork'
+
   # Push to origin
   po = push -u
 
@@ -49,9 +52,6 @@
 
   # Credit an author on the latest commit
   credit = "!f() { git commit --amend --author \"$1 <$2>\" -C HEAD; }; f"
-
-  # Create BitBucket PR
-  pr = bb pull-request --yes
 
   # Find branches containing commit
   fb = "!f() { git branch -a --contains $1; }; f"
