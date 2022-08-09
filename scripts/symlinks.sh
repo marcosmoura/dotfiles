@@ -1,6 +1,6 @@
 print_start "Linking dotfiles\n"
 
-create_symlink() {
+function create_symlink() {
   ln -sfvF $(grealpath $1) "$HOME/$1"
 }
 

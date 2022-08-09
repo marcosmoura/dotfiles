@@ -8,7 +8,7 @@ alias loadMicrosoftDefender="launchctl load /Library/LaunchAgents/com.microsoft.
 alias afk='open -a /System/Library/CoreServices/ScreenSaverEngine.app'
 
 # Start NZXT Kraken
-kraken () {
+function kraken () {
   liquidctl initialize all;
   liquidctl --match "Kraken" set pump speed 20 40 40 70 50 80 60 100
   liquidctl --match "Smart Device" set fan1 speed 70
