@@ -25,7 +25,7 @@ source scripts/postinstall.sh
 
 
 print_green "🎉 Dotfiles installed and configured!"
-print_green "   Reloading shell..."
+print_green "✅ Reloading shell! 😊"
 print_green "$TEXT_SEPARATOR\n"
 
 exec $SHELL -l
