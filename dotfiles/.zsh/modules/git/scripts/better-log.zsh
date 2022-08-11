@@ -10,9 +10,5 @@ if [ -z "${LIMIT}" ]; then
   LIMIT=25
 fi
 
-print_start "Latest $LIMIT commits: \n"
-
 LOG_OUTPUT=`git log -n $LIMIT --abbrev-commit --color --pretty=format:"$FORMAT"`
 format_log $LOG_OUTPUT
-
-print_success "Done!"
