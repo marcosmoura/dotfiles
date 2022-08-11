@@ -1,6 +1,6 @@
 import { animate, cubicBezier, KeyframeOptions } from 'popmotion'
 
-import { animation, animationDuration } from '@/config'
+import { hasAnimation, animationDuration } from '@/config'
 
 const defaultAnimationOptions = {
   duration: animationDuration,
@@ -11,7 +11,7 @@ const animateToFrame = (
   frame: Rectangle,
   { duration, ease }: Partial<KeyframeOptions<Rectangle>> = defaultAnimationOptions,
 ) => {
-  if (animation) {
+  if (hasAnimation) {
     animate({
       from: window.frame(),
       to: frame,
