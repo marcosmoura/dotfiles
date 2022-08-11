@@ -10,7 +10,6 @@ MESSAGE="%<(80,trunc)%C(reset)%s"
 FORMAT=$(join_by_char $LOG_SEPARATOR $HASH $AUTHOR $DATE $MESSAGE)
 
 function format_log() {
-  clear
   PRETTY_PRINT=$(tsv-pretty -e -f -d=$LOG_SEPARATOR <<< $1)
   bat -p --color=always -l="Markdown" --pager="less -RFnXJ" --theme="Sublime Snazzy" <<< $PRETTY_PRINT
 }
