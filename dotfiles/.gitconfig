@@ -11,91 +11,75 @@
   # List aliases
   aliases = config --get-regexp alias
 
-  # View abbreviated SHA, author, date and description of the latest 15 commits
-  l = log -n 15 --abbrev-commit --all --color --pretty=format:'%n%C(yellow bold)%h %C(green bold)<%an> %C(blue bold)%cr%C(red bold)%d %n%C(reset)%s'
-
-  # View abbreviated SHA, description, and history graph of the latest 35 commits
-  ls = log --oneline -n 35 --graph --abbrev-commit --all --decorate --color
-
   # View the current working tree status using the short format
   s = status
   ss = status -s
 
-  # Show the diff between the latest commit and the current state
-  d = !"git diff-index --quiet HEAD -- || clear; git diff --patch-with-stat"
+  # Discard local changes
+  discard = checkout -- .
 
   # Pull in remote changes for the current repository and all its submodules
   p = !"git pull; git submodule foreach git pull origin master"
 
-  # Rebase remote fork onto the current branch
-  rf = !zsh -c 'source ~/.zsh/plugins/git.zsh && rebaseFork'
+  # Sync current branch with remote fork
+  sync-fork = !zsh ~/.zsh/modules/git/scripts/sync-fork.zsh
 
   # Push to origin
   po = push -u
 
+  # Shortcut to merge
+  m = merge --no-ff
+
+  # View abbreviated SHA, author, date and description of the latest 25 commits
+  l = !zsh ~/.zsh/modules/git/scripts/better-log.zsh
+
+  # Log Commits by name
+  fm = !zsh ~/.zsh/modules/git/scripts/find-commit-by-message.zsh
+
+  # Log Commits by path
+  fc = !zsh ~/.zsh/modules/git/scripts/find-commit-by-path.zsh
+
+  # Get log graph
+  graph = log --abbrev-commit --color --graph
+
+  # Show the diff between the latest commit and the current state
+  d = !"git diff-index --quiet HEAD -- || clear; git diff --patch-with-stat"
+
   # Clone a repository including all submodules
   c = clone --recursive
 
-  # Commit all changes
-  ca = !git add -A && git commit -m
+  # Checkout branch
+  ck = checkout
+  ckb = checkout -b
 
   # Switch to a branch, creating it if necessary
-  go = "!f() { git checkout -b \"$1\" 2> /dev/null || git checkout \"$1\"; }; f"
+  go = !zsh ~/.zsh/modules/git/scripts/switch-or-create-branch.zsh
 
   # Show verbose output about tags, branches or remotes
   tags = tag -l
   branches = branch -a
   remotes = remote -v
 
-  # Amend the currently staged files to the latest commit
-  amend = commit --amend --reuse-message=HEAD
+  # Shortcut to commit with message
+  cm = commit -m
+
+  # Commit all changes
+  ca = !git add -A && git commit -m
 
   # Rename latest commit
   rename = commit --amend -m
 
+  # Amend the currently staged files to the latest commit
+  add-to-last-commit = commit --amend --reuse-message=HEAD
+
   # Credit an author on the latest commit
-  credit = "!f() { git commit --amend --author \"$1 <$2>\" -C HEAD; }; f"
+  give-credit = !zsh ~/.zsh/modules/git/scripts/commit-with-credits.zsh
 
-  # Find branches containing commit
-  fb = "!f() { git branch -a --contains $1; }; f"
-
-  # Find commits by source code
-  fc = "!f() { git log --pretty=format:'%C(yellow)%h  %Cblue%ad  %Creset%s%Cgreen  [%cn] %Cred%d' --decorate --date=short -S$1; }; f"
-
-  # Find commits by commit message
-  fm = "!f() { git log --pretty=format:'%C(yellow)%h  %Cblue%ad  %Creset%s%Cgreen  [%cn] %Cred%d' --decorate --date=short --grep=$1; }; f"
-
-  # Remove branches that have already been merged with master
-  # a.k.a. ‘delete merged’
-  dm = "!git branch --merged | egrep -v '(main|release|develop)' | xargs -n 1 git branch -d"
-
-  # Remove all "gone" branches
-  dg = "!git fetch -p && git branch -vv | awk '/: gone]/{print $1}' | xargs git branch -D"
+  # Remove all "merged" branches
+  delete-merged = !zsh ~/.zsh/modules/git/scripts/delete-merged.zsh
 
   # List contributors with number of commits
   contributors = shortlog --summary --numbered
-
-  # Shortcut to commit with message
-  cm = commit -m
-
-  # Shortcut to commit with message
-  m = merge --no-ff
-
-  # Checkout branch
-  ck = checkout
-  ckb = checkout -b
-
-  # Get log graph
-  graph = log --graph
-
-  # Last 10 commits
-  last = log -n 10
-
-  # Discard local changes
-  discard = checkout -- .
-
-  # Show unmerged commits
-  suc = "!f() { git log --oneline --no-merges $1..; }; f"
 
 [apply]
   whitespace = fix
@@ -114,7 +98,7 @@
 [merge]
   # Include summaries of merged commits in newly created merge commit messages
   log = true
-  tool = meld
+  tool = code
   conflictstyle = diff3
 
 [help]
@@ -123,6 +107,7 @@
 [diff]
   colorMoved = default
   renames = copies
+  renameLimit = 1644
 
 [diff "bin"]
   textconv = hexdump -v -C
@@ -167,14 +152,15 @@
   whitespace = space-before-tab,-indent-with-non-tab,trailing-space
 
 [format]
-  pretty = %Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset
+  pretty = %C(yellow bold)%h%Creset -%C(magenta)%d%Creset %s %C(blue bold)(%cr) %C(green bold)<%an>%Creset
+
+[log]
+  abbrevCommit = true
+  date = relative
   graph = true
 
 [advice]
   statusHints = false
-
-[log]
-  abbrevCommit = true
 
 # URL shorthands
 
