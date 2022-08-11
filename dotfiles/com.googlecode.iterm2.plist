@@ -4,6 +4,8 @@
 <dict>
 	<key>AdjustWindowForFontSizeChange</key>
 	<false/>
+	<key>AlternateMouseScroll</key>
+	<true/>
 	<key>BootstrapDaemon</key>
 	<false/>
 	<key>CheckTestRelease</key>

@@ -1,6 +1,14 @@
 shell = "zsh"
 
 
+# colors
+# ----------------------
+
+[plugins.colors]
+local = "~/.zsh/modules"
+use = ["{{ name }}.plugin.zsh"]
+
+
 # compinit
 # ----------------------
 
@@ -8,8 +16,8 @@ shell = "zsh"
 github = 'mafredri/zsh-async'
 
 [plugins.compinit]
-local = "~/.zsh/plugins"
-use = ["compinit.zsh"]
+local = "~/.zsh/modules"
+use = ["{{ name }}.plugin.zsh"]
 
 
 # Completions
@@ -63,5 +71,5 @@ github = 'chrisands/zsh-yarn-completions'
 # ----------------------
 
 [plugins.dotfiles]
-local = "~/.zsh/plugins"
-use = ["*.zsh", "!{compinit,colors}.zsh"]
+local = "~/.zsh/modules"
+use = ["*.plugin.zsh", "!{colors,compinit}/*.plugin.zsh"]

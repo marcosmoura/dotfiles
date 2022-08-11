@@ -50,5 +50,15 @@ function print_success {
 }
 
 function print_error {
-  print_red "\n❌ $1"
+  print_red "❌ $1"
+}
+
+
+# Functions
+function join_by_char {
+  local d=${1-} f=${2-}
+
+  if shift 2; then
+    printf %s "$f" "${@/#/$d}"
+  fi
 }

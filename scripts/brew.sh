@@ -31,6 +31,7 @@ print_progress "Core utilities\n"
 brew install bash
 brew install coreutils
 brew install findutils
+brew install gawk
 brew install grep --with-default-names
 brew install moreutils
 brew install ncurses
@@ -67,6 +68,8 @@ brew install fzf
 brew install git-delta
 brew install glow
 brew install gnu-sed
+brew install hyperfine
+brew install marcosmoura/homebrew-tap/tsv-utils
 brew install ncdu
 brew install starship
 brew install terminal-notifier
