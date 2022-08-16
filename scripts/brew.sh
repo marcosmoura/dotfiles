@@ -1,11 +1,12 @@
-print_start "Installing Homebrew"
+print_start "Installing Homebrew\n"
 
 which -s brew
 if [[ $? != 0 ]] ; then
-  print_progress "Installing Homebrew"
   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-  print_text "\n"
 fi
+
+eval "$(/opt/homebrew/bin/brew shellenv)"
+
 
 print_progress "Updating brew\n"
 
@@ -13,6 +14,7 @@ brew -v update
 brew upgrade --force-bottle
 
 
+print_text ""
 print_progress "Tapping repositories\n"
 
 brew tap dart-lang/dart
@@ -26,19 +28,21 @@ brew tap homebrew/core
 brew tap homebrew/services
 
 
+print_text ""
 print_progress "Core utilities\n"
 
 brew install bash
 brew install coreutils
 brew install findutils
 brew install gawk
-brew install grep --with-default-names
+brew install grep
 brew install moreutils
 brew install ncurses
 brew install openssh
 brew install openssl
 
 
+print_text ""
 print_progress "Programming languages\n"
 
 brew install dart
@@ -50,12 +54,14 @@ brew install rust
 brew install rustup-init
 
 
+print_text ""
 print_progress "Programming tools\n"
 
 brew install cocoapods
 brew install watchman
 
 
+print_text ""
 print_progress "Terminal tools\n"
 
 brew install bat
@@ -78,14 +84,17 @@ brew install vivid
 brew install zoxide
 
 
+print_text ""
 print_progress "Terminal apps\n"
 brew install bandwhich
 brew install koekeishiya/formulae/yabai
 brew install liquidctl
+brew install mas
 brew install osx-cpu-temp
 brew install tokei
 
 
+print_text ""
 print_progress "Fonts\n"
 
 brew install --cask font-fira-code
@@ -95,6 +104,7 @@ brew install --cask font-jetbrains-mono
 brew install --cask font-jetbrains-mono-nerd-font
 
 
+print_text ""
 print_progress "QuickLook extensions\n"
 
 brew install --no-quarantine qlcolorcode
@@ -107,8 +117,10 @@ brew install --no-quarantine quicklookase
 brew install --no-quarantine webpquicklook
 
 
+print_text ""
 print_progress "Cleaning up\n"
 
 brew cleanup
 
+print_text ""
 print_success "Homebrew installed! \n"

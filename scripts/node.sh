@@ -1,8 +1,7 @@
-print_start "Installing Node"
+print_start "Installing Node\n"
 
 which -s node
 if [[ $? != 0 ]] ; then
-  print_progress "Installing node"
   brew install node npm yarn
 fi
 
