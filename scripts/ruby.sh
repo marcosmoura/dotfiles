@@ -1,11 +1,10 @@
 print_start "Installing Ruby"
 
-if ! brew ls --versions ruby > /dev/null; then
-  brew install rbenv
-  export RBENV_VERSION=$(rbenv install -l -s | grep -v - | tail -1)
-  eval "$(rbenv init - zsh)"
-  rbenv global $RBENV_VERSION
-fi
+brew install rbenv
+export RBENV_VERSION=$(rbenv install -l -s | grep -v - | tail -1)
+eval "$(rbenv init - zsh)"
+rbenv install -s $RBENV_VERSION
+rbenv global $RBENV_VERSION
 
 print_progress "Installing gems"
 
