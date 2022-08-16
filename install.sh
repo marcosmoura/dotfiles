@@ -13,14 +13,14 @@ print_text "$TEXT_SEPARATOR\n"
 # Load installation scripts
 source scripts/preinstall.sh
 source scripts/macos.sh
-source scripts/zsh.sh
 source scripts/brew.sh
+source scripts/symlinks.sh
+source scripts/zsh.sh
 source scripts/node.sh
 source scripts/python.sh
 source scripts/ruby.sh
 source scripts/apps.sh
 source scripts/packages.sh
-source scripts/symlinks.sh
 source scripts/postinstall.sh
 
 
