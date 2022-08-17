@@ -1,6 +1,7 @@
 "$schema" = 'https://starship.rs/config-schema.json'
 
 format = "$all $fill $jobs$time$line_break$character"
+command_timeout = 1000
 
 [fill]
 symbol = " "
