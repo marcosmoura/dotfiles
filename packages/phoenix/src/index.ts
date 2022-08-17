@@ -35,7 +35,7 @@ function setupTilingLayout() {
 
   addTilingRule('Discord', {
     ...centeredLayout,
-    space: 5,
+    space: 4,
   })
 
   addTilingRule('(Copy|Bin|About This Mac|Info)', centeredLayout)
