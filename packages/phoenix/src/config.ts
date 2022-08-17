@@ -5,7 +5,7 @@ export const hyperAlt: Phoenix.ModifierKey[] = ['command', 'option', 'control']
 export const hyperShift: Phoenix.ModifierKey[] = [...hyper, 'shift']
 export const hyperAltShift: Phoenix.ModifierKey[] = [...hyperAlt, 'shift']
 
-export const hasAnimation: boolean = false
+export const hasAnimation: boolean = true
 export const animationDuration: number = 0.25
 export const modalDuration: number = 1.25
 
