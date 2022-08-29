@@ -103,6 +103,7 @@ brew install --cask font-hack-nerd-font
 brew install --cask font-inter
 brew install --cask font-jetbrains-mono
 brew install --cask font-jetbrains-mono-nerd-font
+brew install --cask font-maple
 
 
 print_text ""
