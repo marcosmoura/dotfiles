@@ -66,6 +66,9 @@ github = 'wfxr/forgit'
 [plugins.yarn-completion]
 github = 'chrisands/zsh-yarn-completions'
 
+[plugins.nx-completion]
+github = 'jscutlery/nx-completion'
+
 
 # Dotfiles
 # ----------------------
