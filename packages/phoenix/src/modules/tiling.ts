@@ -32,8 +32,8 @@ const defaultOptions: AppLayout = {
     maxGridCells,
   },
 }
-const ruleCache: { [rule: string]: AppLayout } = {}
-const appCache: { [appName: string]: AppLayout } = {}
+const ruleCache: Record<string, AppLayout> = {}
+const appCache: Record<string, AppLayout> = {}
 const tilingQueue = new Queue({ concurrency: 1, autoStart: true })
 
 function clearTilingCache() {
@@ -246,8 +246,8 @@ function redoAppLayout(app: App, forceFocus = false) {
   if (options) {
     applyLayoutToApp(app, options.space, options.tiling, forceFocus)
   } else {
-    Object.entries(ruleCache).forEach(([cachedRule, options]) => {
-      if (cachedRule.test(appName)) {
+    Object.entries(ruleCache).forEach(([ruleName, options]) => {
+      if (new RegExp(ruleName).test(appName)) {
         applyLayoutToApp(app, options.space, options.tiling, forceFocus)
       }
     })

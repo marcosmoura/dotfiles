@@ -8,7 +8,7 @@ alias loadMicrosoftDefender="launchctl load /Library/LaunchAgents/com.microsoft.
 alias afk='open -a /System/Library/CoreServices/ScreenSaverEngine.app'
 
 # Reload Yabai config
-alias reloadYabai='launchctl kickstart -k "gui/${UID}/homebrew.mxcl.yabai"'
+alias reloadYabai='zsh ~/.zsh/modules/tools/scripts/reload-yabai.zsh'
 
 # Start NZXT Kraken
 function kraken () {

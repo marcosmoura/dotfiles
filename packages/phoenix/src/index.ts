@@ -1,5 +1,6 @@
 import IconReload from './assets/icon-reload.png'
 import { alert } from './components/alert'
+import { keybindings } from './config'
 import capsLock from './modules/capsLock'
 import lockScreen from './modules/lockScreen'
 import reload from './modules/reload'
@@ -8,6 +9,8 @@ import slowQuit from './modules/slowquit'
 import tiling, { addTilingRule, AppLayout, clearTilingCache } from './modules/tiling'
 import window from './modules/windows'
 import { addEventListener } from './utils/event'
+import { onKeyPress } from './utils/key'
+import { getExecutablePath, getShellVariable } from './utils/shell'
 
 Phoenix.set({ openAtLogin: true })
 
@@ -54,5 +57,13 @@ function setupTilingLayout() {
 
 setupTilingLayout()
 addEventListener('screensDidChange', setupTilingLayout)
+
+onKeyPress(...keybindings.reloadYabai, async () => {
+  const homeFolder = await getShellVariable('$HOME')
+  const executablePath = await getExecutablePath('zsh')
+
+  Task.run(executablePath, [`${homeFolder}/.zsh/modules/tools/scripts/reload-yabai.zsh`])
+})
+addEventListener('appDidLaunch', setupTilingLayout)
 
 alert('Phoenix reloaded!', IconReload)

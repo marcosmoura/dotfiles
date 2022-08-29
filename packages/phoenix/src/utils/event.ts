@@ -14,6 +14,7 @@ function addEventListener(
   callback: (target: Window, handler: Event) => void,
 ): void
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function addEventListener(event: any, callback: any): void {
   if (Array.isArray(event)) {
     event.forEach((eventName) => Event.on(eventName, callback))
