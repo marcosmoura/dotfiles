@@ -2,16 +2,22 @@ alias yabai_rule='yabai -m rule --add '
 alias yabai_config='yabai -m config '
 alias yabai_space='yabai -m space '
 alias yabai_unmanage='yabai_rule manage=off layer=above '
+alias yabai_signal='yabai -m signal --add '
 
 ## Global settings
+yabai_config active_window_opacity         1
 yabai_config auto_balance                  off
 yabai_config focus_follows_mouse           off
 yabai_config mouse_action1                 move
 yabai_config mouse_action2                 resize
 yabai_config mouse_follows_focus           off
 yabai_config mouse_modifier                fn
+yabai_config normal_window_opacity         0.75
 yabai_config split_ratio                   0.5
+yabai_config window_opacity                on
+yabai_config window_opacity_duration       0.5
 yabai_config window_placement              first_child
+yabai_config window_shadow                 off
 yabai_config window_topmost                on
 
 
@@ -47,56 +53,60 @@ yabai_config --space terminal layout stack
 ####################################################################################################
 
 ## Space - Code
-yabai_rule label="Visual Studio Code" app="^Visual Studio Code - Insiders$" space="code"
-yabai_rule label="Simulator" app="^Simulator$" space="code"
-yabai_rule label="Xcode" app="^Xcode$" space="code"
+yabai_rule label="Visual Studio Code" app="^Visual Studio Code - Insiders$" space="code" display="1"
+yabai_rule label="Simulator" app="^Simulator$" space="code" display="1"
+yabai_rule label="Xcode" app="^Xcode$" space="code" display="1"
 
 
 ## Space - Browser
-yabai_rule label="Chrome" app="^Google Chrome$" space="browser"
-yabai_rule label="Edge" app="^Microsoft Edge" space="browser"
-yabai_rule label="Firefox" app="^Firefox" space="browser"
-yabai_rule label="Safari" app="^Safari$" space="browser"
+yabai_rule label="Chrome" app="^Google Chrome$" space="browser" display="1"
+yabai_rule label="Edge" app="^Microsoft Edge" space="browser" display="1"
+yabai_rule label="Firefox" app="^Firefox" space="browser" display="1"
+yabai_rule label="Safari" app="^Safari$" space="browser" display="1"
 
 
 ## Space - Music
-yabai_rule label="Spotify" app="^Spotify$" space="music"
-yabai_rule label="Music" app="^Music$" space="music"
+yabai_rule label="Spotify" app="^Spotify$" space="music" display="1"
+yabai_rule label="Music" app="^Music$" space="music" display="1"
 
 
 ## Space - Communication
-yabai_rule label="WhatsApp" app="^WhatsApp$" space="communication"
-yabai_rule label="Discord" app="^Discord$" space="communication"
-yabai_rule label="Microsoft Teams" app="^Microsoft Teams$" space="communication"
-yabai_unmanage label="Microsoft Teams" app="^Microsoft Teams$" space="communication"
+yabai_rule label="WhatsApp" app="^WhatsApp$" space="communication" display="1"
+yabai_rule label="Discord" app="^Discord$" space="communication" display="1"
+yabai_rule label="Microsoft Teams" app="^Microsoft Teams$" space="communication" display="1"
+yabai_unmanage label="Microsoft Teams" app="^Microsoft Teams$" space="communication" display="1"
 
 
 ## Space - Events
-yabai_rule label="Outlook" app="^Outlook$" space="events"
-yabai_rule label="Calendar" app="^Calendar$" space="events"
+yabai_rule label="Outlook" app="^Outlook$" space="events" display="1"
+yabai_rule label="Calendar" app="^Calendar$" space="events" display="1"
 
 
 
-#### Screen 1
+#### Screen 2
 ####################################################################################################
 
 ## Space - Terminal
-yabai_rule label="iTerm 2" app="^iTerm 2$" space="terminal"
-yabai_rule label="iTerm" app="^iTerm$" space="terminal"
-yabai_rule label="Terminal" app="^Terminal$" space="terminal"
+yabai_rule label="iTerm 2" app="^iTerm 2$" space="terminal" display="2"
+yabai_rule label="iTerm" app="^iTerm$" space="terminal" display="2"
+yabai_rule label="Terminal" app="^Terminal$" space="terminal" display="2"
 
 
 ## Space - Productivity
-yabai_rule label="Notion" app="^Notion$" space="productivity"
-yabai_rule label="Bitwarden" app="^Bitwarden$" space="productivity"
+yabai_rule label="Notion" app="^Notion$" space="productivity" display="2"
+yabai_rule label="Bitwarden" app="^Bitwarden$" space="productivity" display="2"
 
 
 ## Space - Finder
-yabai_rule label="Finder" app="^Finder$" space="finder"
+yabai_rule label="Finder" app="^Finder$" space="finder" display="2"
 
 
 ## Space - Design
-yabai_rule label="Figma" app="^Figma$" space="design"
+yabai_rule label="Figma" app="^Figma$" space="design" display="2"
+
+
+## Sticky windows
+yabai_rule app="System Preferences" --sticky="on"
 
 
 ## Unmanaged windows
@@ -113,7 +123,6 @@ yabai_unmanage app="Kap"
 yabai_unmanage app="Preview"
 yabai_unmanage app="Stats"
 yabai_unmanage app="System Information"
-yabai_unmanage app="System Preferences"
 yabai_unmanage app="VLC"
 yabai_unmanage app="VoiceOver Utility"
 yabai_unmanage label="Software Update"

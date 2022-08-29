@@ -75,6 +75,7 @@ brew install git-delta
 brew install glow
 brew install gnu-sed
 brew install hyperfine
+brew install jq
 brew install marcosmoura/homebrew-tap/tsv-utils
 brew install ncdu
 brew install starship

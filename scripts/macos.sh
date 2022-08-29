@@ -259,6 +259,10 @@ defaults write com.apple.finder FXInfoPanesExpanded -dict \
 	OpenWith -bool true \
 	Privileges -bool true
 
+# When opening a folder on the desktop there's an animation that conflicts with yabai trying to tile the window.
+defaults write com.apple.finder DisableAllAnimations -bool true
+
+
 ###############################################################################
 # Dock, Dashboard, and hot corners
 ###############################################################################
