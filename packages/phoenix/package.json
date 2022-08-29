@@ -18,11 +18,11 @@
   "sideEffects": false,
   "scripts": {
     "build": "tsx scripts/build.ts",
-    "clean-install": "rm -rf node_modules yarn.lock && yarn",
+    "clean:install": "rm -rf node_modules yarn.lock && yarn",
     "dev": "tsx scripts/build.ts watch",
     "lint": "yarn lint:prettier && yarn lint:eslint && yarn lint:ts",
     "lint:eslint": "eslint ./src --ext .ts --format=pretty --fix --cache --cache-location ./node_modules/.eslintcache",
-    "lint:prettier": "prettier --write '**/*'",
+    "lint:prettier": "prettier --write --list-different '**/*'",
     "lint:ts": "tsc --noEmit"
   },
   "dependencies": {
@@ -48,7 +48,7 @@
     "eslint-plugin-unicorn": "43.0.2",
     "prettier": "^2.7.1",
     "prettier-plugin-packagejson": "^2.2.18",
-    "tsx": "^3.8.2",
+    "tsx": "^3.9.0",
     "typescript": "^4.8.2"
   },
   "engines": {

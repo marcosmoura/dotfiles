@@ -4,7 +4,6 @@ export PATH=/usr/local/opt:$PATH
 export PATH=$HOME/.rbenv/shims:$PATH
 export PATH=$HOME/.yarn/bin:$PATH
 export PATH=$HOME/.config/yarn/global/node_modules/.bin:$PATH
-eval "$(/opt/homebrew/bin/brew shellenv)"
 
 # Preferred editor
 export EDITOR=${EDITOR:-vim}
