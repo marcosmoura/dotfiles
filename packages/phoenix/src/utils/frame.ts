@@ -37,4 +37,4 @@ function getFrameSizeByPosition(screen: Screen, position: FramePosition): Rectan
   return { width, height, x, y }
 }
 
-export { getFrameSizeByPosition, getScreenFrame, getFrameWithGaps, FramePosition, Frame }
+export { Frame, FramePosition, getFrameSizeByPosition, getFrameWithGaps, getScreenFrame }

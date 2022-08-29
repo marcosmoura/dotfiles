@@ -1,4 +1,5 @@
 import { keybindings } from '@/config'
+
 import { onKeyPress } from '@/utils/key'
 
 function reload() {

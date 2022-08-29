@@ -1,7 +1,7 @@
-import { alert } from '@/components/alert'
 import { onKeyPress } from '@/utils/key'
+import { alert } from '@/components/alert'
 
-const blacklist = ['Finder']
+const blacklist = new Set(['Finder'])
 
 function slowQuit() {
   let quitAlert: Modal
@@ -16,7 +16,7 @@ function slowQuit() {
     onKeyPress('q', 'cmd', () => {
       const app = App.focused()
 
-      if (!app || blacklist.includes(app.name())) {
+      if (!app || blacklist.has(app.name())) {
         return
       }
 

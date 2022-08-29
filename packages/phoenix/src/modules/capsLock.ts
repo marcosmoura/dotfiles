@@ -1,8 +1,8 @@
-import { alert } from '@/components/alert'
 import { onKeyPress } from '@/utils/key'
+import { alert } from '@/components/alert'
 
 function getAlertMessage(pressed: boolean) {
-  let prefix = 'Caps'
+  const prefix = 'Caps'
 
   if (pressed) {
     return `${prefix} On`
