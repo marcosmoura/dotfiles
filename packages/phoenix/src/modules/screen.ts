@@ -1,7 +1,5 @@
-import { cubicBezier } from 'popmotion'
+import { keybindings } from '@/config'
 
-import { animationDuration, keybindings } from '@/config'
-import { animateToFrame } from '@/utils/animate'
 import { onKeyPress } from '@/utils/key'
 
 function moveToScreen(window: Window, screen: Screen) {
@@ -12,19 +10,12 @@ function moveToScreen(window: Window, screen: Screen) {
   const widthRatio = targetScreenFrame.width / currentScreenFrame.width
   const heightRatio = targetScreenFrame.height / currentScreenFrame.height
 
-  animateToFrame(
-    window,
-    {
-      width: windowFrame.width * widthRatio,
-      height: windowFrame.height * heightRatio,
-      x: (windowFrame.x - currentScreenFrame.x) * widthRatio + targetScreenFrame.x,
-      y: (windowFrame.y - currentScreenFrame.y) * heightRatio + targetScreenFrame.y,
-    },
-    {
-      duration: animationDuration * 1.25,
-      ease: cubicBezier(0.0, 0.0, 0.2, 1),
-    },
-  )
+  window.setFrame({
+    width: windowFrame.width * widthRatio,
+    height: windowFrame.height * heightRatio,
+    x: (windowFrame.x - currentScreenFrame.x) * widthRatio + targetScreenFrame.x,
+    y: (windowFrame.y - currentScreenFrame.y) * heightRatio + targetScreenFrame.y,
+  })
 }
 
 function moveToPreviousScreen(window = Window.focused()) {

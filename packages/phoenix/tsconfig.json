@@ -8,14 +8,14 @@
     "forceConsistentCasingInFileNames": true,
     "importHelpers": true,
     "lib": ["ESNext"],
-    "module": "CommonJS",
+    "module": "ESNext",
+    "moduleResolution": "Node",
     "newLine": "lf",
     "noEmitOnError": true,
     "noImplicitAny": true,
     "noImplicitReturns": true,
     "noImplicitThis": true,
     "noUnusedLocals": true,
-    "outDir": "..",
     "paths": {
       "@/*": ["./*"]
     },
@@ -28,8 +28,9 @@
     "stripInternal": true,
     "suppressImplicitAnyIndexErrors": true,
     "target": "ESNext",
-    "typeRoots": ["node_modules/@types"]
+    "typeRoots": ["node_modules/@types"],
+    "types": ["phoenix", "node"]
   },
-  "include": ["src/**/*", "types"],
-  "exclude": [".git", "node_modules"]
+  "exclude": ["node_modules"],
+  "include": ["src/**/*", "types"]
 }

@@ -1,10 +1,10 @@
 import { keybindings } from '@/config'
-import { animateToFrame } from '@/utils/animate'
+
 import {
-  getScreenFrame,
-  getFrameWithGaps,
-  getFrameSizeByPosition,
   FramePosition,
+  getFrameSizeByPosition,
+  getFrameWithGaps,
+  getScreenFrame,
 } from '@/utils/frame'
 import { onKeyPress } from '@/utils/key'
 
@@ -19,7 +19,7 @@ function setWindowToPosition(position?: FramePosition, win?: Window, frame?: Rec
   const { window } = getDefaults(win)
   const screenFrame = frame || getFrameSizeByPosition(window.screen(), position)
 
-  animateToFrame(window, screenFrame)
+  window.setFrame(screenFrame)
 }
 
 function setWindowToTop(window?: Window) {
@@ -53,7 +53,7 @@ function setWindowCentered(win?: Window, screenFrame?: Rectangle) {
   const x = frame.x + frame.width / 2 - width / 2
   const y = frame.y + frame.height / 2 - height / 2
 
-  animateToFrame(window, { width, height, x, y })
+  window.setFrame({ width, height, x, y })
 }
 
 function setupScreenShortcuts() {

@@ -5,7 +5,7 @@ import lockScreen from './modules/lockScreen'
 import reload from './modules/reload'
 import screen from './modules/screen'
 import slowQuit from './modules/slowquit'
-import tiling, { addTilingRule, clearTilingCache, AppLayout } from './modules/tiling'
+import tiling, { addTilingRule, AppLayout, clearTilingCache } from './modules/tiling'
 import window from './modules/windows'
 import { addEventListener } from './utils/event'
 
