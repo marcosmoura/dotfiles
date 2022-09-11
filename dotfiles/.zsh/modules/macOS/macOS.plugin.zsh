@@ -12,6 +12,8 @@ function updateAll {
   reload
 
   print_success "Updated! \n"
+
+  exec $SHELL -l
 }
 
 function updateMacos {

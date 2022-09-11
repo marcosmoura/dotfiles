@@ -47,6 +47,4 @@ function updateZsh {
   fast-theme ~/syntax-theme.ini > /dev/null
 
   print_success "zsh plugins updated! \n"
-
-  exec $SHELL -l
 }
