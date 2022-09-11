@@ -71,6 +71,8 @@ brew install exa
 brew install fd
 brew install fx
 brew install fzf
+brew install git
+brew install git-delete-merged-branches
 brew install git-delta
 brew install glow
 brew install gnu-sed
