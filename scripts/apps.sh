@@ -28,12 +28,16 @@ brew install --no-quarantine --cask cryptomator
 brew install --no-quarantine --cask google-drive
 brew install --no-quarantine --cask kap
 brew install --no-quarantine --cask notion
+brew install --no-quarantine --cask onyx
+brew install --no-quarantine --cask raycast
+brew install --no-quarantine --cask shottr
 
 
 print_progress "Browsers\n"
 
 brew install --no-quarantine --cask firefox-nightly
 brew install --no-quarantine --cask google-chrome-canary
+brew install --no-quarantine --cask orion
 
 
 print_progress "Dev Tools\n"
