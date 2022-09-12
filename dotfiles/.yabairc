@@ -45,7 +45,6 @@ yabai_space 9 --label design
 ## Spaces layouts
 yabai_config --space browser layout stack
 yabai_config --space communication layout float
-yabai_config --space terminal layout stack
 
 
 
