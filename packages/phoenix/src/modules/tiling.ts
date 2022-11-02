@@ -184,32 +184,39 @@ function applyLayoutToApp(
   appCache[app.name()] = { space, tiling }
 
   switch (tiling.mode) {
-    case 'column':
+    case 'column': {
       setAppToColumns(app, tiling)
       break
+    }
 
-    case 'row':
+    case 'row': {
       setAppToRows(app, tiling)
       break
+    }
 
-    case 'maximized':
+    case 'maximized': {
       setAppMaximized(app, tiling)
       break
+    }
 
-    case 'centered':
+    case 'centered': {
       setAppCentered(app, tiling)
       break
+    }
 
-    case 'grid':
+    case 'grid': {
       setAppToGrid(app, tiling)
       break
+    }
 
-    case 'floating':
+    case 'floating': {
       setAppFloating(app, tiling)
       break
+    }
 
-    default:
+    default: {
       break
+    }
   }
 }
 
@@ -317,10 +324,10 @@ function setupTiling() {
 
   onKeyPress(...keybindings.reloadSpace, redoSpaceLayout)
   onKeyPress(...keybindings.reloadLayout, redoAllLayouts)
-  onKeyPress(...keybindings.toggleMaximized, toggleWindowLayout({ mode: 'maximized' }))
+  /* onKeyPress(...keybindings.toggleMaximized, toggleWindowLayout({ mode: 'maximized' }))
   onKeyPress(...keybindings.toggleGrid, toggleWindowLayout({ mode: 'grid' }))
   onKeyPress(...keybindings.toggleColumn, toggleWindowLayout({ mode: 'column' }))
-  onKeyPress(...keybindings.toggleRow, toggleWindowLayout({ mode: 'row' }))
+  onKeyPress(...keybindings.toggleRow, toggleWindowLayout({ mode: 'row' })) */
 }
 
 export { addTilingRule, clearTilingCache, toggleWindowLayout }
