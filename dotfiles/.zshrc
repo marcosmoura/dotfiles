@@ -5,8 +5,7 @@ export PATH=$HOME/.rbenv/shims:$PATH
 export PATH=$HOME/.yarn/bin:$PATH
 export PATH=$HOME/.config/yarn/global/node_modules/.bin:$PATH
 
-BREW_PATH=$(which brew)
-eval "$($BREW_PATH shellenv)"
+eval "$(/opt/homebrew/bin/brew shellenv)"
 
 # Preferred editor
 export EDITOR=${EDITOR:-vim}
@@ -46,4 +45,6 @@ export STARSHIP_CONFIG=$HOME/.starship.toml
 eval "$(starship init zsh)"
 
 # Load all plugins
+export SHELDON_CONFIG_DIR="$HOME/.sheldon"
+export SHELDON_DATA_DIR="$HOME/.sheldon"
 eval "$(sheldon source)"
