@@ -1,26 +1,15 @@
 import IconReload from './assets/icon-reload.png'
 import { alert } from './components/alert'
-import { keybindings } from './config'
-import capsLock from './modules/capsLock'
-import lockScreen from './modules/lockScreen'
 import reload from './modules/reload'
-import screen from './modules/screen'
 import slowQuit from './modules/slowquit'
 import tiling, { addTilingRule, AppLayout, clearTilingCache } from './modules/tiling'
-import window from './modules/windows'
 import { addEventListener } from './utils/event'
-import { onKeyPress } from './utils/key'
-import { getExecutablePath, getShellVariable } from './utils/shell'
 
 Phoenix.set({ openAtLogin: true })
 
-capsLock()
-lockScreen()
 reload()
-screen()
 slowQuit()
 tiling()
-window()
 
 const centeredLayout: AppLayout = {
   tiling: {
@@ -31,16 +20,6 @@ const centeredLayout: AppLayout = {
 function setupTilingLayout() {
   clearTilingCache()
 
-  addTilingRule('WhatsApp', {
-    ...centeredLayout,
-    space: 4,
-  })
-
-  addTilingRule('Discord', {
-    ...centeredLayout,
-    space: 4,
-  })
-
   addTilingRule('(Copy|Bin|About This Mac|Info)', centeredLayout)
   addTilingRule('Activity Monitor', centeredLayout)
   addTilingRule('Calculator', centeredLayout)
@@ -48,22 +27,16 @@ function setupTilingLayout() {
   addTilingRule('IINA', centeredLayout)
   addTilingRule('Opening', centeredLayout)
   addTilingRule('Preferences', centeredLayout)
+  addTilingRule('Settings', centeredLayout)
   addTilingRule('Preview', centeredLayout)
   addTilingRule('Steam', centeredLayout)
-  addTilingRule('System Preferences', centeredLayout)
+  addTilingRule('System Settings', centeredLayout)
   addTilingRule('Tone Room', centeredLayout)
   addTilingRule('VLC', centeredLayout)
 }
 
 setupTilingLayout()
 addEventListener('screensDidChange', setupTilingLayout)
-
-onKeyPress(...keybindings.reloadYabai, async () => {
-  const homeFolder = await getShellVariable('$HOME')
-  const executablePath = await getExecutablePath('zsh')
-
-  Task.run(executablePath, [`${homeFolder}/.zsh/modules/tools/scripts/reload-yabai.zsh`])
-})
 addEventListener('appDidLaunch', setupTilingLayout)
 
 alert('Phoenix reloaded!', IconReload)

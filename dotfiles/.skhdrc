@@ -35,3 +35,6 @@ ctrl + cmd + alt - s: yabai -m window --toggle split
 
 ## Reload Yabai
 ctrl + cmd + alt - y: zsh ~/.zsh/modules/yabai/scripts/reload-yabai.zsh
+
+## Lock screen
+ctrl + cmd + alt - l: osascript -e 'tell application "System Events" to keystroke "q" using {control down, command down}'
