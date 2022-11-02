@@ -82,6 +82,7 @@ brew install marcosmoura/homebrew-tap/tsv-utils
 brew install ncdu
 brew install starship
 brew install terminal-notifier
+brew install tldr
 brew install tree
 brew install vivid
 brew install zoxide
