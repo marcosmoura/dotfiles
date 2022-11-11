@@ -86,6 +86,7 @@ yabai -m rule --add label="Finder" app="^Finder$" space="finder" display="2"
 yabai -m rule --add label="iTerm 2" app="^iTerm 2$" space="terminal" display="2"
 yabai -m rule --add label="iTerm" app="^iTerm$" space="terminal" display="2"
 yabai -m rule --add label="Terminal" app="^Terminal$" space="terminal" display="2"
+yabai -m rule --add label="kitty" app="^kitty$" space="terminal" display="2"
 
 
 ## Space - Design

@@ -47,6 +47,7 @@ brew install --no-quarantine --cask flipper
 brew install --no-quarantine --cask imageoptim
 brew install --no-quarantine --cask inkscape
 brew install --no-quarantine --cask iterm2
+brew install --no-quarantine --cask kitty
 brew install --no-quarantine --cask sf-symbols
 brew install --no-quarantine --cask visual-studio-code-insiders
 
