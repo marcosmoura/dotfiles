@@ -3,6 +3,10 @@
 format = "$all $fill $jobs$time$line_break$character"
 command_timeout = 1000
 
+[character]
+success_symbol = "[➜](bold green)"
+error_symbol = "[➜](bold red)"
+
 [fill]
 symbol = " "
 
@@ -12,14 +16,20 @@ truncation_length = 8
 [time]
 disabled = false
 time_format = "%R"
-format = '[♥](bold red) [$time](cyan)'
+format = '[♥](bold red) [$time](bold cyan)'
 
 [git_status]
 ahead = "⇡${count}"
 diverged = "⇕⇡${ahead_count}⇣${behind_count}"
 behind = "⇣${count}"
 
+[git_branch]
+symbol = "שׂ "
+
 [ruby]
+disabled = true
+
+[dotnet]
 disabled = true
 
 [nodejs]

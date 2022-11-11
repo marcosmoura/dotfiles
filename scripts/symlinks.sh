@@ -14,6 +14,12 @@ for file in *; do
   print_purple "📁 Linked $file"
 done
 
+# Override Kitty config
+HOME_CONFIG="$HOME/.config"
+mkdir -p "$HOME_CONFIG"
+rm -rf "$HOME_CONFIG/kitty"
+mv "$HOME/kitty" "$HOME_CONFIG/kitty"
+
 shopt -u dotglob
 
 popd > /dev/null

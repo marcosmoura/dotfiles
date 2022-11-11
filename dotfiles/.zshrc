@@ -48,3 +48,6 @@ eval "$(starship init zsh)"
 export SHELDON_CONFIG_DIR="$HOME/.sheldon"
 export SHELDON_DATA_DIR="$HOME/.sheldon"
 eval "$(sheldon source)"
+
+# clear screen
+clear
