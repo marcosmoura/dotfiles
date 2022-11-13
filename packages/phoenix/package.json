@@ -18,12 +18,12 @@
   "sideEffects": false,
   "scripts": {
     "build": "tsx scripts/build.ts",
-    "clean:install": "rm -rf node_modules yarn.lock && yarn",
+    "clean-install": "rm -rf node_modules yarn.lock && yarn",
     "dev": "tsx scripts/build.ts watch",
-    "lint": "yarn lint:prettier && yarn lint:eslint && yarn lint:ts",
+    "lint": "yarn lint:prettier && yarn lint:eslint && yarn lint:ts-check",
     "lint:eslint": "eslint ./src --ext .ts --format=pretty --fix --cache --cache-location ./node_modules/.eslintcache",
     "lint:prettier": "prettier --write --list-different '**/*'",
-    "lint:ts": "tsc --noEmit"
+    "lint:ts-check": "tsc --noEmit"
   },
   "dependencies": {
     "just-extend": "^6.1.1",
@@ -33,10 +33,10 @@
   "devDependencies": {
     "@types/node": "^18.11.9",
     "@types/phoenix": "github:mafredri/phoenix-typings",
-    "@typescript-eslint/eslint-plugin": "^5.42.0",
-    "@typescript-eslint/parser": "^5.42.0",
-    "esbuild": "^0.15.12",
-    "eslint": "^8.26.0",
+    "@typescript-eslint/eslint-plugin": "^5.42.1",
+    "@typescript-eslint/parser": "^5.42.1",
+    "esbuild": "^0.15.13",
+    "eslint": "^8.27.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-formatter-pretty": "^4.1.0",
     "eslint-import-resolver-alias": "1.1.2",
@@ -48,7 +48,7 @@
     "eslint-plugin-unicorn": "44.0.2",
     "prettier": "^2.7.1",
     "prettier-plugin-packagejson": "^2.3.0",
-    "tsx": "^3.11.0",
+    "tsx": "^3.12.1",
     "typescript": "^4.8.4"
   },
   "engines": {
