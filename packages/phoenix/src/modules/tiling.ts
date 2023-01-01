@@ -138,6 +138,10 @@ function setAppToGrid(app: App, { position, maxGridCells }: TilingLayout) {
 }
 
 function isAppBlacklisted(appName: string) {
+  if (!appName) {
+    return false
+  }
+
   return blacklistedWindows.map((name) => name.toLowerCase()).includes(appName.toLowerCase())
 }
 
@@ -146,7 +150,7 @@ function getMatchedApp(appName: string) {
   const matchedApps = runningApps.filter((app) => {
     const name = app.name()
 
-    return name.match(appName) && !isAppBlacklisted(name)
+    return appName && name.match(appName) && !isAppBlacklisted(name)
   })
 
   return matchedApps
