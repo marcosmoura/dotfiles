@@ -22,7 +22,6 @@
     "strictFunctionTypes": false,
     "strictNullChecks": false,
     "stripInternal": true,
-    "suppressImplicitAnyIndexErrors": true,
     "target": "ESNext"
   },
   "exclude": ["node_modules"]
