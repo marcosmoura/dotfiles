@@ -1,8 +1,8 @@
 {
-  "name": "phoenix-config",
+  "name": "wallpaper-manager",
   "version": "0.1.0",
   "private": true,
-  "description": "Phoenix Config",
+  "description": "macOS wallpaper manager",
   "bugs": {
     "url": "https://github.com/marcosmoura/dotfiles/issues"
   },
@@ -16,23 +16,21 @@
     "email": "marcosvmmoura@gmail.com"
   },
   "sideEffects": false,
+  "type": "module",
   "scripts": {
     "build": "tsx scripts/build.ts",
     "clean-install": "rm -rf node_modules yarn.lock && yarn",
-    "dev": "tsx scripts/build.ts watch",
     "lint": "yarn lint:prettier && yarn lint:eslint && yarn lint:ts-check",
     "lint:eslint": "eslint ./src --ext .ts --format=pretty --fix --cache --cache-location ./node_modules/.eslintcache",
     "lint:prettier": "prettier --write --list-different '**/*'",
-    "lint:ts-check": "tsc --noEmit"
+    "lint:ts-check": "tsc --noEmit",
+    "start": "tsx ./src/index.ts"
   },
   "dependencies": {
-    "just-extend": "^6.2.0",
-    "just-split": "^3.2.0",
-    "p-queue": "^7.3.0"
+    "zx": "^7.1.1"
   },
   "devDependencies": {
     "@types/node": "^18.11.18",
-    "@types/phoenix": "github:mafredri/phoenix-typings",
     "@typescript-eslint/eslint-plugin": "^5.47.1",
     "@typescript-eslint/parser": "^5.47.1",
     "esbuild": "^0.16.12",
