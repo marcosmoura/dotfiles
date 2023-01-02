@@ -1,3 +1,5 @@
+node ~/.zsh/modules/yabai/bin/wallpaper-manager change
+
 ## Global settings
 yabai -m config active_window_opacity         1
 yabai -m config auto_balance                  off
@@ -135,3 +137,14 @@ yabai -m rule --add manage=off layer=above title="(Settings|Preferences)"
 yabai -m rule --add manage=off layer=above title="^(General|(Tab|Password|Website|Extension)s|AutoFill|Se(arch|curity)|Privacy|Advanced)$" manage=off
 yabai -m rule --add manage=off layer=above title="^Exports"
 yabai -m rule --add manage=off layer=above title="^Opening"
+
+
+
+#### Events
+####################################################################################################
+
+yabai -m signal --add event=space_changed action="node ~/.zsh/modules/yabai/bin/wallpaper-manager change"
+yabai -m signal --add event=display_added action="zsh ~/.zsh/modules/yabai/scripts/reload-yabai.zsh"
+yabai -m signal --add event=display_removed action="zsh ~/.zsh/modules/yabai/scripts/reload-yabai.zsh"
+yabai -m signal --add event=display_moved action="zsh ~/.zsh/modules/yabai/scripts/reload-yabai.zsh"
+yabai -m signal --add event=dock_did_restart action="zsh ~/.zsh/modules/yabai/scripts/reload-yabai.zsh"
