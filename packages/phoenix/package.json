@@ -36,6 +36,7 @@
     "@types/phoenix": "github:mafredri/phoenix-typings",
     "@typescript-eslint/eslint-plugin": "^5.48.2",
     "@typescript-eslint/parser": "^5.48.2",
+    "chalk": "^5.2.0",
     "esbuild": "^0.17.3",
     "eslint": "^8.32.0",
     "eslint-config-prettier": "^8.6.0",
