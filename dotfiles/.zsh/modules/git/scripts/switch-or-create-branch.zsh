@@ -2,7 +2,6 @@
 
 source ~/.zsh/utils.sh
 source ~/.zsh/modules/git/scripts/utils.zsh
-source ~/.zsh/modules/git/git.plugin.zsh
 
 BRANCH_NAME=$1
 
