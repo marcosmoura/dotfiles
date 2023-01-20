@@ -21,6 +21,7 @@ ctrl + cmd + alt - right: yabai -m window --display prev; yabai -m display --foc
 # change layout of desktop
 ctrl + cmd + alt - b: yabai -m space --layout bsp
 ctrl + cmd + alt - s: yabai -m space --layout stack
+ctrl + cmd + alt - m: yabai -m space --layout stack
 ctrl + cmd + alt - f: yabai -m space --layout float
 
 # increase window sizes
