@@ -24,29 +24,29 @@
     "lint:eslint": "eslint ./src --ext .ts --format=pretty --fix --cache --cache-location ./node_modules/.eslintcache",
     "lint:prettier": "prettier --write --list-different '**/*'",
     "lint:ts-check": "tsc --noEmit",
-    "start": "tsx ./src/index.ts"
+    "start": "tsx scripts/build.ts watch"
   },
   "dependencies": {
     "zx": "^7.1.1"
   },
   "devDependencies": {
     "@types/node": "^18.11.18",
-    "@typescript-eslint/eslint-plugin": "^5.47.1",
-    "@typescript-eslint/parser": "^5.47.1",
-    "esbuild": "^0.16.12",
-    "eslint": "^8.31.0",
-    "eslint-config-prettier": "^8.5.0",
+    "@typescript-eslint/eslint-plugin": "^5.48.2",
+    "@typescript-eslint/parser": "^5.48.2",
+    "esbuild": "^0.17.3",
+    "eslint": "^8.32.0",
+    "eslint-config-prettier": "^8.6.0",
     "eslint-formatter-pretty": "^4.1.0",
     "eslint-import-resolver-alias": "1.1.2",
-    "eslint-import-resolver-typescript": "3.5.2",
+    "eslint-import-resolver-typescript": "3.5.3",
     "eslint-plugin-eslint-comments": "3.2.0",
-    "eslint-plugin-import": "^2.26.0",
-    "eslint-plugin-simple-import-sort": "^8.0.0",
+    "eslint-plugin-import": "^2.27.5",
+    "eslint-plugin-simple-import-sort": "^9.0.0",
     "eslint-plugin-tsdoc": "^0.2.17",
     "eslint-plugin-unicorn": "45.0.2",
-    "prettier": "^2.8.1",
-    "prettier-plugin-packagejson": "^2.3.0",
-    "tsx": "^3.12.1",
+    "prettier": "^2.8.3",
+    "prettier-plugin-packagejson": "^2.4.0",
+    "tsx": "^3.12.2",
     "typescript": "^4.9.4"
   },
   "engines": {
