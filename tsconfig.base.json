@@ -23,6 +23,5 @@
     "strictNullChecks": false,
     "stripInternal": true,
     "target": "ESNext"
-  },
-  "exclude": ["node_modules"]
+  }
 }
