@@ -37,7 +37,7 @@ alias man='batman'
 # Chmod -x
 alias chmox='chmod -x'
 
-function updateZsh {
+function updateShell {
   print_start "Updating zsh plugins \n"
 
   sheldon lock --reinstall
