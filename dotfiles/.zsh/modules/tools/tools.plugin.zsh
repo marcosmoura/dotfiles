@@ -1,8 +1,17 @@
 #!/usr/bin/env zsh
 
 # Microsoft Defender
-alias killMicrosoftDefender="launchctl unload /Library/LaunchAgents/com.microsoft.wdav.tray.plist"
-alias loadMicrosoftDefender="launchctl load /Library/LaunchAgents/com.microsoft.wdav.tray.plist"
+function killMicrosoftDefender() {
+  launchctl unload /Library/LaunchAgents/com.microsoft.wdav.tray.plist
+  sudo launchctl unload /Library/LaunchDaemons/com.microsoft.fresno.plist
+  sudo launchctl unload /Library/LaunchDaemons/com.tanium.taniumclient.plist
+}
+
+function loadMicrosoftDefender() {
+  launchctl load /Library/LaunchAgents/com.microsoft.wdav.tray.plist
+  sudo launchctl load /Library/LaunchDaemons/com.microsoft.fresno.plist
+  sudo launchctl load /Library/LaunchDaemons/com.tanium.taniumclient.plist
+}
 
 # Start NZXT Kraken
 function kraken () {
