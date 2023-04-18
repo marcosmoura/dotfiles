@@ -29,3 +29,8 @@ function updateMacos {
 
   print_success "macOS should be upgraded! \n"
 }
+
+function systeminfo {
+  print_yellow "\n  💻  Apple MacBook Pro 16\" / M1 Max / 64GB / 1TB"
+  macchina
+}
