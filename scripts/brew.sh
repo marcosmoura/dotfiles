@@ -17,7 +17,6 @@ brew upgrade --force-bottle
 print_text ""
 print_progress "Tapping repositories\n"
 
-brew tap dart-lang/dart
 brew tap dteoh/sqa
 brew tap githubutilities/tap
 brew tap homebrew/cask
@@ -45,7 +44,7 @@ brew install openssl
 print_text ""
 print_progress "Programming languages\n"
 
-brew install dart
+brew install --cask flutter
 brew install deno
 brew install go
 brew install lua
@@ -78,6 +77,7 @@ brew install glow
 brew install gnu-sed
 brew install hyperfine
 brew install jq
+brew install macchina
 brew install marcosmoura/homebrew-tap/tsv-utils
 brew install ncdu
 brew install starship

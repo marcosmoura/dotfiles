@@ -15,7 +15,6 @@ function updateAll {
   updatePackages
   updateShell
   updateBrew
-  reload
 
   print_success "Updated! \n"
 
