@@ -6,7 +6,7 @@ source ~/.zsh/utils.sh
 function updateBrew {
   print_start "Updating Homebrew \n"
 
-  brew -v update
+  brew update
   brew upgrade
   brew cleanup
   brew doctor
