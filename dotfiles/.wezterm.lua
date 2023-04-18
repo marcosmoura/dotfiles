@@ -14,13 +14,14 @@ config.font = wezterm.font_with_fallback {
   {
     family = 'JetBrainsMonoNL Nerd Font Mono',
     weight = 'Bold',
+    scale = 1.2
   },
 }
 config.font_size = 17
 config.line_height = 1.2
 config.cell_width = 0.975
 config.bold_brightens_ansi_colors = 'BrightOnly'
-config.allow_square_glyphs_to_overflow_width = 'Always'
+config.allow_square_glyphs_to_overflow_width = 'Never'
 config.custom_block_glyphs = true
 
 
@@ -65,6 +66,7 @@ config.cursor_blink_rate = 400
 config.command_palette_bg_color = "#000"
 config.command_palette_fg_color = "#EFEFEB"
 config.command_palette_font_size = 19
+config.allow_square_glyphs_to_overflow_width = "Always"
 
 
 --
