@@ -11,17 +11,17 @@ print_text "$TEXT_SEPARATOR\n"
 
 
 # Load installation scripts
-source scripts/preinstall.sh
-source scripts/macos.sh
-source scripts/brew.sh
-source scripts/symlinks.sh
-source scripts/zsh.sh
-source scripts/node.sh
-source scripts/python.sh
-source scripts/ruby.sh
-source scripts/apps.sh
-source scripts/packages.sh
-source scripts/postinstall.sh
+source installation/preinstall.sh
+source installation/macos.sh
+source installation/brew.sh
+source installation/symlinks.sh
+source installation/zsh.sh
+source installation/node.sh
+source installation/python.sh
+source installation/ruby.sh
+source installation/apps.sh
+source installation/packages.sh
+source installation/postinstall.sh
 
 
 print_green "🎉 Dotfiles installed and configured!"
