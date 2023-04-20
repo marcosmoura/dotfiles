@@ -14,14 +14,15 @@ config.font = wezterm.font_with_fallback {
   {
     family = 'JetBrainsMonoNL Nerd Font Mono',
     weight = 'Bold',
-    scale = 1.2
+    scale = 1.2,
+    stretch = 'Expanded',
   },
 }
 config.font_size = 17
 config.line_height = 1.2
-config.cell_width = 0.975
 config.bold_brightens_ansi_colors = 'BrightOnly'
-config.allow_square_glyphs_to_overflow_width = 'Never'
+config.allow_square_glyphs_to_overflow_width = 'Always'
+config.use_cap_height_to_scale_fallback_fonts = true
 config.custom_block_glyphs = true
 
 
