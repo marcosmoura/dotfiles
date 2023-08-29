@@ -3,6 +3,7 @@ node_modules
 dotfiles/.config/sheldon/repos
 dotfiles/.config/sheldon/plugins.lock
 /dist
+!dotfiles/.config/nvim/lua/custom/*
 
 # General
 .DS_Store
