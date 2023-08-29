@@ -1,0 +1,19 @@
+layout {
+  pane  {
+    split_direction "vertical"
+
+    pane {
+      name "main"
+    }
+
+    pane {
+      name "git"
+    }
+  }
+
+  pane {
+    borderless true
+    size 1
+    plugin location="zellij:compact-bar"
+  }
+}

@@ -1,0 +1,41 @@
+## Resize floating windows
+cmd + alt - up: zsh ~/.config/zsh/modules/yabai/scripts/move-windows.zsh top
+cmd + alt - right: zsh ~/.config/zsh/modules/yabai/scripts/move-windows.zsh right
+cmd + alt - down: zsh ~/.config/zsh/modules/yabai/scripts/move-windows.zsh bottom
+cmd + alt - left: zsh ~/.config/zsh/modules/yabai/scripts/move-windows.zsh left
+
+## Move focus of tiling windows
+ctrl + alt - up: yabai -m window --focus north
+ctrl + alt - down: yabai -m window --focus south
+ctrl + alt - right: yabai -m window --focus east
+ctrl + alt - left: yabai -m window --focus west
+
+## Move focus to next/previous display
+ctrl + alt + shift - left: yabai -m display --focus west
+ctrl + alt + shift - right: yabai -m display --focus east
+
+## Move windows between desktops
+ctrl + cmd + alt - left: yabai -m window --display next; yabai -m display --focus next
+ctrl + cmd + alt - right: yabai -m window --display prev; yabai -m display --focus prev
+
+# change layout of desktop
+ctrl + cmd + alt - b: yabai -m space --layout bsp
+ctrl + cmd + alt - s: yabai -m space --layout stack
+ctrl + cmd + alt - m: yabai -m space --layout stack
+ctrl + cmd + alt - f: yabai -m space --layout float
+
+# increase window sizes
+ctrl + cmd + alt - 0x18: yabai -m window --resize right:50:50 --resize left:-50:-50 --resize bottom:50:50 --resize top:-50:-50 # plus
+ctrl + cmd + alt - 0x1B: yabai -m window --resize right:-50:-50 --resize left:50:50 --resize bottom:-50:-50 --resize top:50:50 # minus
+
+## Restore window sizes
+ctrl + cmd + alt - 0: yabai -m space --balance
+
+## Change split mode
+ctrl + cmd + alt - s: yabai -m window --toggle split
+
+## Reload Yabai
+ctrl + cmd + alt - y: zsh ~/.config/zsh/modules/yabai/scripts/reload-yabai.zsh
+
+## Lock screen
+ctrl + cmd + alt - l: zsh ~/.config/zsh/modules/yabai/scripts/lock-screen.zsh

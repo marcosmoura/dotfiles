@@ -274,8 +274,6 @@ function redoSpaceLayout() {
 function redoAllLayouts() {
   alert('Reloading layouts')
 
-  const apps = {}
-
   Space.all().forEach((space) => {
     tilingQueue.add(
       () =>
@@ -283,9 +281,7 @@ function redoAllLayouts() {
           setTimeout(() => {
             const windows = space.windows()
 
-            windows
-              .filter((window) => apps[window.app().name()])
-              .forEach((window) => redoAppLayout(window.app(), true))
+            windows.forEach((window) => redoAppLayout(window.app(), true))
 
             resolve(true)
           }, 25)
