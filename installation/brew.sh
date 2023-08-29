@@ -32,6 +32,7 @@ print_text ""
 print_progress "Core utilities\n"
 
 brew install bash
+brew install cmake
 brew install coreutils
 brew install findutils
 brew install gawk
