@@ -19,36 +19,36 @@
   "type": "module",
   "scripts": {
     "build": "tsx scripts/build.ts",
-    "clean-install": "rm -rf node_modules yarn.lock && yarn",
-    "lint": "yarn lint:prettier && yarn lint:eslint && yarn lint:ts-check",
+    "clean-install": "rm -rf node_modules pnpm-lock.yaml && pnpm install",
+    "lint": "pnpm run lint:prettier && pnpm run lint:eslint && pnpm run lint:ts-check",
     "lint:eslint": "eslint ./src --ext .ts --format=pretty --fix --cache --cache-location ./node_modules/.eslintcache",
     "lint:prettier": "prettier --write --list-different '**/*'",
     "lint:ts-check": "tsc --noEmit",
     "start": "tsx scripts/build.ts watch"
   },
   "dependencies": {
-    "zx": "^7.1.1"
+    "zx": "^7.2.3"
   },
   "devDependencies": {
-    "@types/node": "^18.11.18",
-    "@typescript-eslint/eslint-plugin": "^5.48.2",
-    "@typescript-eslint/parser": "^5.48.2",
-    "chalk": "^5.2.0",
-    "esbuild": "^0.17.3",
-    "eslint": "^8.32.0",
-    "eslint-config-prettier": "^8.6.0",
-    "eslint-formatter-pretty": "^4.1.0",
+    "@types/node": "^20.5.7",
+    "@typescript-eslint/eslint-plugin": "^6.5.0",
+    "@typescript-eslint/parser": "^6.5.0",
+    "chalk": "^5.3.0",
+    "esbuild": "^0.19.2",
+    "eslint": "^8.48.0",
+    "eslint-config-prettier": "^9.0.0",
+    "eslint-formatter-pretty": "^5.0.0",
     "eslint-import-resolver-alias": "1.1.2",
-    "eslint-import-resolver-typescript": "3.5.3",
+    "eslint-import-resolver-typescript": "3.6.0",
     "eslint-plugin-eslint-comments": "3.2.0",
-    "eslint-plugin-import": "^2.27.5",
-    "eslint-plugin-simple-import-sort": "^9.0.0",
+    "eslint-plugin-import": "^2.28.1",
+    "eslint-plugin-simple-import-sort": "^10.0.0",
     "eslint-plugin-tsdoc": "^0.2.17",
-    "eslint-plugin-unicorn": "45.0.2",
-    "prettier": "^2.8.3",
-    "prettier-plugin-packagejson": "^2.4.0",
-    "tsx": "^3.12.2",
-    "typescript": "^4.9.4"
+    "eslint-plugin-unicorn": "48.0.1",
+    "prettier": "^3.0.2",
+    "prettier-plugin-packagejson": "^2.4.5",
+    "tsx": "^3.12.7",
+    "typescript": "^5.2.2"
   },
   "engines": {
     "node": ">= 16.0"

@@ -1,6 +1,6 @@
 #!/bin/sh
 
-source dotfiles/.zsh/utils.sh
+source dotfiles/.config/zsh/utils.sh
 
 print_purple "$TEXT_SEPARATOR"
 print_purple "          Marcos Moura Dotfiles          "

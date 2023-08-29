@@ -22,7 +22,7 @@
   p = !"git pull; git submodule foreach git pull origin master"
 
   # Sync current branch with remote fork
-  sync-fork = !zsh ~/.zsh/modules/git/scripts/sync-fork.zsh
+  sync-fork = !zsh ~/.config/zsh/modules/git/scripts/sync-fork.zsh
 
   # Push to origin
   po = push -u
@@ -31,13 +31,13 @@
   m = merge --no-ff
 
   # View abbreviated SHA, author, date and description of the latest 25 commits
-  l = !zsh ~/.zsh/modules/git/scripts/better-log.zsh
+  l = !zsh ~/.config/zsh/modules/git/scripts/better-log.zsh
 
   # Log Commits by name
-  fm = !zsh ~/.zsh/modules/git/scripts/find-commit-by-message.zsh
+  fm = !zsh ~/.config/zsh/modules/git/scripts/find-commit-by-message.zsh
 
   # Log Commits by path
-  fc = !zsh ~/.zsh/modules/git/scripts/find-commit-by-path.zsh
+  fc = !zsh ~/.config/zsh/modules/git/scripts/find-commit-by-path.zsh
 
   # Get log graph
   graph = log --abbrev-commit --color --graph
@@ -51,9 +51,6 @@
   # Checkout branch
   ck = checkout
   ckb = checkout -b
-
-  # Switch to a branch, creating it if necessary
-  go = !zsh ~/.zsh/modules/git/scripts/switch-or-create-branch.zsh
 
   # Show verbose output about tags, branches or remotes
   tags = tag -l
@@ -73,10 +70,10 @@
   add-to-last-commit = commit --amend --reuse-message=HEAD
 
   # Credit an author on the latest commit
-  give-credit = !zsh ~/.zsh/modules/git/scripts/commit-with-credits.zsh
+  give-credit = !zsh ~/.config/zsh/modules/git/scripts/commit-with-credits.zsh
 
   # Remove all "merged" branches
-  delete-merged = !zsh ~/.zsh/modules/git/scripts/delete-merged.zsh
+  delete-merged = !zsh ~/.config/zsh/modules/git/scripts/delete-merged.zsh
 
   # List contributors with number of commits
   contributors = shortlog --summary --numbered

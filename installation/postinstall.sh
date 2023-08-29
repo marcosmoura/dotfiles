@@ -14,7 +14,7 @@ sudo softwareupdate -i -a;
 
 print_progress "Resetting terminal"
 
-fast-theme ~/syntax-theme.ini
+fast-theme $XDG_CONFIG_HOME/syntax-theme/syntax-theme.ini
 
 
 print_success "Clean up complete! \n"

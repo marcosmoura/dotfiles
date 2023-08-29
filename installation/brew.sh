@@ -18,6 +18,7 @@ print_text ""
 print_progress "Tapping repositories\n"
 
 brew tap dteoh/sqa
+brew tap FelixKratz/formulae
 brew tap githubutilities/tap
 brew tap homebrew/cask
 brew tap homebrew/cask-drivers
@@ -64,6 +65,7 @@ print_text ""
 print_progress "Terminal tools\n"
 
 brew install bat
+brew install bottom
 brew install dust
 brew install eth-p/software/bat-extras
 brew install exa
@@ -79,12 +81,15 @@ brew install hyperfine
 brew install jq
 brew install macchina
 brew install marcosmoura/homebrew-tap/tsv-utils
+brew install navi
 brew install ncdu
+brew install nvim
 brew install starship
+brew install tealdeer
 brew install terminal-notifier
-brew install tldr
 brew install tree
 brew install vivid
+brew install zellij
 brew install zoxide
 
 
@@ -96,6 +101,7 @@ brew install koekeishiya/formulae/yabai
 brew install liquidctl
 brew install mas
 brew install osx-cpu-temp
+brew install sketchybar
 brew install tokei
 
 

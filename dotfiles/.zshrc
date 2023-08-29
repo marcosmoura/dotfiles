@@ -5,6 +5,7 @@ export PATH=$HOME/.rbenv/shims:$PATH
 export PATH=$HOME/.yarn/bin:$PATH
 export PATH=$HOME/.config/yarn/global/node_modules/.bin:$PATH
 
+# Homebrew
 eval "$(/opt/homebrew/bin/brew shellenv)"
 
 # Preferred editor
@@ -21,14 +22,14 @@ export LESS_TERMCAP_md="${yellow}"
 export MANPAGER="less -X"
 
 # Define bat config
-export BAT_CONFIG_PATH="$HOME/.batconfig"
+export BAT_CONFIG_PATH="$XDG_CONFIG_HOME/bat/batconfig"
 
 # Setup SSH
 export SSH_KEY_PATH="$HOME/.ssh/personal"
 ssh-add $SSH_KEY_PATH
 
 # Setup zsh
-export ZSH_CACHE_DIR=$HOME/.zsh
+export ZSH_CACHE_DIR=$HOME/.config/zsh
 export ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=#888"
 export ZSH_THEME=""
 export ENABLE_CORRECTION="false"
@@ -41,13 +42,19 @@ export SAVESIZE=25000
 export YSU_MODE=ALL
 
 # Load starship
-export STARSHIP_CONFIG=$HOME/.starship.toml
+export XDG_CONFIG_HOME=${XDG_CONFIG_HOME:-$HOME/.config}
+export STARSHIP_CONFIG=$XDG_CONFIG_HOME/starship/starship.toml
 eval "$(starship init zsh)"
 
-# Load all plugins
-export SHELDON_CONFIG_DIR="$HOME/.sheldon"
-export SHELDON_DATA_DIR="$HOME/.sheldon"
+# Zellij
+eval "$(zellij setup --generate-completion zsh)"
+
+# Load sheldon
 eval "$(sheldon source)"
 
-# clear screen
+# Load tabtab if it exists
+[[ -f ~/.config/tabtab/zsh/__tabtab.zsh ]] && . ~/.config/tabtab/zsh/__tabtab.zsh || true
+
+# Clear screen
 clear
+systeminfo

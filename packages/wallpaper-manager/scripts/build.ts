@@ -17,7 +17,7 @@ const isBuildMode = mode === 'build'
 
 const config: BuildOptions = {
   entryPoints: [getFileFromRoot('src/index.ts')],
-  outfile: getFileFromRoot('../../dotfiles/.zsh/modules/yabai/bin/wallpaper-manager'),
+  outfile: getFileFromRoot('../../dotfiles/.config/zsh/modules/yabai/bin/wallpaper-manager'),
   assetNames: '[name]',
   bundle: true,
   minify: isBuildMode,

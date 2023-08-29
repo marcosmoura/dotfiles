@@ -1,0 +1,98 @@
+shell = "zsh"
+
+# defer loading
+# ----------------------
+[plugins.zsh-defer]
+github = "romkatv/zsh-defer"
+
+[templates]
+defer = "{{ hooks | get: \"pre\" | nl }}{% for file in files %}zsh-defer source \"{{ file }}\"\n{% endfor %}{{ hooks | get: \"post\" | nl }}"
+
+
+# colors
+# ----------------------
+
+[plugins.colors]
+local = "~/.config/zsh/modules"
+use = ["{{ name }}.plugin.zsh"]
+apply = ["defer"]
+
+
+# compinit
+# ----------------------
+
+[plugins.async]
+github = 'mafredri/zsh-async'
+
+[plugins.compinit]
+local = "~/.config/zsh/modules"
+use = ["{{ name }}.plugin.zsh"]
+
+
+# Completions
+# ----------------------
+
+[plugins.zsh-completions]
+github = "zsh-users/zsh-completions"
+apply = ["defer"]
+
+[plugins.zsh-autosuggestions]
+github = "zsh-users/zsh-autosuggestions"
+use = ["{{ name }}.zsh"]
+apply = ["defer"]
+
+
+# omz plugins
+# ----------------------
+
+[plugins.ohmyzsh-lib]
+github = "ohmyzsh/ohmyzsh"
+dir = "lib"
+use = ["{completion,git,history,key-bindings,directories}.zsh"]
+apply = ["defer"]
+
+[plugins.ohmyzsh-plugins]
+github = "ohmyzsh/ohmyzsh"
+dir = "plugins"
+use = ["{zoxide,aliases,cp,dircycle,pnpm-shell-completion}/*.plugin.zsh"]
+apply = ["defer"]
+
+
+# Other plugins
+# ----------------------
+
+[plugins.zoxide]
+github = 'ajeetdsouza/zoxide'
+apply = ["defer"]
+
+[plugins.syntax-highlight]
+github = 'marcosmoura/fast-syntax-highlighting'
+apply = ["defer"]
+
+[plugins.256color]
+github = 'chrissicool/zsh-256color'
+apply = ["defer"]
+
+[plugins.zsh-you-should-use]
+github = "MichaelAquilina/zsh-you-should-use"
+apply = ["defer"]
+
+[plugins.forgit]
+github = 'wfxr/forgit'
+apply = ["defer"]
+
+[plugins.yarn-completion]
+github = 'chrisands/zsh-yarn-completions'
+apply = ["defer"]
+
+[plugins.nx-completion]
+github = 'jscutlery/nx-completion'
+apply = ["defer"]
+
+
+# Dotfiles
+# ----------------------
+
+[plugins.dotfiles]
+local = "~/.config/zsh/modules"
+use = ["*.plugin.zsh", "!{colors,compinit}/*.plugin.zsh"]

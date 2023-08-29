@@ -45,7 +45,7 @@ async function getWallpaperCache() {
 }
 
 async function applyWallpaper(space: number, display: number, cache: Record<string, string>) {
-  const wallpaperLocation = path.resolve(homeDir, 'wallpapers', `${space}.jpg`)
+  const wallpaperLocation = path.resolve(homeDir, '.config', 'wallpapers', `${space}.jpg`)
 
   try {
     await $`wallpaper set ${wallpaperLocation} --screen ${display}`
@@ -64,7 +64,7 @@ async function applyWallpaper(space: number, display: number, cache: Record<stri
 async function onWallpaperChange() {
   const { space, display } = await getSpaceData()
 
-  if (space === undefined || display === undefined) {
+  if ([space, display].includes(undefined)) {
     throw new Error('No space or display found.')
   }
 

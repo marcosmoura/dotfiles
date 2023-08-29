@@ -71,8 +71,8 @@ brew install --no-quarantine --cask vlc
 print_progress "Others\n"
 
 brew install --no-quarantine --cask adguard
+brew install nextdns/tap/nextdns
 brew install --no-quarantine --cask appcleaner
-brew install --no-quarantine --cask mullvadvpn
 brew install --no-quarantine --cask opencore-configurator
 brew install --no-quarantine --cask windscribe
 mas install 1294126402 # HEIC converter

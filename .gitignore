@@ -1,7 +1,7 @@
 # Local files
 node_modules
-dotfiles/.sheldon/repos
-dotfiles/.sheldon/plugins.lock
+dotfiles/.config/sheldon/repos
+dotfiles/.config/sheldon/plugins.lock
 /dist
 
 # General
