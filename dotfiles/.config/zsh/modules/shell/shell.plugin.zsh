@@ -2,7 +2,6 @@
 
 source ~/.config/zsh/utils.sh
 
-
 # Open zsh config
 alias dotfiles="code ~/Projects/dotfiles"
 
@@ -14,7 +13,6 @@ alias reload="exec $SHELL -l"
 
 # Alias to VSCode
 alias code='code-insiders '
-alias c='code-insiders '
 
 # Always enable colored `grep` output
 # Note: `GREP_OPTIONS="--color=auto"` is deprecated, hence the alias usage.
@@ -23,8 +21,8 @@ alias fgrep='fgrep --color=auto'
 alias egrep='egrep --color=auto'
 
 # sudo editors
-alias vim='nvim'
-alias svim='sudo vim'
+alias vim='lvim'
+alias svim='sudo lvim'
 alias snano='sudo nano'
 
 # Better du
@@ -37,15 +35,27 @@ alias man='batman'
 # Chmod -x
 alias chmox='chmod -x'
 
+# Better bottom
+alias bottom='btm'
+
+# Better FZF
+export FZF_DEFAULT_OPTS=" \
+--color=bg+:#313244,bg:#1e1e2e,spinner:#f5e0dc,hl:#f38ba8 \
+--color=fg:#cdd6f4,header:#f38ba8,info:#cba6f7,pointer:#f5e0dc \
+--color=marker:#f5e0dc,fg+:#cdd6f4,prompt:#cba6f7,hl+:#f38ba8"
+
+# Better Glamour
+export GLAMOUR_STYLE="~/.config/glamour/catppuccin.json"
+
 function updateShell {
   print_start "Updating zsh plugins \n"
 
   sheldon lock --reinstall
-  export SNAZZY_COLORS=$(vivid generate snazzy)
-  export LS_COLORS=$SNAZZY_COLORS
-  echo $SNAZZY_COLORS > ~/.config/zsh/static/snazzy-colors.txt
-  fast-theme $XDG_CONFIG_HOME/syntax-theme/syntax-theme.ini > /dev/null
-  tldr --update > /dev/null
+  export CATPPUCCIN_COLORS=$(vivid generate catppuccin-mocha)
+  export LS_COLORS=$CATPPUCCIN_COLORS
+  echo $CATPPUCCIN_COLORS >~/.config/zsh/static/catppuccin-colors.txt
+  fast-theme $XDG_CONFIG_HOME/syntax-theme/syntax-theme.ini >/dev/null
+  tldr --update >/dev/null
 
   print_success "zsh plugins updated! \n"
 }

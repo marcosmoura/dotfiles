@@ -1,8 +1,20 @@
 # Local files
-node_modules
-dotfiles/.config/sheldon/repos
-dotfiles/.config/sheldon/plugins.lock
 /dist
+dotfiles/.config/yarn
+dotfiles/.config/gh/hosts.yml
+dotfiles/.config/github-copilot
+dotfiles/.config/mume
+dotfiles/.config/phoenix
+dotfiles/.config/raycast
+dotfiles/.config/sheldon/plugins.lock
+dotfiles/.config/sheldon/repos
+dotfiles/.config/zsh/modules/yabai/bin
+dotfiles/.config/spicetify/Backup
+dotfiles/.config/spicetify/CustomApps
+dotfiles/.config/spicetify/Extensions
+dotfiles/.config/spicetify/Extracted
+dotfiles/.config/spicetify/Themes
+node_modules
 
 # General
 .DS_Store

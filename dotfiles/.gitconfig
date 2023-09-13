@@ -51,6 +51,7 @@
   # Checkout branch
   ck = checkout
   ckb = checkout -b
+  go = checkout
 
   # Show verbose output about tags, branches or remotes
   tags = tag -l
@@ -141,7 +142,7 @@
 [core]
   pager = delta
   attributesfile = ~/.gitattributes
-  editor = vim
+  editor = lvim
   excludesfile = ~/.gitignore
   precomposeunicode = false
   trustctime = false

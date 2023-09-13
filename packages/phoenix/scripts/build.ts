@@ -17,7 +17,7 @@ const isBuildMode = mode === 'build'
 
 const config: BuildOptions = {
   entryPoints: [getFileFromRoot('src/index.ts')],
-  outfile: getFileFromRoot('..', '..', 'dotfiles', '.phoenix.js'),
+  outfile: getFileFromRoot('../../dotfiles/.config/phoenix/phoenix.js'),
   assetNames: '[name]',
   bundle: true,
   minify: isBuildMode,

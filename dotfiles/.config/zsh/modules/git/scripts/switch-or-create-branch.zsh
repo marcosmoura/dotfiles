@@ -11,13 +11,13 @@ if [ -z "${BRANCH_NAME}" ]; then
   return 1
 fi
 
-EXISTS=`git show-ref refs/heads/$BRANCH_NAME`
+EXISTS=$(git show-ref refs/heads/$BRANCH_NAME)
 
 if [ -n "$EXISTS" ]; then
-  git checkout $BRANCH_NAME 2> /dev/null
+  git checkout $BRANCH_NAME 2>/dev/null
   print_success "Switched to branch '$BRANCH_NAME'"
 else
-  git checkout -b $BRANCH_NAME 2> /dev/null
+  git checkout -b $BRANCH_NAME 2>/dev/null
   echo ""
   print_start "A new branch called '$BRANCH_NAME' was created!"
 fi

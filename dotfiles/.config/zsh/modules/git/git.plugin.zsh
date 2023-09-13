@@ -15,30 +15,30 @@ zstyle ':completion:*:*:git:*' user-commands fc:'find commits by path'
 zstyle ':completion:*:*:git:*' user-commands give-credit:'give author credits to a commit'
 zstyle ':completion:*:*:git:*' user-commands delete-merged:'delete merged branches'
 
-_git-go () {
+_git-go() {
   _git-branch
 }
 
-_git-sync-fork () {
+_git-sync-fork() {
   _git-branch
 }
 
-_git-l () {
+_git-l() {
   _git-log
 }
 
-_git-fm () {
+_git-fm() {
   _git-log
 }
 
-_git-fc () {
+_git-fc() {
   _git-log
 }
 
-_git-give-credit () {
+_git-give-credit() {
   _git-commit
 }
 
-_git-delete-merged () {
+_git-delete-merged() {
   _git-branch
 }

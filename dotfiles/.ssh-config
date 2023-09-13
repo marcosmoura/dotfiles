@@ -1,9 +1,17 @@
-Host *
-  UseKeychain yes
-  AddKeysToAgent yes
-
-# Personal GitHub
+# Work GitHub
 Host github.com
-  HostName github.com
+  AddKeysToAgent yes
+  IdentityFile ~/.ssh/microsoft
   PreferredAuthentications publickey
+
+# EMU GitHub
+Host github-emu
+  AddKeysToAgent yes
+  Hostname github.com
+  IdentityFile ~/.ssh/microsoft_enterprise
+  PreferredAuthentications publickey
+  User git
+
+Host *
+  AddKeysToAgent yes
   IdentityFile ~/.ssh/personal

@@ -1,18 +1,18 @@
+#!/usr/bin/env zsh
+
 print_start "Installing Homebrew\n"
 
 which -s brew
-if [[ $? != 0 ]] ; then
+if [[ $? != 0 ]]; then
   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 fi
 
 eval "$(/opt/homebrew/bin/brew shellenv)"
 
-
 print_progress "Updating brew\n"
 
 brew -v update
 brew upgrade --force-bottle
-
 
 print_text ""
 print_progress "Tapping repositories\n"
@@ -27,7 +27,6 @@ brew tap homebrew/cask-versions
 brew tap homebrew/core
 brew tap homebrew/services
 
-
 print_text ""
 print_progress "Core utilities\n"
 
@@ -39,9 +38,7 @@ brew install gawk
 brew install grep
 brew install moreutils
 brew install ncurses
-brew install openssh
 brew install openssl
-
 
 print_text ""
 print_progress "Programming languages\n"
@@ -54,13 +51,11 @@ brew install perl
 brew install rust
 brew install rustup-init
 
-
 print_text ""
 print_progress "Programming tools\n"
 
 brew install cocoapods
 brew install watchman
-
 
 print_text ""
 print_progress "Terminal tools\n"
@@ -69,7 +64,7 @@ brew install bat
 brew install bottom
 brew install dust
 brew install eth-p/software/bat-extras
-brew install exa
+brew install eza
 brew install fd
 brew install fx
 brew install fzf
@@ -85,6 +80,8 @@ brew install marcosmoura/homebrew-tap/tsv-utils
 brew install navi
 brew install ncdu
 brew install nvim
+brew install shellcheck
+brew install shfmt
 brew install starship
 brew install tealdeer
 brew install terminal-notifier
@@ -92,7 +89,6 @@ brew install tree
 brew install vivid
 brew install zellij
 brew install zoxide
-
 
 print_text ""
 print_progress "Terminal apps\n"
@@ -105,7 +101,6 @@ brew install osx-cpu-temp
 brew install sketchybar
 brew install tokei
 
-
 print_text ""
 print_progress "Fonts\n"
 
@@ -114,7 +109,6 @@ brew install --cask font-hack-nerd-font
 brew install --cask font-inter
 brew install --cask font-jetbrains-mono
 brew install --cask font-jetbrains-mono-nerd-font
-
 
 print_text ""
 print_progress "QuickLook extensions\n"
@@ -127,7 +121,6 @@ brew install --no-quarantine qlvideo
 brew install --no-quarantine quicklook-json
 brew install --no-quarantine quicklookase
 brew install --no-quarantine webpquicklook
-
 
 print_text ""
 print_progress "Cleaning up\n"
