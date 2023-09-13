@@ -21,8 +21,10 @@ alias fgrep='fgrep --color=auto'
 alias egrep='egrep --color=auto'
 
 # sudo editors
-alias vim='lvim'
-alias svim='sudo lvim'
+alias vim='nvim'
+alias svim='sudo nvim'
+alias l='lvim'
+alias slvim='sudo lvim'
 alias snano='sudo nano'
 
 # Better du
