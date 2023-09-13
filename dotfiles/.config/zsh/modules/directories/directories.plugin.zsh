@@ -18,10 +18,10 @@ alias .......='cd ../../../../../..'
 alias ~="cd ~"
 
 # Always use color output for `ls`
-alias ls="exa -a -s type --group-directories-first --icons --color always"
+alias ls="eza -a -s type --group-directories-first --icons --color always"
 
 # List all files colorized in long format
-alias la="ls -laFh"
+alias la="ls -laFh --git"
 
 # List all files colorized in short format
 alias ll='ls -lh'
@@ -31,5 +31,5 @@ alias lsd="ls -lD"
 
 # Create a new directory and enter it
 function mkd() {
-  mkdir -p "$@" && cd "$_";
+  mkdir -p "$@" && cd "$_"
 }

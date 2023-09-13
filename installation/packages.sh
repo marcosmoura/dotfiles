@@ -1,8 +1,13 @@
 print_start "Building packages"
 
-pushd packages/phoenix > /dev/null
+pushd packages/phoenix >/dev/null
 yarn install
 yarn build
-popd > /dev/null
+popd >/dev/null
+
+pushd packages/wallpaper-manager >/dev/null
+yarn install
+yarn build
+popd >/dev/null
 
 print_success "All packages were built! \n"

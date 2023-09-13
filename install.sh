@@ -9,7 +9,6 @@ print_purple "$TEXT_SEPARATOR\n"
 print_text "💻 Installing all dotfiles..."
 print_text "$TEXT_SEPARATOR\n"
 
-
 # Load installation scripts
 source installation/preinstall.sh
 source installation/macos.sh
@@ -22,7 +21,6 @@ source installation/ruby.sh
 source installation/apps.sh
 source installation/packages.sh
 source installation/postinstall.sh
-
 
 print_green "🎉 Dotfiles installed and configured!"
 print_green "✅ Reloading shell! 😊"

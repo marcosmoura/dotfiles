@@ -31,7 +31,6 @@ function print_red {
   print_text "$TEXT_RED$1$TEXT_RESET"
 }
 
-
 # Modes
 function print_start {
   print_text "🆕 $1"
@@ -52,7 +51,6 @@ function print_success {
 function print_error {
   print_red "❌ $1"
 }
-
 
 # Functions
 function join_by_char {

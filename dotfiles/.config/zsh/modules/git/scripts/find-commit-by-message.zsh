@@ -19,7 +19,7 @@ fi
 
 print_start "Searching the last $LIMIT commits with the keyword '$KEYWORD' \n"
 
-LOG_OUTPUT=`git log -n $LIMIT --abbrev-commit --color  --decorate --grep=$KEYWORD --pretty=format:"$FORMAT"`
+LOG_OUTPUT=$(git log -n $LIMIT --abbrev-commit --color --decorate --grep=$KEYWORD --pretty=format:"$FORMAT")
 
 if [ -z "${LOG_OUTPUT}" ]; then
   print_info "No commits found with the keyword '$KEYWORD'."

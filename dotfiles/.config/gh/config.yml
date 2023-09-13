@@ -1,0 +1,5 @@
+git_protocol: https
+editor: lvim
+prompt: enabled
+aliases:
+  co: pr checkout

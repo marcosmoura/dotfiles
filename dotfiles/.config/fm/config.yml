@@ -1,0 +1,12 @@
+settings:
+  borderless: false
+  enable_logging: false
+  pretty_markdown: true
+  show_icons: true
+  start_dir: .
+
+theme:
+  app_theme: catppuccin
+  syntax_theme:
+    dark: dracula
+    light: pygments

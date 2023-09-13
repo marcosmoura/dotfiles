@@ -1,6 +1,5 @@
 print_start "Installing applications"
 
-
 print_progress "OS utilities\n"
 
 brew install --no-quarantine --cask captin
@@ -14,19 +13,16 @@ brew install --no-quarantine --cask topnotch
 brew install --no-quarantine --cask turbo-boost-switcher
 mas install 497799835 # Xcode
 
-
 print_progress "Communication\n"
 
 brew install --no-quarantine --cask discord
 brew install --no-quarantine --cask whatsapp
-
 
 print_text ""
 print_progress "Keyboard Tools\n"
 
 brew install --cask qmk-toolbox
 brew install --cask via
-
 
 print_progress "Productivity\n"
 
@@ -39,13 +35,11 @@ brew install --no-quarantine --cask onyx
 brew install --no-quarantine --cask raycast
 brew install --no-quarantine --cask shottr
 
-
 print_progress "Browsers\n"
 
 brew install --no-quarantine --cask firefox-nightly
 brew install --no-quarantine --cask google-chrome-canary
 brew install --no-quarantine --cask orion
-
 
 print_progress "Dev Tools\n"
 
@@ -58,7 +52,6 @@ brew install --no-quarantine --cask sf-symbols
 brew install --no-quarantine --cask visual-studio-code-insiders
 brew install --no-quarantine --cask wezterm
 
-
 print_progress "Media\n"
 
 brew install --no-quarantine --cask caption
@@ -66,7 +59,6 @@ brew install --no-quarantine --cask iina
 brew install --no-quarantine --cask spotify
 brew install --no-quarantine --cask transmission
 brew install --no-quarantine --cask vlc
-
 
 print_progress "Others\n"
 
@@ -78,7 +70,6 @@ brew install --no-quarantine --cask windscribe
 mas install 1294126402 # HEIC converter
 mas install 1596706466 # Speediness
 mas install 1611378436 # Pure Paste
-
 
 print_progress "Cleaning up\n"
 

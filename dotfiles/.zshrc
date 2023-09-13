@@ -1,15 +1,19 @@
 # Path
+export XDG_CONFIG_HOME=${XDG_CONFIG_HOME:-$HOME/.config}
 export PATH=/usr/local/bin:$PATH
 export PATH=/usr/local/opt:$PATH
+export PATH=$HOME/.local/bin:$PATH
 export PATH=$HOME/.rbenv/shims:$PATH
 export PATH=$HOME/.yarn/bin:$PATH
 export PATH=$HOME/.config/yarn/global/node_modules/.bin:$PATH
+export PATH=$HOME/.spicetify:$PATH
+export PATH=$HOME/go/bin:$PATH
 
 # Homebrew
 eval "$(/opt/homebrew/bin/brew shellenv)"
 
 # Preferred editor
-export EDITOR=${EDITOR:-vim}
+export EDITOR=lvim
 
 # Prefer US English and use UTF-8.
 export LANG="en_US.UTF-8"
@@ -23,10 +27,6 @@ export MANPAGER="less -X"
 
 # Define bat config
 export BAT_CONFIG_PATH="$XDG_CONFIG_HOME/bat/batconfig"
-
-# Setup SSH
-export SSH_KEY_PATH="$HOME/.ssh/personal"
-ssh-add $SSH_KEY_PATH
 
 # Setup zsh
 export ZSH_CACHE_DIR=$HOME/.config/zsh
@@ -42,12 +42,8 @@ export SAVESIZE=25000
 export YSU_MODE=ALL
 
 # Load starship
-export XDG_CONFIG_HOME=${XDG_CONFIG_HOME:-$HOME/.config}
 export STARSHIP_CONFIG=$XDG_CONFIG_HOME/starship/starship.toml
 eval "$(starship init zsh)"
-
-# Zellij
-eval "$(zellij setup --generate-completion zsh)"
 
 # Load sheldon
 eval "$(sheldon source)"

@@ -2,7 +2,6 @@
 
 source ~/.config/zsh/utils.sh
 
-
 function updateBrew {
   print_start "Updating Homebrew \n"
 

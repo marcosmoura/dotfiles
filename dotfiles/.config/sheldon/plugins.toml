@@ -15,7 +15,6 @@ defer = "{{ hooks | get: \"pre\" | nl }}{% for file in files %}zsh-defer source 
 [plugins.colors]
 local = "~/.config/zsh/modules"
 use = ["{{ name }}.plugin.zsh"]
-apply = ["defer"]
 
 
 # compinit
@@ -27,6 +26,7 @@ github = 'mafredri/zsh-async'
 [plugins.compinit]
 local = "~/.config/zsh/modules"
 use = ["{{ name }}.plugin.zsh"]
+apply = ["defer"]
 
 
 # Completions
@@ -48,13 +48,13 @@ apply = ["defer"]
 [plugins.ohmyzsh-lib]
 github = "ohmyzsh/ohmyzsh"
 dir = "lib"
-use = ["{completion,git,history,key-bindings,directories}.zsh"]
+use = ["{compfix,completion,git,grep,history,key-bindings}.zsh"]
 apply = ["defer"]
 
 [plugins.ohmyzsh-plugins]
 github = "ohmyzsh/ohmyzsh"
 dir = "plugins"
-use = ["{zoxide,aliases,cp,dircycle,pnpm-shell-completion}/*.plugin.zsh"]
+use = ["{aliases,cp,dircyclegh,zoxide,}/*.plugin.zsh"]
 apply = ["defer"]
 
 
