@@ -9,9 +9,14 @@ fi
 
 print_progress "Installing yarn global packages"
 
-yarn global add eslint
-yarn global add nx
-yarn global add prettier
-yarn global add typescript
+pnpm i -g @fsouza/prettierd
+pnpm i -g @johnnymorganz/stylua-bin
+pnpm i -g @vscode/codicons
+pnpm i -g eslint
+pnpm i -g eslint_d
+pnpm i -g nx
+pnpm i -g prettier
+pnpm i -g stylelint
+pnpm i -g typescript
 
 print_success "Node installed! \n"

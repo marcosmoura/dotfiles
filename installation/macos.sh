@@ -14,6 +14,9 @@ sudo nvram SystemAudioVolume=" "
 # Finder: show hidden files by default
 defaults write com.apple.finder AppleShowAllFiles -bool true
 
+# Disable menubar transparency
+defaults write NSGlobalDomain AppleEnableMenuBarTransparency -bool false
+
 # Make Dock icons of hidden applications translucent
 defaults write com.apple.dock showhidden -bool true
 
@@ -129,7 +132,7 @@ defaults write com.apple.universalaccess HIDScrollZoomModifierMask -int 262144
 defaults write com.apple.universalaccess closeViewZoomFollowsFocus -bool true
 
 # Disable press-and-hold for keys in favor of key repeat
-defaults write NSGlobalDomain ApplePressAndHoldEnabled -bool false
+defaults write -g ApplePressAndHoldEnabled -bool false
 
 # Set a faster keyboard repeat rate
 defaults write NSGlobalDomain KeyRepeat -int 1
@@ -137,6 +140,9 @@ defaults write NSGlobalDomain InitialKeyRepeat -int 10
 
 # Set the timezone; see `systemsetup -listtimezones` for other values
 sudo systemsetup -settimezone "Europe/Amsterdam" >/dev/null
+
+# Disable text replacement
+defaults write -g WebAutomaticTextReplacementEnabled -bool false
 
 ###############################################################################
 # Screen
@@ -258,8 +264,9 @@ defaults write com.apple.finder FXInfoPanesExpanded -dict \
   OpenWith -bool true \
   Privileges -bool true
 
-# When opening a folder on the desktop there's an animation that conflicts with yabai trying to tile the window.
+# When opening a folder on the desktop there's an animation that conflicts with aerospace trying to tile the window.
 defaults write com.apple.finder DisableAllAnimations -bool true
+defaults write -g NSAutomaticWindowAnimationsEnabled -bool false
 
 ###############################################################################
 # Dock, Dashboard, and hot corners
@@ -269,7 +276,7 @@ defaults write com.apple.finder DisableAllAnimations -bool true
 defaults write com.apple.dock mouse-over-hilite-stack -bool true
 
 # Set the icon size of Dock items to 38 pixels
-defaults write com.apple.dock tilesize -int 38
+defaults write com.apple.dock tilesize -int 40
 
 # Change minimize/maximize window effect
 defaults write com.apple.dock mineffect -string "scale"
@@ -307,14 +314,17 @@ defaults write com.apple.dock dashboard-in-overlay -bool true
 # Don’t automatically rearrange Spaces based on most recent use
 defaults write com.apple.dock mru-spaces -bool false
 
+# Monitors don't have separate spaces
+defaults write com.apple.spaces spans-displays -bool true
+
 # Remove the auto-hiding Dock delay
 defaults write com.apple.dock autohide-delay -float 0
 
+# Drag windows anywhere
+defaults write -g NSWindowShouldDragOnGesture -bool true
+
 # Automatically hide and show the Dock
 defaults write com.apple.dock autohide -bool false
-
-# Reset Launchpad, but keep the desktop wallpaper intact
-find "${HOME}/Library/Application Support/Dock" -name "*-*.db" -maxdepth 1 -delete
 
 ###############################################################################
 # Terminal

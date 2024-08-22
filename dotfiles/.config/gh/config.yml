@@ -1,5 +1,6 @@
 git_protocol: https
-editor: lvim
+editor: vim
 prompt: enabled
 aliases:
-  co: pr checkout
+    co: pr checkout
+version: "1"

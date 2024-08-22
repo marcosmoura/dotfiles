@@ -53,7 +53,6 @@ const config: BuildOptions = {
           if (isBuildMode) {
             console.log(chalk.green('🆕 Building...\n'))
           } else {
-            console.clear()
             console.log(chalk.green('👀 Watching...\n'))
           }
         })

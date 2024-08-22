@@ -3,13 +3,34 @@ reload("user.plugins.lualine")
 reload("user.plugins.nvimtree")
 reload("user.plugins.telescope")
 
+local lazy_events = {
+  on_file_open = {
+    "BufReadPost",
+    "BufNewFile",
+  },
+  on_file_read = {
+    "BufRead",
+  },
+  on_lazy = "VeryLazy",
+}
+
 lvim.plugins = {
+  {
+    "folke/lazy.nvim",
+    opts = function(_, opts)
+      opts.defaults.lazy = true
+
+      return opts
+    end,
+  },
+
   -- Highlight TODOs
   {
     "folke/todo-comments.nvim",
     dependencies = {
       "nvim-lua/plenary.nvim",
     },
+    event = lazy_events.on_file_open,
     keys = {
       {
         "<leader>T",
@@ -27,6 +48,7 @@ lvim.plugins = {
   -- Telescope plugins
   {
     "nvim-telescope/telescope-fzf-native.nvim",
+    event = lazy_events.on_lazy,
     build = "cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Release && cmake --build build --config Release && cmake --install build --prefix build",
   },
   {
@@ -34,6 +56,7 @@ lvim.plugins = {
     dependencies = {
       "kkharji/sqlite.lua",
     },
+    event = lazy_events.on_lazy,
     config = function()
       local picker = {
         disable = false,
@@ -60,10 +83,15 @@ lvim.plugins = {
   { "AstroNvim/astrocommunity" },
 
   -- Git extensions
-  { "f-person/git-blame.nvim" },
+  {
+    "f-person/git-blame.nvim",
+    event = lazy_events.on_file_read,
+  },
 
   -- Theme
-  { import = "astrocommunity.colorscheme.catppuccin" },
+  {
+    import = "astrocommunity.colorscheme.catppuccin",
+  },
   {
     "catppuccin",
     opts = {
@@ -117,11 +145,17 @@ lvim.plugins = {
   },
 
   -- Copilot
-  { import = "astrocommunity.completion.copilot-lua" },
+  {
+    import = "astrocommunity.completion.copilot-lua",
+    event = lazy_events.on_file_open,
+  },
   {
     "copilot.lua",
+    event = lazy_events.on_file_open,
     opts = {
       suggestion = {
+        auto_trigger = true,
+        debounce = 0,
         keymap = {
           accept = "<C-l>",
           accept_word = false,
@@ -135,11 +169,21 @@ lvim.plugins = {
   },
 
   -- UI
-  { "stevearc/dressing.nvim" },
-  { "NvChad/nvim-colorizer.lua" },
-  { "nacro90/numb.nvim" },
+  {
+    "stevearc/dressing.nvim",
+    event = lazy_events.on_lazy,
+  },
+  {
+    "NvChad/nvim-colorizer.lua",
+    event = lazy_events.on_file_open,
+  },
+  {
+    "nacro90/numb.nvim",
+    event = lazy_events.on_lazy,
+  },
   {
     "rcarriga/nvim-notify",
+    event = lazy_events.on_lazy,
     opts = function(_, opts)
       opts.timeout = 3000
       opts.render = "compact"
@@ -148,29 +192,20 @@ lvim.plugins = {
   },
   {
     "lukas-reineke/virt-column.nvim",
+    event = lazy_events.on_file_open,
     config = function()
       reload("virt-column").setup()
     end,
   },
   {
     "lewis6991/satellite.nvim",
+    event = lazy_events.on_file_open,
     opts = { excluded_filetypes = { "prompt", "TelescopePrompt", "noice", "notify", "neo-tree" } },
   },
   {
-    "folke/zen-mode.nvim",
-    opts = function(_, opts)
-      local old_on_open, old_on_close = opts.on_open, opts.on_close
-      opts.on_open = function()
-        utils.conditional_func(old_on_open, true)
-        vim.cmd.SatelliteDisable()
-      end
-      opts.on_close = function()
-        utils.conditional_func(old_on_close, true)
-        vim.cmd.SatelliteEnable()
-      end
-    end,
+    import = "astrocommunity.motion.mini-move",
+    event = lazy_events.on_lazy,
   },
-  { import = "astrocommunity.motion.mini-move" },
 
   -- Auto session
   {
@@ -179,30 +214,20 @@ lvim.plugins = {
       vim.o.sessionoptions = "blank,buffers,curdir,folds,help,tabpages,winsize,winpos,terminal"
       require("auto-session").setup({
         log_level = "error",
-        auto_session_enable_last_session = true,
+        auto_session_enable_last_session = false,
         auto_save_enabled = true,
-        auto_restore_enabled = true,
+        auto_restore_enabled = false,
         auto_session_use_git_branch = true,
         auto_session_suppress_dirs = { "~/" },
         pre_save_cmds = { "NvimTreeClose" },
       })
     end,
   },
-  {
-    "rmagatti/session-lens",
-    dependencies = { "rmagatti/auto-session", "nvim-telescope/telescope.nvim" },
-    config = function()
-      require("session-lens").setup({
-        previewer = false,
-        theme_conf = { layout_strategy = "vertical", borderchars = lvim.builtin.telescope.defaults.borderchars },
-      })
-      require("telescope").load_extension("session-lens")
-    end,
-  },
 
   -- -- Others
   {
     "folke/trouble.nvim",
+    event = lazy_events.on_file_open,
     cmd = { "TroubleToggle", "Trouble" },
     keys = {
       {
@@ -236,6 +261,7 @@ lvim.plugins = {
   },
   {
     "folke/edgy.nvim",
+    event = lazy_events.on_file_open,
     opts = function(_, opts)
       if not opts.bottom then
         opts.bottom = {}
@@ -243,10 +269,22 @@ lvim.plugins = {
       table.insert(opts.bottom, "Trouble")
     end,
   },
-  { import = "astrocommunity.markdown-and-latex.glow-nvim" },
-  "mbbill/undotree",
-  "windwp/nvim-ts-autotag",
+  {
+    import = "astrocommunity.markdown-and-latex.glow-nvim",
+    event = lazy_events.on_file_open,
+  },
+  {
+    "mbbill/undotree",
+    event = lazy_events.on_file_open,
+  },
+  {
+    "windwp/nvim-ts-autotag",
+    event = lazy_events.on_file_open,
+  },
   { "goolord/alpha-nvim", enabled = false },
   { "max397574/better-escape.nvim", enabled = false },
-  { "lvimuser/lsp-inlayhints.nvim" },
+  {
+    "lvimuser/lsp-inlayhints.nvim",
+    event = lazy_events.on_lazy,
+  },
 }

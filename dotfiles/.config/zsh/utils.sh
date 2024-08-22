@@ -4,7 +4,7 @@ TEXT_BLUE=$(tput setaf 6)
 TEXT_PURPLE=$(tput setaf 5)
 TEXT_RED=$(tput setaf 1)
 TEXT_RESET=$(tput sgr0)
-TEXT_SEPARATOR="-----------------------------------------"
+export TEXT_SEPARATOR="-----------------------------------------"
 
 # Colors
 function print_text {

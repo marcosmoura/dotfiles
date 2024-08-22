@@ -8,13 +8,7 @@ dotfiles/.config/phoenix
 dotfiles/.config/raycast
 dotfiles/.config/sheldon/plugins.lock
 dotfiles/.config/sheldon/repos
-dotfiles/.config/spicetify/Backup
-dotfiles/.config/spicetify/CustomApps
-dotfiles/.config/spicetify/Extensions
-dotfiles/.config/spicetify/Extracted
-dotfiles/.config/spicetify/Themes
 dotfiles/.config/yarn
-dotfiles/.config/zsh/modules/yabai/bin
 node_modules
 
 # General
