@@ -11,22 +11,19 @@ end
 --
 config.font = wezterm.font_with_fallback({
   {
-    family = "JetBrains Mono",
-    weight = "Medium",
+    family = "Maple Mono",
+    weight = 500,
   },
   {
-    family = "JetBrainsMonoNL Nerd Font Mono",
-    weight = "Medium",
-    scale = 1.4,
-    stretch = "Expanded",
+    family = "Symbols Nerd Font Mono",
+    scale = 0.8,
   },
   {
     family = "Apple Color Emoji",
-    weight = "Medium",
   },
 })
-config.font_size = 17
-config.line_height = 1.2
+config.font_size = 17.1
+config.line_height = 1.3
 config.bold_brightens_ansi_colors = "BrightOnly"
 config.allow_square_glyphs_to_overflow_width = "Always"
 config.use_cap_height_to_scale_fallback_fonts = true
@@ -35,18 +32,7 @@ config.custom_block_glyphs = true
 --
 -- [[ STYLE CONFIGURATION ]]
 --
-
-local custom = wezterm.color.get_builtin_schemes()["Catppuccin Mocha"]
-
-custom.background = "#11111b"
-custom.tab_bar.background = "#040404"
-custom.tab_bar.inactive_tab.bg_color = "#0f0f0f"
-custom.tab_bar.new_tab.bg_color = "#080808"
-
-config.color_schemes = {
-  ["OLEDppuccin"] = custom,
-}
-config.color_scheme = "OLEDppuccin"
+config.color_scheme = "Catppuccin Mocha"
 config.default_cursor_style = "BlinkingBar"
 config.cursor_thickness = "1.5"
 config.cursor_blink_rate = 400
@@ -56,7 +42,7 @@ config.command_palette_font_size = 19
 config.allow_square_glyphs_to_overflow_width = "Always"
 
 --
--- [[ WINDOW CONFIGURATION ]]
+-- [[ WINDOW AND PANES CONFIGURATION ]]
 --
 config.window_padding = {
   left = 24,
@@ -72,8 +58,11 @@ config.window_frame = {
 }
 config.window_decorations = "RESIZE"
 config.window_background_opacity = 0.9
-config.macos_window_background_blur = 20
+config.macos_window_background_blur = 25
 config.window_close_confirmation = "NeverPrompt"
+config.inactive_pane_hsb = {
+  brightness = 0.25,
+}
 
 --
 -- [[ DEFAULT APP CONFIGURATION ]]
@@ -90,8 +79,6 @@ config.tab_bar_at_bottom = true
 --
 -- [[ KEY BINDINGS ]]
 --
-config.send_composed_key_when_left_alt_is_pressed = false
-config.send_composed_key_when_right_alt_is_pressed = true
 config.keys = {
   {
     key = "P",
@@ -125,7 +112,7 @@ config.keys = {
 }
 
 --
--- [[ STARTUP CONFIGURATION ]]
+-- [[ EVENTS CONFIGURATION ]]
 --
 config.default_cwd = "~/Projects"
 

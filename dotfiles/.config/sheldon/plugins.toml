@@ -1,13 +1,5 @@
 shell = "zsh"
 
-# defer loading
-# ----------------------
-[plugins.zsh-defer]
-github = "romkatv/zsh-defer"
-
-[templates]
-defer = "{{ hooks | get: \"pre\" | nl }}{% for file in files %}zsh-defer source \"{{ file }}\"\n{% endfor %}{{ hooks | get: \"post\" | nl }}"
-
 
 # colors
 # ----------------------
@@ -26,7 +18,6 @@ github = 'mafredri/zsh-async'
 [plugins.compinit]
 local = "~/.config/zsh/modules"
 use = ["{{ name }}.plugin.zsh"]
-apply = ["defer"]
 
 
 # Completions
@@ -34,12 +25,10 @@ apply = ["defer"]
 
 [plugins.zsh-completions]
 github = "zsh-users/zsh-completions"
-apply = ["defer"]
 
 [plugins.zsh-autosuggestions]
 github = "zsh-users/zsh-autosuggestions"
 use = ["{{ name }}.zsh"]
-apply = ["defer"]
 
 
 # omz plugins
@@ -49,45 +38,36 @@ apply = ["defer"]
 github = "ohmyzsh/ohmyzsh"
 dir = "lib"
 use = ["{compfix,completion,git,grep,history,key-bindings}.zsh"]
-apply = ["defer"]
 
 [plugins.ohmyzsh-plugins]
 github = "ohmyzsh/ohmyzsh"
 dir = "plugins"
 use = ["{aliases,cp,dircyclegh,zoxide,}/*.plugin.zsh"]
-apply = ["defer"]
 
 
 # Other plugins
 # ----------------------
 
+[plugins.256color]
+github = 'chrissicool/zsh-256color'
+
 [plugins.zoxide]
 github = 'ajeetdsouza/zoxide'
-apply = ["defer"]
 
 [plugins.syntax-highlight]
 github = 'marcosmoura/fast-syntax-highlighting'
-apply = ["defer"]
-
-[plugins.256color]
-github = 'chrissicool/zsh-256color'
-apply = ["defer"]
 
 [plugins.zsh-you-should-use]
 github = "MichaelAquilina/zsh-you-should-use"
-apply = ["defer"]
 
 [plugins.forgit]
 github = 'wfxr/forgit'
-apply = ["defer"]
 
 [plugins.yarn-completion]
 github = 'chrisands/zsh-yarn-completions'
-apply = ["defer"]
 
 [plugins.nx-completion]
 github = 'jscutlery/nx-completion'
-apply = ["defer"]
 
 
 # Dotfiles

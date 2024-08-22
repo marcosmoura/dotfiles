@@ -47,9 +47,8 @@ brew install --cask flutter
 brew install deno
 brew install go
 brew install lua
+brew install luarocks
 brew install perl
-brew install rust
-brew install rustup-init
 
 print_text ""
 print_progress "Programming tools\n"
@@ -62,10 +61,12 @@ print_progress "Terminal tools\n"
 
 brew install bat
 brew install bottom
+brew install camdencheek/brew/fre
 brew install dust
 brew install eth-p/software/bat-extras
 brew install eza
 brew install fd
+brew install ffmpegthumbnailer
 brew install fx
 brew install fzf
 brew install git
@@ -80,21 +81,23 @@ brew install marcosmoura/homebrew-tap/tsv-utils
 brew install navi
 brew install ncdu
 brew install nvim
+brew install poppler
 brew install shellcheck
 brew install shfmt
 brew install starship
 brew install tealdeer
 brew install terminal-notifier
 brew install tree
+brew install unar
 brew install vivid
+brew install yazi
 brew install zellij
 brew install zoxide
 
 print_text ""
 print_progress "Terminal apps\n"
 brew install bandwhich
-brew install koekeishiya/formulae/skhd
-brew install koekeishiya/formulae/yabai
+brew install --cask nikitabobko/tap/aerospace
 brew install liquidctl
 brew install mas
 brew install osx-cpu-temp
@@ -105,10 +108,10 @@ print_text ""
 print_progress "Fonts\n"
 
 brew install --cask font-fira-code
-brew install --cask font-hack-nerd-font
 brew install --cask font-inter
 brew install --cask font-jetbrains-mono
-brew install --cask font-jetbrains-mono-nerd-font
+brew install --cask font-maple
+brew install --cask font-symbols-only-nerd-font
 
 print_text ""
 print_progress "QuickLook extensions\n"

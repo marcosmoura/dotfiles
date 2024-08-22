@@ -51,7 +51,7 @@
   # Checkout branch
   ck = checkout
   ckb = checkout -b
-  go = checkout
+  go = "!f() { git checkout -b \"$1\" 2> /dev/null || git checkout \"$1\"; }; f"
 
   # Show verbose output about tags, branches or remotes
   tags = tag -l
@@ -142,7 +142,7 @@
 [core]
   pager = delta
   attributesfile = ~/.gitattributes
-  editor = lvim
+  editor = vim
   excludesfile = ~/.gitignore
   precomposeunicode = false
   trustctime = false

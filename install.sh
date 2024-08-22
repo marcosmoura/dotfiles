@@ -1,6 +1,6 @@
 #!/bin/sh
 
-source dotfiles/.config/zsh/utils.sh
+. dotfiles/.config/zsh/utils.sh
 
 print_purple "$TEXT_SEPARATOR"
 print_purple "          Marcos Moura Dotfiles          "
@@ -10,17 +10,19 @@ print_text "💻 Installing all dotfiles..."
 print_text "$TEXT_SEPARATOR\n"
 
 # Load installation scripts
-source installation/preinstall.sh
-source installation/macos.sh
-source installation/brew.sh
-source installation/symlinks.sh
-source installation/zsh.sh
-source installation/node.sh
-source installation/python.sh
-source installation/ruby.sh
-source installation/apps.sh
-source installation/packages.sh
-source installation/postinstall.sh
+. installation/preinstall.sh
+. installation/macos.sh
+. installation/brew.sh
+. installation/symlinks.sh
+. installation/zsh.sh
+. installation/node.sh
+. installation/python.sh
+. installation/ruby.sh
+. installation/rust.sh
+. installation/go.sh
+. installation/apps.sh
+. installation/packages.sh
+. installation/postinstall.sh
 
 print_green "🎉 Dotfiles installed and configured!"
 print_green "✅ Reloading shell! 😊"

@@ -1,5 +1,4 @@
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
-local plugins = require("custom.plugins")
 local is_vscode = vim.g.vscode
 
 if not vim.loop.fs_stat(lazypath) then
@@ -15,20 +14,36 @@ end
 
 vim.opt.rtp:prepend(lazypath)
 
-require("lazy").setup(plugins, {
+require("lazy").setup({
+  { import = "custom.plugins" },
+  { import = "custom.plugins.coding" },
+  { import = "custom.plugins.editor" },
+  { import = "custom.plugins.lsp" },
+  { import = "custom.plugins.lsp.languages" },
+  { import = "custom.plugins.ui" },
+}, {
   defaults = {
     lazy = true,
     cond = not is_vscode,
   },
 
+  checker = {
+    enabled = true,
+    notify = false,
+  },
+
+  change_detection = {
+    notify = false,
+  },
+
   install = {
     colorscheme = {
       "catppuccin",
-      "habamax",
     },
   },
 
   ui = {
+    border = "rounded",
     icons = {
       ft = "",
       lazy = "󰂠 ",

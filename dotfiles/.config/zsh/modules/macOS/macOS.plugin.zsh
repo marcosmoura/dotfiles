@@ -12,9 +12,9 @@ function updateAll {
 
   updateRuby
   updatePython
+  updateBrew
   updatePackages
   updateShell
-  updateBrew
 
   print_success "Updated! \n"
 

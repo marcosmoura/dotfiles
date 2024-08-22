@@ -7,7 +7,7 @@ key_color = "Yellow"
 separator = ""
 
 [palette]
-visible = true
+visible = false
 
 [keys]
 resolution = "Displays"

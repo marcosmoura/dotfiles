@@ -7,7 +7,7 @@ brew cleanup
 print_progress "Updating MacOS"
 
 sudo softwareupdate -i -a
-"xcode-select --install"
+xcode-select --install
 
 print_progress "Resetting terminal"
 

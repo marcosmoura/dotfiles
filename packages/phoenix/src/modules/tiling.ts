@@ -1,6 +1,6 @@
 import extend from 'just-extend'
 import split from 'just-split'
-import Queue from 'p-queue'
+import { default as Queue } from 'p-queue'
 
 import { blacklistedWindows, gapSize, keybindings, maxGridCells } from '@/config'
 
@@ -150,7 +150,11 @@ function getMatchedApp(appName: string) {
   const matchedApps = runningApps.filter((app) => {
     const name = app.name()
 
-    return appName && name.match(appName) && !isAppBlacklisted(name)
+    if (!name || !appName) {
+      return false
+    }
+
+    return name.match(appName) && !isAppBlacklisted(name)
   })
 
   return matchedApps
@@ -324,10 +328,7 @@ function setupTiling() {
 
   onKeyPress(...keybindings.reloadSpace, redoSpaceLayout)
   onKeyPress(...keybindings.reloadLayout, redoAllLayouts)
-  /* onKeyPress(...keybindings.toggleMaximized, toggleWindowLayout({ mode: 'maximized' }))
-  onKeyPress(...keybindings.toggleGrid, toggleWindowLayout({ mode: 'grid' }))
-  onKeyPress(...keybindings.toggleColumn, toggleWindowLayout({ mode: 'column' }))
-  onKeyPress(...keybindings.toggleRow, toggleWindowLayout({ mode: 'row' })) */
+  onKeyPress(...keybindings.centralize, toggleWindowLayout({ mode: 'centered' }))
 }
 
 export { addTilingRule, clearTilingCache, toggleWindowLayout }

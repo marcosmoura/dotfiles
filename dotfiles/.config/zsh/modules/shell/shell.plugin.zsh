@@ -11,9 +11,6 @@ alias zshconfig="code ~/.zshrc"
 # Reload the shell (i.e. invoke as a login shell)
 alias reload="exec $SHELL -l"
 
-# Alias to VSCode
-alias code='code-insiders '
-
 # Always enable colored `grep` output
 # Note: `GREP_OPTIONS="--color=auto"` is deprecated, hence the alias usage.
 alias grep='grep --color=auto'

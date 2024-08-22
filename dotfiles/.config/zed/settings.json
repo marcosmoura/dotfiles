@@ -1,0 +1,68 @@
+{
+  "assistant": {
+    "dock": "bottom",
+    "default_model": {
+      "model": "gpt-4",
+      "provider": "copilot_chat"
+    },
+    "version": "2"
+  },
+  "auto_update_extensions": {
+    "enabled": true
+  },
+  "base_keymap": "SublimeText",
+  "buffer_font_fallbacks": ["JetBrains Mono", "Symbols Nerd Font Mono", "Apple Color Emoji"],
+  "buffer_font_family": "Maple Mono",
+  "buffer_font_size": 17.1,
+  "buffer_font_weight": 500,
+  "buffer_line_height": {
+    "custom": 1.65
+  },
+  "hard_tabs": false,
+  "indent_guides": {
+    "active_line_width": 2,
+    "coloring": "indent_aware"
+  },
+  "preferred_line_length": 120,
+  "project_panel": {
+    "dock": "right",
+    "indent_size": 20
+  },
+  "scroll_sensitivity": 1.1,
+  "tab_bar": {
+    "show_nav_history_buttons": false
+  },
+  "tab_size": 2,
+  "tabs": {
+    "file_icons": true,
+    "git_status": true
+  },
+  "telemetry": {
+    "diagnostics": false,
+    "metrics": false
+  },
+  "terminal": {
+    "blinking": "on",
+    "copy_on_select": true,
+    "default_height": 400,
+    "line_height": {
+      "custom": 1.65
+    },
+    "working_directory": "current_project_directory"
+  },
+  "theme": "Catppuccin Mocha - No Italics",
+  "toolbar": {
+    "breadcrumbs": false,
+    "quick_actions": false
+  },
+  "ui_font_fallbacks": ["JetBrains Mono", "Symbols Nerd Font Mono", "Apple Color Emoji"],
+  "ui_font_family": "Maple Mono",
+  "ui_font_size": 17,
+  "ui_font_weight": 500,
+  "ui_line_height": {
+    "custom": 1.25
+  },
+  "use_auto_surround": true,
+  "use_autoclose": true,
+  "wrap_guides": [120]
+}
