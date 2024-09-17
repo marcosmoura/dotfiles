@@ -1,23 +1,37 @@
 shell = "zsh"
 
 
-# colors
+# defer
+# ----------------------
+
+[plugins.zsh-defer]
+github = "romkatv/zsh-defer"
+
+[templates]
+defer = "{{ hooks?.pre | nl }}{% for file in files %}zsh-defer source \"{{ file }}\"\n{% endfor %}{{ hooks?.post | nl }}"
+
+
+# core modules
 # ----------------------
 
 [plugins.colors]
 local = "~/.config/zsh/modules"
-use = ["{{ name }}.plugin.zsh"]
+use = ["{colors,compinit,macOS}/*.plugin.zsh"]
 
 
-# compinit
+# powerlevel10k
 # ----------------------
 
-[plugins.async]
-github = 'mafredri/zsh-async'
+[plugins.powerlevel10k]
+github = "romkatv/powerlevel10k"
 
-[plugins.compinit]
-local = "~/.config/zsh/modules"
-use = ["{{ name }}.plugin.zsh"]
+
+# Syntax highlighting
+# ----------------------
+
+[plugins.syntax-highlight]
+github = "marcosmoura/fast-syntax-highlighting"
+apply = ["defer"]
 
 
 # Completions
@@ -25,10 +39,12 @@ use = ["{{ name }}.plugin.zsh"]
 
 [plugins.zsh-completions]
 github = "zsh-users/zsh-completions"
+apply = ["defer"]
 
 [plugins.zsh-autosuggestions]
 github = "zsh-users/zsh-autosuggestions"
 use = ["{{ name }}.zsh"]
+apply = ["defer"]
 
 
 # omz plugins
@@ -38,36 +54,45 @@ use = ["{{ name }}.zsh"]
 github = "ohmyzsh/ohmyzsh"
 dir = "lib"
 use = ["{compfix,completion,git,grep,history,key-bindings}.zsh"]
+apply = ["defer"]
 
 [plugins.ohmyzsh-plugins]
 github = "ohmyzsh/ohmyzsh"
 dir = "plugins"
 use = ["{aliases,cp,dircyclegh,zoxide,}/*.plugin.zsh"]
+apply = ["defer"]
 
 
 # Other plugins
 # ----------------------
 
 [plugins.256color]
-github = 'chrissicool/zsh-256color'
+github = "chrissicool/zsh-256color"
+apply = ["defer"]
 
 [plugins.zoxide]
-github = 'ajeetdsouza/zoxide'
-
-[plugins.syntax-highlight]
-github = 'marcosmoura/fast-syntax-highlighting'
+github = "ajeetdsouza/zoxide"
+apply = ["defer"]
 
 [plugins.zsh-you-should-use]
 github = "MichaelAquilina/zsh-you-should-use"
-
-[plugins.forgit]
-github = 'wfxr/forgit'
+apply = ["defer"]
 
 [plugins.yarn-completion]
-github = 'chrisands/zsh-yarn-completions'
+github = "chrisands/zsh-yarn-completions"
+apply = ["defer"]
 
 [plugins.nx-completion]
-github = 'jscutlery/nx-completion'
+github = "jscutlery/nx-completion"
+apply = ["defer"]
+
+[plugins.pnpm-completion]
+github = "g-plane/pnpm-shell-completion"
+apply = ["defer"]
+
+[plugins.icd]
+github = "g-plane/icd"
+apply = ["defer"]
 
 
 # Dotfiles
@@ -75,4 +100,5 @@ github = 'jscutlery/nx-completion'
 
 [plugins.dotfiles]
 local = "~/.config/zsh/modules"
-use = ["*.plugin.zsh", "!{colors,compinit}/*.plugin.zsh"]
+use = ["*.plugin.zsh", "!{colors,compinit,macOS}/*.plugin.zsh"]
+apply = ["defer"]

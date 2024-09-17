@@ -1,3 +1,8 @@
+# Enable Powerlevel10k instant prompt
+if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-\${(%):-%n}.zsh" ]]; then
+  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-\${(%):-%n}.zsh"
+fi
+
 # Path
 export XDG_CONFIG_HOME=${XDG_CONFIG_HOME:-$HOME/.config}
 export PATH=/usr/local/bin:$PATH
@@ -46,12 +51,12 @@ export SAVESIZE=25000
 # You Should Use
 export YSU_MODE=ALL
 
-# Load starship
-export STARSHIP_CONFIG=$XDG_CONFIG_HOME/starship/starship.toml
-eval "$(starship init zsh)"
+# Load starship - Deprecated: Using p10k instead
+# export STARSHIP_CONFIG=$XDG_CONFIG_HOME/starship/starship.toml
+# eval "$(starship init zsh)"
 
-# Load tabtab if it exists
-[[ -f ~/.config/tabtab/zsh/__tabtab.zsh ]] && . ~/.config/tabtab/zsh/__tabtab.zsh || true
+# Load powerlevel10k
+[[ ! -f ~/.config/p10k/.p10k.zsh ]] || source ~/.config/p10k/.p10k.zsh
 
 # SSH Agent
 SSH_AGENT_INSTANCES=$(pgrep ssh-agent)
@@ -62,9 +67,10 @@ fi
 
 # Load sheldon
 eval "$(sheldon source)"
+eval "$(sheldon completions --shell zsh)"
 
 # FZF
-eval "$(fzf --zsh)"
+source <(fzf --zsh)
 
 # Clear screen
 clear

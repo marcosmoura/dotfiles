@@ -56,8 +56,8 @@ config.window_frame = {
   border_bottom_height = 0,
   border_top_height = 0,
 }
-config.window_decorations = "RESIZE"
-config.window_background_opacity = 0.9
+config.window_decorations = "RESIZE|MACOS_FORCE_ENABLE_SHADOW"
+config.window_background_opacity = 0.85
 config.macos_window_background_blur = 25
 config.window_close_confirmation = "NeverPrompt"
 config.inactive_pane_hsb = {

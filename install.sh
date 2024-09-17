@@ -29,3 +29,5 @@ print_green "✅ Reloading shell! 😊"
 print_green "$TEXT_SEPARATOR\n"
 
 exec $SHELL -l
+
+reload

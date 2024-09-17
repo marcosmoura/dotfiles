@@ -10,7 +10,9 @@ source ~/.config/zsh/modules/brew/brew.plugin.zsh
 function updateAll {
   print_green "💻 Updating all tools \n"
 
+  authenticateBeforeUpdate
   updateRuby
+  updateRust
   updatePython
   updateBrew
   updatePackages
@@ -18,12 +20,13 @@ function updateAll {
 
   print_success "Updated! \n"
 
-  exec $SHELL -l
+  reload
 }
 
 function updateMacos {
   print_text "Updating macOS \n"
 
+  authenticateBeforeUpdate
   sudo softwareupdate -i -a
   mas upgrade
 

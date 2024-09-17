@@ -13,15 +13,6 @@ function loadMicrosoftDefender() {
   sudo launchctl load /Library/LaunchDaemons/com.tanium.taniumclient.plist
 }
 
-# Start NZXT Kraken
-function kraken() {
-  liquidctl initialize all
-  liquidctl --match "Kraken" set pump speed 20 40 40 70 50 80 60 100
-  liquidctl --match "Smart Device" set fan1 speed 70
-  liquidctl --match "Smart Device" set fan2 speed 70
-  liquidctl --match "Smart Device" set fan3 speed 70
-}
-
 # Create a .tar.gz archive, using `zopfli`, `pigz` or `gzip` for compression
 function targz() {
   local tmpFile="${@%/}.tar"
