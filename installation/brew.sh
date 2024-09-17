@@ -98,7 +98,6 @@ print_text ""
 print_progress "Terminal apps\n"
 brew install bandwhich
 brew install --cask nikitabobko/tap/aerospace
-brew install liquidctl
 brew install mas
 brew install osx-cpu-temp
 brew install sketchybar

@@ -5,8 +5,6 @@ after-startup-command = [
   'layout accordion',
   'workspace design',
   'layout accordion',
-  'workspace communication',
-  'layout accordion',
   'workspace code',
 ]
 exec-on-workspace-change = [
@@ -16,7 +14,7 @@ exec-on-workspace-change = [
 ]
 
 start-at-login = true
-enable-normalization-flatten-containers = true
+enable-normalization-flatten-containers = false
 enable-normalization-opposite-orientation-for-nested-containers = true
 accordion-padding = 0
 default-root-container-layout = 'tiles'
@@ -52,10 +50,13 @@ remote = 'r'
 # Misc
 ctrl-cmd-r = ['mode service', 'reload-config', 'mode main', 'balance-sizes']
 ctrl-cmd-e = 'balance-sizes'
+ctrl-cmd-shift-e = ['balance-sizes', 'flatten-workspace-tree']
 ctrl-cmd-b = 'layout tiles'
 ctrl-cmd-f = 'layout floating tiling'
 ctrl-cmd-m = 'layout accordion tiling'
-cmd-backtick = ['focus left --ignore-floating', 'focus up --ignore-floating']
+ctrl-cmd-c = 'split horizontal'
+ctrl-cmd-v = 'split vertical'
+cmd-backtick = ['focus left', 'focus up']
 
 # Resize windows
 ctrl-cmd-minus = 'resize smart -50'

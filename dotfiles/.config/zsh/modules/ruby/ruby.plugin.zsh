@@ -3,16 +3,9 @@
 source ~/.config/zsh/utils.sh
 
 # Init rbenv
-function startRbEnv {
-  export RBENV_VERSION=$(rbenv install -l -s | grep -v - | tail -1)
-  eval "$(rbenv init - zsh)"
-  rbenv global $RBENV_VERSION
-
-  async_stop_worker init_rbenv
-}
-
-async_start_worker init_rbenv -n
-async_job init_rbenv startRbEnv
+export RBENV_VERSION=$(rbenv install -l -s | grep -v - | tail -1)
+eval "$(rbenv init - zsh)"
+rbenv global $RBENV_VERSION
 
 function updateRuby {
   print_start "Updating Ruby \n"

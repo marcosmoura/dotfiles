@@ -384,6 +384,12 @@ defaults write com.apple.DiskUtility DUDebugMenuEnabled -bool true
 defaults write com.apple.DiskUtility advanced-image-options -bool true
 
 ###############################################################################
+# WezTerm
+###############################################################################
+# Set the default appearance to light
+defaults write com.github.wez.wezterm NSRequiresAquaSystemAppearance -bool YES
+
+###############################################################################
 # Mac App Store
 ###############################################################################
 

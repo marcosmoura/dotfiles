@@ -21,7 +21,7 @@ alias ~="cd ~"
 alias ls="eza -a -s type --group-directories-first --icons --color-scale --color always"
 
 # List all files colorized in long format
-alias la="ls -laFh --git"
+alias la="ls -lahF --git"
 
 # List all files colorized in short format
 alias ll='ls -lh'
