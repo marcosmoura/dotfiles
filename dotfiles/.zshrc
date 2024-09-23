@@ -72,6 +72,9 @@ eval "$(sheldon completions --shell zsh)"
 # FZF
 source <(fzf --zsh)
 
+# Direnv
+eval "$(direnv hook zsh)"
+
 # Clear screen
 clear
 systeminfo
