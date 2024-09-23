@@ -54,6 +54,7 @@ print_text ""
 print_progress "Programming tools\n"
 
 brew install cocoapods
+brew install direnv
 brew install watchman
 
 print_text ""

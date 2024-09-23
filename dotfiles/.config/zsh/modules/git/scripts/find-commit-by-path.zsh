@@ -19,7 +19,7 @@ fi
 
 print_start "Searching the last $LIMIT commits that affected the \"$SEARCH_PATH\" path \n"
 
-LOG_OUTPUT=$(git log -n $LIMIT --abbrev-commit --color --decorate --pretty=format:"$FORMAT" -S$SEARCH_PATH)
+LOG_OUTPUT=$(git log -n $LIMIT --date=human --abbrev-commit --color --decorate --pretty=format:"$FORMAT" -S$SEARCH_PATH)
 
 if [ -z "${LOG_OUTPUT}" ]; then
   print_info "No commits found for the '$SEARCH_PATH' path."
