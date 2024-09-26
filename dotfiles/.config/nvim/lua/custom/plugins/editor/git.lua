@@ -33,38 +33,38 @@ return {
       "BufNewFile",
     },
     opts = {
-      signs = {
-        add = {
-          hl = "GitSignsAdd",
-          text = bold_line_left,
-          numhl = "GitSignsAddNr",
-          linehl = "GitSignsAddLn",
-        },
-        change = {
-          hl = "GitSignsChange",
-          text = bold_line_left,
-          numhl = "GitSignsChangeNr",
-          linehl = "GitSignsChangeLn",
-        },
-        delete = {
-          hl = "GitSignsDelete",
-          text = triangle,
-          numhl = "GitSignsDeleteNr",
-          linehl = "GitSignsDeleteLn",
-        },
-        topdelete = {
-          hl = "GitSignsDelete",
-          text = triangle,
-          numhl = "GitSignsDeleteNr",
-          linehl = "GitSignsDeleteLn",
-        },
-        changedelete = {
-          hl = "GitSignsChange",
-          text = bold_line_left,
-          numhl = "GitSignsChangeNr",
-          linehl = "GitSignsChangeLn",
-        },
-      },
+      -- signs = {
+      --   add = {
+      --     hl = "GitSignsAdd",
+      --     text = bold_line_left,
+      --     numhl = "GitSignsAddNr",
+      --     linehl = "GitSignsAddLn",
+      --   },
+      --   change = {
+      --     hl = "GitSignsChange",
+      --     text = bold_line_left,
+      --     numhl = "GitSignsChangeNr",
+      --     linehl = "GitSignsChangeLn",
+      --   },
+      --   delete = {
+      --     hl = "GitSignsDelete",
+      --     text = triangle,
+      --     numhl = "GitSignsDeleteNr",
+      --     linehl = "GitSignsDeleteLn",
+      --   },
+      --   topdelete = {
+      --     hl = "GitSignsDelete",
+      --     text = triangle,
+      --     numhl = "GitSignsDeleteNr",
+      --     linehl = "GitSignsDeleteLn",
+      --   },
+      --   changedelete = {
+      --     hl = "GitSignsChange",
+      --     text = bold_line_left,
+      --     numhl = "GitSignsChangeNr",
+      --     linehl = "GitSignsChangeLn",
+      --   },
+      -- },
       signcolumn = true,
       numhl = false,
       linehl = false,
