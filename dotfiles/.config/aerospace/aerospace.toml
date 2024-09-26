@@ -153,6 +153,10 @@ run = "move-node-to-workspace design"
 if.app-id = 'com.spotify.client'
 run = "move-node-to-workspace music"
 
+[[on-window-detected]]
+if.app-id = 'com.apple.Music'
+run = "move-node-to-workspace music"
+
 # Space - Communication
 [[on-window-detected]]
 if.app-id = 'com.microsoft.teams2'
