@@ -1,0 +1,114 @@
+{
+  "root": true,
+  "extends": [
+    "eslint:recommended",
+    "plugin:eslint-comments/recommended",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:import/recommended",
+    "plugin:import/typescript",
+    "plugin:unicorn/recommended",
+    "prettier"
+  ],
+  "plugins": ["eslint-plugin-tsdoc", "simple-import-sort"],
+  "rules": {
+    "import/default": "off",
+    "import/export": "off",
+    "import/first": "error",
+    "import/named": "off",
+    "import/namespace": "off",
+    "import/newline-after-import": "error",
+    "import/no-duplicates": "error",
+    "import/no-unresolved": "off",
+    "simple-import-sort/exports": "error",
+    "unicorn/filename-case": "off",
+    "unicorn/no-array-for-each": "off",
+    "unicorn/no-array-reduce": "off",
+    "unicorn/no-null": "off",
+    "unicorn/prevent-abbreviations": "off",
+    "simple-import-sort/imports": [
+      "error",
+      {
+        "groups": [
+          ["^[a-z]+|(@[a-z]+)"],
+          ["^@/"],
+          [
+            "^@/utils/(.*)$",
+            "^@/config/(.*)$",
+            "^@/components/(.*)$",
+            "^@/modules/(.*)$",
+            "^@/assets/(.*)$"
+          ],
+          ["^[../]"],
+          ["^[./]"]
+        ]
+      }
+    ]
+  },
+  "parserOptions": {
+    "project": "./tsconfig.json"
+  },
+  "settings": {
+    "import/resolver": {
+      "typescript": {
+        "project": "./tsconfig.json"
+      }
+    }
+  },
+  "overrides": [
+    {
+      "files": ["**/{.eslintrc,.prettierrc}"],
+      "rules": {
+        "unicorn/filename-case": [
+          "error",
+          {
+            "cases": {
+              "kebabCase": true
+            }
+          }
+        ]
+      }
+    },
+    {
+      "files": ["**/*.{md,html,json,txt,png,jpg,gif,ico}"],
+      "rules": {
+        "unicorn/filename-case": [
+          "error",
+          {
+            "cases": {
+              "kebabCase": true
+            }
+          }
+        ]
+      }
+    },
+    {
+      "files": ["**/*.ts"],
+      "rules": {
+        "unicorn/filename-case": [
+          "error",
+          {
+            "cases": {
+              "camelCase": true,
+              "pascalCase": true
+            }
+          }
+        ]
+      }
+    },
+    {
+      "files": ["**/*.d.ts"],
+      "rules": {
+        "unicorn/filename-case": [
+          "error",
+          {
+            "cases": {
+              "kebabCase": true,
+              "camelCase": true,
+              "pascalCase": true
+            }
+          }
+        ]
+      }
+    }
+  ]
+}
