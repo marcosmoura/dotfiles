@@ -1,0 +1,156 @@
+node ~/.config/zsh/modules/yabai/bin/wallpaper-manager change
+
+## Global settings
+yabai -m config active_window_opacity 1
+yabai -m config auto_balance on
+yabai -m config focus_follows_mouse off
+yabai -m config mouse_action1 move
+yabai -m config mouse_action2 resize
+yabai -m config mouse_follows_focus off
+yabai -m config mouse_modifier fn
+yabai -m config normal_window_opacity 0.75
+yabai -m config split_ratio 0.5
+yabai -m config window_animation_duration 0.25
+yabai -m config window_animation_frame_rate 144
+yabai -m config window_border_blur on
+yabai -m config window_border_hidpi on
+yabai -m config window_border_radius 9
+yabai -m config window_opacity on
+yabai -m config window_opacity_duration 0.25
+yabai -m config window_placement first_child
+yabai -m config window_shadow off
+yabai -m config window_topmost on
+# yabai -m config external_bar all:56:0
+
+
+## General space settings
+yabai -m config layout bsp
+yabai -m config top_padding 16
+yabai -m config right_padding 16
+yabai -m config bottom_padding 16
+yabai -m config left_padding 16
+yabai -m config window_gap 16
+
+
+## Label spaces
+yabai -m space 1 --label code
+yabai -m space 2 --label browser
+yabai -m space 3 --label music
+yabai -m space 4 --label communication
+yabai -m space 5 --label events
+yabai -m space 6 --label finder
+yabai -m space 7 --label terminal
+yabai -m space 8 --label design
+yabai -m space 9 --label productivity
+
+
+## Spaces layouts
+yabai -m config --space browser layout stack
+yabai -m config --space communication layout float
+
+
+
+#### Screen 1
+####################################################################################################
+
+## Space - Code
+yabai -m rule --add label="Visual Studio Code" app="^Visual Studio Code - Insiders$" space="code" display="1"
+yabai -m rule --add label="Simulator" app="^Simulator$" space="code" display="1"
+yabai -m rule --add label="Xcode" app="^Xcode$" space="code" display="1"
+
+
+## Space - Browser
+yabai -m rule --add label="Chrome" app="^Google Chrome$" space="browser" display="1"
+yabai -m rule --add label="Edge" app="^Microsoft Edge" space="browser" display="1"
+yabai -m rule --add label="Firefox" app="^Firefox" space="browser" display="1"
+yabai -m rule --add label="Safari" app="^Safari$" space="browser" display="1"
+
+
+## Space - Music
+yabai -m rule --add label="Spotify" app="^Spotify$" space="music" display="1"
+yabai -m rule --add label="Music" app="^Music$" space="music" display="1"
+
+
+## Space - Communication
+yabai -m rule --add label="WhatsApp" app="^WhatsApp$" space="communication" display="1" grid="2560:2560:320:320:1920:1920" manage=off layer=normal
+yabai -m rule --add label="Discord" app="^Discord$" space="communication" display="1" grid="2560:2560:320:320:1920:1920" manage=off layer=normal
+yabai -m rule --add label="Microsoft Teams" app="Microsoft Teams" space="communication" display="1" grid="2560:2560:320:320:1920:1920" manage=off layer=below
+yabai -m rule --add label="work preview" app="work preview" space="communication" display="1" grid="2560:2560:320:320:1920:1920" manage=off layer=below
+
+
+## Space - Events
+yabai -m rule --add label="Outlook" app="^Outlook$" space="events" display="1"
+yabai -m rule --add label="Calendar" app="^Calendar$" space="events" display="1"
+
+
+
+#### Screen 2
+####################################################################################################
+
+## Space - Finder
+yabai -m rule --add label="Finder" app="^Finder$" space="finder" display="2"
+
+
+## Space - Terminal
+yabai -m rule --add label="Terminal" app="^Terminal$" space="terminal" display="2"
+yabai -m rule --add label="kitty" app="^kitty$" space="terminal" display="2"
+yabai -m rule --add label="WezTerm" app="^WezTerm$" space="terminal" display="2"
+
+
+## Space - Design
+yabai -m rule --add label="Figma" app="^Figma$" space="design" display="2"
+
+
+## Space - Productivity
+yabai -m rule --add label="Notion" app="^Notion$" space="productivity" display="2"
+yabai -m rule --add label="Bitwarden" app="^Bitwarden$" space="productivity" display="2"
+
+
+
+#### All Screens
+####################################################################################################
+
+## Sticky windows
+yabai -m rule --add manage=off layer=above label="System Settings" app="System Settings" sticky="on" grid="2560:2560:740:740:1080:1080"
+
+
+## Unmanaged windows
+yabai -m rule --add manage=off layer=above app="Activity Monitor"
+yabai -m rule --add manage=off layer=above app="AdGuard"
+yabai -m rule --add manage=off layer=above app="App Store"
+yabai -m rule --add manage=off layer=above app="Calculator"
+yabai -m rule --add manage=off layer=above app="Console"
+yabai -m rule --add manage=off layer=above app="Contexts"
+yabai -m rule --add manage=off layer=above app="Dictionary"
+yabai -m rule --add manage=off layer=above app="Displaperture"
+yabai -m rule --add manage=off layer=above app="IINA"
+yabai -m rule --add manage=off layer=above app="Inna"
+yabai -m rule --add manage=off layer=above app="Kap"
+yabai -m rule --add manage=off layer=above app="Preview"
+yabai -m rule --add manage=off layer=above app="Stats"
+yabai -m rule --add manage=off layer=above app="^Steam$"
+yabai -m rule --add manage=off layer=above app="^csgo$"
+yabai -m rule --add manage=off layer=above app="^counter$"
+yabai -m rule --add manage=off layer=above app="^Counter$"
+yabai -m rule --add manage=off layer=above app="^CSGO$"
+yabai -m rule --add manage=off layer=above app="System Information"
+yabai -m rule --add manage=off layer=above app="Tone Room"
+yabai -m rule --add manage=off layer=above app="VLC"
+yabai -m rule --add manage=off layer=above app="VoiceOver Utility"
+yabai -m rule --add manage=off layer=above label="Software Update"
+yabai -m rule --add manage=off layer=above title="(Copy|Bin|About This Mac|Info)"
+yabai -m rule --add manage=off layer=above title="(Settings|Preferences)"
+yabai -m rule --add manage=off layer=above title="^(General|(Tab|Password|Website|Extension)s|AutoFill|Se(arch|curity)|Privacy|Advanced)$" manage=off
+yabai -m rule --add manage=off layer=above title="^Exports"
+yabai -m rule --add manage=off layer=above title="^Opening"
+
+
+
+#### Events
+####################################################################################################
+
+yabai -m signal --add event=space_changed action="sleep 0.5; node ~/.config/zsh/modules/yabai/bin/wallpaper-manager change"
+yabai -m signal --add event=display_added action="zsh ~/.config/zsh/modules/yabai/scripts/reload-yabai.zsh"
+yabai -m signal --add event=display_removed action="zsh ~/.config/zsh/modules/yabai/scripts/reload-yabai.zsh"
+yabai -m signal --add event=display_moved action="zsh ~/.config/zsh/modules/yabai/scripts/reload-yabai.zsh"
+yabai -m signal --add event=dock_did_restart action="zsh ~/.config/zsh/modules/yabai/scripts/reload-yabai.zsh"
