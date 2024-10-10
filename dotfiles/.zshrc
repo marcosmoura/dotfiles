@@ -3,7 +3,7 @@ if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-\${(%):-%n}.zsh" ]
   source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-\${(%):-%n}.zsh"
 fi
 
-# Path
+# Paths
 export XDG_CONFIG_HOME=${XDG_CONFIG_HOME:-$HOME/.config}
 export PATH=/usr/local/bin:$PATH
 export PATH=/usr/local/opt:$PATH

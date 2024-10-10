@@ -99,7 +99,6 @@ print_text ""
 print_progress "Terminal apps\n"
 brew install --cask nikitabobko/tap/aerospace
 brew install bandwhich
-brew install koekeishiya/formulae/skhd
 brew install koekeishiya/formulae/yabai
 brew install mas
 brew install osx-cpu-temp

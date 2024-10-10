@@ -1,95 +1,100 @@
-#!/usr/bin/env zx
+import { constants, promises } from 'node:fs';
+import { homedir } from 'node:os';
+import path from 'node:path';
 
-import { access, constants, readFile, writeFile } from 'node:fs/promises'
-import os from 'node:os'
-import path from 'node:path'
-import { $ } from 'zx'
+import 'zx/globals';
 
-const homeDir = os.homedir()
-const wallpaperCacheLocation = path.resolve(homeDir, '.wallpapercache')
+const { access, readFile, writeFile } = promises;
+
+const resolvePath = (pathToResolve: string) => {
+  return path.resolve(homedir(), pathToResolve);
+};
+
+const wallpaperCacheLocation = resolvePath('.wallpapercache');
 
 function toInt(value: string): number {
-  return Number.parseInt(value, 10)
+  return Number.parseInt(value, 10);
 }
 
 function getCacheKey(space: number) {
-  return `space-${space}`
+  return `space-${space}`;
 }
 
 async function getSpaceData() {
-  const space = await $`yabai -m query --spaces --space | jq '.index'`
-  const display = await $`yabai -m query --spaces --space | jq '.display'`
+  const space = await $`yabai -m query --spaces --space | jq '.index'`;
+  const display = await $`yabai -m query --spaces --space | jq '.display'`;
 
   if (display) {
     return {
       space: toInt(space.stdout),
       display: toInt(display.stdout) - 1,
-    }
+    };
   }
 
-  return {}
+  return {};
 }
 
 async function getWallpaperCache() {
   try {
-    await access(path.resolve(wallpaperCacheLocation), constants.R_OK | constants.W_OK)
+    await access(resolvePath(wallpaperCacheLocation), constants.R_OK | constants.W_OK);
   } catch {
-    return {}
+    throw new Error('Could not access wallpaper cache.');
   }
 
-  const cache = await readFile(wallpaperCacheLocation, 'utf8')
+  const cache = await readFile(wallpaperCacheLocation, 'utf8');
 
   if (cache) {
-    return JSON.parse(cache)
+    return JSON.parse(cache);
   }
 }
 
 async function applyWallpaper(space: number, display: number, cache: Record<string, string>) {
-  const wallpaperLocation = path.resolve(homeDir, '.config', 'wallpapers', `${space}.jpg`)
+  const wallpaperLocation = resolvePath(`.config/wallpapers/${space}.jpg`);
 
   try {
-    await $`wallpaper set ${wallpaperLocation} --screen ${display}`
+    await $`wallpaper set ${wallpaperLocation} --screen ${display}`;
   } catch {
-    throw new Error('Could not set wallpaper.')
+    throw new Error('Could not set wallpaper.');
   }
 
   const newCache = {
     ...cache,
     [getCacheKey(space)]: wallpaperLocation,
-  }
+  };
 
-  await writeFile(wallpaperCacheLocation, JSON.stringify(newCache, null, 2), 'utf8')
+  await writeFile(wallpaperCacheLocation, JSON.stringify(newCache, null, 2), 'utf8');
+
+  console.log(chalk.green('✅ Wallpaper set: ' + wallpaperLocation));
 }
 
 async function onWallpaperChange() {
-  const { space, display } = await getSpaceData()
+  const { space, display } = await getSpaceData();
 
   if ([space, display].includes(undefined)) {
-    throw new Error('No space or display found.')
+    throw new Error('No space or display found.');
   }
 
-  const cache = await getWallpaperCache()
+  const cache = await getWallpaperCache();
 
   if (!cache[getCacheKey(space)]) {
-    await applyWallpaper(space, display, cache)
+    await applyWallpaper(space, display, cache);
   }
 }
 
 async function onCacheClean() {
-  await writeFile(wallpaperCacheLocation, JSON.stringify({}, null, 2), 'utf8')
+  await writeFile(wallpaperCacheLocation, JSON.stringify({}, null, 2), 'utf8');
+
+  console.log(chalk.yellow('\n\u2139\uFE0F  Wallpaper cache cleaned.'));
+
+  await onWallpaperChange();
 }
 
-async function init() {
-  const [action = 'change'] = process.argv.slice(2)
+const [action = 'change'] = process.argv.slice(2);
 
-  if (action === 'change') {
-    await onWallpaperChange()
-  }
-
-  if (action === 'clean') {
-    await onCacheClean()
-  }
+if (action === 'change') {
+  await onWallpaperChange();
 }
 
-// eslint-disable-next-line unicorn/prefer-top-level-await
-init()
+if (action === 'clean') {
+  await onCacheClean();
+}
