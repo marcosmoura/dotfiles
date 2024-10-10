@@ -1,6 +1,6 @@
 print_start "Building packages"
 
-pushd packages/phoenix >/dev/null
+pushd packages/wallpaper-manager >/dev/null
 pnpm i
 pnpm run build
 popd >/dev/null

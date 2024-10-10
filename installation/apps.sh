@@ -4,9 +4,10 @@ print_progress "OS utilities\n"
 
 brew install --no-quarantine --cask captin
 brew install --no-quarantine --cask displaperture
+brew install --no-quarantine --cask hammerspoon
+defaults write org.hammerspoon.Hammerspoon MJConfigFile "~/.config/hammerspoon/init.lua"
 brew install --no-quarantine --cask hiddenbar
 brew install --no-quarantine --cask keepingyouawake
-brew install --no-quarantine --cask phoenix
 brew install --no-quarantine --cask stats
 brew install --no-quarantine --cask the-unarchiver
 brew install --no-quarantine --cask topnotch

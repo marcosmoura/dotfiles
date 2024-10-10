@@ -20,37 +20,42 @@
   "scripts": {
     "build": "tsx scripts/build.ts",
     "clean-install": "rm -rf node_modules pnpm-lock.yaml && pnpm install",
-    "lint": "pnpm run lint:prettier && pnpm run lint:eslint && pnpm run lint:ts-check",
-    "lint:eslint": "eslint ./src --ext .ts --format=pretty --fix --cache --cache-location ./node_modules/.eslintcache",
+    "lint": "pnpm run lint:prettier && pnpm run lint:oxlint && pnpm run lint:eslint && pnpm run lint:ts-check",
+    "lint:oxlint": "oxlint -c oxlint.json ./ --fix --fix-suggestions",
+    "lint:eslint": "eslint --format=pretty --fix",
     "lint:prettier": "prettier --write --list-different '**/*'",
     "lint:ts-check": "tsc --noEmit",
-    "start": "tsx scripts/build.ts watch"
+    "watch": "tsx scripts/watch.ts"
   },
   "dependencies": {
-    "zx": "^7.2.3"
+    "zx": "^8.1.9"
   },
   "devDependencies": {
-    "@types/node": "^20.6.0",
-    "@typescript-eslint/eslint-plugin": "^6.7.0",
-    "@typescript-eslint/parser": "^6.7.0",
+    "@eslint-community/eslint-plugin-eslint-comments": "^4.4.0",
+    "@eslint/js": "^9.12.0",
+    "@swc/core": "^1.7.26",
+    "@types/eslint__js": "^8.42.3",
+    "@types/node": "^22.7.5",
     "chalk": "^5.3.0",
-    "esbuild": "^0.19.2",
-    "eslint": "^8.49.0",
-    "eslint-config-prettier": "^9.0.0",
-    "eslint-formatter-pretty": "^5.0.0",
-    "eslint-import-resolver-alias": "1.1.2",
-    "eslint-import-resolver-typescript": "3.6.0",
-    "eslint-plugin-eslint-comments": "3.2.0",
-    "eslint-plugin-import": "^2.28.1",
-    "eslint-plugin-simple-import-sort": "^10.0.0",
-    "eslint-plugin-tsdoc": "^0.2.17",
-    "eslint-plugin-unicorn": "48.0.1",
-    "prettier": "^3.0.3",
-    "prettier-plugin-packagejson": "^2.4.5",
-    "tsx": "^3.12.9",
-    "typescript": "^5.2.2"
+    "chokidar": "^4.0.1",
+    "eslint": "^9.12.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-formatter-pretty": "^6.0.1",
+    "eslint-import-resolver-typescript": "3.6.3",
+    "eslint-plugin-import": "^2.31.0",
+    "eslint-plugin-oxlint": "^0.9.10",
+    "eslint-plugin-simple-import-sort": "^12.1.1",
+    "eslint-plugin-unicorn": "56.0.0",
+    "oxc-resolver": "^1.12.0",
+    "oxc-transform": "^0.31.0",
+    "oxlint": "^0.9.10",
+    "prettier": "^3.3.3",
+    "prettier-plugin-packagejson": "^2.5.2",
+    "tsx": "^4.19.1",
+    "typescript": "^5.6.2",
+    "typescript-eslint": "^8.8.1"
   },
   "engines": {
-    "node": ">= 16.0"
+    "node": ">= 20.0"
   }
 }
