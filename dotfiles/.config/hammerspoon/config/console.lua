@@ -16,7 +16,7 @@ local print_available_colors = function()
   print(table.concat(color_names, ", "))
 end
 
-module.catppuccinDarkMode = function()
+module.catppuccinDarkMode = function(print_colors)
   console.outputBackgroundColor({ hex = colors.crust.hex })
   console.consolePrintColor({ hex = green })
   console.consoleResultColor({ hex = green })
@@ -26,7 +26,9 @@ module.catppuccinDarkMode = function()
   console.darkMode(true)
   console.clearConsole()
 
-  print_available_colors()
+  if print_colors then
+    print_available_colors()
+  end
 end
 
 return tables.merge(console, module)

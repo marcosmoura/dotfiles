@@ -1,9 +1,14 @@
+local hide_notch = require("config.hide-notch")
 local task = require("config.utils.task")
 
 local hotkey = hs.hotkey
-local utils = hs.fnutils
+local spaces = hs.spaces
+local window = hs.window
+local caffeinate = hs.caffeinate
+local toggleConsole = hs.toggleConsole
 local reload = hs.reload
 
+local noop = function() end
 local yabai_path = "/opt/homebrew/bin/yabai"
 local yabai_direction_map = {
   up = "north",
@@ -19,11 +24,18 @@ local yabai_grid_map = {
 }
 
 --------------------
+-- Disable built-in useless hotkeys
+--------------------
+hotkey.bind({ "cmd" }, "H", noop)
+hotkey.bind({ "cmd", "alt" }, "H", noop)
+
+--------------------
 -- Misc
 --------------------
 local reload_tools = task.to_async(function(await)
   await(task.run(yabai_path, "--restart-service"))
   await(task.run("/opt/homebrew/bin/node", "~/.config/zsh/modules/yabai/bin/wallpaper-manager clean"))
+  hide_notch.remove_wallpapers()
   reload()
 end)
 
@@ -31,23 +43,20 @@ hotkey.bind({ "cmd", "ctrl" }, "Y", reload_tools)
 hotkey.bind({ "cmd", "ctrl" }, "R", reload_tools)
 
 hotkey.bind({ "cmd", "ctrl" }, "L", function()
-  task.run("/usr/bin/open", "-a /System/Library/CoreServices/ScreenSaverEngine.app")
+  caffeinate.lockScreen()
 end)
 
 hotkey.bind({ "cmd", "ctrl" }, "D", function()
-  task.run(yabai_path, "-m space --toggle show-desktop")
+  spaces.toggleShowDesktop()
 end)
 
 hotkey.bind({ "cmd", "ctrl" }, "X", function()
-  task.run(yabai_path, "-m window --close")
+  window.focusedWindow():close()
 end)
 
---------------------
--- Disable built-in shortcuts
---------------------
-hotkey.bind({ "cmd" }, "H", function() end)
--- hotkey.bind({ "cmd" }, "Q", function() end)
-hotkey.bind({ "cmd", "alt" }, "H", function() end)
+hotkey.bind({ "cmd", "ctrl", "options" }, "C", function()
+  toggleConsole()
+end)
 
 --------------------
 -- Move windows
@@ -71,90 +80,47 @@ end
 --------------------
 --- Move windows between displays
 --------------------
-hotkey.bind(
-  { "cmd", "ctrl", "alt" },
-  "left",
-  task.to_async(function(await)
-    await(task.run(yabai_path, "-m window --display next"))
-    await(task.run(yabai_path, "-m window --focus next"))
-  end)
-)
+for _, arrow_key in ipairs({ "left", "right" }) do
+  hotkey.bind({ "cmd", "ctrl", "alt" }, arrow_key, function()
+    local hammerspoon_direction_map = {
+      left = "moveOneScreenWest",
+      right = "moveOneScreenEast",
+    }
 
-hotkey.bind(
-  { "cmd", "ctrl", "alt" },
-  "right",
-  task.to_async(function(await)
-    await(task.run(yabai_path, "-m window --display prev"))
-    await(task.run(yabai_path, "-m window --focus prev"))
+    window.focusedWindow()[hammerspoon_direction_map[arrow_key]]()
   end)
-)
+end
 
 --------------------
 --- Focus windows
 --------------------
 for _, arrow_key in ipairs({ "up", "down", "left", "right" }) do
   hotkey.bind({ "cmd", "ctrl", "shift" }, arrow_key, function()
-    task.run(yabai_path, "-m window --focus " .. yabai_direction_map[arrow_key])
+    local hammerspoon_direction_map = {
+      up = "focusWindowNorth",
+      right = "focusWindowEast",
+      down = "focusWindowSouth",
+      left = "focusWindowWest",
+    }
+
+    window.focusedWindow()[hammerspoon_direction_map[arrow_key]]()
   end)
 end
 
 hotkey.bind({ "cmd" }, "`", function()
-  local focus_tiling_window = task.to_async(function(await)
-    local _, error = await(task.run(yabai_path, "-m window --focus stack.next"))
+  local windows = window.visibleWindows()
+  local focused_window_id = window.focusedWindow():id()
+  local focused_window_index = 0
 
-    if error ~= "" then
-      _, error = await(task.run(yabai_path, "-m window --focus stack.first"))
+  for index, window in ipairs(windows) do
+    if window:id() == focused_window_id then
+      focused_window_index = index
+      break
     end
-
-    if error ~= "" then
-      _, error = await(task.run(yabai_path, "-m window --focus next"))
-    end
-
-    if error ~= "" then
-      await(task.run(yabai_path, "-m window --focus first"))
-    end
-  end)
-
-  local focus_floating_window = function(focused_window)
-    return task.async(function(await)
-      local space_windows = await(task.run(yabai_path, "-m query --windows --space", { type = "json" }))
-      local focused_index = 0
-
-      table.sort(space_windows, function(a, b)
-        return a["id"] > b["id"]
-      end)
-
-      space_windows = utils.filter(space_windows, function(window)
-        return window["role"] == "AXWindow" and window["subrole"] == "AXStandardWindow"
-      end) or {}
-
-      utils.some(space_windows, function(window, index)
-        if window["id"] == focused_window["id"] then
-          focused_index = index
-          return true
-        end
-      end)
-
-      local target_index = focused_index - 1
-
-      if space_windows[target_index] == nil then
-        target_index = #space_windows
-      end
-
-      task.run(yabai_path, "-m window --focus " .. space_windows[target_index]["id"])
-    end)
   end
 
-  task.async(function(await)
-    local focused_window = await(task.run(yabai_path, "-m query --windows --window", { type = "json" }))
-
-    if focused_window["is-floating"] == true then
-      focus_floating_window(focused_window)
-      return
-    end
-
-    focus_tiling_window()
-  end)
+  local target_window = windows[focused_window_index - 1] or windows[#windows]
+  target_window:focus()
 end)
 
 --------------------

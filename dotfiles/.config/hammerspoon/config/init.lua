@@ -1,5 +1,6 @@
 local colors = require("config.utils.colors")
 local console = require("config.console")
+local hide_notch = require("config.hide-notch")
 local module = {}
 
 local load_spoons = function()
@@ -7,12 +8,6 @@ local load_spoons = function()
 
   spoon.SpoonInstall.use_syncinstall = true
   spoon.SpoonInstall:andUse("EmmyLua")
-  spoon.SpoonInstall:andUse("RoundedCorners", {
-    start = true,
-    config = {
-      radius = 16,
-    },
-  })
   spoon.SpoonInstall:andUse("MiddleClickDragScroll", {
     start = true,
     config = {
@@ -27,14 +22,15 @@ local load_spoons = function()
   spoon.SpoonInstall:andUse("ReloadConfiguration", {
     start = true,
   })
-  spoon.SpoonInstall:asyncUpdateAllRepos()
+  spoon.SpoonInstall:updateAllRepos()
 end
 
 module.setup = function()
   console.catppuccinDarkMode()
   load_spoons()
   require("config.hold-to-quit")
-  require("config.yabai")
+  require("config.window-manager")
+  hide_notch.start()
   require("config.utils.alert").custom("Configuration Reloaded!", "settings.png")
 end
 
