@@ -9,7 +9,6 @@ else
   print_start "Reloading Yabai"
 fi
 
-node ~/.config/zsh/modules/yabai/bin/wallpaper-manager clean
 yabai --restart-service
 
 print_success "Yabai Reloaded!"

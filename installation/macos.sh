@@ -264,7 +264,7 @@ defaults write com.apple.finder FXInfoPanesExpanded -dict \
   OpenWith -bool true \
   Privileges -bool true
 
-# When opening a folder on the desktop there's an animation that conflicts with aerospace trying to tile the window.
+# When opening a folder on the desktop there's an animation that conflicts with tiling window managers.
 defaults write com.apple.finder DisableAllAnimations -bool true
 defaults write -g NSAutomaticWindowAnimationsEnabled -bool false
 
