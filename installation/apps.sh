@@ -16,12 +16,6 @@ print_progress "Communication\n"
 brew install --no-quarantine --cask discord
 brew install --no-quarantine --cask whatsapp
 
-print_text ""
-print_progress "Keyboard Tools\n"
-
-brew install --cask qmk-toolbox
-brew install --cask via
-
 print_progress "Productivity\n"
 
 brew install --no-quarantine --cask google-drive
