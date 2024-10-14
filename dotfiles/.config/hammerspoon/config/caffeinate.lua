@@ -31,13 +31,13 @@ end
 local on_caffeinate = function(event)
   if event == hs.caffeinate.watcher.screensDidLock then
     hs.caffeinate.set("displayIdle", false)
+    update_menubar(true)
   end
 
   if event == hs.caffeinate.watcher.screensDidUnlock then
     hs.caffeinate.set("displayIdle", true)
+    update_menubar(true)
   end
-
-  update_menubar(true)
 end
 
 module.start = function()
