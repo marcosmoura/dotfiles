@@ -160,14 +160,8 @@ local get_space_index = function(screen, space_id)
   return 0
 end
 
-local apply_wallpaper = function(screen, path)
-  local current_wallpaper = screen:desktopImageURL()
-
-  if current_wallpaper == "file://" .. path then
-    return
-  end
-
-  screen:desktopImageURL("file://" .. path)
+local apply_wallpaper = function(path)
+  hs.execute('osascript -e \'tell application "Finder" to set desktop picture to POSIX file "' .. path .. "\"'")
 end
 
 local generate_wallpaper_for_space = function()
@@ -178,7 +172,7 @@ local generate_wallpaper_for_space = function()
   ensure_wallpaper_dir()
 
   if hs.fs.attributes(wallpaper_path) then
-    apply_wallpaper(screen, wallpaper_path)
+    apply_wallpaper(wallpaper_path)
     return
   end
 
@@ -195,7 +189,7 @@ local generate_wallpaper_for_space = function()
   end
 
   wallpaper_with_corners:saveToFile(wallpaper_path)
-  apply_wallpaper(screen, wallpaper_path)
+  apply_wallpaper(wallpaper_path)
 end
 
 local remove_wallpapers = function()
