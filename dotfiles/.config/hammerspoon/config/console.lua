@@ -1,4 +1,3 @@
-local console = hs.console
 local colors = require("config.utils.colors")
 local tables = require("jls.util.tables")
 local green = colors.green.hex
@@ -17,18 +16,18 @@ local print_available_colors = function()
 end
 
 module.catppuccinDarkMode = function(print_colors)
-  console.outputBackgroundColor({ hex = colors.crust.hex })
-  console.consolePrintColor({ hex = green })
-  console.consoleResultColor({ hex = green })
-  console.consoleCommandColor({ hex = green })
-  console.consoleFont({ name = "Maple Mono", size = 13.5 })
-  console.alpha(1)
-  console.darkMode(true)
-  console.clearConsole()
+  hs.console.outputBackgroundColor({ hex = colors.crust.hex })
+  hs.console.consolePrintColor({ hex = green })
+  hs.console.consoleResultColor({ hex = green })
+  hs.console.consoleCommandColor({ hex = green })
+  hs.console.consoleFont({ name = "Maple Mono", size = 13.5 })
+  hs.console.alpha(1)
+  hs.console.darkMode(true)
+  hs.console.clearConsole()
 
   if print_colors then
     print_available_colors()
   end
 end
 
-return tables.merge(console, module)
+return tables.merge(hs.console, module)
