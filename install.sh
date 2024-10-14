@@ -20,7 +20,6 @@ print_text "$TEXT_SEPARATOR\n"
 . installation/ruby.sh
 . installation/rust.sh
 . installation/go.sh
-. installation/apps.sh
 . installation/postinstall.sh
 
 print_green "🎉 Dotfiles installed and configured!"

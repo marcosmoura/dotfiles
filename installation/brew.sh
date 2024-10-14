@@ -11,12 +11,6 @@ eval "$(/opt/homebrew/bin/brew shellenv)"
 
 print_progress "Updating brew\n"
 
-brew -v update
-brew upgrade --force-bottle
-
-print_text ""
-print_progress "Tapping repositories\n"
-
 brew tap dteoh/sqa
 brew tap FelixKratz/formulae
 brew tap githubutilities/tap
@@ -27,107 +21,176 @@ brew tap homebrew/cask-versions
 brew tap homebrew/core
 brew tap homebrew/services
 
-print_text ""
-print_progress "Core utilities\n"
+brew -v update
+brew upgrade
 
+brew install aom
+brew install bandwhich
 brew install bash
-brew install cmake
-brew install coreutils
-brew install findutils
-brew install gawk
-brew install grep
-brew install moreutils
-brew install ncurses
-brew install openssl
-
-print_text ""
-print_progress "Programming languages\n"
-
-brew install --cask flutter
-brew install deno
-brew install go
-brew install lua
-brew install luarocks
-brew install perl
-
-print_text ""
-print_progress "Programming tools\n"
-
-brew install cocoapods
-brew install direnv
-brew install watchman
-
-print_text ""
-print_progress "Terminal tools\n"
-
 brew install bat
+brew install boost
+brew install borders
 brew install bottom
+brew install bun
 brew install camdencheek/brew/fre
+brew install cmake
+brew install cocoapods
+brew install code-minimap
+brew install coreutils
+brew install curl
+brew install deno
+brew install direnv
 brew install dust
+brew install edencommon
 brew install eth-p/software/bat-extras
-brew install eza
+brew install fastfetch
+brew install fb303
+brew install fbthrift
 brew install fd
+brew install ffmpeg
 brew install ffmpegthumbnailer
+brew install findutils
+brew install fizz
+brew install folly
 brew install fx
 brew install fzf
+brew install gawk
+brew install gcc
+brew install gh
 brew install git
 brew install git-delete-merged-branches
 brew install git-delta
 brew install glow
 brew install gnu-sed
+brew install gnupg
+brew install gnutls
+brew install go
+brew install gpgme
+brew install grep
 brew install hyperfine
+brew install jpeg-xl
 brew install jq
+brew install koekeishiya/formulae/yabai
+brew install lazygit
+brew install libarchive
+brew install libgit2
+brew install librist
+brew install llvm
+brew install llvm@16
+brew install lpeg
+brew install lua
+brew install luajit
+brew install luarocks
 brew install macchina
 brew install marcosmoura/homebrew-tap/tsv-utils
+brew install mas
+brew install moreutils
 brew install navi
 brew install ncdu
-brew install nvim
+brew install ncurses
+brew install neovim
+brew install nextdns
+brew install nnn
+brew install node
+brew install node@18
+brew install node@20
+brew install openblas
+brew install openjpeg
+brew install openssl@3
+brew install openvino
+brew install osx-cpu-temp
+brew install perl
+brew install pillow
+brew install pipx
+brew install pnpm
 brew install poppler
+brew install python-packaging
+brew install rbenv
+brew install ripgrep
+brew install rust
+brew install rustup
+brew install sheldon
 brew install shellcheck
 brew install shfmt
+brew install sketchybar
+brew install skhd
 brew install starship
 brew install tealdeer
 brew install terminal-notifier
+brew install tmux
+brew install tokei
 brew install tree
+brew install tree-sitter
+brew install tsv-utils
 brew install unar
+brew install unbound
 brew install vivid
+brew install wallpaper
+brew install wangle
+brew install watchman
+brew install webp
+brew install yarn
 brew install yazi
 brew install zellij
 brew install zoxide
+brew install zsh
 
 print_text ""
-print_progress "Terminal apps\n"
-brew install bandwhich
-brew install koekeishiya/formulae/yabai
-brew install mas
-brew install osx-cpu-temp
-brew install sketchybar
-brew install tokei
+print_progress "Installing applications"
 
-print_text ""
-print_progress "Fonts\n"
-
-brew install --cask font-fira-code
-brew install --cask font-inter
-brew install --cask font-jetbrains-mono
-brew install --cask font-maple
-brew install --cask font-symbols-only-nerd-font
-
-print_text ""
-print_progress "QuickLook extensions\n"
-
-brew install --no-quarantine qlcolorcode
-brew install --no-quarantine qlimagesize
-brew install --no-quarantine qlmarkdown
-brew install --no-quarantine qlstephen
-brew install --no-quarantine qlvideo
-brew install --no-quarantine quicklook-json
-brew install --no-quarantine quicklookase
-brew install --no-quarantine webpquicklook
+brew install --cask --no-quarantine adguard
+brew install --cask --no-quarantine appcleaner
+brew install --cask --no-quarantine arc
+brew install --cask --no-quarantine discord
+brew install --cask --no-quarantine displaylink
+brew install --cask --no-quarantine figma
+brew install --cask --no-quarantine firefox-nightly
+brew install --cask --no-quarantine font-fira-code
+brew install --cask --no-quarantine font-hanken-grotesk
+brew install --cask --no-quarantine font-inter
+brew install --cask --no-quarantine font-jetbrains-mono
+brew install --cask --no-quarantine font-maple
+brew install --cask --no-quarantine font-sf-mono
+brew install --cask --no-quarantine font-symbols-only-nerd-font
+brew install --cask --no-quarantine google-chrome-canary
+brew install --cask --no-quarantine hammerspoon
+brew install --cask --no-quarantine hiddenbar
+brew install --cask --no-quarantine imageoptim
+brew install --cask --no-quarantine kap
+brew install --cask --no-quarantine logitech-camera-settings
+brew install --cask --no-quarantine microsoft-auto-update
+brew install --cask --no-quarantine microsoft-outlook
+brew install --cask --no-quarantine microsoft-remote-desktop
+brew install --cask --no-quarantine microsoft-teams
+brew install --cask --no-quarantine proton-drive
+brew install --cask --no-quarantine proton-pass
+brew install --cask --no-quarantine protonvpn
+brew install --cask --no-quarantine proxy-audio-device
+brew install --cask --no-quarantine qlcolorcode
+brew install --cask --no-quarantine qlimagesize
+brew install --cask --no-quarantine qlmarkdown
+brew install --cask --no-quarantine qlstephen
+brew install --cask --no-quarantine qlvideo
+brew install --cask --no-quarantine quicklook-json
+brew install --cask --no-quarantine quicklookase
+brew install --cask --no-quarantine raycast
+brew install --cask --no-quarantine sf-symbols
+brew install --cask --no-quarantine shottr
+brew install --cask --no-quarantine spotify
+brew install --cask --no-quarantine stats
+brew install --cask --no-quarantine the-unarchiver
+brew install --cask --no-quarantine visual-studio-code
+brew install --cask --no-quarantine vlc
+brew install --cask --no-quarantine webpquicklook
+brew install --cask --no-quarantine wezterm
+brew install --cask --no-quarantine whatsapp@beta
+brew install --cask --no-quarantine zoom
+mas install 497799835 # Xcode
 
 print_text ""
 print_progress "Cleaning up\n"
 
+defaults write org.hammerspoon.Hammerspoon MJConfigFile "~/.config/hammerspoon/init.lua"
 brew cleanup
 
 print_text ""
