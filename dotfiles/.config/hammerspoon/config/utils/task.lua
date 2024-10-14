@@ -1,8 +1,5 @@
-local task = hs.task
-
 local Promise = require("jls.lang.Promise")
 local json = require("jls.util.json")
-local utils = hs.fnutils
 
 local function run(executable, args, opts)
   local options = opts or {
@@ -19,10 +16,10 @@ local function run(executable, args, opts)
     end
 
     if type(args) == "string" then
-      arguments = utils.split(args, " ")
+      arguments = hs.fnutils.split(args, " ")
     end
 
-    local task = task.new(executable, nil, function(_, stdout, stderr)
+    local task = hs.task.new(executable, nil, function(_, stdout, stderr)
       if stdout ~= nil then
         task_output = task_output .. stdout
       end

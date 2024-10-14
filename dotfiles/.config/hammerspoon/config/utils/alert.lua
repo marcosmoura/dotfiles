@@ -1,7 +1,5 @@
 local colors = require("config.utils.colors")
 local tables = require("jls.util.tables")
-local alert = hs.alert
-local image = hs.image
 
 local module = {}
 local assets_path = "~/.config/hammerspoon/assets/"
@@ -21,12 +19,22 @@ local default_alert_style = {
   textColor = { hex = colors.text.hex },
 }
 
-hs.alert.defaultStyle = tables.merge(alert.defaultStyle, default_alert_style)
+hs.alert.defaultStyle = tables.merge(hs.alert.defaultStyle, default_alert_style)
 
 local show_alert = function(message, icon_path, style, duration)
-  local icon = icon_path and image.imageFromPath(assets_path .. icon_path) or nil
+  local icon = icon_path and hs.image.imageFromPath(assets_path .. icon_path) or nil
 
-  alert.showWithImage(message, icon, tables.merge(default_alert_style, style or {}), duration or 1)
+  if icon == nil then
+    return
+  end
+
+  local size = icon:size()
+
+  if size.w > 32.0 or size.h > 32.0 then
+    icon = icon:setSize({ w = 32.0, h = 32.0 })
+  end
+
+  hs.alert.showWithImage(message, icon, tables.merge(default_alert_style, style or {}), duration or 1)
 end
 
 module.info = function(message, duration)

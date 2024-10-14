@@ -1,13 +1,6 @@
 local hide_notch = require("config.hide-notch")
 local task = require("config.utils.task")
 
-local hotkey = hs.hotkey
-local spaces = hs.spaces
-local window = hs.window
-local caffeinate = hs.caffeinate
-local toggleConsole = hs.toggleConsole
-local reload = hs.reload
-
 local noop = function() end
 local yabai_path = "/opt/homebrew/bin/yabai"
 local yabai_direction_map = {
@@ -26,8 +19,8 @@ local yabai_grid_map = {
 --------------------
 -- Disable built-in useless hotkeys
 --------------------
-hotkey.bind({ "cmd" }, "H", noop)
-hotkey.bind({ "cmd", "alt" }, "H", noop)
+hs.hotkey.bind({ "cmd" }, "H", noop)
+hs.hotkey.bind({ "cmd", "alt" }, "H", noop)
 
 --------------------
 -- Misc
@@ -36,33 +29,33 @@ local reload_tools = task.to_async(function(await)
   await(task.run(yabai_path, "--restart-service"))
   await(task.run("/opt/homebrew/bin/node", "~/.config/zsh/modules/yabai/bin/wallpaper-manager clean"))
   hide_notch.remove_wallpapers()
-  reload()
+  hs.reload()
 end)
 
-hotkey.bind({ "cmd", "ctrl" }, "Y", reload_tools)
-hotkey.bind({ "cmd", "ctrl" }, "R", reload_tools)
+hs.hotkey.bind({ "cmd", "ctrl" }, "Y", reload_tools)
+hs.hotkey.bind({ "cmd", "ctrl" }, "R", reload_tools)
 
-hotkey.bind({ "cmd", "ctrl" }, "L", function()
-  caffeinate.lockScreen()
+hs.hotkey.bind({ "cmd", "ctrl" }, "L", function()
+  hs.caffeinate.lockScreen()
 end)
 
-hotkey.bind({ "cmd", "ctrl" }, "D", function()
-  spaces.toggleShowDesktop()
+hs.hotkey.bind({ "cmd", "ctrl" }, "D", function()
+  hs.spaces.toggleShowDesktop()
 end)
 
-hotkey.bind({ "cmd", "ctrl" }, "X", function()
-  window.focusedWindow():close()
+hs.hotkey.bind({ "cmd", "ctrl" }, "X", function()
+  hs.window.focusedWindow():close()
 end)
 
-hotkey.bind({ "cmd", "ctrl", "options" }, "C", function()
-  toggleConsole()
+hs.hotkey.bind({ "cmd", "ctrl", "options" }, "C", function()
+  hs.toggleConsole()
 end)
 
 --------------------
 -- Move windows
 --------------------
 for _, arrow_key in ipairs({ "up", "down", "left", "right" }) do
-  hotkey.bind({ "cmd", "ctrl" }, arrow_key, function()
+  hs.hotkey.bind({ "cmd", "ctrl" }, arrow_key, function()
     task.async(function(await)
       local window = await(task.run(yabai_path, "-m query --windows --window", { type = "json" }))
       local is_floating = window["is-floating"]
@@ -81,13 +74,13 @@ end
 --- Move windows between displays
 --------------------
 for _, arrow_key in ipairs({ "left", "right" }) do
-  hotkey.bind({ "cmd", "ctrl", "alt" }, arrow_key, function()
+  hs.hotkey.bind({ "cmd", "ctrl", "alt" }, arrow_key, function()
     local hammerspoon_direction_map = {
       left = "moveOneScreenWest",
       right = "moveOneScreenEast",
     }
 
-    window.focusedWindow()[hammerspoon_direction_map[arrow_key]]()
+    hs.window.focusedWindow()[hammerspoon_direction_map[arrow_key]]()
   end)
 end
 
@@ -95,7 +88,7 @@ end
 --- Focus windows
 --------------------
 for _, arrow_key in ipairs({ "up", "down", "left", "right" }) do
-  hotkey.bind({ "cmd", "ctrl", "shift" }, arrow_key, function()
+  hs.hotkey.bind({ "cmd", "ctrl", "shift" }, arrow_key, function()
     local hammerspoon_direction_map = {
       up = "focusWindowNorth",
       right = "focusWindowEast",
@@ -103,13 +96,13 @@ for _, arrow_key in ipairs({ "up", "down", "left", "right" }) do
       left = "focusWindowWest",
     }
 
-    window.focusedWindow()[hammerspoon_direction_map[arrow_key]]()
+    hs.window.focusedWindow()[hammerspoon_direction_map[arrow_key]]()
   end)
 end
 
-hotkey.bind({ "cmd" }, "`", function()
-  local windows = window.visibleWindows()
-  local focused_window_id = window.focusedWindow():id()
+hs.hotkey.bind({ "cmd" }, "`", function()
+  local windows = hs.window.visibleWindows()
+  local focused_window_id = hs.window.focusedWindow():id()
   local focused_window_index = 0
 
   for index, window in ipairs(windows) do
@@ -127,7 +120,7 @@ end)
 --- Focus monitors
 --------------------
 for _, arrow_key in ipairs({ "left", "right" }) do
-  hotkey.bind({ "cmd", "alt", "shift" }, arrow_key, function()
+  hs.hotkey.bind({ "cmd", "alt", "shift" }, arrow_key, function()
     task.run(yabai_path, "-m display --focus " .. yabai_direction_map[arrow_key])
   end)
 end
@@ -135,7 +128,7 @@ end
 --------------------
 --- Resize windows
 --------------------
-hotkey.bind({ "cmd", "ctrl" }, "=", function()
+hs.hotkey.bind({ "cmd", "ctrl" }, "=", function()
   task.run(yabai_path, {
     "-m",
     "window",
@@ -150,7 +143,7 @@ hotkey.bind({ "cmd", "ctrl" }, "=", function()
   })
 end)
 
-hotkey.bind({ "cmd", "ctrl" }, "-", function()
+hs.hotkey.bind({ "cmd", "ctrl" }, "-", function()
   task.run(yabai_path, {
     "-m",
     "window",
@@ -165,38 +158,38 @@ hotkey.bind({ "cmd", "ctrl" }, "-", function()
   })
 end)
 
-hotkey.bind({ "cmd", "ctrl", "alt", "shift" }, "up", function()
+hs.hotkey.bind({ "cmd", "ctrl", "alt", "shift" }, "up", function()
   task.run(yabai_path, "-m window --resize bottom:0:-50")
 end)
 
-hotkey.bind({ "cmd", "ctrl", "alt", "shift" }, "down", function()
+hs.hotkey.bind({ "cmd", "ctrl", "alt", "shift" }, "down", function()
   task.run(yabai_path, "-m window --resize bottom:0:50")
 end)
 
-hotkey.bind({ "cmd", "ctrl", "alt", "shift" }, "left", function()
+hs.hotkey.bind({ "cmd", "ctrl", "alt", "shift" }, "left", function()
   task.run(yabai_path, "-m window --resize right:-50:0")
 end)
 
-hotkey.bind({ "cmd", "ctrl", "alt", "shift" }, "right", function()
+hs.hotkey.bind({ "cmd", "ctrl", "alt", "shift" }, "right", function()
   task.run(yabai_path, "-m window --resize right:50:0")
 end)
 
-hotkey.bind({ "cmd", "ctrl" }, "E", function()
+hs.hotkey.bind({ "cmd", "ctrl" }, "E", function()
   task.run(yabai_path, "-m space --balance")
 end)
 
 --------------------
 -- Layouts
 --------------------
-hotkey.bind({ "cmd", "ctrl" }, "B", function()
+hs.hotkey.bind({ "cmd", "ctrl" }, "B", function()
   task.run(yabai_path, "-m space --layout bsp")
 end)
 
-hotkey.bind({ "cmd", "ctrl" }, "F", function()
+hs.hotkey.bind({ "cmd", "ctrl" }, "F", function()
   task.run(yabai_path, "-m space --layout float")
 end)
 
-hotkey.bind({ "cmd", "ctrl" }, "M", function()
+hs.hotkey.bind({ "cmd", "ctrl" }, "M", function()
   task.run(yabai_path, "-m space --layout stack")
 end)
 
@@ -206,7 +199,7 @@ for _, key in ipairs({ "V", "C" }) do
     C = "horizontal",
   }
 
-  hotkey.bind(
+  hs.hotkey.bind(
     { "cmd", "ctrl" },
     key,
     task.to_async(function(await)
@@ -223,3 +216,9 @@ for _, key in ipairs({ "V", "C" }) do
     end)
   )
 end
+
+local module = {}
+
+module.start = noop
+
+return module

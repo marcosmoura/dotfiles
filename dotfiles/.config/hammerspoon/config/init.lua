@@ -1,6 +1,4 @@
 local colors = require("config.utils.colors")
-local console = require("config.console")
-local hide_notch = require("config.hide-notch")
 local module = {}
 
 local load_spoons = function()
@@ -22,15 +20,40 @@ local load_spoons = function()
   spoon.SpoonInstall:andUse("ReloadConfiguration", {
     start = true,
   })
+  spoon.SpoonInstall:andUse("PopupTranslateSelection", {
+    config = {
+      popup_style = hs.webview.windowMasks.utility
+        | hs.webview.windowMasks.HUD
+        | hs.webview.windowMasks.titled
+        | hs.webview.windowMasks.closable
+        | hs.webview.windowMasks.resizable,
+    },
+    hotkeys = {
+      translate_to_en = { { "cmd", "alt", "ctrl" }, "t" },
+    },
+  })
   spoon.SpoonInstall:updateAllRepos()
 end
 
 module.setup = function()
-  console.catppuccinDarkMode()
+  require("config.console").catppuccinDarkMode()
+
   load_spoons()
-  require("config.hold-to-quit")
-  require("config.window-manager")
+
+  local caffeinate = require("config.caffeinate")
+  local caps_lock = require("config.caps-lock")
+  local hide_notch = require("config.hide-notch")
+  local hold_to_quit = require("config.hold-to-quit")
+  local window_manager = require("config.window-manager")
+  local audio = require("config.audio")
+
+  audio.start()
+  hold_to_quit.start()
+  window_manager.start()
   hide_notch.start()
+  caffeinate.start()
+  caps_lock.start()
+
   require("config.utils.alert").custom("Configuration Reloaded!", "settings.png")
 end
 

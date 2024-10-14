@@ -198,15 +198,23 @@ local generate_wallpaper_for_space = function()
   apply_wallpaper(screen, wallpaper_path)
 end
 
+local remove_wallpapers = function()
+  hs.execute("rm -rf " .. wallpaper_prefix_path)
+end
+
 local module = {}
+
+module.remove_wallpapers = remove_wallpapers
 
 module.start = function()
   generate_wallpaper_for_space()
   hs.spaces.watcher.new(generate_wallpaper_for_space):start()
-end
-
-module.remove_wallpapers = function()
-  hs.execute("rm -rf " .. wallpaper_prefix_path)
+  hs.screen.watcher
+    .new(function()
+      remove_wallpapers()
+      generate_wallpaper_for_space()
+    end)
+    :start()
 end
 
 return module
