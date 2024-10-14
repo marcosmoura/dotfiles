@@ -12,7 +12,7 @@ end
 config.font = wezterm.font_with_fallback({
   {
     family = "Maple Mono",
-    weight = 500,
+    weight = "Medium",
   },
   {
     family = "Symbols Nerd Font Mono",
@@ -22,6 +22,7 @@ config.font = wezterm.font_with_fallback({
     family = "Apple Color Emoji",
   },
 })
+config.cell_width = 0.95
 config.font_size = 17.1
 config.line_height = 1.3
 config.bold_brightens_ansi_colors = "BrightOnly"
