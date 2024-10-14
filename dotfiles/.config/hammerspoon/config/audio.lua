@@ -6,20 +6,21 @@ local on_audio_change = function()
   local dedicated_speakers = hs.audiodevice.findOutputByName("Speakers")
   local integrated_speakers = hs.audiodevice.findOutputByName("MacBook Pro Speakers")
   local current = hs.audiodevice.defaultOutputDevice()
+  local target = hs.audiodevice.defaultOutputDevice()
 
   if airpods then
-    current = airpods
+    target = airpods
   elseif audio_interface and dedicated_speakers then
-    current = dedicated_speakers
+    target = dedicated_speakers
   elseif integrated_speakers then
-    current = integrated_speakers
+    target = integrated_speakers
   end
 
-  if current then
-    current:setDefaultOutputDevice()
-    current:setDefaultEffectDevice()
+  if current and target and current:name() ~= target:name() then
+    target:setDefaultOutputDevice()
+    target:setDefaultEffectDevice()
 
-    print("Default output device set to " .. current:name())
+    print("Default output device set to " .. target:name())
   end
 end
 
