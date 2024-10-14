@@ -24,14 +24,12 @@ hs.alert.defaultStyle = tables.merge(hs.alert.defaultStyle, default_alert_style)
 local show_alert = function(message, icon_path, style, duration)
   local icon = icon_path and hs.image.imageFromPath(assets_path .. icon_path) or nil
 
-  if icon == nil then
-    return
-  end
+  if icon ~= nil then
+    local size = icon:size()
 
-  local size = icon:size()
-
-  if size.w > 32.0 or size.h > 32.0 then
-    icon = icon:setSize({ w = 32.0, h = 32.0 })
+    if size.w > 32.0 or size.h > 32.0 then
+      icon = icon:setSize({ w = 32.0, h = 32.0 })
+    end
   end
 
   hs.alert.showWithImage(message, icon, tables.merge(default_alert_style, style or {}), duration or 1)
