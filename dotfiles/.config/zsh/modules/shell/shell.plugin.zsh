@@ -17,7 +17,6 @@ alias egrep='egrep --color=auto'
 # sudo editors
 alias vim='nvim'
 alias svim='sudo nvim'
-alias l='lvim'
 alias slvim='sudo lvim'
 alias snano='sudo nano'
 
