@@ -1,5 +1,7 @@
 local wallpaper_prefix_path = "/tmp/hammerspoon-wallpapers/"
 
+local wallpaper_name_map = {}
+
 local function get_corner_data(raw_frame, radius, menubar_height)
   local frame = {
     x = raw_frame.x,
@@ -167,7 +169,7 @@ end
 local generate_wallpaper_for_space = function()
   local screen = hs.window.focusedWindow():screen()
   local current_space = get_space_index(screen, hs.spaces.activeSpaceOnScreen(screen))
-  local wallpaper_path = wallpaper_prefix_path .. current_space .. ".jpg"
+  local wallpaper_path = wallpaper_prefix_path .. wallpaper_name_map[current_space] .. ".jpg"
 
   ensure_wallpaper_dir()
 
@@ -196,11 +198,25 @@ local remove_wallpapers = function()
   hs.execute("rm -rf " .. wallpaper_prefix_path)
 end
 
+local generate_wallpaper_uuids = function()
+  local spaces = hs.spaces.allSpaces()
+
+  if spaces == nil then
+    return
+  end
+
+  for index, _ in ipairs(spaces[hs.window.focusedWindow():screen():getUUID()]) do
+    wallpaper_name_map[index] = hs.host.uuid()
+  end
+end
+
 local module = {}
 
 module.remove_wallpapers = remove_wallpapers
 
 module.start = function()
+  remove_wallpapers()
+  generate_wallpaper_uuids()
   generate_wallpaper_for_space()
   hs.spaces.watcher.new(generate_wallpaper_for_space):start()
   hs.screen.watcher

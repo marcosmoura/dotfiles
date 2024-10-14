@@ -1,5 +1,5 @@
-local hide_notch = require("config.hide-notch")
 local task = require("config.utils.task")
+local wallpaper = require("config.wallpaper")
 
 local noop = function() end
 local yabai_path = "/opt/homebrew/bin/yabai"
@@ -28,7 +28,7 @@ hs.hotkey.bind({ "cmd", "alt" }, "H", noop)
 local reload_tools = task.to_async(function(await)
   await(task.run(yabai_path, "--restart-service"))
   await(task.run("/opt/homebrew/bin/node", "~/.config/zsh/modules/yabai/bin/wallpaper-manager clean"))
-  hide_notch.remove_wallpapers()
+  wallpaper.remove_wallpapers()
   hs.reload()
 end)
 
