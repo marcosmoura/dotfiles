@@ -1,4 +1,5 @@
 local alert = require("config.utils.alert")
+local assets = require("config.utils.assets")
 
 local module = {}
 local assets_path = "~/.config/hammerspoon/assets/"
@@ -11,20 +12,16 @@ local update_menubar = function(show_alert)
   end
 
   local state = hs.caffeinate.get("displayIdle")
-  local icon_name = "mug" .. (state and "-filled" or "") .. ".png"
-  local icon = hs.image.imageFromPath(assets_path .. icon_name)
+  local menubar_icon = state and assets.mugFilledSmall or assets.mugSmall
   local message = "Caffeinate is " .. (state and "enabled" or "disabled") .. "!"
 
-  if icon == nil then
-    return
-  end
-
-  icon = icon:setSize({ w = 16, h = 16 })
-  menubar_item:setIcon(icon)
+  menubar_item:setIcon(menubar_icon)
   menubar_item:setTooltip(message)
 
   if show_alert then
-    alert.custom(message, icon_name)
+    local alert_icon = state and assets.mugFilled or assets.mug
+
+    alert.custom(message, alert_icon)
   end
 end
 

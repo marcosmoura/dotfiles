@@ -1,8 +1,8 @@
+local assets = require("config.utils.assets")
 local colors = require("config.utils.colors")
-local tables = require("jls.util.tables")
+local deepMerge = require("config.utils.deepMerge")
 
 local module = {}
-local assets_path = "~/.config/hammerspoon/assets/"
 
 local default_alert_style = {
   fadeInDuration = 0.2,
@@ -19,44 +19,34 @@ local default_alert_style = {
   textColor = { hex = colors.text.hex },
 }
 
-hs.alert.defaultStyle = tables.merge(hs.alert.defaultStyle, default_alert_style)
+hs.alert.defaultStyle = deepMerge(hs.alert.defaultStyle, default_alert_style)
 
-local show_alert = function(message, icon_path, style, duration)
-  local icon = icon_path and hs.image.imageFromPath(assets_path .. icon_path) or nil
-
-  if icon ~= nil then
-    local size = icon:size()
-
-    if size.w > 32.0 or size.h > 32.0 then
-      icon = icon:setSize({ w = 32.0, h = 32.0 })
-    end
-  end
-
-  hs.alert.showWithImage(message, icon, tables.merge(default_alert_style, style or {}), duration or 1)
+local show_alert = function(message, image, style, duration)
+  hs.alert.showWithImage(message, image, deepMerge(default_alert_style, style or {}), duration or 1)
 end
 
 module.info = function(message, duration)
-  show_alert(message, "info.png", nil, duration)
+  show_alert(message, assets.info, nil, duration)
 end
 
 module.error = function(message, duration)
-  show_alert(message, "error.png", {
+  show_alert(message, assets.error, {
     fillColor = { hex = colors.red.hex },
-    textColor = { hex = colors.text.hex },
+    textColor = { hex = colors.crust.hex },
   }, duration)
 end
 
 module.success = function(message, duration)
-  show_alert(message, "success.png", {
+  show_alert(message, assets.success, {
     fillColor = { hex = colors.green.hex },
-    textColor = { hex = colors.text.hex },
+    textColor = { hex = colors.crust.hex },
   }, duration)
 end
 
 module.warning = function(message, duration)
-  show_alert(message, "warning.png", {
-    fillColor = { hex = colors.orange.hex },
-    textColor = { hex = colors.text.hex },
+  show_alert(message, assets.warning, {
+    fillColor = { hex = colors.peach.hex },
+    textColor = { hex = colors.crust.hex },
   }, duration)
 end
 

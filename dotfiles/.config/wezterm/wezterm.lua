@@ -46,10 +46,10 @@ config.allow_square_glyphs_to_overflow_width = "Always"
 -- [[ WINDOW AND PANES CONFIGURATION ]]
 --
 config.window_padding = {
-  left = 24,
-  right = 24,
-  top = 8,
-  bottom = 8,
+  left = "3cell",
+  right = "3cell",
+  top = "8px",
+  bottom = "8px",
 }
 config.window_frame = {
   border_left_width = 0,

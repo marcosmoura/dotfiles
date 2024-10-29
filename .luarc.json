@@ -1,6 +1,9 @@
 {
   "$schema": "https://raw.githubusercontent.com/sumneko/vscode-lua/master/setting/schema.json",
   "Lua.workspace.checkThirdParty": false,
-  "diagnostics.globals": ["vim", "ls"],
-  "completion.autoRequire": false
+  "diagnostics.globals": ["vim", "ls", "hs", "DEBUG"],
+    "completion.autoRequire": false,
+    "diagnostics.disable": [
+        "unused-function"
+    ]
 }

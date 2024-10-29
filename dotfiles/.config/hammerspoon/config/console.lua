@@ -1,5 +1,4 @@
 local colors = require("config.utils.colors")
-local tables = require("jls.util.tables")
 local green = colors.green.hex
 
 local module = {}
@@ -15,7 +14,7 @@ local print_available_colors = function()
   print(table.concat(color_names, ", "))
 end
 
-module.catppuccinDarkMode = function(print_colors)
+module.start = function()
   hs.console.outputBackgroundColor({ hex = colors.crust.hex })
   hs.console.consolePrintColor({ hex = green })
   hs.console.consoleResultColor({ hex = green })
@@ -25,9 +24,10 @@ module.catppuccinDarkMode = function(print_colors)
   hs.console.darkMode(true)
   hs.console.clearConsole()
 
-  if print_colors then
+  if DEBUG then
+    print("Catppuccin Dark Mode Enabled")
     print_available_colors()
   end
 end
 
-return tables.merge(hs.console, module)
+return module
