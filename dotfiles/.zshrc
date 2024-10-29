@@ -75,6 +75,9 @@ source <(fzf --zsh)
 # Direnv
 eval "$(direnv hook zsh)"
 
+# Luarocks
+eval "$(luarocks path)"
+
 # Clear screen
 clear
 systeminfo

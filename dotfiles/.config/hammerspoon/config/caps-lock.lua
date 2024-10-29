@@ -1,7 +1,9 @@
+local execute = require("config.utils.execute")
+
 local module = {}
 
 module.start = function()
-  local status = os.execute(
+  local status = execute(
     'hidutil property --set \'{"UserKeyMapping":[{"HIDKeyboardModifierMappingSrc": 0x700000039, "HIDKeyboardModifierMappingDst": 0x7000000E3}]}\''
   )
 

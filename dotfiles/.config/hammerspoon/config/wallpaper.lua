@@ -1,3 +1,4 @@
+local execute = require("config.utils.execute")
 local wallpaper_prefix_path = "/tmp/hammerspoon-wallpapers/"
 
 local wallpaper_name_map = {}
@@ -96,7 +97,7 @@ end
 
 local ensure_wallpaper_dir = function()
   if hs.fs.attributes(wallpaper_prefix_path) == nil then
-    hs.execute("mkdir -p " .. wallpaper_prefix_path)
+    execute("mkdir -p " .. wallpaper_prefix_path)
   end
 end
 
@@ -120,7 +121,7 @@ end
 
 local create_wallpaper_with_corners = function(image, screen)
   local screen_frame = screen:fullFrame()
-  local menubar_height = screen:frame().y - 1
+  local menubar_height = screen:frame().y
   local radius = 16
 
   local corner_data = get_corner_data(screen_frame, radius, menubar_height)
@@ -163,7 +164,7 @@ local get_space_index = function(screen, space_id)
 end
 
 local apply_wallpaper = function(path)
-  hs.execute('osascript -e \'tell application "Finder" to set desktop picture to POSIX file "' .. path .. "\"'")
+  hs.osascript.applescript('tell application "Finder" to set desktop picture to POSIX file "' .. path .. '"')
 end
 
 local generate_wallpaper_for_space = function()
@@ -195,7 +196,7 @@ local generate_wallpaper_for_space = function()
 end
 
 local remove_wallpapers = function()
-  hs.execute("rm -rf " .. wallpaper_prefix_path)
+  execute("rm -rf " .. wallpaper_prefix_path)
 end
 
 local generate_wallpaper_uuids = function()
@@ -217,7 +218,6 @@ module.remove_wallpapers = remove_wallpapers
 module.start = function()
   remove_wallpapers()
   generate_wallpaper_uuids()
-  generate_wallpaper_for_space()
   hs.spaces.watcher.new(generate_wallpaper_for_space):start()
   hs.screen.watcher
     .new(function()
