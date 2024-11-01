@@ -3,15 +3,15 @@ local green = colors.green.hex
 
 local module = {}
 
-local print_available_colors = function()
-  local color_names = {}
+local printAvailableColors = function()
+  local colorNames = {}
 
   for k, _ in pairs(colors) do
-    table.insert(color_names, k)
+    table.insert(colorNames, k)
   end
 
   print("Available Catppuccin palette colors:")
-  print(table.concat(color_names, ", "))
+  print(table.concat(colorNames, ", "))
 end
 
 module.start = function()
@@ -26,7 +26,7 @@ module.start = function()
 
   if DEBUG then
     print("Catppuccin Dark Mode Enabled")
-    print_available_colors()
+    printAvailableColors()
   end
 end
 

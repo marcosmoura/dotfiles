@@ -1,9 +1,7 @@
-local module = {}
-
-local assets_path = "~/.config/hammerspoon/assets/"
+local assetsPath = "~/.config/hammerspoon/assets/"
 
 local prepareIcon = function(path, size)
-  local icon = path and hs.image.imageFromPath(assets_path .. path) or nil
+  local icon = path and hs.image.imageFromPath(assetsPath .. path) or nil
 
   if icon ~= nil then
     local iconSize = icon:size()

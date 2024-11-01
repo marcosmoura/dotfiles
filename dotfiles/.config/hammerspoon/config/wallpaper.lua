@@ -1,14 +1,14 @@
 local execute = require("config.utils.execute")
-local wallpaper_prefix_path = "/tmp/hammerspoon-wallpapers/"
+local wallpaperPrefixPath = "/tmp/hammerspoon-wallpapers/"
 
-local wallpaper_name_map = {}
+local wallpaperNameMap = {}
 
-local function get_corner_data(raw_frame, radius, menubar_height)
+local function getCornerData(rawFrame, radius, menubarHeight)
   local frame = {
-    x = raw_frame.x,
-    y = raw_frame.y,
-    w = raw_frame.w,
-    h = raw_frame.h,
+    x = rawFrame.x,
+    y = rawFrame.y,
+    w = rawFrame.w,
+    h = rawFrame.h,
   }
 
   local cornerData = {
@@ -27,12 +27,12 @@ local function get_corner_data(raw_frame, radius, menubar_height)
     },
   }
 
-  if menubar_height ~= 0 then
+  if menubarHeight ~= 0 then
     cornerData[#cornerData + 1] =
-      { frame = { x = frame.x, y = menubar_height }, center = { x = radius, y = radius + menubar_height } }
+      { frame = { x = frame.x, y = menubarHeight }, center = { x = radius, y = radius + menubarHeight } }
     cornerData[#cornerData + 1] = {
-      frame = { x = frame.x + frame.w - radius, y = menubar_height },
-      center = { x = frame.x + frame.w - radius, y = radius + menubar_height },
+      frame = { x = frame.x + frame.w - radius, y = menubarHeight },
+      center = { x = frame.x + frame.w - radius, y = radius + menubarHeight },
     }
     cornerData[#cornerData + 1] = {
       frame = { x = frame.x, y = frame.y + frame.h - radius },
@@ -47,7 +47,7 @@ local function get_corner_data(raw_frame, radius, menubar_height)
   return cornerData
 end
 
-local function get_elements(image, frame, corner_data, radius, menubar_height)
+local function getElements(image, frame, cornerData, radius, menubarHeight)
   local elements = {}
 
   elements[#elements + 1] = {
@@ -61,7 +61,7 @@ local function get_elements(image, frame, corner_data, radius, menubar_height)
     },
   }
 
-  for _, data in pairs(corner_data) do
+  for _, data in pairs(cornerData) do
     elements[#elements + 1] = { action = "build", type = "rectangle" }
     elements[#elements + 1] = {
       action = "clip",
@@ -81,11 +81,11 @@ local function get_elements(image, frame, corner_data, radius, menubar_height)
     elements[#elements + 1] = { type = "resetClip" }
   end
 
-  if menubar_height ~= 0 then
+  if menubarHeight ~= 0 then
     elements[#elements + 1] = {
       action = "fill",
       type = "rectangle",
-      frame = { x = 0, y = 0, w = frame.w, h = menubar_height },
+      frame = { x = 0, y = 0, w = frame.w, h = menubarHeight },
       fillColor = {
         hex = "#000000",
       },
@@ -95,20 +95,20 @@ local function get_elements(image, frame, corner_data, radius, menubar_height)
   return elements
 end
 
-local ensure_wallpaper_dir = function()
-  if hs.fs.attributes(wallpaper_prefix_path) == nil then
-    execute("mkdir -p " .. wallpaper_prefix_path)
+local ensureWallpaperDir = function()
+  if hs.fs.attributes(wallpaperPrefixPath) == nil then
+    execute("mkdir -p " .. wallpaperPrefixPath)
   end
 end
 
-local get_wallpaper = function(current_space, screen)
-  local wallpaper_path = "~/.config/wallpapers/" .. current_space .. ".jpg"
+local getWallpaper = function(currentSpace, screen)
+  local wallpaperPath = "~/.config/wallpapers/" .. currentSpace .. ".jpg"
 
-  if hs.fs.attributes(wallpaper_path) == nil then
+  if hs.fs.attributes(wallpaperPath) == nil then
     return
   end
 
-  local image = hs.image.imageFromPath(wallpaper_path)
+  local image = hs.image.imageFromPath(wallpaperPath)
 
   if image == nil then
     return
@@ -119,43 +119,43 @@ local get_wallpaper = function(current_space, screen)
   return image
 end
 
-local create_wallpaper_with_corners = function(image, screen)
-  local screen_frame = screen:fullFrame()
-  local menubar_height = screen:frame().y
+local createWallpaperWithCorners = function(image, screen)
+  local screenFrame = screen:fullFrame()
+  local menubarHeight = screen:frame().y
   local radius = 16
 
-  local corner_data = get_corner_data(screen_frame, radius, menubar_height)
-  local elements = get_elements(image, screen_frame, corner_data, radius, menubar_height)
+  local cornerData = getCornerData(screenFrame, radius, menubarHeight)
+  local elements = getElements(image, screenFrame, cornerData, radius, menubarHeight)
 
-  local wallpaper_with_corners = hs.canvas.new({
-    x = screen_frame.x,
-    y = screen_frame.y,
-    w = screen_frame.w,
-    h = screen_frame.h,
+  local wallpaperWithCorners = hs.canvas.new({
+    x = screenFrame.x,
+    y = screenFrame.y,
+    w = screenFrame.w,
+    h = screenFrame.h,
   })
 
-  if wallpaper_with_corners == nil then
+  if wallpaperWithCorners == nil then
     return
   end
 
-  wallpaper_with_corners
+  wallpaperWithCorners
     :appendElements(elements)
     :behavior(hs.canvas.windowBehaviors.canJoinAllSpaces)
     :level(hs.canvas.windowLevels.desktopIcon)
 
-  return wallpaper_with_corners:imageFromCanvas()
+  return wallpaperWithCorners:imageFromCanvas()
 end
 
-local get_space_index = function(screen, space_id)
-  local all_spaces = hs.spaces.allSpaces()
-  local screen_uuid = screen:getUUID()
+local getSpaceIndex = function(screen, spaceId)
+  local allSpaces = hs.spaces.allSpaces()
+  local screenUuid = screen:getUUID()
 
-  if all_spaces == nil or all_spaces[screen_uuid] == nil then
+  if allSpaces == nil or allSpaces[screenUuid] == nil then
     return 0
   end
 
-  for index, space in ipairs(all_spaces[screen_uuid]) do
-    if space == space_id then
+  for index, space in ipairs(allSpaces[screenUuid]) do
+    if space == spaceId then
       return index
     end
   end
@@ -163,43 +163,43 @@ local get_space_index = function(screen, space_id)
   return 0
 end
 
-local apply_wallpaper = function(path)
+local applyWallpaper = function(path)
   hs.osascript.applescript('tell application "Finder" to set desktop picture to POSIX file "' .. path .. '"')
 end
 
-local generate_wallpaper_for_space = function()
+local generateWallpaperForSpace = function()
   local screen = hs.window.focusedWindow():screen()
-  local current_space = get_space_index(screen, hs.spaces.activeSpaceOnScreen(screen))
-  local wallpaper_path = wallpaper_prefix_path .. wallpaper_name_map[current_space] .. ".jpg"
+  local currentSpace = getSpaceIndex(screen, hs.spaces.activeSpaceOnScreen(screen))
+  local wallpaperPath = wallpaperPrefixPath .. wallpaperNameMap[currentSpace] .. ".jpg"
 
-  ensure_wallpaper_dir()
+  ensureWallpaperDir()
 
-  if hs.fs.attributes(wallpaper_path) then
-    apply_wallpaper(wallpaper_path)
+  if hs.fs.attributes(wallpaperPath) then
+    applyWallpaper(wallpaperPath)
     return
   end
 
-  local raw_wallpaper = get_wallpaper(current_space, screen)
+  local rawWallpaper = getWallpaper(currentSpace, screen)
 
-  if raw_wallpaper == nil then
+  if rawWallpaper == nil then
     return
   end
 
-  local wallpaper_with_corners = create_wallpaper_with_corners(raw_wallpaper, screen)
+  local wallpaperWithCorners = createWallpaperWithCorners(rawWallpaper, screen)
 
-  if wallpaper_with_corners == nil then
+  if wallpaperWithCorners == nil then
     return
   end
 
-  wallpaper_with_corners:saveToFile(wallpaper_path)
-  apply_wallpaper(wallpaper_path)
+  wallpaperWithCorners:saveToFile(wallpaperPath)
+  applyWallpaper(wallpaperPath)
 end
 
-local remove_wallpapers = function()
-  execute("rm -rf " .. wallpaper_prefix_path)
+local removeWallpapers = function()
+  execute("rm -rf " .. wallpaperPrefixPath)
 end
 
-local generate_wallpaper_uuids = function()
+local generateWallpaperUuids = function()
   local spaces = hs.spaces.allSpaces()
 
   if spaces == nil then
@@ -207,22 +207,22 @@ local generate_wallpaper_uuids = function()
   end
 
   for index, _ in ipairs(spaces[hs.window.focusedWindow():screen():getUUID()]) do
-    wallpaper_name_map[index] = hs.host.uuid()
+    wallpaperNameMap[index] = hs.host.uuid()
   end
 end
 
 local module = {}
 
-module.remove_wallpapers = remove_wallpapers
+module.removeWallpapers = removeWallpapers
 
 module.start = function()
-  remove_wallpapers()
-  generate_wallpaper_uuids()
-  hs.spaces.watcher.new(generate_wallpaper_for_space):start()
+  removeWallpapers()
+  generateWallpaperUuids()
+  hs.spaces.watcher.new(generateWallpaperForSpace):start()
   hs.screen.watcher
     .new(function()
-      remove_wallpapers()
-      generate_wallpaper_for_space()
+      removeWallpapers()
+      generateWallpaperForSpace()
     end)
     :start()
 end
