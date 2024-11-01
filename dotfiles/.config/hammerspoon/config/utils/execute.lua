@@ -1,4 +1,4 @@
-local function execute(command_path, args, opts)
+local function execute(commandPath, args, opts)
   local arguments = args or ""
   local options = opts or {}
 
@@ -10,7 +10,7 @@ local function execute(command_path, args, opts)
     arguments = table.concat(args, " ")
   end
 
-  local command = command_path .. " " .. arguments
+  local command = commandPath .. " " .. arguments
   local output, status = hs.execute(command)
 
   if options.json then

@@ -1,15 +1,14 @@
-local execute = require("config.utils.execute")
 local executeYabai = require("config.utils.executeYabai")
 local wallpaper = require("config.wallpaper")
 
 local noop = function() end
-local yabai_direction_map = {
+local yabaiDirectionMap = {
   up = "north",
   right = "east",
   down = "south",
   left = "west",
 }
-local yabai_grid_map = {
+local yabaiGridMap = {
   up = "1:1:0:0:1:1",
   right = "1:2:1:0:1:1",
   down = "2560:2560:320:320:1920:1920",
@@ -25,14 +24,14 @@ hs.hotkey.bind({ "cmd", "alt" }, "H", noop)
 --------------------
 -- Misc
 --------------------
-local reload_tools = function()
+local reloadTools = function()
   executeYabai("--restart-service")
   hs.reload()
-  wallpaper.remove_wallpapers()
+  wallpaper.removeWallpapers()
 end
 
-hs.hotkey.bind({ "cmd", "ctrl" }, "Y", reload_tools)
-hs.hotkey.bind({ "cmd", "ctrl" }, "R", reload_tools)
+hs.hotkey.bind({ "cmd", "ctrl" }, "Y", reloadTools)
+hs.hotkey.bind({ "cmd", "ctrl" }, "R", reloadTools)
 
 hs.hotkey.bind({ "cmd", "ctrl" }, "L", function()
   hs.caffeinate.lockScreen()
@@ -103,6 +102,7 @@ hs.hotkey.bind({ "cmd", "ctrl", "alt" }, "escape", function()
       end if
     end getIndexOfItem:inList:
   ]])
+
   hs.osascript.applescript([[
     tell application "System Events" to tell application process "NotificationCenter"
       try
@@ -115,63 +115,63 @@ end)
 --------------------
 -- Move windows
 --------------------
-for _, arrow_key in ipairs({ "up", "down", "left", "right" }) do
-  hs.hotkey.bind({ "cmd", "ctrl" }, arrow_key, function()
+for _, arrowKey in ipairs({ "up", "down", "left", "right" }) do
+  hs.hotkey.bind({ "cmd", "ctrl" }, arrowKey, function()
     local window = executeYabai("-m query --windows --window", { json = true })
-    local is_floating = window["is-floating"]
+    local isFloating = window["is-floating"]
 
-    if is_floating then
-      executeYabai({ "-m window --grid", yabai_grid_map[arrow_key] })
+    if isFloating then
+      executeYabai({ "-m window --grid", yabaiGridMap[arrowKey] })
       return
     end
 
-    executeYabai({ "-m window --swap", yabai_direction_map[arrow_key] })
+    executeYabai({ "-m window --swap", yabaiDirectionMap[arrowKey] })
   end)
 end
 
 --------------------
 --- Move windows between displays
 --------------------
-for _, arrow_key in ipairs({ "left", "right" }) do
-  hs.hotkey.bind({ "cmd", "ctrl", "alt" }, arrow_key, function()
-    local hammerspoon_direction_map = {
+for _, arrowKey in ipairs({ "left", "right" }) do
+  hs.hotkey.bind({ "cmd", "ctrl", "alt" }, arrowKey, function()
+    local hammerspoonDirectionMap = {
       left = "moveOneScreenWest",
       right = "moveOneScreenEast",
     }
 
-    hs.window.focusedWindow()[hammerspoon_direction_map[arrow_key]]()
+    hs.window.focusedWindow()[hammerspoonDirectionMap[arrowKey]]()
   end)
 end
 
 --------------------
 --- Focus windows
 --------------------
-for _, arrow_key in ipairs({ "up", "down", "left", "right" }) do
-  hs.hotkey.bind({ "cmd", "ctrl", "shift" }, arrow_key, function()
-    local hammerspoon_direction_map = {
+for _, arrowKey in ipairs({ "up", "down", "left", "right" }) do
+  hs.hotkey.bind({ "cmd", "ctrl", "shift" }, arrowKey, function()
+    local hammerspoonDirectionMap = {
       up = "focusWindowNorth",
       right = "focusWindowEast",
       down = "focusWindowSouth",
       left = "focusWindowWest",
     }
 
-    hs.window.focusedWindow()[hammerspoon_direction_map[arrow_key]]()
+    hs.window.focusedWindow()[hammerspoonDirectionMap[arrowKey]]()
   end)
 end
 
 local cycleWindows = function(direction)
   local windows = hs.window.orderedWindows()
-  local focused_window = hs.window.focusedWindow()
-  local focused_window_index = hs.fnutils.indexOf(windows, focused_window)
-  local next_window_index = focused_window_index + direction
+  local focusedWindow = hs.window.focusedWindow()
+  local focusedWindowIndex = hs.fnutils.indexOf(windows, focusedWindow)
+  local nextWindowIndex = focusedWindowIndex + direction
 
-  if next_window_index < 1 then
-    next_window_index = #windows
-  elseif next_window_index > #windows then
-    next_window_index = 1
+  if nextWindowIndex < 1 then
+    nextWindowIndex = #windows
+  elseif nextWindowIndex > #windows then
+    nextWindowIndex = 1
   end
 
-  windows[next_window_index]:focus()
+  windows[nextWindowIndex]:focus()
 end
 
 hs.hotkey.bind({ "cmd" }, "`", function()
@@ -185,9 +185,9 @@ end)
 --------------------
 --- Focus monitors
 --------------------
-for _, arrow_key in ipairs({ "left", "right" }) do
-  hs.hotkey.bind({ "cmd", "alt", "shift" }, arrow_key, function()
-    executeYabai({ "-m display --focus", yabai_direction_map[arrow_key] })
+for _, arrowKey in ipairs({ "left", "right" }) do
+  hs.hotkey.bind({ "cmd", "alt", "shift" }, arrowKey, function()
+    executeYabai({ "-m display --focus", yabaiDirectionMap[arrowKey] })
   end)
 end
 
@@ -260,17 +260,17 @@ hs.hotkey.bind({ "cmd", "ctrl" }, "M", function()
 end)
 
 for _, key in ipairs({ "V", "C" }) do
-  local direction_map = {
+  local directionMap = {
     V = "vertical",
     C = "horizontal",
   }
 
   hs.hotkey.bind({ "cmd", "ctrl" }, key, function()
     local window = executeYabai("-m query --windows --window", { json = true })
-    local split_type = window["split-type"]
-    local is_current_layout = split_type ~= direction_map[key]
+    local splitType = window["split-type"]
+    local isCurrentLayout = splitType ~= directionMap[key]
 
-    if is_current_layout then
+    if isCurrentLayout then
       return
     end
 

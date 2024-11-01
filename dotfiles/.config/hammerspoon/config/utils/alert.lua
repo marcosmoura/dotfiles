@@ -4,7 +4,7 @@ local deepMerge = require("config.utils.deepMerge")
 
 local module = {}
 
-local default_alert_style = {
+local defaultAlertStyle = {
   fadeInDuration = 0.2,
   fadeOutDuration = 0.2,
 
@@ -19,39 +19,39 @@ local default_alert_style = {
   textColor = { hex = colors.text.hex },
 }
 
-hs.alert.defaultStyle = deepMerge(hs.alert.defaultStyle, default_alert_style)
+hs.alert.defaultStyle = deepMerge(hs.alert.defaultStyle, defaultAlertStyle)
 
-local show_alert = function(message, image, style, duration)
-  hs.alert.showWithImage(message, image, deepMerge(default_alert_style, style or {}), duration or 1)
+local showAlert = function(message, image, style, duration)
+  hs.alert.showWithImage(message, image, deepMerge(defaultAlertStyle, style or {}), duration or 1)
 end
 
 module.info = function(message, duration)
-  show_alert(message, assets.info, nil, duration)
+  showAlert(message, assets.info, nil, duration)
 end
 
 module.error = function(message, duration)
-  show_alert(message, assets.error, {
+  showAlert(message, assets.error, {
     fillColor = { hex = colors.red.hex },
     textColor = { hex = colors.crust.hex },
   }, duration)
 end
 
 module.success = function(message, duration)
-  show_alert(message, assets.success, {
+  showAlert(message, assets.success, {
     fillColor = { hex = colors.green.hex },
     textColor = { hex = colors.crust.hex },
   }, duration)
 end
 
 module.warning = function(message, duration)
-  show_alert(message, assets.warning, {
+  showAlert(message, assets.warning, {
     fillColor = { hex = colors.peach.hex },
     textColor = { hex = colors.crust.hex },
   }, duration)
 end
 
-module.custom = function(message, icon_path, config, duration)
-  show_alert(message, icon_path, config, duration)
+module.custom = function(message, iconPath, config, duration)
+  showAlert(message, iconPath, config, duration)
 end
 
 return module
