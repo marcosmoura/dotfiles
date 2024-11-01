@@ -159,26 +159,27 @@ for _, arrow_key in ipairs({ "up", "down", "left", "right" }) do
   end)
 end
 
-hs.hotkey.bind({ "cmd" }, "`", function()
+local cycleWindows = function(direction)
   local windows = hs.window.orderedWindows()
   local focused_window = hs.window.focusedWindow()
+  local focused_window_index = hs.fnutils.indexOf(windows, focused_window)
+  local next_window_index = focused_window_index + direction
 
-  if focused_window == nil then
-    return
+  if next_window_index < 1 then
+    next_window_index = #windows
+  elseif next_window_index > #windows then
+    next_window_index = 1
   end
 
-  local focused_window_id = hs.window.focusedWindow():id()
-  local focused_window_index = 0
+  windows[next_window_index]:focus()
+end
 
-  for index, window in ipairs(windows) do
-    if window:id() == focused_window_id then
-      focused_window_index = index
-      break
-    end
-  end
+hs.hotkey.bind({ "cmd" }, "`", function()
+  cycleWindows(-1)
+end)
 
-  local target_window = windows[focused_window_index - 1] or windows[#windows]
-  target_window:focus()
+hs.hotkey.bind({ "cmd", "shift" }, "`", function()
+  cycleWindows(1)
 end)
 
 --------------------
