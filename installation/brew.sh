@@ -112,8 +112,6 @@ brew install rustup
 brew install sheldon
 brew install shellcheck
 brew install shfmt
-brew install sketchybar
-brew install skhd
 brew install starship
 brew install tealdeer
 brew install terminal-notifier
