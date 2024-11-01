@@ -1,8 +1,8 @@
 local execute = require("config.utils.execute")
+local executeYabai = require("config.utils.executeYabai")
 local wallpaper = require("config.wallpaper")
 
 local noop = function() end
-local yabai_path = "/opt/homebrew/bin/yabai"
 local yabai_direction_map = {
   up = "north",
   right = "east",
@@ -26,8 +26,7 @@ hs.hotkey.bind({ "cmd", "alt" }, "H", noop)
 -- Misc
 --------------------
 local reload_tools = function()
-  execute(yabai_path, "--restart-service")
-  execute("/opt/homebrew/bin/node ~/.config/zsh/modules/yabai/bin/wallpaper-manager clean")
+  executeYabai("--restart-service")
   hs.reload()
   wallpaper.remove_wallpapers()
 end
@@ -118,15 +117,15 @@ end)
 --------------------
 for _, arrow_key in ipairs({ "up", "down", "left", "right" }) do
   hs.hotkey.bind({ "cmd", "ctrl" }, arrow_key, function()
-    local window = execute(yabai_path, "-m query --windows --window", { json = true })
+    local window = executeYabai("-m query --windows --window", { json = true })
     local is_floating = window["is-floating"]
 
     if is_floating then
-      execute(yabai_path, { "-m window --grid", yabai_grid_map[arrow_key] })
+      executeYabai({ "-m window --grid", yabai_grid_map[arrow_key] })
       return
     end
 
-    execute(yabai_path, { "-m window --swap", yabai_direction_map[arrow_key] })
+    executeYabai({ "-m window --swap", yabai_direction_map[arrow_key] })
   end)
 end
 
@@ -187,7 +186,7 @@ end)
 --------------------
 for _, arrow_key in ipairs({ "left", "right" }) do
   hs.hotkey.bind({ "cmd", "alt", "shift" }, arrow_key, function()
-    execute(yabai_path, { "-m display --focus", yabai_direction_map[arrow_key] })
+    executeYabai({ "-m display --focus", yabai_direction_map[arrow_key] })
   end)
 end
 
@@ -195,7 +194,7 @@ end
 --- Resize windows
 --------------------
 hs.hotkey.bind({ "cmd", "ctrl" }, "=", function()
-  execute(yabai_path, {
+  executeYabai({
     "-m",
     "window",
     "--resize",
@@ -210,7 +209,7 @@ hs.hotkey.bind({ "cmd", "ctrl" }, "=", function()
 end)
 
 hs.hotkey.bind({ "cmd", "ctrl" }, "-", function()
-  execute(yabai_path, {
+  executeYabai({
     "-m",
     "window",
     "--resize",
@@ -225,38 +224,38 @@ hs.hotkey.bind({ "cmd", "ctrl" }, "-", function()
 end)
 
 hs.hotkey.bind({ "cmd", "ctrl", "alt", "shift" }, "up", function()
-  execute(yabai_path, "-m window --resize bottom:0:-50")
+  executeYabai("-m window --resize bottom:0:-50")
 end)
 
 hs.hotkey.bind({ "cmd", "ctrl", "alt", "shift" }, "down", function()
-  execute(yabai_path, "-m window --resize bottom:0:50")
+  executeYabai("-m window --resize bottom:0:50")
 end)
 
 hs.hotkey.bind({ "cmd", "ctrl", "alt", "shift" }, "left", function()
-  execute(yabai_path, "-m window --resize right:-50:0")
+  executeYabai("-m window --resize right:-50:0")
 end)
 
 hs.hotkey.bind({ "cmd", "ctrl", "alt", "shift" }, "right", function()
-  execute(yabai_path, "-m window --resize right:50:0")
+  executeYabai("-m window --resize right:50:0")
 end)
 
 hs.hotkey.bind({ "cmd", "ctrl" }, "E", function()
-  execute(yabai_path, "-m space --balance")
+  executeYabai("-m space --balance")
 end)
 
 --------------------
 -- Layouts
 --------------------
 hs.hotkey.bind({ "cmd", "ctrl" }, "B", function()
-  execute(yabai_path, "-m space --layout bsp")
+  executeYabai("-m space --layout bsp")
 end)
 
 hs.hotkey.bind({ "cmd", "ctrl" }, "F", function()
-  execute(yabai_path, "-m space --layout float")
+  executeYabai("-m space --layout float")
 end)
 
 hs.hotkey.bind({ "cmd", "ctrl" }, "M", function()
-  execute(yabai_path, "-m space --layout stack")
+  executeYabai("-m space --layout stack")
 end)
 
 for _, key in ipairs({ "V", "C" }) do
@@ -266,7 +265,7 @@ for _, key in ipairs({ "V", "C" }) do
   }
 
   hs.hotkey.bind({ "cmd", "ctrl" }, key, function()
-    local window = execute(yabai_path, "-m query --windows --window", { json = true })
+    local window = executeYabai("-m query --windows --window", { json = true })
     local split_type = window["split-type"]
     local is_current_layout = split_type ~= direction_map[key]
 
@@ -274,8 +273,8 @@ for _, key in ipairs({ "V", "C" }) do
       return
     end
 
-    execute(yabai_path, "-m window --toggle split")
-    execute(yabai_path, "-m space --balance")
+    executeYabai("-m window --toggle split")
+    executeYabai("-m space --balance")
   end)
 end
 
