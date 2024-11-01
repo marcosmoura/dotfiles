@@ -18,7 +18,10 @@ module.setup = function()
   require("config.window-manager").start()
   require("config.window-stack-indicator").start()
 
-  require("config.utils.alert").custom("Configuration Reloaded!", require("config.utils.assets").settings, nil, 1)
+  local assets = require("config.utils.assets")
+  local alert = require("config.utils.alert")
+
+  alert.custom("Configuration Reloaded!", assets.settings, nil, 1)
 end
 
 return module
