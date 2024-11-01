@@ -154,14 +154,18 @@ brew install --cask --no-quarantine font-sf-mono
 brew install --cask --no-quarantine font-symbols-only-nerd-font
 brew install --cask --no-quarantine google-chrome-canary
 brew install --cask --no-quarantine hammerspoon
-brew install --cask --no-quarantine hiddenbar
 brew install --cask --no-quarantine imageoptim
+brew install --cask --no-quarantine jordanbaird-ice
 brew install --cask --no-quarantine kap
+brew install --cask --no-quarantine keka
+brew install --cask --no-quarantine kekaexternalhelper
+brew install --cask --no-quarantine linearmouse
 brew install --cask --no-quarantine logitech-camera-settings
 brew install --cask --no-quarantine microsoft-auto-update
 brew install --cask --no-quarantine microsoft-outlook
 brew install --cask --no-quarantine microsoft-remote-desktop
 brew install --cask --no-quarantine microsoft-teams
+brew install --cask --no-quarantine pearcleaner
 brew install --cask --no-quarantine proton-drive
 brew install --cask --no-quarantine proton-pass
 brew install --cask --no-quarantine protonvpn
@@ -178,7 +182,6 @@ brew install --cask --no-quarantine sf-symbols
 brew install --cask --no-quarantine shottr
 brew install --cask --no-quarantine spotify
 brew install --cask --no-quarantine stats
-brew install --cask --no-quarantine the-unarchiver
 brew install --cask --no-quarantine visual-studio-code
 brew install --cask --no-quarantine vlc
 brew install --cask --no-quarantine webpquicklook
