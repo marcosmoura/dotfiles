@@ -1,23 +1,11 @@
 local alert = require("config.utils.alert")
 local assets = require("config.utils.assets")
+local debounce = require("config.utils.debounce")
 
 local module = {}
 
-local debounce = function(fn, timeout)
-  local timer = nil
-
-  return function(...)
-    local args = { ... }
-    if timer then
-      timer:stop()
-      timer = nil
-    end
-
-    timer = hs.timer.doAfter(timeout, function()
-      fn(table.unpack(args))
-      timer = nil
-    end)
-  end
+local showWifiAlert = function(message, icon)
+  alert.custom(message, icon, {}, 2)
 end
 
 module.start = function()
@@ -31,16 +19,20 @@ module.start = function()
     end
 
     if newWifi then
-      alert.custom("Connected to " .. newWifi, assets.wifiOn, {}, 2)
+      showWifiAlert("Connected to " .. newWifi, assets.wifiOn)
     else
-      alert.custom("Disconnected from " .. currentWifi, assets.wifiOff, {}, 2)
+      showWifiAlert("Disconnected from " .. currentWifi, assets.wifiOff)
     end
 
     currentWifi = newWifi
   end, 0.5)
 
-  hs.wifi.watcher.new(onWifiChange):start()
-  currentWifi = hs.wifi.currentNetwork()
+  local watcher = hs.wifi.watcher.new(onWifiChange)
+
+  hs.timer.doAfter(1, function()
+    currentWifi = hs.wifi.currentNetwork()
+    watcher:start()
+  end)
 end
 
 return module
