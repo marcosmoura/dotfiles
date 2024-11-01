@@ -85,19 +85,24 @@ local onIndicatorClick = function(_, _, id)
   window:focus()
 end
 
+function hideNotVisibleCanvas()
+  local focusedSpace = hs.spaces.focusedSpace()
+
+  for id, space in ipairs(spaces) do
+    if id == focusedSpace or not space or space.canvas then
+      return
+    end
+
+    space.canvas:hide()
+  end
+end
+
 local createSpaceFilter = function()
   local focusedSpace = hs.spaces.focusedSpace()
   local space = spaces[focusedSpace]
 
   if space then
-    for key, spaceConfig in spaces do
-      if key == focusedSpace then
-        return
-      end
-
-      spaceConfig.canvas:hide()
-    end
-
+    hideNotVisibleCanvas()
     drawIndicators(space.canvas, space.filter)
 
     return
