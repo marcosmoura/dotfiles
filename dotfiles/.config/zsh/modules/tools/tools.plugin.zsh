@@ -1,18 +1,5 @@
 #!/usr/bin/env zsh
 
-# Microsoft Defender
-function killMicrosoftDefender() {
-  launchctl unload /Library/LaunchAgents/com.microsoft.wdav.tray.plist
-  sudo launchctl unload /Library/LaunchDaemons/com.microsoft.fresno.plist
-  sudo launchctl unload /Library/LaunchDaemons/com.tanium.taniumclient.plist
-}
-
-function loadMicrosoftDefender() {
-  launchctl load /Library/LaunchAgents/com.microsoft.wdav.tray.plist
-  sudo launchctl load /Library/LaunchDaemons/com.microsoft.fresno.plist
-  sudo launchctl load /Library/LaunchDaemons/com.tanium.taniumclient.plist
-}
-
 # Create a .tar.gz archive, using `zopfli`, `pigz` or `gzip` for compression
 function targz() {
   local tmpFile="${@%/}.tar"

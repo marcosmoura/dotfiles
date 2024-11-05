@@ -9,6 +9,17 @@ end
 --
 -- [[ FONT CONFIGURATION ]]
 --
+config.font = wezterm.font_with_fallback({
+  {
+    family = "Maple Mono",
+    weight = "Medium",
+  },
+  {
+    family = "Symbols Nerd Font Mono",
+    scale = 0.8,
+  },
+})
+config.cell_width = 0.95
 config.font_size = 17.1
 config.line_height = 1.3
 config.bold_brightens_ansi_colors = "BrightOnly"
@@ -32,10 +43,10 @@ config.allow_square_glyphs_to_overflow_width = "Always"
 -- [[ WINDOW AND PANES CONFIGURATION ]]
 --
 config.window_padding = {
-  left = 24,
-  right = 24,
-  top = 8,
-  bottom = 8,
+  left = "3cell",
+  right = "3cell",
+  top = "8px",
+  bottom = "8px",
 }
 config.window_frame = {
   border_left_width = 0,

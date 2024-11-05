@@ -8,10 +8,11 @@ local mappings = {
 
 return {
   "folke/which-key.nvim",
+  dependencies = { "echasnovski/mini.icons" },
   cmd = "WhichKey",
   event = "VeryLazy",
   opts = {
-    window = {
+    win = {
       padding = { 2, 2, 2, 2 },
     },
     layout = {

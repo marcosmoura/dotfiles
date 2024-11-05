@@ -1,0 +1,14 @@
+[misc]
+no_retry = true
+cleanup = true
+disable = ["git_repos", "bun", "node"]
+
+[python]
+enable_pipupgrade = true
+
+[brew]
+fetch_head = true
+
+[commands]
+"Catppuccin Colors" = "export CATPPUCCIN_COLORS=$(vivid generate catppuccin-mocha); export LS_COLORS=$CATPPUCCIN_COLORS; echo $CATPPUCCIN_COLORS >~/.config/zsh/static/catppuccin-colors.txt"
+"fast-theme" = "fast-theme $XDG_CONFIG_HOME/syntax-theme/syntax-theme.ini >/dev/null"

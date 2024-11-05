@@ -15,22 +15,6 @@ add_to_path $PNPM_HOME
 
 export PATH=$(flatten_path)
 
-function updatePackages {
-  print_start "Updating Packages \n"
-
-  print_progress "Updating NPM"
-
-  sudo npm cache clean -f
-  npm update -g
-
-  print_progress "Updating PNPM \n"
-
-  pnpm store prune
-  pnpm update -g
-
-  print_success "Packages updated! \n"
-}
-
 function nodeVersions {
   echo "node: $(node -v)"
   echo "npm: $(npm -v)"

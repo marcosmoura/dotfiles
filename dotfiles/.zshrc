@@ -1,9 +1,4 @@
-# Enable Powerlevel10k instant prompt
-if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-\${(%):-%n}.zsh" ]]; then
-  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-\${(%):-%n}.zsh"
-fi
-
-# Path
+# Paths
 function add_to_path {
   if [ -d "$1" ] && [[ ":$PATH:" != *":$1:"* ]]; then
     export PATH="${PATH:+"$PATH:"}$1"
@@ -20,7 +15,7 @@ add_to_path /usr/local/opt
 add_to_path $HOME/.local/bin
 add_to_path $HOME/.rbenv/shims
 add_to_path $HOME/.yarn/bin
-add_to_path $XDG_CONFIG_HOME/yarn/global/node_modules/.bin
+add_to_path $HOME/.config/yarn/global/node_modules/.bin
 add_to_path $HOME/go/bin
 add_to_path $HOME/.cargo/bin
 add_to_path $HOME/.local/share/venv/bin/python
@@ -55,8 +50,9 @@ export SAVESIZE=25000
 # You Should Use
 export YSU_MODE=ALL
 
-# Load powerlevel10k
-[[ ! -f ~/.config/p10k/.p10k.zsh ]] || source ~/.config/p10k/.p10k.zsh
+# Load starship
+export STARSHIP_CONFIG=$XDG_CONFIG_HOME/starship/starship.toml
+eval "$(starship init zsh)"
 
 # SSH Agent
 SSH_AGENT_INSTANCES=$(pgrep ssh-agent)
@@ -71,6 +67,12 @@ eval "$(sheldon completions --shell zsh)"
 
 # FZF
 source <(fzf --zsh)
+
+# Direnv
+eval "$(direnv hook zsh)"
+
+# Luarocks
+eval "$(luarocks path)"
 
 # Clear screen
 clear

@@ -1,6 +1,6 @@
 "$schema" = 'https://starship.rs/config-schema.json'
 
-format = "${custom.special-day-emoji}$all $fill $jobs${custom.clock-emoji} $time$line_break$character"
+format = "${custom.special-emoji}$all $fill $jobs${custom.clock-emoji} $time$line_break$character"
 command_timeout = 1000
 palette = "catppuccin"
 
@@ -69,6 +69,8 @@ when = true
 command = 'echo "" | cut -c $(($(date +%H)%12+1))'
 format = "[$output](bold white)"
 
-[custom.special-day-emoji]
+[custom.special-emoji]
 when = true
 command = 'sh ~/.config/starship/emoji.sh'
+format = "[$output](bold cyan)"
+ignore_timeout = true

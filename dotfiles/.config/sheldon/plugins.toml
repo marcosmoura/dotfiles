@@ -19,13 +19,6 @@ local = "~/.config/zsh/modules"
 use = ["{colors,compinit,macOS}/*.plugin.zsh"]
 
 
-# powerlevel10k
-# ----------------------
-
-[plugins.powerlevel10k]
-github = "romkatv/powerlevel10k"
-
-
 # Syntax highlighting
 # ----------------------
 
@@ -54,13 +47,11 @@ apply = ["defer"]
 github = "ohmyzsh/ohmyzsh"
 dir = "lib"
 use = ["{compfix,completion,git,grep,history,key-bindings}.zsh"]
-apply = ["defer"]
 
 [plugins.ohmyzsh-plugins]
 github = "ohmyzsh/ohmyzsh"
 dir = "plugins"
 use = ["{aliases,cp,dircyclegh,zoxide,}/*.plugin.zsh"]
-apply = ["defer"]
 
 
 # Other plugins
@@ -101,4 +92,3 @@ apply = ["defer"]
 [plugins.dotfiles]
 local = "~/.config/zsh/modules"
 use = ["*.plugin.zsh", "!{colors,compinit,macOS}/*.plugin.zsh"]
-apply = ["defer"]

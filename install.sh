@@ -20,7 +20,9 @@ is_linux && . installation/linux/install.sh
 . installation/python.sh
 . installation/rust.sh
 . installation/go.sh
+. installation/apps.sh
 . installation/packages.sh
+. installation/postinstall.sh
 
 print_green "\n$TEXT_SEPARATOR"
 print_green "🎉 Dotfiles installed and configured! Reloading shell... 😊"

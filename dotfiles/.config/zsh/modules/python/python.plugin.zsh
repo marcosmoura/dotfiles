@@ -1,9 +1,7 @@
 #!/usr/bin/env zsh
 
-function updatePython {
-  print_start "Updating Python \n"
+source ~/.config/zsh/utils.sh
 
-  pip install --upgrade *
-
-  print_success "Python updated! \n"
-}
+# Fix python3
+alias python=$(which python3)
+alias pip=$(which pip3)
