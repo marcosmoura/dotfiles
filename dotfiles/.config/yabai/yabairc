@@ -29,13 +29,14 @@ yabai -m space 6 --label music
 yabai -m space 7 --label communication
 yabai -m space 8 --label events
 yabai -m space 9 --label productivity
-yabai -m space 10 --label remote
+yabai -m space 10 --label misc
 
 ## Spaces layouts
 yabai -m config --space code layout stack
 yabai -m config --space browser layout stack
 yabai -m config --space music layout stack
 yabai -m config --space communication layout float
+yabai -m config --space misc layout float
 
 #### Screen 1
 ####################################################################################################
@@ -83,7 +84,7 @@ yabai -m rule --add label="Notion" app="^Notion$" space="productivity"
 yabai -m rule --add label="Bitwarden" app="^Bitwarden$" space="productivity"
 
 # Space - Remote
-yabai -m rule --add label="Microsoft Remote Desktop" app="^Microsoft Remote Desktop$" space="remote"
+yabai -m rule --add label="Microsoft Remote Desktop" app="^Microsoft Remote Desktop$" space="misc"
 
 #### All Screens
 ####################################################################################################
