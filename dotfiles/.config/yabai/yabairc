@@ -34,6 +34,7 @@ yabai -m space 10 --label remote
 ## Spaces layouts
 yabai -m config --space code layout stack
 yabai -m config --space browser layout stack
+yabai -m config --space music layout stack
 yabai -m config --space communication layout float
 
 #### Screen 1
