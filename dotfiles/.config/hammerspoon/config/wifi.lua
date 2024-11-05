@@ -29,7 +29,7 @@ module.start = function()
 
   local watcher = hs.wifi.watcher.new(onWifiChange)
 
-  hs.timer.doAfter(1, function()
+  hs.timer.doAfter(0.5, function()
     currentWifi = hs.wifi.currentNetwork()
     watcher:start()
   end)
