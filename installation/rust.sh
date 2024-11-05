@@ -10,5 +10,6 @@ print_progress "Installing Rust packages"
 
 cargo install binocular-cli
 cargo install cargo-update
+cargo install cargo-cache
 
 print_success "Rust installed! \n"

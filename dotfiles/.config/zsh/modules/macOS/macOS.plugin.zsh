@@ -1,36 +1,16 @@
 #!/usr/bin/env zsh
 
 source ~/.config/zsh/utils.sh
-source ~/.config/zsh/modules/ruby/ruby.plugin.zsh
-source ~/.config/zsh/modules/python/python.plugin.zsh
-source ~/.config/zsh/modules/node/node.plugin.zsh
-source ~/.config/zsh/modules/shell/shell.plugin.zsh
-source ~/.config/zsh/modules/brew/brew.plugin.zsh
 
 function updateAll {
   print_green "💻 Updating all tools \n"
 
   authenticateBeforeUpdate
-  updateRuby
-  updateRust
-  updatePython
-  updateBrew
-  updatePackages
-  updateShell
+  topgrade
 
   print_success "Updated! \n"
 
   reload
-}
-
-function updateMacos {
-  print_text "Updating macOS \n"
-
-  authenticateBeforeUpdate
-  sudo softwareupdate -i -a
-  mas upgrade
-
-  print_success "macOS should be upgraded! \n"
 }
 
 function systeminfo {
