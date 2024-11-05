@@ -1,8 +1,3 @@
-# Enable Powerlevel10k instant prompt
-if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-\${(%):-%n}.zsh" ]]; then
-  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-\${(%):-%n}.zsh"
-fi
-
 # Paths
 export XDG_CONFIG_HOME=${XDG_CONFIG_HOME:-$HOME/.config}
 export PATH=/usr/local/bin:$PATH
@@ -51,12 +46,9 @@ export SAVESIZE=25000
 # You Should Use
 export YSU_MODE=ALL
 
-# Load starship - Deprecated: Using p10k instead
-# export STARSHIP_CONFIG=$XDG_CONFIG_HOME/starship/starship.toml
-# eval "$(starship init zsh)"
-
-# Load powerlevel10k
-[[ ! -f ~/.config/p10k/.p10k.zsh ]] || source ~/.config/p10k/.p10k.zsh
+# Load starship
+export STARSHIP_CONFIG=$XDG_CONFIG_HOME/starship/starship.toml
+eval "$(starship init zsh)"
 
 # SSH Agent
 SSH_AGENT_INSTANCES=$(pgrep ssh-agent)
