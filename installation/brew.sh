@@ -117,6 +117,7 @@ brew install tealdeer
 brew install terminal-notifier
 brew install tmux
 brew install tokei
+brew install topgrade
 brew install tree
 brew install tree-sitter
 brew install tsv-utils

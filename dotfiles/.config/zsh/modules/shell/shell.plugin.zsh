@@ -45,16 +45,3 @@ export GLAMOUR_STYLE="~/.config/glamour/catppuccin.json"
 function reload() {
   exec $SHELL -l
 }
-
-function updateShell {
-  print_start "Updating zsh plugins \n"
-
-  sheldon lock --reinstall
-  export CATPPUCCIN_COLORS=$(vivid generate catppuccin-mocha)
-  export LS_COLORS=$CATPPUCCIN_COLORS
-  echo $CATPPUCCIN_COLORS >~/.config/zsh/static/catppuccin-colors.txt
-  fast-theme $XDG_CONFIG_HOME/syntax-theme/syntax-theme.ini >/dev/null
-  tldr --update >/dev/null
-
-  print_success "zsh plugins updated! \n"
-}
