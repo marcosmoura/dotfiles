@@ -8,28 +8,32 @@ function current_emoji {
   local day=$(date +%d)
   local month=$(date +%m)
   local day_of_week=$(date +%u)
+  local dir=$PWD
 
   day=${day#0}
   month=${month#0}
 
-  if [[ $day_of_week -eq 2 && $day -eq 13 ]]; then
-    # Friday the 13th
-    random_emoji "👻" "💀"
-  # elif [[ $month -eq 2 && $day -eq 14 ]]; then
-  #   # valentines day
-  #   random_emoji "💌" "❤️" "🧡" "💛" "💚" "💙" "💜" "❣️" "💕" "💞" "💓" "💗" "💖" "💘" "💝"
-  elif [[ $month -eq 10 ]]; then
-    # halloween
-    random_emoji "👹" "👺" "👻" "💀" "🎃" "🧛🏻‍♂️" "🧟‍♂️" "🕷" "🕸"
-  elif [[ $month -eq 10 && $day -eq 15 ]]; then
-    # birthday
+  # birthday
+  if [[ $month -eq 10 && $day -eq 15 ]]; then
     echo "🎂"
+  # halloween
+  elif [[ $month -eq 10 && $day -eq 31 ]]; then
+    random_emoji "👹" "👺" "👻" "💀" "🎃" "🧛🏻‍♂️" "🧟‍♂️" "🕷" "🕸"
+  # Friday the 13th
+  elif [[ $day_of_week -eq 2 && $day -eq 13 ]]; then
+    random_emoji "👻" "💀"
+  # christmas
   elif [[ $month -eq 12 && $day -le 25 ]]; then
-    # christmas
     random_emoji "🎅🏻" "🎄" "🎁" "☃️" "⛄️"
+  # new years eve
   elif [[ $month -eq 12 && $day -eq 31 ]]; then
-    # new years eve
     random_emoji "🍾" "🥂" "🎊" "🎉"
+  # Fluent UI directory
+  elif [[ $dir =~ "fluent" ]]; then
+    echo "󰍲󠀠 󠀠"
+  # Dotfiles
+  elif [[ $dir =~ "dotfiles" ]]; then
+    echo "🤍"
   fi
 }
 

@@ -19,13 +19,6 @@ local = "~/.config/zsh/modules"
 use = ["{colors,compinit,macOS}/*.plugin.zsh"]
 
 
-# powerlevel10k
-# ----------------------
-
-[plugins.powerlevel10k]
-github = "romkatv/powerlevel10k"
-
-
 # Syntax highlighting
 # ----------------------
 
