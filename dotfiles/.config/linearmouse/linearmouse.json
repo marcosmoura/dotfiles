@@ -1,18 +1,19 @@
 {
+  "$schema" : "https:\/\/schema.linearmouse.app\/0.10.0",
   "schemes" : [
     {
       "pointer" : {
-        "acceleration" : 0.5677,
         "speed" : 0.0689655172413792768,
+        "acceleration" : 0.5677,
         "disableAcceleration" : false
-      },
-      "buttons" : {
-        "universalBackForward" : true
       },
       "scrolling" : {
         "reverse" : {
           "vertical" : false
         }
+      },
+      "buttons" : {
+        "universalBackForward" : true
       },
       "if" : {
         "device" : {
@@ -22,7 +23,22 @@
           "productName" : "Apple Internal Keyboard \/ Trackpad"
         }
       }
+    },
+    {
+      "if" : {
+        "device" : {
+          "category" : "mouse",
+          "productName" : "USB Receiver",
+          "productID" : "0xc54d",
+          "vendorID" : "0x46d",
+          "serialNumber" : "398038783232"
+        }
+      },
+      "pointer" : {
+        "acceleration" : 0.3125,
+        "disableAcceleration" : true,
+        "speed" : 0.0689655172413792768
+      }
     }
-  ],
-  "$schema" : "https:\/\/schema.linearmouse.app\/0.10.0"
+  ]
 }
