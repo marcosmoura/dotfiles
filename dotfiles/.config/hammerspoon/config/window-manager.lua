@@ -8,12 +8,47 @@ local yabaiDirectionMap = {
   down = "south",
   left = "west",
 }
-local yabaiGridMap = {
-  up = "1:1:0:0:1:1",
-  right = "1:2:1:0:1:1",
-  down = "2560:2560:320:320:1920:1920",
-  left = "1:2:0:0:1:1",
-}
+
+local setFloatingWindowPosition = function(arrowKey)
+  hs.grid.setGrid("2x1")
+
+  if arrowKey == "down" then
+    local width = 2560
+    local height = 1440
+    local windowWidth = width * 70 / 100
+    local windowHeight = height * 70 / 100
+    local x = (width - windowWidth) / 2
+    local y = (height - windowHeight) / 2
+
+    local focusedWindow = hs.window.focusedWindow()
+
+    focusedWindow:setFrame({
+      w = windowWidth,
+      h = windowHeight,
+      x = x,
+      y = y,
+    })
+
+    focusedWindow:centerOnScreen()
+
+    return
+  end
+
+  if arrowKey == "up" then
+    hs.grid.set(hs.window.focusedWindow(), "0,0 2x1")
+    return
+  end
+
+  if arrowKey == "right" then
+    hs.grid.set(hs.window.focusedWindow(), "1,0 1x2")
+    return
+  end
+
+  if arrowKey == "left" then
+    hs.grid.set(hs.window.focusedWindow(), "0,0 1x2")
+    return
+  end
+end
 
 --------------------
 -- Disable built-in useless hotkeys
@@ -121,7 +156,7 @@ for _, arrowKey in ipairs({ "up", "down", "left", "right" }) do
     local isFloating = window["is-floating"]
 
     if isFloating then
-      executeYabai({ "-m window --grid", yabaiGridMap[arrowKey] })
+      setFloatingWindowPosition(arrowKey)
       return
     end
 
