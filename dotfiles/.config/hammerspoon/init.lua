@@ -1,3 +1,3 @@
 DEBUG = false
-require("luarocks")
+require("setup")
 require("config").setup()

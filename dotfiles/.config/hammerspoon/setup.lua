@@ -8,3 +8,7 @@ if #luarocks > 0 then
   package.path = package.path .. ";" .. lrPath
   package.cpath = package.cpath .. ";" .. lrCpath
 end
+
+Print = function(...)
+  hs.printf(hs.inspect(...))
+end

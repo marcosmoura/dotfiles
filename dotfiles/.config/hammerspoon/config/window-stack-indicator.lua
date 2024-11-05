@@ -1,4 +1,3 @@
-local colors = require("config.utils.colors")
 local debounce = require("config.utils.debounce")
 local executeYabai = require("config.utils.executeYabai")
 
@@ -9,31 +8,40 @@ local indicator = {
   radius = 3,
 }
 
-local drawIndicators = function(canvas, filter)
-  local space = executeYabai("-m query --spaces --space", { json = true })
-  local layout = space["type"]
+local onIndicatorClick = function(_, _, id)
+  local window = hs.window.get(id)
 
-  if layout ~= "stack" then
-    local focusedSpace = hs.spaces.focusedSpace()
-    local spaceConfig = spaces[focusedSpace]
-
-    if spaceConfig then
-      spaceConfig.canvas:delete(hs.window.animationDuration)
-      spaces[focusedSpace] = nil
-    end
-
+  if not window then
     return
   end
 
-  local spaceWindows = filter:getWindows(hs.window.filter.sortByCreated)
+  window:focus()
+end
 
-  if #spaceWindows < 2 then
-    canvas:hide()
-    return
-  end
-
+local removeCanvasElements = function(canvas)
   while canvas:elementCount() > 0 do
     canvas:removeElement(1)
+  end
+end
+
+local getSpaceData = function()
+  local space = executeYabai("-m query --spaces --space", { json = true })
+  local label = space["label"]
+  local isStack = space["type"] == "stack"
+
+  return label, isStack
+end
+
+local drawIndicators = function(spaceConfig, isStack)
+  local filter = spaceConfig.filter
+  local canvas = spaceConfig.canvas
+  local windows = filter:getWindows()
+
+  removeCanvasElements(canvas)
+
+  if not isStack or #windows < 2 then
+    canvas:hide()
+    return
   end
 
   local focusedWindow = hs.window.focusedWindow()
@@ -51,7 +59,7 @@ local drawIndicators = function(canvas, filter)
     y = frame.y - (indicator.h * 2),
   })
 
-  for index, window in ipairs(spaceWindows) do
+  for index, window in ipairs(windows) do
     local isFocused = window == focusedWindow
 
     canvas:insertElement({
@@ -80,45 +88,27 @@ local drawIndicators = function(canvas, filter)
   canvas:show()
 end
 
-local onIndicatorClick = function(_, _, id)
-  local window = hs.window.get(id)
+local onFilterChange = debounce(function()
+  local label, isStack = getSpaceData()
 
-  if not window then
-    return
-  end
+  drawIndicators(spaces[label], isStack)
+end, 0.1)
 
-  window:focus()
-end
+local createCurrentSpaceData = function()
+  local label, isStack = getSpaceData()
 
-function hideNotVisibleCanvas()
-  local focusedSpace = hs.spaces.focusedSpace()
-
-  for id, space in ipairs(spaces) do
-    if id == focusedSpace or not space or space.canvas then
-      return
-    end
-
-    space.canvas:hide()
-  end
-end
-
-local createSpaceFilter = function()
-  local focusedSpace = hs.spaces.focusedSpace()
-  local space = spaces[focusedSpace]
-
-  if space then
-    hideNotVisibleCanvas()
-    drawIndicators(space.canvas, space.filter)
+  if spaces[label] then
+    drawIndicators(spaces[label], isStack)
 
     return
   end
 
-  spaces[focusedSpace] = {
-    filter = hs.window.filter.new():setDefaultFilter(),
+  spaces[label] = {
+    filter = hs.window.filter.new(),
     canvas = hs.canvas.new({}),
   }
 
-  local space = spaces[focusedSpace]
+  local space = spaces[label]
 
   if not space.canvas then
     return
@@ -127,11 +117,9 @@ local createSpaceFilter = function()
   space.canvas:mouseCallback(onIndicatorClick)
   space.canvas:level(hs.canvas.windowLevels.normal - 1)
 
-  local onFilterChange = debounce(function()
-    drawIndicators(space.canvas, space.filter)
-  end, 0.1)
-
   space.filter
+    :setDefaultFilter()
+    :setSortOrder(hs.window.filter.sortByCreated)
     :setOverrideFilter({
       visible = true,
       fullscreen = false,
@@ -159,8 +147,8 @@ end
 local module = {}
 
 module.start = function()
-  hs.spaces.watcher.new(createSpaceFilter):start()
-  createSpaceFilter()
+  hs.spaces.watcher.new(createCurrentSpaceData):start()
+  createCurrentSpaceData()
 end
 
 return module
