@@ -37,6 +37,11 @@ local drawIndicators = function(canvas, filter)
   end
 
   local focusedWindow = hs.window.focusedWindow()
+
+  if not focusedWindow then
+    return
+  end
+
   local frame = focusedWindow:frame()
 
   canvas:frame({

@@ -13,6 +13,13 @@ local function execute(commandPath, args, opts)
   local command = commandPath .. " " .. arguments
   local output, status = hs.execute(command)
 
+  if not status then
+    print("Error executing command: " .. command)
+    print(output)
+
+    return "", status
+  end
+
   if options.json then
     return hs.json.decode(output or {}) or {}, status
   end

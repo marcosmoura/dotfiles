@@ -168,7 +168,13 @@ local applyWallpaper = function(path)
 end
 
 local generateWallpaperForSpace = function()
-  local screen = hs.window.focusedWindow():screen()
+  local focusedWindow = hs.window.focusedWindow()
+
+  if focusedWindow == nil then
+    return
+  end
+
+  local screen = focusedWindow:screen()
   local currentSpace = getSpaceIndex(screen, hs.spaces.activeSpaceOnScreen(screen))
   local wallpaperPath = wallpaperPrefixPath .. wallpaperNameMap[currentSpace] .. ".jpg"
 
