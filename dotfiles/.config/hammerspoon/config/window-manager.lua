@@ -198,6 +198,11 @@ local cycleWindows = function(direction)
   local windows = hs.window.orderedWindows()
   local focusedWindow = hs.window.focusedWindow()
   local focusedWindowIndex = hs.fnutils.indexOf(windows, focusedWindow)
+
+  if #windows < 2 or not focusedWindow or not focusedWindowIndex then
+    return
+  end
+
   local nextWindowIndex = focusedWindowIndex + direction
 
   if nextWindowIndex < 1 then
