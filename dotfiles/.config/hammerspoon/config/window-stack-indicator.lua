@@ -124,9 +124,8 @@ local onIndicatorClick = function(_, _, id)
 end
 
 local onSpaceChange = debounce(function()
-  local label = getSpaceData()
+  local label, isStack = getSpaceData()
   local canvas = canvasMap[label]
-  local isStack = getSpaceData()
 
   if canvas or not isStack then
     return
