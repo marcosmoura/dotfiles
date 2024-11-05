@@ -1,7 +1,7 @@
 local module = {}
 
 module.start = function()
-  hs.window.animationDuration = 0.125
+  hs.window.animationDuration = 0
   hs.grid.setMargins({ 16, 16 })
 
   hs.allowAppleScript(true)
