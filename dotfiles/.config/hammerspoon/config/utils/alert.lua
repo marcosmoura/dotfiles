@@ -22,36 +22,36 @@ local defaultAlertStyle = {
 hs.alert.defaultStyle = deepMerge(hs.alert.defaultStyle, defaultAlertStyle)
 
 local showAlert = function(message, image, style, duration)
-  hs.alert.showWithImage(message, image, deepMerge(defaultAlertStyle, style or {}), duration or 1)
+  return hs.alert.showWithImage(message, image, deepMerge(defaultAlertStyle, style or {}), duration or 1)
 end
 
 module.info = function(message, duration)
-  showAlert(message, assets.info, nil, duration)
+  return showAlert(message, assets.info, nil, duration)
 end
 
 module.error = function(message, duration)
-  showAlert(message, assets.error, {
+  return showAlert(message, assets.error, {
     fillColor = { hex = colors.red.hex },
     textColor = { hex = colors.crust.hex },
   }, duration)
 end
 
 module.success = function(message, duration)
-  showAlert(message, assets.success, {
+  return showAlert(message, assets.success, {
     fillColor = { hex = colors.green.hex },
     textColor = { hex = colors.crust.hex },
   }, duration)
 end
 
 module.warning = function(message, duration)
-  showAlert(message, assets.warning, {
+  return showAlert(message, assets.warning, {
     fillColor = { hex = colors.peach.hex },
     textColor = { hex = colors.crust.hex },
   }, duration)
 end
 
 module.custom = function(message, iconPath, config, duration)
-  showAlert(message, iconPath, config, duration)
+  return showAlert(message, iconPath, config, duration)
 end
 
 return module

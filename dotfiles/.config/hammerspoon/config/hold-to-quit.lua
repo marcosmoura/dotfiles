@@ -7,14 +7,40 @@ end
 local module = {}
 
 module.start = function()
+  local killed = false
+
   spoon.SpoonInstall:andUse("HoldToQuit", {
     fn = function(holdToQuit)
+      local currentAlert = nil
+
+      local closeCurrentAlert = function()
+        if currentAlert then
+          hs.alert.closeSpecific(currentAlert)
+          currentAlert = nil
+        end
+      end
+
       function holdToQuit:onKeyUp()
         if self.timer:running() then
           self.timer:stop()
+          killed = false
 
-          alert.custom("Hold ⌘Q to quit " .. getCurrentApp():name(), nil, nil, 0.75)
+          hs.timer.doAfter(0.5, closeCurrentAlert)
         end
+      end
+
+      function holdToQuit:onKeyDown()
+        self.timer:start()
+
+        local app = getCurrentApp()
+        local appName = app:name()
+
+        if appName == "Finder" then
+          alert.warning("You can't quit Finder!", 1)
+          return
+        end
+
+        currentAlert = alert.custom("Hold ⌘Q to quit " .. appName, nil, nil, 2)
       end
 
       holdToQuit.timer = hs.timer.delayed.new(1.5, function()
@@ -25,7 +51,13 @@ module.start = function()
           return
         end
 
+        if killed then
+          return
+        end
+
         app:kill()
+        killed = true
+        closeCurrentAlert()
       end)
 
       holdToQuit:start()
