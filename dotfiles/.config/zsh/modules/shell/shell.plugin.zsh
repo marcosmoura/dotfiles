@@ -59,3 +59,6 @@ function updateShell {
 
   print_success "zsh plugins updated! \n"
 }
+
+# Remove duplicates from $PATH
+export PATH=$(flatten_path)

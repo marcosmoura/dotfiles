@@ -2,13 +2,18 @@
 
 source ~/.config/zsh/utils.sh
 
+# bun completions
+[ -s "$HOME/.bun/_bun" ] && source "$HOME/.bun/_bun"
+
+# bun
+export BUN_INSTALL="$HOME/.bun"
+add_to_path $BUN_INSTALL/bin
+
 # pnpm
-export PNPM_HOME="/Users/marcosmoura/Library/pnpm"
-case ":$PATH:" in
-*":$PNPM_HOME:"*) ;;
-*) export PATH="$PNPM_HOME:$PATH" ;;
-esac
-# pnpm end
+export PNPM_HOME="$HOME/.local/share/pnpm"
+add_to_path $PNPM_HOME
+
+export PATH=$(flatten_path)
 
 function updatePackages {
   print_start "Updating Packages \n"

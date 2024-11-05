@@ -9,19 +9,6 @@ end
 --
 -- [[ FONT CONFIGURATION ]]
 --
-config.font = wezterm.font_with_fallback({
-  {
-    family = "Maple Mono",
-    weight = 500,
-  },
-  {
-    family = "Symbols Nerd Font Mono",
-    scale = 0.8,
-  },
-  {
-    family = "Apple Color Emoji",
-  },
-})
 config.font_size = 17.1
 config.line_height = 1.3
 config.bold_brightens_ansi_colors = "BrightOnly"
@@ -116,27 +103,73 @@ config.keys = {
 --
 config.default_cwd = "~/Projects"
 
-wezterm.on("gui-startup", function(cmd)
-  local args = {}
-  if cmd then
-    args = cmd.args
-  end
-
-  local project_dir = wezterm.home_dir .. "/Projects/fluent/fluentui"
-
-  mux.spawn_window({
-    cwd = project_dir,
-    args = args,
+if wezterm.target_triple == "x86_64-pc-windows-msvc" then
+  config.default_domain = "WSL:Arch"
+  config.wsl_domains = {
+    {
+      name = "WSL:Arch",
+      distribution = "Arch",
+      username = "marcosmoura",
+      default_cwd = config.default_cwd,
+    },
+  }
+  config.window_decorations = "TITLE|RESIZE"
+  config.window_frame = {
+    font = wezterm.font("Maple Mono"),
+    font_size = 13,
+  }
+  config.font = wezterm.font_with_fallback({
+    {
+      family = "Maple Mono",
+      weight = 550,
+    },
+    {
+      family = "Symbols Nerd Font Mono",
+      scale = 0.8,
+    },
+    {
+      family = "Segoe UI Emoji",
+    },
   })
+  config.font_size = 14
+  config.line_height = 1.25
+else
+  wezterm.on("gui-startup", function(cmd)
+    local args = {}
+    if cmd then
+      args = cmd.args
+    end
 
-  local _, second_panel = mux.spawn_window({
-    cwd = project_dir,
-    args = args,
-  })
+    local project_dir = wezterm.home_dir .. "/Projects/fluent/fluentui"
 
-  wezterm.time.call_after(1, function()
-    second_panel:send_text("clear\n")
+    mux.spawn_window({
+      cwd = project_dir,
+      args = args,
+    })
+
+    local _, second_panel = mux.spawn_window({
+      cwd = project_dir,
+      args = args,
+    })
+
+    wezterm.time.call_after(1, function()
+      second_panel:send_text("clear\n")
+    end)
   end)
-end)
+
+  config.font = wezterm.font_with_fallback({
+    {
+      family = "Maple Mono",
+      weight = 500,
+    },
+    {
+      family = "Symbols Nerd Font Mono",
+      scale = 0.8,
+    },
+    {
+      family = "Apple Color Emoji",
+    },
+  })
+end
 
 return config

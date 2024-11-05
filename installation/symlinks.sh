@@ -1,11 +1,21 @@
-print_start "Linking dotfiles\n"
+print_start "Linking dotfiles"
+print_text ""
 
 function create_symlink() {
+  local absolute_path=""
+
+  which grealpath >/dev/null 2>&1
+  if [ $? -eq 0 ]; then
+    absolute_path=$(grealpath $1)
+  else
+    absolute_path=$(readlink -f $1)
+  fi
+
   # If $2 is set, use it as the destination, otherwise use $1
   if [ -z "$2" ]; then
-    ln -sfvF $(grealpath $1) "$HOME/$1"
+    ln -sfvF $absolute_path $HOME/$1
   else
-    ln -sfvF $(grealpath $1) "$HOME/$2"
+    ln -sfvF $absolute_path $HOME/$2
   fi
 }
 

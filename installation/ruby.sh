@@ -1,18 +1,19 @@
-print_start "Installing Ruby"
+if is_macos; then
+  print_start "Installing Ruby"
 
-brew install rbenv
-export RBENV_VERSION=$(rbenv install -l -s | grep -v - | tail -1)
-eval "$(rbenv init - zsh)"
-rbenv install -s $RBENV_VERSION
-rbenv global $RBENV_VERSION
+  export RBENV_VERSION=$(rbenv install -l -s | grep -v - | tail -1)
+  eval "$(rbenv init - zsh)"
+  rbenv install -s $RBENV_VERSION
+  rbenv global $RBENV_VERSION
 
-print_progress "Installing gems"
+  print_progress "Installing gems"
 
-gem install bundler
-gem install openssl
-gem install rake
-gem install rdoc
-gem install rubygems-update
-gem install sqlite3
+  gem install bundler
+  gem install openssl
+  gem install rake
+  gem install rdoc
+  gem install rubygems-update
+  gem install sqlite3
 
-print_success "Ruby installed! \n"
+  print_success "Ruby installed! \n"
+fi

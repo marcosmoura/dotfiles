@@ -16,4 +16,3 @@ ios
 *.gitignore
 *.gitattributes
 *.prettierignore
-*.watchmanconfig

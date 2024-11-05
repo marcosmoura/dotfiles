@@ -1,78 +1,218 @@
 print_start "Installing applications"
 
-print_progress "OS utilities\n"
+package_manager=""
 
-brew install --no-quarantine --cask captin
-brew install --no-quarantine --cask displaperture
-brew install --no-quarantine --cask hiddenbar
-brew install --no-quarantine --cask keepingyouawake
-brew install --no-quarantine --cask phoenix
-brew install --no-quarantine --cask stats
-brew install --no-quarantine --cask the-unarchiver
-brew install --no-quarantine --cask topnotch
-brew install --no-quarantine --cask turbo-boost-switcher
-mas install 497799835 # Xcode
+if is_macos; then
+  package_manager="Homebrew and mas"
+elif is_linux; then
+  package_manager="Yay"
+fi
 
-print_progress "Communication\n"
+print_progress "All apps will be installed using the package manager of your system.\n \
+  The package manager used is $TEXT_BLUE$package_manager$TEXT_RESET.\n"
 
-brew install --no-quarantine --cask discord
-brew install --no-quarantine --cask whatsapp
+APPS=(
+  # OS utilities
+  "bash"
+  "coreutils"
+  "findutils"
+  "gawk"
+  "grep"
+  "moreutils"
+  "ncurses"
+  "openssl"
 
-print_text ""
-print_progress "Keyboard Tools\n"
+  # Programming languages and tools
+  "deno"
+  "go"
+  "lua"
+  "luarocks"
+  "npm"
+  "perl"
+  "pnpm"
+  "python"
+  "rbenv"
+  "ruby-build"
+  "yarn"
 
-brew install --cask qmk-toolbox
-brew install --cask via
+  # Terminal tools
+  "bat"
+  "bottom"
+  "dust"
+  "eza"
+  "fd"
+  "ffmpegthumbnailer"
+  "fx"
+  "fzf"
+  "git-delete-merged-branches"
+  "git-delta"
+  "git"
+  "glow"
+  "hyperfine"
+  "jq"
+  "macchina"
+  "navi"
+  "ncdu"
+  "neovim"
+  "poppler"
+  "sheldon"
+  "shellcheck"
+  "shfmt"
+  "starship"
+  "tealdeer"
+  "tree"
+  "vivid"
+  "yazi"
+  "zellij"
+  "zsh"
+  "zoxide"
 
-print_progress "Productivity\n"
+  # Terminal apps
+  "bandwhich"
+  "tokei"
+)
 
-brew install --no-quarantine --cask bitwarden
-brew install --no-quarantine --cask cryptomator
-brew install --no-quarantine --cask google-drive
-brew install --no-quarantine --cask kap
-brew install --no-quarantine --cask notion
-brew install --no-quarantine --cask onyx
-brew install --no-quarantine --cask raycast
-brew install --no-quarantine --cask shottr
+if ! is_wsl; then
+  APPS+=(
+    # Desktop apps
+    "discord"
+    "firefox-nightly"
+    "inkscape"
+    "notion"
+    "spotify"
+    "vlc"
+    "wezterm"
+  )
+fi
 
-print_progress "Browsers\n"
+if is_macos; then
+  APPS+=(
+    # OS utilities
+    "gnu-sed"
+    "cmake"
 
-brew install --no-quarantine --cask firefox-nightly
-brew install --no-quarantine --cask google-chrome-canary
-brew install --no-quarantine --cask orion
+    # Programming languages and tools
+    "cocoapods"
+    "node"
+    "rustup-init"
 
-print_progress "Dev Tools\n"
+    # Terminal tools
+    "eth-p/software/bat-extras"
+    "terminal-notifier"
+    "unar"
 
-brew install --no-quarantine --cask figma
-brew install --no-quarantine --cask flipper
-brew install --no-quarantine --cask imageoptim
-brew install --no-quarantine --cask inkscape
-brew install --no-quarantine --cask kitty
-brew install --no-quarantine --cask sf-symbols
-brew install --no-quarantine --cask visual-studio-code
-brew install --no-quarantine --cask wezterm
+    # Terminal apps
+    "mas"
+    "nextdns/tap/nextdns"
+    "osx-cpu-temp"
 
-print_progress "Media\n"
+    # Apps
+    "nikitabobko/tap/aerospace"
+    "sketchybar"
 
-brew install --no-quarantine --cask caption
-brew install --no-quarantine --cask iina
-brew install --no-quarantine --cask spotify
-brew install --no-quarantine --cask transmission
-brew install --no-quarantine --cask vlc
+    # Fonts
+    "font-fira-code"
+    "font-inter"
+    "font-jetbrains-mono"
+    "font-maple"
+    "font-symbols-only-nerd-font"
 
-print_progress "Others\n"
+    # Quick Look plugins
+    "qlcolorcode"
+    "qlimagesize"
+    "qlmarkdown"
+    "qlstephen"
+    "qlvideo"
+    "quicklook-json"
+    "quicklookase"
+    "webpquicklook"
 
-brew install --no-quarantine --cask adguard
-brew install nextdns/tap/nextdns
-brew install --no-quarantine --cask appcleaner
-brew install --no-quarantine --cask opencore-configurator
-brew install --no-quarantine --cask windscribe
-mas install 1294126402 # HEIC converter
-mas install 1596706466 # Speediness
-mas install 1611378436 # Pure Paste
+    # Desktop apps
+    "adguard"
+    "appcleaner"
+    "captin"
+    "caption"
+    "displaperture"
+    "figma"
+    "flipper"
+    "google-chrome-canary"
+    "hiddenbar"
+    "iina"
+    "imageoptim"
+    "kap"
+    "keepingyouawake"
+    "onyx"
+    "phoenix"
+    "qmk-toolbox"
+    "raycast"
+    "sf-symbols"
+    "shottr"
+    "stats"
+    "the-unarchiver"
+    "topnotch"
+    "transmission"
+    "turbo-boost-switcher"
+    "via"
+    "visual-studio-code"
+    "whatsapp"
+  )
 
-print_progress "Cleaning up\n"
+  mas install 1294126402 # HEIC converter
+  mas install 1596706466 # Speediness
+  mas install 1611378436 # Pure Paste
+  mas install 497799835  # Xcode
+fi
 
-brew cleanup
+if is_linux; then
+  APPS+=(
+    # Programming languages and tools
+    "nodejs"
+    "python-pip"
+    "rustup"
+
+    # Terminal tools
+    "bat-extras"
+
+    # Fonts
+    "ttf-fira-code"
+    "ttf-inter"
+    "ttf-jetbrains-mono"
+    "ttf-maple"
+    "ttf-nerd-fonts-symbols"
+  )
+
+  if ! is_wsl; then
+    APPS+=(
+      # Desktop apps
+      "google-chrome-dev"
+      "nextdns"
+      "transmission-gtk"
+      "visual-studio-code-bin"
+      "whatsie"
+    )
+  fi
+fi
+
+install_apps "${APPS[@]}"
 
 print_success "All apps installed! \n"
+
+# TODO: Add Winget apps
+# Winget apps
+# "7zip.7zip"
+# "AdGuard.AdGuard"
+# "Cockos.REAPER"
+# "Daum.PotPlayer"
+# "Discord.Discord"
+# "FACEITLTD.FACEITAC"
+# "Google.Chrome"
+# "JamesCJ60.Universalx86TuningUtility"
+# "Logitech.CameraSettings"
+# "Microsoft.PowerShell"
+# "Microsoft.PowerToys"
+# "NextDNS.NextDNS.Desktop"
+# "Notion.Notion"
+# "Proton.ProtonDrive"
+# "Proton.ProtonPass"
+# "Proton.ProtonVPN"
+# "TheBrowserCompany.Arc"

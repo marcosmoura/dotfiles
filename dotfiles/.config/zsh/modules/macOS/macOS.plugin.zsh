@@ -34,6 +34,10 @@ function updateMacos {
 }
 
 function systeminfo {
-  print_yellow "\n  💻  Apple MacBook Pro 16\" / M1 Max / 64GB / 1TB"
-  macchina
+  if is_macos; then
+    print_yellow "\n  💻  Apple MacBook Pro 16\" / M1 Max / 64GB / 1TB"
+    macchina
+  else
+    fastfetch
+  fi
 }

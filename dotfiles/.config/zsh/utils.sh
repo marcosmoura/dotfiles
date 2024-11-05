@@ -1,10 +1,13 @@
+alias echo="echo -e"
+
+# Text
 TEXT_YELLOW=$(tput setaf 3)
 TEXT_GREEN=$(tput setaf 2)
 TEXT_BLUE=$(tput setaf 6)
 TEXT_PURPLE=$(tput setaf 5)
 TEXT_RED=$(tput setaf 1)
 TEXT_RESET=$(tput sgr0)
-export TEXT_SEPARATOR="-----------------------------------------"
+export TEXT_SEPARATOR="-----------------------------------------------------------"
 
 # Colors
 function print_text {
@@ -34,10 +37,11 @@ function print_red {
 # Modes
 function print_start {
   print_text "🆕 $1"
+  print_text "$TEXT_SEPARATOR"
 }
 
 function print_progress {
-  print_text "🏃 $1"
+  print_text "\n🏃 $1\n"
 }
 
 function print_info {
@@ -63,13 +67,45 @@ function join_by_char {
 
 function authenticateBeforeUpdate {
   print_text "🔑 Authenticating"
+  print_text "$TEXT_SEPARATOR\n"
   sudo -v
 
   # Keep-alive: update existing `sudo` time stamp until `.osx` has finished
-  print_text ""
   while true; do
     sudo -n true
     sleep 60
     kill -0 "$$" || exit
   done 2>/dev/null &
+}
+
+function is_macos {
+  [[ "$OSTYPE" == "darwin"* ]]
+}
+
+function is_linux {
+  [[ "$OSTYPE" == "linux-gnu"* ]]
+}
+
+function is_wsl {
+  [[ $(uname -r) =~ WSL ]]
+}
+
+function install_app {
+  local app_name=$1
+
+  if is_macos; then
+    brew install --no-quarantine $app_name
+  elif is_linux; then
+    yay -S $app_name --noconfirm --needed
+  fi
+}
+
+function install_apps {
+  local apps=("$@")
+
+  if is_macos; then
+    brew install --no-quarantine "${apps[@]}"
+  elif is_linux; then
+    yay -S "${apps[@]}" --noconfirm --needed
+  fi
 }

@@ -4,23 +4,27 @@ if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-\${(%):-%n}.zsh" ]
 fi
 
 # Path
-export XDG_CONFIG_HOME=${XDG_CONFIG_HOME:-$HOME/.config}
-export PATH=/usr/local/bin:$PATH
-export PATH=/usr/local/opt:$PATH
-export PATH=$HOME/.local/bin:$PATH
-export PATH=$HOME/.rbenv/shims:$PATH
-export PATH=$HOME/.yarn/bin:$PATH
-export PATH=$HOME/.config/yarn/global/node_modules/.bin:$PATH
-export PATH=$HOME/go/bin:$PATH
-export PATH=$HOME/.cargo/bin:$PATH
-export PATH=$HOME/.local/share/venv/bin/python:$PATH
-export PATH=$HOME/.local/share/venv/bin/pip:$PATH
+function add_to_path {
+  if [ -d "$1" ] && [[ ":$PATH:" != *":$1:"* ]]; then
+    export PATH="${PATH:+"$PATH:"}$1"
+  fi
+}
 
-# Homebrew
-eval "$(/opt/homebrew/bin/brew shellenv)"
-if type brew &>/dev/null; then
-  FPATH="$(brew --prefix)/share/zsh/site-functions:${FPATH}"
-fi
+function flatten_path {
+  printf "%s" "$PATH" | awk -v RS=':' '!a[$1]++ { if (NR > 1) printf RS; printf $1 }'
+}
+
+export XDG_CONFIG_HOME=${XDG_CONFIG_HOME:-$HOME/.config}
+add_to_path /usr/local/bin
+add_to_path /usr/local/opt
+add_to_path $HOME/.local/bin
+add_to_path $HOME/.rbenv/shims
+add_to_path $HOME/.yarn/bin
+add_to_path $XDG_CONFIG_HOME/yarn/global/node_modules/.bin
+add_to_path $HOME/go/bin
+add_to_path $HOME/.cargo/bin
+add_to_path $HOME/.local/share/venv/bin/python
+add_to_path $HOME/.local/share/venv/bin/pip
 
 # Preferred editor
 export EDITOR=vim
@@ -39,7 +43,7 @@ export MANPAGER="less -X"
 export BAT_CONFIG_PATH="$XDG_CONFIG_HOME/bat/batconfig"
 
 # Setup zsh
-export ZSH_CACHE_DIR=$HOME/.config/zsh
+export ZSH_CACHE_DIR=$XDG_CONFIG_HOME/zsh
 export ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=#888"
 export ZSH_THEME=""
 export ENABLE_CORRECTION="false"
@@ -50,10 +54,6 @@ export SAVESIZE=25000
 
 # You Should Use
 export YSU_MODE=ALL
-
-# Load starship - Deprecated: Using p10k instead
-# export STARSHIP_CONFIG=$XDG_CONFIG_HOME/starship/starship.toml
-# eval "$(starship init zsh)"
 
 # Load powerlevel10k
 [[ ! -f ~/.config/p10k/.p10k.zsh ]] || source ~/.config/p10k/.p10k.zsh
@@ -75,3 +75,6 @@ source <(fzf --zsh)
 # Clear screen
 clear
 systeminfo
+
+# bun completions
+[ -s "/home/marcosmoura/.bun/_bun" ] && source "/home/marcosmoura/.bun/_bun"
