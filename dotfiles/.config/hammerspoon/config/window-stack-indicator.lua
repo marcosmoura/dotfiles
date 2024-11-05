@@ -1,28 +1,14 @@
 local debounce = require("config.utils.debounce")
 local executeYabai = require("config.utils.executeYabai")
 
-local spaces = {}
+local canvasMap = {}
 local indicator = {
   w = 40,
   h = 6,
   radius = 3,
 }
 
-local onIndicatorClick = function(_, _, id)
-  local window = hs.window.get(id)
-
-  if not window then
-    return
-  end
-
-  window:focus()
-end
-
-local removeCanvasElements = function(canvas)
-  while canvas:elementCount() > 0 do
-    canvas:removeElement(1)
-  end
-end
+local module = {}
 
 local getSpaceData = function()
   local space = executeYabai("-m query --spaces --space", { json = true })
@@ -32,24 +18,32 @@ local getSpaceData = function()
   return label, isStack
 end
 
-local drawIndicators = function(spaceConfig, isStack)
-  local filter = spaceConfig.filter
-  local canvas = spaceConfig.canvas
-  local windows = filter:getWindows()
-
-  removeCanvasElements(canvas)
-
-  if not isStack or #windows < 2 then
-    canvas:hide()
-    return
+local removeCanvasElements = function(canvas)
+  while canvas:elementCount() > 0 do
+    canvas:removeElement(1)
   end
+end
 
-  local focusedWindow = hs.window.focusedWindow()
+local getSortedYabaiWindows = function()
+  local yabaiWindows = executeYabai("-m query --windows --space", { json = true })
+  local windows = type(yabaiWindows) == "table" and yabaiWindows or {}
 
-  if not focusedWindow then
-    return
-  end
+  table.sort(windows, function(a, b)
+    local hasStackIndex = a["stack-index"] and b["stack-index"]
 
+    if not hasStackIndex then
+      return a["id"] < b["id"]
+    end
+
+    return a["stack-index"] < b["stack-index"]
+  end)
+
+  -- Print(windows)
+
+  return windows
+end
+
+local setCanvasFrame = function(canvas, focusedWindow)
   local frame = focusedWindow:frame()
 
   canvas:frame({
@@ -58,9 +52,24 @@ local drawIndicators = function(spaceConfig, isStack)
     x = frame.x,
     y = frame.y - (indicator.h * 2),
   })
+end
+
+local draw = function(canvas)
+  local windows = getSortedYabaiWindows()
+  local focusedWindow = hs.window.focusedWindow()
+
+  removeCanvasElements(canvas)
+
+  if #windows < 2 or not focusedWindow then
+    canvas:hide()
+    return
+  end
+
+  setCanvasFrame(canvas, focusedWindow)
 
   for index, window in ipairs(windows) do
-    local isFocused = window == focusedWindow
+    local id = window["id"]
+    local isFocused = id == focusedWindow:id()
 
     canvas:insertElement({
       type = "rectangle",
@@ -81,74 +90,75 @@ local drawIndicators = function(spaceConfig, isStack)
         h = indicator.h,
       },
       trackMouseDown = true,
-      id = window:id(),
+      id = id,
     })
   end
 
   canvas:show()
 end
 
-local onFilterChange = debounce(function()
+local onWindowChanged = debounce(function()
   local label, isStack = getSpaceData()
+  local canvas = canvasMap[label]
 
-  drawIndicators(spaces[label], isStack)
+  if not canvas then
+    return
+  end
+
+  if not isStack then
+    canvas:hide()
+    return
+  end
+
+  draw(canvas)
 end, 0.1)
 
-local createCurrentSpaceData = function()
-  local label, isStack = getSpaceData()
+local onIndicatorClick = function(_, _, id)
+  local window = hs.window.get(id)
 
-  if spaces[label] then
-    drawIndicators(spaces[label], isStack)
-
+  if not window then
     return
   end
 
-  spaces[label] = {
-    filter = hs.window.filter.new(),
-    canvas = hs.canvas.new({}),
-  }
-
-  local space = spaces[label]
-
-  if not space.canvas then
-    return
-  end
-
-  space.canvas:mouseCallback(onIndicatorClick)
-  space.canvas:level(hs.canvas.windowLevels.normal - 1)
-
-  space.filter
-    :setDefaultFilter()
-    :setSortOrder(hs.window.filter.sortByCreated)
-    :setOverrideFilter({
-      visible = true,
-      fullscreen = false,
-      currentSpace = true,
-      allowRoles = { "AXStandardWindow" },
-    })
-    :rejectApp("Hammerspoon")
-    :rejectApp("System Preferences")
-    :rejectApp("Notification Center")
-    :subscribe({
-      hs.window.filter.windowAllowed,
-      hs.window.filter.windowCreated,
-      hs.window.filter.windowDestroyed,
-      hs.window.filter.windowFocused,
-      hs.window.filter.windowInCurrentSpace,
-      hs.window.filter.windowMinimized,
-      hs.window.filter.windowMoved,
-      hs.window.filter.windowRejected,
-      hs.window.filter.windowsChanged,
-      hs.window.filter.windowTitleChanged,
-      hs.window.filter.windowUnfocused,
-    }, onFilterChange, true)
+  window:focus()
 end
 
-local module = {}
+local onSpaceChange = debounce(function()
+  local label = getSpaceData()
+  local canvas = canvasMap[label]
+  local isStack = getSpaceData()
+
+  if canvas or not isStack then
+    return
+  end
+
+  canvas = hs.canvas.new({})
+  canvasMap[label] = canvas
+
+  if not canvas then
+    return
+  end
+
+  canvas:mouseCallback(onIndicatorClick)
+  canvas:level(hs.canvas.windowLevels.normal - 1)
+  canvas:hide()
+
+  draw(canvas)
+end, 0.1)
+
+local onDisplayChange = debounce(function()
+  canvasMap = {}
+  onSpaceChange()
+end, 0.1)
 
 module.start = function()
-  hs.spaces.watcher.new(createCurrentSpaceData):start()
-  createCurrentSpaceData()
+  hs.ipc.localPort("yabaiHammerSpoon:onDisplaysChanged", onDisplayChange)
+  hs.ipc.localPort("yabaiHammerSpoon:onSpacesChanged", onSpaceChange)
+  hs.ipc.localPort("yabaiHammerSpoon:onWindowsChanged", onWindowChanged)
+
+  onDisplayChange()
+  onSpaceChange()
+  onWindowChanged()
 end
 
 return module
