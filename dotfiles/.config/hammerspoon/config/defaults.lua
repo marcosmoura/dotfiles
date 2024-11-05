@@ -16,6 +16,8 @@ module.start = function()
   hs.logger.defaultLogLevel = DEBUG and "info" or "error"
   hs.ipc.cliUninstall()
   hs.ipc.cliInstall()
+  hs.ipc.cliSaveHistory(true)
+  hs.ipc.cliSaveHistorySize(99999)
 end
 
 return module

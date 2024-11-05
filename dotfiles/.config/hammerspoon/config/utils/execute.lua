@@ -17,6 +17,10 @@ local function execute(commandPath, args, opts)
     print("Error executing command: " .. command)
     print(output)
 
+    if options.json then
+      return {}, status
+    end
+
     return "", status
   end
 
