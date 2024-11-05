@@ -142,12 +142,16 @@ local createSpaceFilter = function()
     :rejectApp("System Preferences")
     :rejectApp("Notification Center")
     :subscribe({
+      hs.window.filter.windowAllowed,
       hs.window.filter.windowCreated,
       hs.window.filter.windowDestroyed,
       hs.window.filter.windowFocused,
+      hs.window.filter.windowInCurrentSpace,
       hs.window.filter.windowMinimized,
       hs.window.filter.windowMoved,
+      hs.window.filter.windowRejected,
       hs.window.filter.windowsChanged,
+      hs.window.filter.windowTitleChanged,
       hs.window.filter.windowUnfocused,
     }, onFilterChange, true)
 end
