@@ -12,8 +12,8 @@ local module = {}
 
 local getSpaceData = function()
   local space = executeYabai("-m query --spaces --space", { json = true })
-  local label = space["label"]
-  local isStack = space["type"] == "stack"
+  local label = space.label
+  local isStack = space.type == "stack"
 
   return label, isStack
 end
@@ -29,16 +29,16 @@ local getSortedYabaiWindows = function()
   local windows = type(yabaiWindows) == "table" and yabaiWindows or {}
 
   table.sort(windows, function(a, b)
-    local hasStackIndex = a["stack-index"] and b["stack-index"]
+    local aIndex = a["stack-index"]
+    local bIndex = b["stack-index"]
+    local hasStackIndex = aIndex and bIndex
 
     if not hasStackIndex then
-      return a["id"] < b["id"]
+      return a.id < b.id
     end
 
-    return a["stack-index"] < b["stack-index"]
+    return aIndex < bIndex
   end)
-
-  -- Print(windows)
 
   return windows
 end
@@ -68,7 +68,7 @@ local draw = function(canvas)
   setCanvasFrame(canvas, focusedWindow)
 
   for index, window in ipairs(windows) do
-    local id = window["id"]
+    local id = window.id
     local isFocused = id == focusedWindow:id()
 
     canvas:insertElement({
