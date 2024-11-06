@@ -14,8 +14,10 @@ local function execute(commandPath, args, opts)
   local output, status = hs.execute(command)
 
   if not status then
-    print("Error executing command: " .. command)
-    print(output)
+    if not options.silent then
+      print("Error executing command: " .. command)
+      print(output)
+    end
 
     if options.json then
       return {}, status
