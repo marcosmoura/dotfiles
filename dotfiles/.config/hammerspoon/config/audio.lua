@@ -1,10 +1,20 @@
 local module = {}
 
 local function findDeviceByName(devices, name)
+  if not (devices or name) then
+    return
+  end
+
   local lowerName = string.lower(name)
 
   return hs.fnutils.find(devices, function(device)
-    local lowerDeviceName = string.lower(device:name())
+    local deviceName = device:name()
+
+    if not deviceName then
+      return false
+    end
+
+    local lowerDeviceName = string.lower(deviceName)
 
     return string.find(lowerDeviceName, lowerName)
   end)
