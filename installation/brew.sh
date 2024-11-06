@@ -81,7 +81,6 @@ brew install lpeg
 brew install lua
 brew install luajit
 brew install luarocks
-brew install macchina
 brew install marcosmoura/homebrew-tap/tsv-utils
 brew install mas
 brew install moreutils
