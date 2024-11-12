@@ -1,11 +1,11 @@
 local alert = require("config.utils.alert")
 local assets = require("config.utils.assets")
 
-local module = {}
-
 local menubarItem = hs.menubar.new()
 
 local updateMenubar = function(showAlert)
+  local hasAlert = showAlert ~= nil and showAlert or true
+
   if menubarItem == nil then
     return
   end
@@ -17,24 +17,37 @@ local updateMenubar = function(showAlert)
   menubarItem:setIcon(menubarIcon)
   menubarItem:setTooltip(message)
 
-  if showAlert then
+  if hasAlert then
     local alertIcon = state and assets.mugFilled or assets.mug
 
     alert.custom(message, alertIcon)
   end
 end
 
+local caffeinate = function(showAlert)
+  hs.caffeinate.set("displayIdle", true)
+  updateMenubar(showAlert)
+end
+
+local uncaffeinate = function(showAlert)
+  hs.caffeinate.set("displayIdle", false)
+  updateMenubar(showAlert)
+end
+
 local onCaffeinate = function(event)
   if event == hs.caffeinate.watcher.screensDidLock then
-    hs.caffeinate.set("displayIdle", false)
-    updateMenubar(true)
+    uncaffeinate(true)
   end
 
   if event == hs.caffeinate.watcher.screensDidUnlock then
-    hs.caffeinate.set("displayIdle", true)
-    updateMenubar(true)
+    caffeinate(true)
   end
 end
+
+local module = {}
+
+module.caffeinate = caffeinate
+module.uncaffeinate = uncaffeinate
 
 module.start = function()
   if menubarItem == nil then
@@ -47,9 +60,10 @@ module.start = function()
     updateMenubar(true)
   end)
 
+  caffeinate(false)
   hs.caffeinate.watcher.new(onCaffeinate):start()
-  hs.caffeinate.set("displayIdle", true)
-  updateMenubar(false)
+
+  hs.ipc.localPort("yabaiHammerSpoon:onSystemWoke", caffeinate)
 end
 
 return module

@@ -2,7 +2,7 @@ local module = {}
 
 module.start = function()
   hs.window.animationDuration = 0
-  hs.grid.setMargins({ 16, 16 })
+  hs.grid.setMargins({ 20, 20 })
 
   hs.allowAppleScript(true)
   hs.autoLaunch(true)
@@ -14,7 +14,7 @@ module.start = function()
 
   hs.hotkey.setLogLevel(DEBUG and "info" or "error")
   hs.logger.defaultLogLevel = DEBUG and "info" or "error"
-  hs.ipc.cliUninstall()
+
   hs.ipc.cliInstall()
   hs.ipc.cliSaveHistory(true)
   hs.ipc.cliSaveHistorySize(99999)

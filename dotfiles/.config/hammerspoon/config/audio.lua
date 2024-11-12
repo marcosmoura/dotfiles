@@ -1,24 +1,56 @@
 local module = {}
 
 local function findDeviceByName(devices, name)
+  if not (devices or name) then
+    return
+  end
+
   local lowerName = string.lower(name)
 
   return hs.fnutils.find(devices, function(device)
-    local lowerDeviceName = string.lower(device:name())
+    local deviceName = device:name()
+
+    if not deviceName then
+      return false
+    end
+
+    local lowerDeviceName = string.lower(deviceName)
 
     return string.find(lowerDeviceName, lowerName)
   end)
 end
 
-local handleOutputDeviceChange = function()
-  local allDevices = hs.audiodevice.allOutputDevices()
+local getTargetOutputDevice = function(current)
+  local outputDevices = hs.audiodevice.allOutputDevices()
 
+  local airpods = findDeviceByName(outputDevices, "airpods")
+  local teamsAudio = findDeviceByName(outputDevices, "microsoft teams audio")
+  local speakers = findDeviceByName(outputDevices, "external speakers")
+  local audioInterface = findDeviceByName(outputDevices, "minifuse")
+  local macbookPro = findDeviceByName(outputDevices, "MacBook Pro")
+
+  if airpods then
+    return airpods
+  end
+
+  if audioInterface then
+    if teamsAudio and teamsAudio:inUse() then
+      return teamsAudio
+    end
+
+    if speakers then
+      return speakers
+    end
+
+    return macbookPro
+  end
+
+  return current
+end
+
+local handleOutputDeviceChange = function()
   local current = hs.audiodevice.defaultOutputDevice()
-  local airpods = findDeviceByName(allDevices, "airpods")
-  local speakers = findDeviceByName(allDevices, "external speakers")
-  local audioInterface = findDeviceByName(allDevices, "minifuse")
-  local macbookPro = findDeviceByName(allDevices, "MacBook Pro")
-  local targetDevice = airpods or (audioInterface and speakers or macbookPro) or current
+  local targetDevice = getTargetOutputDevice(current)
 
   if not targetDevice or current and current:name() == targetDevice:name() then
     return
@@ -30,12 +62,12 @@ local handleOutputDeviceChange = function()
 end
 
 local handleInputDeviceChange = function()
-  local allDevices = hs.audiodevice.allInputDevices()
+  local inputDevices = hs.audiodevice.allInputDevices()
 
   local current = hs.audiodevice.defaultInputDevice()
-  local airpods = findDeviceByName(allDevices, "airpods")
-  local externalMic = findDeviceByName(allDevices, "at2020usb")
-  local macbookPro = findDeviceByName(allDevices, "MacBook Pro")
+  local airpods = findDeviceByName(inputDevices, "airpods")
+  local externalMic = findDeviceByName(inputDevices, "at2020usb")
+  local macbookPro = findDeviceByName(inputDevices, "MacBook Pro")
   local targetDevice = externalMic or airpods or macbookPro
 
   if not targetDevice or current and current:name() == targetDevice:name() then

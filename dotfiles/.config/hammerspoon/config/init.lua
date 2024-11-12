@@ -10,13 +10,12 @@ module.setup = function()
 
   -- Load all modules
   require("config.audio").start()
-  require("config.caffeinate").start()
+  require("config.caffeine").start()
   require("config.caps-lock").start()
   require("config.hold-to-quit").start()
   require("config.wallpaper").start()
   require("config.wifi").start()
-  require("config.window-manager").start()
-  require("config.window-stack-indicator").start()
+  require("config.window-manager").start(true)
 
   local assets = require("config.utils.assets")
   local alert = require("config.utils.alert")

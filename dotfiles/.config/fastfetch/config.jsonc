@@ -1,10 +1,18 @@
 {
   "$schema": "https://github.com/fastfetch-cli/fastfetch/raw/dev/doc/json_schema.json",
   "logo": {
-    "type": "small",
+    "type": "data",
+    "source": "$1        .:'\n    __ :'__\n$2 .'`  `-'  ``.\n:          .-'\n$3:         :\n :         `-;\n$4  `.__.-.__.'",
+    "color": {
+      "1": "green",
+      "2": "yellow",
+      "3": "red",
+      "4": "magenta"
+    },
+
     "padding": {
-      "top": 1,
-      "right": 4,
+      "top": 0,
+      "right": 3,
       "left": 1
     }
   },
@@ -19,33 +27,22 @@
     {
       "type": "os",
       "key": "OS        ",
-      "format": "💻 {2}"
-    },
-    {
-      "type": "gpu",
-      "key": "GPU       ",
-      "format": "{2}",
-      "hideType": "integrated"
-    },
-    {
-      "type": "cpu",
-      "key": "CPU       ",
-      "format": "{1}"
+      "format": "{2} - {8} {10}"
     },
     {
       "type": "display",
-      "compactType": "original",
-      "key": "Display   "
+      "key": "Display   ",
+      "format": "{6}: {1}x{2} @ {3}Hz in {12}\""
     },
     {
       "type": "terminal",
-      "format": "{5}",
-      "key": "Terminal  "
+      "key": "Terminal  ",
+      "format": "{5}"
     },
     {
       "type": "shell",
-      "format": "{1}",
-      "key": "Shell     "
+      "key": "Shell     ",
+      "format": "{1}"
     },
     {
       "type": "packages",
@@ -56,9 +53,11 @@
       "key": "Uptime    "
     },
     {
-      "type": "weather",
-      "location": "Prague",
-      "key": "Weather   "
+      "type": "battery",
+      "key": "Battery   "
+    },
+    {
+      "type": "break"
     }
   ]
 }
