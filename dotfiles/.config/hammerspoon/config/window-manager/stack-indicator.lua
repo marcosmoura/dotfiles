@@ -24,21 +24,25 @@ local removeCanvasElements = function(canvas)
   end
 end
 
-local getSortedYabaiWindows = function()
-  local yabaiWindows = executeYabai("-m query --windows --space", { json = true })
-  local windows = type(yabaiWindows) == "table" and yabaiWindows or {}
+local getFilteredWindows = function()
+  local filter = nil
 
-  table.sort(windows, function(a, b)
-    local aIndex = a["stack-index"]
-    local bIndex = b["stack-index"]
-    local hasStackIndex = aIndex and bIndex
+  filter = hs.window.filter
+    .new(false)
+    :setDefaultFilter({
+      visible = true,
+      currentSpace = true,
+      allowRoles = "AXStandardWindow",
+      allowScreens = hs.window.focusedWindow():screen():getUUID(),
+      fullscreen = false,
+    })
+    :rejectApp("Hammerspoon")
+    :setSortOrder(hs.window.filter.sortByCreatedLast)
+  local windows = filter:getWindows()
 
-    if not hasStackIndex then
-      return a.id < b.id
-    end
-
-    return aIndex < bIndex
-  end)
+  filter:unsubscribeAll()
+  filter:pause()
+  filter = nil
 
   return windows
 end
@@ -55,7 +59,7 @@ local setCanvasFrame = function(canvas, focusedWindow)
 end
 
 local draw = function(canvas)
-  local windows = getSortedYabaiWindows()
+  local windows = getFilteredWindows()
   local focusedWindow = hs.window.focusedWindow()
 
   removeCanvasElements(canvas)
@@ -68,7 +72,7 @@ local draw = function(canvas)
   setCanvasFrame(canvas, focusedWindow)
 
   for index, window in ipairs(windows) do
-    local id = window.id
+    local id = window:id()
     local isFocused = id == focusedWindow:id()
 
     canvas:insertElement({
@@ -151,13 +155,13 @@ local onDisplayChange = debounce(function()
 end, 0.1)
 
 module.start = function()
-  hs.ipc.localPort("yabaiHammerSpoon:onDisplaysChanged", onDisplayChange)
-  hs.ipc.localPort("yabaiHammerSpoon:onSpacesChanged", onSpaceChange)
-  hs.ipc.localPort("yabaiHammerSpoon:onWindowsChanged", onWindowChanged)
-
   onDisplayChange()
   onSpaceChange()
   onWindowChanged()
+
+  hs.ipc.localPort("yabaiHammerSpoon:onDisplaysChanged", onDisplayChange)
+  hs.ipc.localPort("yabaiHammerSpoon:onSpacesChanged", onSpaceChange)
+  hs.ipc.localPort("yabaiHammerSpoon:onWindowsChanged", onWindowChanged)
 end
 
 return module

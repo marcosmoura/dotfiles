@@ -1,3 +1,4 @@
+local caffeine = require("config.caffeine")
 local executeYabai = require("config.utils.executeYabai")
 local wallpaper = require("config.wallpaper")
 
@@ -17,16 +18,15 @@ local setFloatingWindowPosition = function(arrowKey)
     local height = 1440
     local windowWidth = width * 70 / 100
     local windowHeight = height * 70 / 100
-    local x = (width - windowWidth) / 2
-    local y = (height - windowHeight) / 2
 
     local focusedWindow = hs.window.focusedWindow()
+    local frame = focusedWindow:frame()
 
     focusedWindow:setFrame({
       w = windowWidth,
       h = windowHeight,
-      x = x,
-      y = y,
+      x = frame.x,
+      y = frame.y,
     })
 
     focusedWindow:centerOnScreen()
@@ -60,7 +60,7 @@ hs.hotkey.bind({ "cmd", "alt" }, "H", noop)
 -- Misc
 --------------------
 local reloadTools = function()
-  executeYabai("--restart-service")
+  executeYabai("--restart-service", { silent = true })
   hs.reload()
   wallpaper.removeWallpapers()
 end
@@ -68,9 +68,13 @@ end
 hs.hotkey.bind({ "cmd", "ctrl" }, "Y", reloadTools)
 hs.hotkey.bind({ "cmd", "ctrl" }, "R", reloadTools)
 
-hs.hotkey.bind({ "cmd", "ctrl" }, "L", function()
+local onLockScreen = function()
+  caffeine.uncaffeinate(false)
   hs.caffeinate.lockScreen()
-end)
+end
+
+hs.hotkey.bind({ "cmd", "ctrl" }, "L", onLockScreen)
+hs.hotkey.bind({ "cmd", "ctrl" }, "Q", onLockScreen)
 
 hs.hotkey.bind({ "cmd", "ctrl" }, "D", function()
   hs.spaces.toggleShowDesktop()
@@ -150,52 +154,73 @@ end)
 --------------------
 -- Move windows
 --------------------
-for _, arrowKey in ipairs({ "up", "down", "left", "right" }) do
+for arrowKey, direction in pairs(yabaiDirectionMap) do
   hs.hotkey.bind({ "cmd", "ctrl" }, arrowKey, function()
     local window = executeYabai("-m query --windows --window", { json = true })
-    local isFloating = window["is-floating"]
+    local space = executeYabai("-m query --spaces --space", { json = true })
+    local isFloating = window["is-floating"] or space.type == "float"
 
     if isFloating then
       setFloatingWindowPosition(arrowKey)
       return
     end
 
-    executeYabai({ "-m window --swap", yabaiDirectionMap[arrowKey] })
+    executeYabai({ "-m window --swap", direction }, { silent = true })
   end)
 end
 
 --------------------
 --- Move windows between displays
 --------------------
-for _, arrowKey in ipairs({ "left", "right" }) do
-  hs.hotkey.bind({ "cmd", "ctrl", "alt" }, arrowKey, function()
-    local hammerspoonDirectionMap = {
-      left = "moveOneScreenWest",
-      right = "moveOneScreenEast",
-    }
-
-    hs.window.focusedWindow()[hammerspoonDirectionMap[arrowKey]]()
+for arrowKey, direction in pairs(yabaiDirectionMap) do
+  hs.hotkey.bind({ "cmd", "alt", "ctrl" }, arrowKey, function()
+    executeYabai({ "-m window --display", direction, "--focus" }, { silent = true })
   end)
 end
 
 --------------------
 --- Focus windows
 --------------------
-for _, arrowKey in ipairs({ "up", "down", "left", "right" }) do
-  hs.hotkey.bind({ "cmd", "ctrl", "shift" }, arrowKey, function()
-    local hammerspoonDirectionMap = {
-      up = "focusWindowNorth",
-      right = "focusWindowEast",
-      down = "focusWindowSouth",
-      left = "focusWindowWest",
-    }
+local focusDirectionMap = {
+  up = "focusWindowNorth",
+  right = "focusWindowEast",
+  down = "focusWindowSouth",
+  left = "focusWindowWest",
+}
 
-    hs.window.focusedWindow()[hammerspoonDirectionMap[arrowKey]]()
+for arrowKey, direction in pairs(focusDirectionMap) do
+  hs.hotkey.bind({ "cmd", "ctrl", "shift" }, arrowKey, function()
+    local focusedWindow = hs.window.focusedWindow()
+
+    focusedWindow[direction](focusedWindow)
   end)
 end
 
+local getFilteredWindows = function()
+  local filter = nil
+
+  filter = hs.window.filter
+    .new(false)
+    :setDefaultFilter({
+      visible = true,
+      currentSpace = true,
+      allowRoles = "AXStandardWindow",
+      allowScreens = hs.window.focusedWindow():screen():getUUID(),
+      fullscreen = false,
+    })
+    :rejectApp("Hammerspoon")
+    :setSortOrder(hs.window.filter.sortByCreatedLast)
+  local windows = filter:getWindows()
+
+  filter:unsubscribeAll()
+  filter:pause()
+  filter = nil
+
+  return windows
+end
+
 local cycleWindows = function(direction)
-  local windows = hs.window.orderedWindows()
+  local windows = getFilteredWindows()
   local focusedWindow = hs.window.focusedWindow()
   local focusedWindowIndex = hs.fnutils.indexOf(windows, focusedWindow)
 
@@ -225,9 +250,9 @@ end)
 --------------------
 --- Focus monitors
 --------------------
-for _, arrowKey in ipairs({ "left", "right" }) do
+for arrowKey, direction in pairs(yabaiDirectionMap) do
   hs.hotkey.bind({ "cmd", "alt", "shift" }, arrowKey, function()
-    executeYabai({ "-m display --focus", yabaiDirectionMap[arrowKey] })
+    executeYabai({ "-m display --focus", direction }, { silent = true })
   end)
 end
 
@@ -246,7 +271,7 @@ hs.hotkey.bind({ "cmd", "ctrl" }, "=", function()
     "bottom:50:50",
     "--resize",
     "top:-50:-50",
-  })
+  }, { silent = true })
 end)
 
 hs.hotkey.bind({ "cmd", "ctrl" }, "-", function()
@@ -261,42 +286,42 @@ hs.hotkey.bind({ "cmd", "ctrl" }, "-", function()
     "bottom:-50:-50",
     "--resize",
     "top:50:50",
-  })
+  }, { silent = true })
 end)
 
 hs.hotkey.bind({ "cmd", "ctrl", "alt", "shift" }, "up", function()
-  executeYabai("-m window --resize bottom:0:-50")
+  executeYabai("-m window --resize bottom:0:-50", { silent = true })
 end)
 
 hs.hotkey.bind({ "cmd", "ctrl", "alt", "shift" }, "down", function()
-  executeYabai("-m window --resize bottom:0:50")
+  executeYabai("-m window --resize bottom:0:50", { silent = true })
 end)
 
 hs.hotkey.bind({ "cmd", "ctrl", "alt", "shift" }, "left", function()
-  executeYabai("-m window --resize right:-50:0")
+  executeYabai("-m window --resize right:-50:0", { silent = true })
 end)
 
 hs.hotkey.bind({ "cmd", "ctrl", "alt", "shift" }, "right", function()
-  executeYabai("-m window --resize right:50:0")
+  executeYabai("-m window --resize right:50:0", { silent = true })
 end)
 
 hs.hotkey.bind({ "cmd", "ctrl" }, "E", function()
-  executeYabai("-m space --balance")
+  executeYabai("-m space --balance", { silent = true })
 end)
 
 --------------------
 -- Layouts
 --------------------
 hs.hotkey.bind({ "cmd", "ctrl" }, "B", function()
-  executeYabai("-m space --layout bsp")
+  executeYabai("-m space --layout bsp", { silent = true })
 end)
 
 hs.hotkey.bind({ "cmd", "ctrl" }, "F", function()
-  executeYabai("-m space --layout float")
+  executeYabai("-m space --layout float", { silent = true })
 end)
 
 hs.hotkey.bind({ "cmd", "ctrl" }, "M", function()
-  executeYabai("-m space --layout stack")
+  executeYabai("-m space --layout stack", { silent = true })
 end)
 
 for _, key in ipairs({ "V", "C" }) do
@@ -314,8 +339,8 @@ for _, key in ipairs({ "V", "C" }) do
       return
     end
 
-    executeYabai("-m window --toggle split")
-    executeYabai("-m space --balance")
+    executeYabai("-m window --toggle split", { silent = true })
+    executeYabai("-m space --balance", { silent = true })
   end)
 end
 
