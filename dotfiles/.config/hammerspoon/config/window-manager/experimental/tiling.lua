@@ -1,4 +1,5 @@
 local debounce = require("config.utils.debounce")
+local deepMerge = require("config.utils.deepMerge")
 local memoize = require("config.utils.memoize")
 
 local onLayoutChangedIpc = hs.ipc.remotePort("windowManager.tiling.onLayoutChanged")
@@ -52,7 +53,10 @@ local config = {
   {
     name = "Communication",
     apps = {
-      "Microsoft Teams",
+      {
+        name = "Microsoft Teams",
+        hasTitlebar = true,
+      },
       "WhatsApp",
     },
     layout = "float",
@@ -60,7 +64,13 @@ local config = {
   {
     name = "Mail",
     apps = {
-      "Microsoft Outlook",
+      {
+        name = "Microsoft Outlook",
+        hasTitlebar = true,
+        rejectTitles = {
+          "Reminder",
+        },
+      },
     },
     layout = "tile",
   },
@@ -187,6 +197,29 @@ local applyLayout = function(layout, windows)
   end
 end
 
+local getAppFilter = function(app)
+  local defaultFilter = {
+    visible = true,
+    fullscreen = false,
+    allowRoles = { "AXStandardWindow", "AXWindow" },
+  }
+
+  if type(app) == "table" then
+    local filter = deepMerge(defaultFilter, {
+      rejectTitles = app.rejectTitles,
+      hasTitlebar = app.hasTitlebar,
+      allowTitles = app.allowTitles,
+      allowScreens = app.allowScreens,
+      rejectScreens = app.rejectScreens,
+      allowRoles = app.allowRoles,
+    })
+
+    return app.name, filter
+  end
+
+  return app, defaultFilter
+end
+
 local module = {}
 
 module.start = function()
@@ -201,13 +234,12 @@ module.start = function()
     end
 
     local filter = hs.window.filter.new(false):setCurrentSpace(true):setSortOrder(hs.window.filter.sortByCreatedLast)
+    local apps = spaceConfig.apps or {}
 
-    for _, app in ipairs(spaceConfig.apps) do
-      filter:setAppFilter(app, {
-        visible = true,
-        fullscreen = false,
-        allowRoles = "AXStandardWindow",
-      })
+    for _, app in ipairs(apps) do
+      local appName, appFilter = getAppFilter(app)
+
+      filter:setAppFilter(appName, appFilter)
     end
 
     filter:subscribe(

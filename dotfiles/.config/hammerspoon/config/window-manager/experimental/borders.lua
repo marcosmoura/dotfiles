@@ -21,9 +21,7 @@ local drawFocusedWindowBorder = function(canvas)
   canvas:show()
 end
 
-local createFocusedWindowBorderWatcher = function()
-  local canvas = hs.canvas.new({})
-
+local setCanvas = function(canvas)
   if not canvas then
     return
   end
@@ -35,14 +33,22 @@ local createFocusedWindowBorderWatcher = function()
     type = "rectangle",
     action = "stroke",
     strokeColor = { hex = "#fff" },
-    strokeWidth = 2.25,
+    strokeWidth = 2.125,
     roundedRectRadii = { xRadius = 11, yRadius = 11 },
   })
   canvas:frame(hs.window.frontmostWindow():screen():fullFrame())
+end
+
+local module = {}
+
+module.start = function()
+  local canvas = hs.canvas.new({})
 
   local onChange = debounce(function()
     drawFocusedWindowBorder(canvas)
   end, 0.1)
+
+  setCanvas(canvas)
 
   hs.window.filter
     .new(hs.window.filter.defaultCurrentSpace)
@@ -71,12 +77,45 @@ local createFocusedWindowBorderWatcher = function()
     }, onChange, true)
 
   hs.ipc.localPort("windowManager.tiling.onLayoutChanged", onChange)
-end
 
-local module = {}
+  local prevPosition = {
+    x = nil,
+    y = nil,
+  }
 
-module.start = function()
-  createFocusedWindowBorderWatcher()
+  hs.eventtap
+    .new({
+      hs.eventtap.event.types.leftMouseDragged,
+    }, function()
+      local focusedWindow = hs.window.focusedWindow()
+
+      if not focusedWindow then
+        return
+      end
+
+      local frame = focusedWindow:frame()
+
+      if frame.x == prevPosition.x and frame.y == prevPosition.y then
+        return
+      end
+
+      if not (prevPosition.x and prevPosition.y) then
+        prevPosition = {
+          x = frame.x,
+          y = frame.y,
+        }
+
+        return
+      end
+
+      prevPosition = {
+        x = frame.x,
+        y = frame.y,
+      }
+
+      onChange()
+    end)
+    :start()
 end
 
 return module

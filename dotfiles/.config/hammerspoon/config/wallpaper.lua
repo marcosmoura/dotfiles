@@ -5,8 +5,8 @@ local wallpaperNameMap = {}
 
 local function getCornerData(rawFrame, radius, menubarHeight)
   local frame = {
-    x = rawFrame.x,
-    y = rawFrame.y,
+    x = 0,
+    y = 0,
     w = rawFrame.w,
     h = rawFrame.h,
   }
@@ -87,7 +87,7 @@ local function getElements(image, frame, cornerData, radius, menubarHeight)
       type = "rectangle",
       frame = { x = 0, y = 0, w = frame.w, h = menubarHeight },
       fillColor = {
-        hex = "#000000",
+        hex = "#000",
       },
     }
   end
@@ -114,14 +114,16 @@ local getWallpaper = function(currentSpace, screen)
     return
   end
 
-  image = image:setSize({ w = screen:fullFrame().w, h = screen:fullFrame().h }, true)
+  local frame = screen:fullFrame()
+
+  image = image:setSize({ w = frame.w, h = frame.h }, true)
 
   return image
 end
 
 local createWallpaperWithCorners = function(image, screen)
   local screenFrame = screen:fullFrame()
-  local menubarHeight = screen:frame().y
+  local menubarHeight = screen:frame().y - screenFrame.y
   local radius = 16
 
   local cornerData = getCornerData(screenFrame, radius, menubarHeight)
@@ -140,42 +142,59 @@ local createWallpaperWithCorners = function(image, screen)
 
   wallpaperWithCorners
     :appendElements(elements)
-    :behavior(hs.canvas.windowBehaviors.canJoinAllSpaces)
+    :behavior(hs.canvas.windowBehaviors.moveToActiveSpace)
     :level(hs.canvas.windowLevels.desktopIcon)
 
-  return wallpaperWithCorners:imageFromCanvas()
+  local generatedWallpaper = wallpaperWithCorners:imageFromCanvas()
+
+  if generatedWallpaper == nil then
+    wallpaperWithCorners:delete()
+    return
+  end
+
+  wallpaperWithCorners:delete()
+
+  return generatedWallpaper
 end
 
-local getSpaceIndex = function(screen, spaceId)
-  local allSpaces = hs.spaces.allSpaces()
-  local screenUuid = screen:getUUID()
+local getAllSpaces = function()
+  local spacesByDisplay = hs.spaces.data_managedDisplaySpaces()
+  local allSpaces = hs.fnutils.reduce(spacesByDisplay, function(acc, spaces)
+    local otherSpaces = hs.fnutils.map(spaces.Spaces, function(space)
+      return space.id64
+    end)
 
-  if allSpaces == nil or allSpaces[screenUuid] == nil then
+    return hs.fnutils.concat(acc, otherSpaces)
+  end, {}) or {}
+
+  return allSpaces
+end
+
+local getSpaceIndex = function(spaceId)
+  local allSpaces = getAllSpaces()
+
+  if not allSpaces then
     return 0
   end
 
-  for index, space in ipairs(allSpaces[screenUuid]) do
-    if space == spaceId then
-      return index
-    end
-  end
-
-  return 0
+  return hs.fnutils.indexOf(allSpaces, spaceId) or 0
 end
 
 local applyWallpaper = function(path)
-  hs.osascript.applescript('tell application "Finder" to set desktop picture to POSIX file "' .. path .. '"')
+  local focusedWindow = hs.window.focusedWindow() or hs.window.frontmostWindow()
+
+  focusedWindow:screen():desktopImageURL("file://" .. path)
 end
 
 local generateWallpaperForSpace = function()
-  local focusedWindow = hs.window.focusedWindow()
+  local focusedWindow = hs.window.frontmostWindow()
 
   if focusedWindow == nil then
     return
   end
 
   local screen = focusedWindow:screen()
-  local currentSpace = getSpaceIndex(screen, hs.spaces.activeSpaceOnScreen(screen))
+  local currentSpace = getSpaceIndex(hs.spaces.activeSpaceOnScreen(screen))
   local wallpaperPath = wallpaperPrefixPath .. wallpaperNameMap[currentSpace] .. ".jpg"
 
   ensureWallpaperDir()
@@ -205,14 +224,14 @@ local removeWallpapers = function()
   execute("rm -rf " .. wallpaperPrefixPath)
 end
 
-local generateWallpaperUuids = function()
-  local spaces = hs.spaces.allSpaces()
+local generateWallpaperUUIDs = function()
+  local spaces = getAllSpaces()
 
-  if spaces == nil then
+  if not spaces then
     return
   end
 
-  for index, _ in ipairs(spaces[hs.window.focusedWindow():screen():getUUID()]) do
+  for index, _ in ipairs(spaces) do
     wallpaperNameMap[index] = hs.host.uuid()
   end
 end
@@ -223,7 +242,7 @@ module.removeWallpapers = removeWallpapers
 
 module.start = function()
   removeWallpapers()
-  generateWallpaperUuids()
+  generateWallpaperUUIDs()
   hs.spaces.watcher.new(generateWallpaperForSpace):start()
   hs.screen.watcher
     .new(function()
