@@ -24,9 +24,9 @@ local setFloatingWindowPosition = function(arrowKey)
 
     focusedWindow
       :setSize({
-      w = windowWidth,
-      h = windowHeight,
-    })
+        w = windowWidth,
+        h = windowHeight,
+      })
       :centerOnScreen()
 
     return
@@ -156,9 +156,8 @@ end)
 --------------------
 for arrowKey, direction in pairs(yabaiDirectionMap) do
   hs.hotkey.bind({ "cmd", "ctrl" }, arrowKey, function()
-    local window = executeYabai("-m query --windows --window", { json = true })
     local space = executeYabai("-m query --spaces --space", { json = true })
-    local isFloating = window["is-floating"] or space.type == "float"
+    local isFloating = space.type == "float"
 
     if isFloating then
       setFloatingWindowPosition(arrowKey)
@@ -330,6 +329,14 @@ hs.hotkey.bind({ "cmd", "ctrl" }, "B", function()
 end)
 
 hs.hotkey.bind({ "cmd", "ctrl" }, "F", function()
+  local space = executeYabai("-m query --spaces --space", { json = true })
+  local label = space.label
+
+  if label then
+    executeYabai({ "-m config --space", label, "layout float" }, { silent = true })
+    return
+  end
+
   executeYabai("-m space --layout float", { silent = true })
 end)
 
