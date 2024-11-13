@@ -1,6 +1,8 @@
+local memoize = require("config.utils.memoize")
+
 local module = {}
 
-local function findDeviceByName(devices, name)
+local findDeviceByName = memoize(function(devices, name)
   if not (devices or name) then
     return
   end
@@ -18,9 +20,9 @@ local function findDeviceByName(devices, name)
 
     return string.find(lowerDeviceName, lowerName)
   end)
-end
+end)
 
-local getTargetOutputDevice = function(current)
+local getTargetOutputDevice = function()
   local outputDevices = hs.audiodevice.allOutputDevices()
 
   local airpods = findDeviceByName(outputDevices, "airpods")
@@ -45,12 +47,12 @@ local getTargetOutputDevice = function(current)
     return macbookPro
   end
 
-  return current
+  return nil
 end
 
 local handleOutputDeviceChange = function()
   local current = hs.audiodevice.defaultOutputDevice()
-  local targetDevice = getTargetOutputDevice(current)
+  local targetDevice = getTargetOutputDevice() or current
 
   if not targetDevice or current and current:name() == targetDevice:name() then
     return
@@ -68,7 +70,7 @@ local handleInputDeviceChange = function()
   local airpods = findDeviceByName(inputDevices, "airpods")
   local externalMic = findDeviceByName(inputDevices, "at2020usb")
   local macbookPro = findDeviceByName(inputDevices, "MacBook Pro")
-  local targetDevice = externalMic or airpods or macbookPro
+  local targetDevice = externalMic or airpods or macbookPro or current
 
   if not targetDevice or current and current:name() == targetDevice:name() then
     return
