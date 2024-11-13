@@ -11,41 +11,41 @@ local yabaiDirectionMap = {
 }
 
 local setFloatingWindowPosition = function(arrowKey)
-  hs.grid.setGrid("2x1")
+  local focusedWindow = hs.window.focusedWindow()
+
+  hs.grid.setGrid("1x1")
 
   if arrowKey == "down" then
-    local width = 2560
-    local height = 1440
+    local screenFrame = focusedWindow:screen():fullFrame()
+    local width = screenFrame.w
+    local height = screenFrame.h
     local windowWidth = width * 70 / 100
     local windowHeight = height * 70 / 100
 
-    local focusedWindow = hs.window.focusedWindow()
-    local frame = focusedWindow:frame()
-
-    focusedWindow:setFrame({
+    focusedWindow
+      :setSize({
       w = windowWidth,
       h = windowHeight,
-      x = frame.x,
-      y = frame.y,
     })
-
-    focusedWindow:centerOnScreen()
+      :centerOnScreen()
 
     return
   end
 
+  hs.grid.setGrid("2x1")
+
   if arrowKey == "up" then
-    hs.grid.set(hs.window.focusedWindow(), "0,0 2x1")
+    hs.grid.set(focusedWindow, "0,0 2x1")
     return
   end
 
   if arrowKey == "right" then
-    hs.grid.set(hs.window.focusedWindow(), "1,0 1x2")
+    hs.grid.set(focusedWindow, "1,0 1x2")
     return
   end
 
   if arrowKey == "left" then
-    hs.grid.set(hs.window.focusedWindow(), "0,0 1x2")
+    hs.grid.set(focusedWindow, "0,0 1x2")
     return
   end
 end
@@ -196,27 +196,40 @@ for arrowKey, direction in pairs(focusDirectionMap) do
   end)
 end
 
-local getFilteredWindows = function()
-  local filter = nil
+local filters = {}
 
-  filter = hs.window.filter
+local getFilteredWindows = function()
+  local focusedWindow = hs.window.focusedWindow()
+
+  if not focusedWindow then
+    return {}
+  end
+
+  local space = hs.spaces.activeSpaceOnScreen(focusedWindow:screen())
+
+  if not space then
+    return {}
+  end
+
+  if filters[space] then
+    return filters[space]:getWindows()
+  end
+
+  local filter = hs.window.filter
     .new(false)
     :setDefaultFilter({
       visible = true,
-      currentSpace = true,
       allowRoles = "AXStandardWindow",
-      allowScreens = hs.window.focusedWindow():screen():getUUID(),
+      allowScreens = focusedWindow:screen():getUUID(),
       fullscreen = false,
     })
+    :setCurrentSpace(true)
     :rejectApp("Hammerspoon")
     :setSortOrder(hs.window.filter.sortByCreatedLast)
-  local windows = filter:getWindows()
 
-  filter:unsubscribeAll()
-  filter:pause()
-  filter = nil
+  filters[space] = filter
 
-  return windows
+  return filter:getWindows()
 end
 
 local cycleWindows = function(direction)
@@ -346,6 +359,6 @@ end
 
 local module = {}
 
-module.start = noop
+module.start = getFilteredWindows
 
 return module
