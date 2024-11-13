@@ -1,5 +1,17 @@
 {
   "Lua.workspace.library": [
     "~/.config/hammerspoon/Spoons/EmmyLua.spoon/annotations"
+  ],
+  "cSpell.words": [
+    "applescript",
+    "audiodevice",
+    "caffeinate",
+    "eventtap",
+    "fnutils",
+    "hidutil",
+    "minifuse",
+    "osascript",
+    "syncinstall",
+    "uncaffeinate"
   ]
 }
