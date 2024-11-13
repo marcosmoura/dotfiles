@@ -25,6 +25,8 @@ module.start = function()
   if not hs.ipc.cliStatus() then
     hs.ipc.cliInstall()
   end
+
+  hs.window.filter.default:rejectApp("Hammerspoon")
 end
 
 return module
