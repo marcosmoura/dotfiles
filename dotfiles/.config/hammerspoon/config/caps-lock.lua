@@ -3,8 +3,10 @@ local execute = require("config.utils.execute")
 local module = {}
 
 module.start = function()
-  local status = execute(
-    'hidutil property --set \'{"UserKeyMapping":[{"HIDKeyboardModifierMappingSrc": 0x700000039, "HIDKeyboardModifierMappingDst": 0x7000000E3}]}\''
+  local _, status = execute(
+    'hidutil property --set \'{"UserKeyMapping":[{"HIDKeyboardModifierMappingSrc": 0x700000039, "HIDKeyboardModifierMappingDst": 0x7000000E3}]}\'',
+    {},
+    { silent = true }
   )
 
   if not status then
