@@ -1,5 +1,6 @@
 local debounce = require("config.utils.debounce")
 local executeYabai = require("config.utils.executeYabai")
+local memoize = require("config.utils.memoize")
 
 local canvasMap = {}
 local indicator = {
@@ -24,27 +25,40 @@ local removeCanvasElements = function(canvas)
   end
 end
 
-local getFilteredWindows = function()
-  local filter = nil
+local filters = {}
 
-  filter = hs.window.filter
+local getFilteredWindows = function()
+  local focusedWindow = hs.window.focusedWindow()
+
+  if not focusedWindow then
+    return {}
+  end
+
+  local space = hs.spaces.activeSpaceOnScreen(focusedWindow:screen())
+
+  if not space then
+    return {}
+  end
+
+  if filters[space] then
+    return filters[space]:getWindows()
+  end
+
+  local filter = hs.window.filter
     .new(false)
     :setDefaultFilter({
       visible = true,
-      currentSpace = true,
       allowRoles = "AXStandardWindow",
-      allowScreens = hs.window.focusedWindow():screen():getUUID(),
+      allowScreens = focusedWindow:screen():getUUID(),
       fullscreen = false,
     })
+    :setCurrentSpace(true)
     :rejectApp("Hammerspoon")
     :setSortOrder(hs.window.filter.sortByCreatedLast)
-  local windows = filter:getWindows()
 
-  filter:unsubscribeAll()
-  filter:pause()
-  filter = nil
+  filters[space] = filter
 
-  return windows
+  return filter:getWindows()
 end
 
 local setCanvasFrame = function(canvas, focusedWindow)
@@ -58,8 +72,7 @@ local setCanvasFrame = function(canvas, focusedWindow)
   })
 end
 
-local draw = function(canvas)
-  local windows = getFilteredWindows()
+local draw = memoize(function(canvas, windows)
   local focusedWindow = hs.window.focusedWindow()
 
   removeCanvasElements(canvas)
@@ -99,7 +112,7 @@ local draw = function(canvas)
   end
 
   canvas:show()
-end
+end)
 
 local onWindowChanged = debounce(function()
   local label, isStack = getSpaceData()
@@ -114,7 +127,7 @@ local onWindowChanged = debounce(function()
     return
   end
 
-  draw(canvas)
+  draw(canvas, getFilteredWindows())
 end, 0.1)
 
 local onIndicatorClick = function(_, _, id)
@@ -146,7 +159,7 @@ local onSpaceChange = debounce(function()
   canvas:level(hs.canvas.windowLevels.normal - 1)
   canvas:hide()
 
-  draw(canvas)
+  draw(canvas, getFilteredWindows())
 end, 0.1)
 
 local onDisplayChange = debounce(function()
@@ -155,13 +168,9 @@ local onDisplayChange = debounce(function()
 end, 0.1)
 
 module.start = function()
-  onDisplayChange()
-  onSpaceChange()
-  onWindowChanged()
-
-  hs.ipc.localPort("yabaiHammerSpoon:onDisplaysChanged", onDisplayChange)
-  hs.ipc.localPort("yabaiHammerSpoon:onSpacesChanged", onSpaceChange)
-  hs.ipc.localPort("yabaiHammerSpoon:onWindowsChanged", onWindowChanged)
+  hs.ipc.localPort("yabai:onDisplaysChanged", onDisplayChange)
+  hs.ipc.localPort("yabai:onSpacesChanged", onSpaceChange)
+  hs.ipc.localPort("yabai:onWindowsChanged", onWindowChanged)
 end
 
 return module
