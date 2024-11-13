@@ -1,6 +1,7 @@
 local execute = require("config.utils.execute")
-local wallpaperPrefixPath = "/tmp/hammerspoon-wallpapers/"
+local memoize = require("config.utils.memoize")
 
+local wallpaperPrefixPath = "/tmp/hammerspoon-wallpapers/"
 local wallpaperNameMap = {}
 
 local function getCornerData(rawFrame, radius, menubarHeight)
@@ -101,8 +102,12 @@ local ensureWallpaperDir = function()
   end
 end
 
-local getWallpaper = function(currentSpace, screen)
-  local wallpaperPath = "~/.config/wallpapers/" .. currentSpace .. ".jpg"
+local getLocalWallpaperPath = function(currentSpace)
+  return "~/.config/wallpapers/" .. currentSpace .. ".jpg"
+end
+
+local getWallpaper = memoize(function(currentSpace, screen)
+  local wallpaperPath = getLocalWallpaperPath(currentSpace)
 
   if hs.fs.attributes(wallpaperPath) == nil then
     return
@@ -119,9 +124,9 @@ local getWallpaper = function(currentSpace, screen)
   image = image:setSize({ w = frame.w, h = frame.h }, true)
 
   return image
-end
+end)
 
-local createWallpaperWithCorners = function(image, screen)
+local createWallpaperWithCorners = memoize(function(image, screen)
   local screenFrame = screen:fullFrame()
   local menubarHeight = screen:frame().y - screenFrame.y
   local radius = 16
@@ -155,7 +160,7 @@ local createWallpaperWithCorners = function(image, screen)
   wallpaperWithCorners:delete()
 
   return generatedWallpaper
-end
+end)
 
 local getAllSpaces = function()
   local spacesByDisplay = hs.spaces.data_managedDisplaySpaces()
@@ -170,7 +175,7 @@ local getAllSpaces = function()
   return allSpaces
 end
 
-local getSpaceIndex = function(spaceId)
+local getSpaceIndex = memoize(function(spaceId)
   local allSpaces = getAllSpaces()
 
   if not allSpaces then
@@ -178,7 +183,7 @@ local getSpaceIndex = function(spaceId)
   end
 
   return hs.fnutils.indexOf(allSpaces, spaceId) or 0
-end
+end)
 
 local applyWallpaper = function(path)
   local focusedWindow = hs.window.focusedWindow() or hs.window.frontmostWindow()
@@ -232,7 +237,7 @@ local generateWallpaperUUIDs = function()
   end
 
   for index, _ in ipairs(spaces) do
-    wallpaperNameMap[index] = hs.host.uuid()
+    wallpaperNameMap[index] = hs.hash.SHA1(getLocalWallpaperPath(index))
   end
 end
 
