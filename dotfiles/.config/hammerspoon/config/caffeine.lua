@@ -4,8 +4,6 @@ local assets = require("config.utils.assets")
 local menubarItem = hs.menubar.new()
 
 local updateMenubar = function(showAlert)
-  local hasAlert = showAlert ~= nil and showAlert or true
-
   if menubarItem == nil then
     return
   end
@@ -17,7 +15,7 @@ local updateMenubar = function(showAlert)
   menubarItem:setIcon(menubarIcon)
   menubarItem:setTooltip(message)
 
-  if hasAlert then
+  if showAlert then
     local alertIcon = state and assets.mugFilled or assets.mug
 
     alert.custom(message, alertIcon)
@@ -62,8 +60,7 @@ module.start = function()
 
   caffeinate(false)
   hs.caffeinate.watcher.new(onCaffeinate):start()
-
-  hs.ipc.localPort("yabaiHammerSpoon:onSystemWoke", caffeinate)
+  hs.ipc.localPort("yabai:onSystemWoke", caffeinate)
 end
 
 return module
