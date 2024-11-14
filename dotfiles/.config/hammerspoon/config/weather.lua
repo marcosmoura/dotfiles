@@ -218,7 +218,6 @@ local updateCanvas = memoize(function(canvas, weather)
 
   canvas[3].text = weatherText
   canvas[5].text = weatherIcon
-  canvas:show()
 
   local textDrawing = hs.drawing.getTextDrawingSize(canvas[3].text)
 
@@ -235,13 +234,14 @@ local updateCanvas = memoize(function(canvas, weather)
   canvas[5].frame.x = textWidth + spacing * 2 + 6
 
   canvas:topLeft({
-    x = screenFrame.x + screenFrame.w - fullCanvasWidth - gap,
+    x = screenFrame.x + screenFrame.w - fullCanvasWidth - gap + padding / 2,
     y = screenFrame.y + screenFrame.h - iconFrame - padding * 2 - 13,
   })
   canvas:size({
     w = fullCanvasWidth,
     h = canvas:frame().h,
   })
+  canvas:show()
 end)
 
 local getLocation = function()
