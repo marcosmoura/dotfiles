@@ -1,4 +1,5 @@
 local devices = require("config.audio.devices")
+local music = require("config.audio.music")
 
 local module = {}
 
