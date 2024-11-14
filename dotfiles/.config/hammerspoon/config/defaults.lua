@@ -16,17 +16,6 @@ module.start = function()
 
   hs.hotkey.setLogLevel(logLevel)
   hs.logger.defaultLogLevel = logLevel
-
-  require("hs.ipc")
-
-  hs.ipc.cliSaveHistory(true)
-  hs.ipc.cliSaveHistorySize(99999)
-
-  if not hs.ipc.cliStatus() then
-    hs.ipc.cliInstall()
-  end
-
-  hs.window.filter.default:rejectApp("Hammerspoon")
 end
 
 return module
