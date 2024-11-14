@@ -291,12 +291,13 @@ local updateWeather = function(canvas)
 end
 
 local canvas = createCanvas()
+local timer = nil
 
 module.start = function()
   local updater = updateWeather(canvas)
-  -- Fetch weather every 10 minutes
-  local timer = hs.timer.new(10 * 60, updater)
 
+  -- Fetch weather every 10 minutes
+  timer = hs.timer.new(10 * 60, updater)
   updater()
   timer:start()
 end
