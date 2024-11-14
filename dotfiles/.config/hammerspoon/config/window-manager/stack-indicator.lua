@@ -1,6 +1,7 @@
 local debounce = require("config.utils.debounce")
 local executeYabai = require("config.utils.executeYabai")
 local memoize = require("config.utils.memoize")
+local windows = require("config.utils.windows")
 
 local canvasMap = {}
 local indicator = {
@@ -23,42 +24,6 @@ local removeCanvasElements = function(canvas)
   while canvas:elementCount() > 0 do
     canvas:removeElement(1)
   end
-end
-
-local filters = {}
-
-local getFilteredWindows = function()
-  local focusedWindow = hs.window.focusedWindow()
-
-  if not focusedWindow then
-    return {}
-  end
-
-  local space = hs.spaces.activeSpaceOnScreen(focusedWindow:screen())
-
-  if not space then
-    return {}
-  end
-
-  if filters[space] then
-    return filters[space]:getWindows()
-  end
-
-  local filter = hs.window.filter
-    .new(false)
-    :setDefaultFilter({
-      visible = true,
-      allowRoles = "AXStandardWindow",
-      allowScreens = focusedWindow:screen():getUUID(),
-      fullscreen = false,
-    })
-    :setCurrentSpace(true)
-    :rejectApp("Hammerspoon")
-    :setSortOrder(hs.window.filter.sortByCreatedLast)
-
-  filters[space] = filter
-
-  return filter:getWindows()
 end
 
 local setCanvasFrame = function(canvas, focusedWindow)
@@ -127,7 +92,7 @@ local onWindowChanged = debounce(function()
     return
   end
 
-  draw(canvas, getFilteredWindows())
+  draw(canvas, windows.getCurrentSpaceWindows())
 end, 0.1)
 
 local onIndicatorClick = function(_, _, id)
@@ -159,7 +124,7 @@ local onSpaceChange = debounce(function()
   canvas:level(hs.canvas.windowLevels.normal - 1)
   canvas:hide()
 
-  draw(canvas, getFilteredWindows())
+  draw(canvas, windows.getFilteredWindows())
 end, 0.1)
 
 local onDisplayChange = debounce(function()
