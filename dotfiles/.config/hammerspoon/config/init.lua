@@ -5,6 +5,9 @@ module.setup = function()
   require("config.console").start()
   require("config.defaults").start()
 
+  -- Load IPC communication
+  require("config.ipc").start()
+
   -- Load all spoons
   require("config.spoons").start()
 
