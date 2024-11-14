@@ -20,6 +20,7 @@ module.setup = function()
   -- Load modules that create a watcher
   require("config.audio").start()
   require("config.hold-to-quit").start()
+  require("config.weather").start()
   require("config.wifi").start()
 
   local assets = require("config.utils.assets")
