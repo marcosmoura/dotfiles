@@ -1,7 +1,7 @@
 local execute = require("config.utils.execute")
 local memoize = require("config.utils.memoize")
 
-local wallpaperPrefixPath = "/tmp/hammerspoon-wallpapers/"
+local wallpaperPrefixPath = "/tmp/hammerspoon-temp/wallpapers/"
 local wallpaperNameMap = {}
 
 local function getCornerData(rawFrame, radius, menubarHeight)
