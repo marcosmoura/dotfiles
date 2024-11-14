@@ -2,7 +2,6 @@ local caffeine = require("config.caffeine")
 local executeYabai = require("config.utils.executeYabai")
 local wallpaper = require("config.wallpaper")
 
-local noop = function() end
 local yabaiDirectionMap = {
   up = "north",
   right = "east",

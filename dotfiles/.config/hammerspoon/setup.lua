@@ -12,3 +12,5 @@ end
 Print = function(...)
   hs.printf(hs.inspect(...))
 end
+
+noop = function() end
