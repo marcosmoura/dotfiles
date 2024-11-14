@@ -405,10 +405,10 @@ end)
 
 local module = {}
 
-module.start = function()
-  local canvas = createCanvas()
-  local timer = nil
+local canvas = createCanvas()
+local timer = nil
 
+module.start = function()
   local update = function()
     updateCurrentMusic(canvas, getCurrentMusic())
   end
