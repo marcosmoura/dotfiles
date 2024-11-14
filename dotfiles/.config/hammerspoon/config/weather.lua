@@ -80,7 +80,7 @@ local iconMap = {
   VeryCloudy = "☁️",
 }
 
-local fontSize = 14
+local fontSize = 13
 local iconFrame = 36
 local spacing = 12
 local padding = 4

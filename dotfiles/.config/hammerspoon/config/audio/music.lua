@@ -3,7 +3,7 @@ local deepMerge = require("config.utils.deepMerge")
 local execute = require("config.utils.execute")
 local memoize = require("config.utils.memoize")
 
-local fontSize = 14
+local fontSize = 13
 local artworkWidth = 36
 local spacing = 12
 local padding = 4
@@ -234,7 +234,7 @@ local getMusicIcon = function(name)
 end
 
 local getNormalizedTrackInfo = memoize(function(info, truncateNumber)
-  local shouldTruncate = string.len(info) > truncateNumber
+  local shouldTruncate = truncateNumber ~= 0 and string.len(info) > truncateNumber
   local normalized = string.gsub(info, "^%s*(.-)%s*$", "%1")
 
   if shouldTruncate then
@@ -246,8 +246,17 @@ local getNormalizedTrackInfo = memoize(function(info, truncateNumber)
 end)
 
 local getMusicStyledText = memoize(function(currentMusic)
-  local trackName = getNormalizedTrackInfo(currentMusic.track, 45)
-  local artistName = getNormalizedTrackInfo(currentMusic.artist, 30)
+  local trackTruncateNumber = 50
+  local artistTruncateNumber = 35
+  local totalTruncateNumber = trackTruncateNumber + artistTruncateNumber
+
+  if string.len(currentMusic.track) + string.len(currentMusic.artist) < totalTruncateNumber then
+    trackTruncateNumber = 0
+    artistTruncateNumber = 0
+  end
+
+  local trackName = getNormalizedTrackInfo(currentMusic.track, trackTruncateNumber)
+  local artistName = getNormalizedTrackInfo(currentMusic.artist, artistTruncateNumber)
   local message = string.format("__%s - %s", trackName, artistName)
 
   return hs.styledtext.new(message, mergeWithDefaultStyle({}))
