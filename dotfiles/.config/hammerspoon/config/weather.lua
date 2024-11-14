@@ -244,27 +244,48 @@ local updateCanvas = memoize(function(canvas, weather)
   })
 end)
 
-local updateWeather = function(canvas)
-  return function()
-    if hs.location.servicesEnabled() and hs.location.authorizationStatus() == "authorized" then
-      hs.location.start()
+local getLocation = function()
+  local locationData = {}
 
-      local location = hs.location.get()
+  if hs.location.servicesEnabled() and hs.location.authorizationStatus() == "authorized" then
+    hs.location.start()
 
-      if location then
-        print("Current Location:")
-        print("Latitude: " .. location.latitude)
-        print("Longitude: " .. location.longitude)
-        print("Altitude: " .. location.altitude)
-        print("Horizontal Accuracy: " .. location.horizontalAccuracy)
-        print("Vertical Accuracy: " .. location.verticalAccuracy)
-      else
-        print("Unable to retrieve location information.")
-      end
+    local location = hs.location.get()
 
-      hs.location.stop()
+    if location then
+      locationData = {
+        latitude = location.latitude,
+        longitude = location.longitude,
+        altitude = location.altitude,
+        horizontalAccuracy = location.horizontalAccuracy,
+        verticalAccuracy = location.verticalAccuracy,
+      }
     else
-      print("Location services are not enabled.")
+      print("Unable to retrieve location information.")
+      return nil
+    end
+
+    hs.location.stop()
+  else
+    print("Location services are not enabled.")
+    return nil
+  end
+
+  return locationData
+end
+
+local updateWeather = function(canvas)
+  local fetchLocation = true
+
+  return function()
+    local location = nil
+
+    if fetchLocation then
+      location = getLocation()
+
+      if not location then
+        fetchLocation = false
+      end
     end
 
     hs.http.asyncGet("https://wttr.in/?format=j1", nil, function(_, body)
