@@ -4,4 +4,5 @@ globals = {
   "hs",
   "DEBUG",
   "Print",
+  "noop",
 }
