@@ -311,7 +311,7 @@ local createCanvas = function()
   local screenFrame = screen:fullFrame()
 
   local canvasFrame = {
-    x = gap,
+    x = gap - padding / 2,
     y = screenFrame.y + screenFrame.h - artworkWidth - padding * 2 - 13,
     w = screenFrame.w / 3 + padding * 2,
     h = artworkWidth + padding * 2,
