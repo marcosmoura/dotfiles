@@ -1,6 +1,7 @@
 local caffeine = require("config.caffeine")
 local executeYabai = require("config.utils.executeYabai")
 local wallpaper = require("config.wallpaper")
+local windows = require("config.utils.windows")
 
 local yabaiDirectionMap = {
   up = "north",
@@ -194,60 +195,25 @@ for arrowKey, direction in pairs(focusDirectionMap) do
   end)
 end
 
-local filters = {}
-
-local getFilteredWindows = function()
-  local focusedWindow = hs.window.focusedWindow()
-
-  if not focusedWindow then
-    return {}
-  end
-
-  local space = hs.spaces.activeSpaceOnScreen(focusedWindow:screen())
-
-  if not space then
-    return {}
-  end
-
-  if filters[space] then
-    return filters[space]:getWindows()
-  end
-
-  local filter = hs.window.filter
-    .new(false)
-    :setDefaultFilter({
-      visible = true,
-      allowRoles = "AXStandardWindow",
-      allowScreens = focusedWindow:screen():getUUID(),
-      fullscreen = false,
-    })
-    :setCurrentSpace(true)
-    :rejectApp("Hammerspoon")
-    :setSortOrder(hs.window.filter.sortByCreatedLast)
-
-  filters[space] = filter
-
-  return filter:getWindows()
-end
-
 local cycleWindows = function(direction)
-  local windows = getFilteredWindows()
+  local allWindows = windows.getCurrentSpaceWindows()
   local focusedWindow = hs.window.focusedWindow()
-  local focusedWindowIndex = hs.fnutils.indexOf(windows, focusedWindow)
+  local focusedWindowIndex = hs.fnutils.indexOf(allWindows, focusedWindow)
+  local totalWindows = #allWindows
 
-  if #windows < 2 or not focusedWindow or not focusedWindowIndex then
+  if totalWindows < 2 or not focusedWindow or not focusedWindowIndex then
     return
   end
 
   local nextWindowIndex = focusedWindowIndex + direction
 
   if nextWindowIndex < 1 then
-    nextWindowIndex = #windows
-  elseif nextWindowIndex > #windows then
+    nextWindowIndex = totalWindows
+  elseif nextWindowIndex > totalWindows then
     nextWindowIndex = 1
   end
 
-  windows[nextWindowIndex]:focus()
+  allWindows[nextWindowIndex]:focus()
 end
 
 hs.hotkey.bind({ "cmd" }, "`", function()
@@ -365,6 +331,6 @@ end
 
 local module = {}
 
-module.start = getFilteredWindows
+module.start = windows.getCurrentSpaceWindows
 
 return module
