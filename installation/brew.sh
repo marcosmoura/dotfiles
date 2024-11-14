@@ -139,10 +139,12 @@ print_progress "Installing applications"
 brew install --cask --no-quarantine adguard
 brew install --cask --no-quarantine appcleaner
 brew install --cask --no-quarantine arc
+brew install --cask --no-quarantine cursor
 brew install --cask --no-quarantine discord
 brew install --cask --no-quarantine displaylink
 brew install --cask --no-quarantine figma
 brew install --cask --no-quarantine firefox-nightly
+brew install --cask --no-quarantine font-cozette
 brew install --cask --no-quarantine font-fira-code
 brew install --cask --no-quarantine font-hanken-grotesk
 brew install --cask --no-quarantine font-inter
