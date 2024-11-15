@@ -333,6 +333,17 @@ end
 
 local module = {}
 
-module.start = windows.getCurrentSpaceWindows
+module.start = function()
+  windows.getCurrentSpaceWindows()
+
+  local goToSpace = function(_, space)
+    local spaces = executeYabai("-m query --spaces", { json = true })
+    local targetSpace = spaces[space]
+
+    hs.spaces.gotoSpace(targetSpace.index)
+  end
+
+  hs.ipc.localPort("sketchybar:goToSpace", goToSpace)
+end
 
 return module
