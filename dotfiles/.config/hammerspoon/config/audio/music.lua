@@ -395,7 +395,6 @@ local updateCurrentMusic = memoize(function(canvas, currentMusic)
 
   canvas[4].image = currentMusic.artwork
   canvas[6].text = music:setString(stateIcon, 2, 2):setString(playerIcon, 1, 1)
-  canvas:show()
 
   local textDrawing = hs.drawing.getTextDrawingSize(canvas[6].text)
 
@@ -410,6 +409,7 @@ local updateCurrentMusic = memoize(function(canvas, currentMusic)
     w = fullCanvasWidth,
     h = canvas:frame().h,
   })
+  canvas:show()
 end)
 
 local module = {}
