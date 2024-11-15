@@ -124,7 +124,7 @@ local onSpaceChange = debounce(function()
   canvas:level(hs.canvas.windowLevels.normal - 1)
   canvas:hide()
 
-  draw(canvas, windows.getFilteredWindows())
+  draw(canvas, windows.getCurrentSpaceWindows())
 end, 0.1)
 
 local onDisplayChange = debounce(function()
