@@ -237,7 +237,7 @@ local generateWallpaperUUIDs = function()
   end
 
   for index, _ in ipairs(spaces) do
-    wallpaperNameMap[index] = hs.hash.SHA1(getLocalWallpaperPath(index))
+    wallpaperNameMap[index] = hs.hash.SHA1(hs.host.uuid() .. getLocalWallpaperPath(index))
   end
 end
 
