@@ -188,11 +188,15 @@ end)
 local applyWallpaper = function(path)
   local focusedWindow = hs.window.focusedWindow() or hs.window.frontmostWindow()
 
+  if not focusedWindow then
+    return
+  end
+
   focusedWindow:screen():desktopImageURL("file://" .. path)
 end
 
 local generateWallpaperForSpace = function()
-  local focusedWindow = hs.window.frontmostWindow()
+  local focusedWindow = hs.window.focusedWindow() or hs.window.frontmostWindow()
 
   if focusedWindow == nil then
     return
