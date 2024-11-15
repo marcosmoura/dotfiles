@@ -1,3 +1,5 @@
+require("hs.ipc")
+
 local module = {}
 
 module.start = function()
