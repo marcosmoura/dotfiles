@@ -1,4 +1,5 @@
 local caffeine = require("config.caffeine")
+local execute = require("config.utils.execute")
 local executeYabai = require("config.utils.executeYabai")
 local wallpaper = require("config.wallpaper")
 local windows = require("config.utils.windows")
@@ -61,6 +62,7 @@ hs.hotkey.bind({ "cmd", "alt" }, "H", noop)
 --------------------
 local reloadTools = function()
   executeYabai("--restart-service", { silent = true })
+  execute("/opt/homebrew/bin/sketchybar", "--reload", { silent = true })
   hs.reload()
   wallpaper.removeWallpapers()
 end

@@ -126,9 +126,9 @@ local getWallpaper = memoize(function(currentSpace, screen)
   return image
 end)
 
-local createWallpaperWithCorners = memoize(function(image, screen)
+local createWallpaperWithCorners = memoize(function(image, screen, hasSketchyBar)
   local screenFrame = screen:fullFrame()
-  local menubarHeight = screen:frame().y - screenFrame.y
+  local menubarHeight = hasSketchyBar and 25 or screen:frame().y - screenFrame.y
   local radius = 16
 
   local cornerData = getCornerData(screenFrame, radius, menubarHeight)
@@ -219,7 +219,8 @@ local generateWallpaperForSpace = function()
     return
   end
 
-  local wallpaperWithCorners = createWallpaperWithCorners(rawWallpaper, screen)
+  local hasSketchyBar = hs.application.get("SketchyBar") ~= nil
+  local wallpaperWithCorners = createWallpaperWithCorners(rawWallpaper, screen, hasSketchyBar)
 
   if wallpaperWithCorners == nil then
     return
