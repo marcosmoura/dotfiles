@@ -120,7 +120,7 @@ local createCanvas = function()
   local screenFrame = getScreenFrame()
   local canvasFrame = {
     x = gap,
-    y = screenFrame.y + screenFrame.h - iconFrame - padding * 2 - 13,
+    y = screenFrame.y + screenFrame.h - iconFrame - padding * 2 - 14,
     w = screenFrame.w / 3 + padding * 2,
     h = iconFrame + padding * 2,
   }
