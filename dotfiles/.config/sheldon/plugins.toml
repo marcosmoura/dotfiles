@@ -44,6 +44,18 @@ local = "~/.config/zsh/modules/completions"
 use = ["*.plugin.zsh"]
 apply = ["defer"]
 
+[plugins.yarn-completion]
+github = "chrisands/zsh-yarn-completions"
+apply = ["defer"]
+
+[plugins.nx-completion]
+github = "jscutlery/nx-completion"
+apply = ["defer"]
+
+[plugins.pnpm-completion]
+github = "g-plane/pnpm-shell-completion"
+apply = ["defer"]
+
 
 # omz plugins
 # ----------------------
@@ -64,31 +76,16 @@ use = ["{aliases,cp,dircycle,github,zoxide}/*.plugin.zsh"]
 
 [plugins.256color]
 github = "chrissicool/zsh-256color"
-apply = ["defer"]
 
 [plugins.zoxide]
 github = "ajeetdsouza/zoxide"
-apply = ["defer"]
 
 [plugins.zsh-you-should-use]
 github = "MichaelAquilina/zsh-you-should-use"
 apply = ["defer"]
 
-[plugins.yarn-completion]
-github = "chrisands/zsh-yarn-completions"
-apply = ["defer"]
-
-[plugins.nx-completion]
-github = "jscutlery/nx-completion"
-apply = ["defer"]
-
-[plugins.pnpm-completion]
-github = "g-plane/pnpm-shell-completion"
-apply = ["defer"]
-
 [plugins.icd]
 github = "g-plane/icd"
-apply = ["defer"]
 
 
 # Dotfiles

@@ -21,5 +21,6 @@
   "Lua.workspace.library": [
     "~/.config/hammerspoon/Spoons/EmmyLua.spoon/annotations"
   ],
-  "stylua.targetReleaseVersion": "latest"
+  "stylua.targetReleaseVersion": "latest",
+  "oxc.enable": true
 }

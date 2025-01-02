@@ -1,2 +1,1 @@
-require("custom.core")
-require("custom.config")
+require("config")

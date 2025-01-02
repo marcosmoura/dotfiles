@@ -1,0 +1,93 @@
+return {
+  -- {
+  --   "nvim-tree/nvim-tree.lua",
+  --   version = "*",
+  --   lazy = false,
+  --   dependencies = {
+  --     "nvim-tree/nvim-web-devicons",
+  --   },
+  --   config = function()
+  --     require("nvim-tree").setup({
+  --       sort = {
+  --         sorter = "case_sensitive",
+  --       },
+  --       diagnostics = {
+  --         enable = true,
+  --         show_on_dirs = false,
+  --       },
+  --       sync_root_with_cwd = true,
+  --       open_on_tab = false,
+  --       filters = {
+  --         dotfiles = false,
+  --         custom = {},
+  --       },
+
+  --       git = {
+  --         enable = true,
+  --       },
+
+  --       view = {
+  --         adaptive_size = true,
+  --         side = "right",
+  --         width = 40,
+  --       },
+  --       renderer = {
+  --         group_empty = true,
+  --         highlight_git = true,
+  --         highlight_diagnostics = true,
+  --         highlight_bookmarks = "all",
+  --         highlight_clipboard = "all",
+
+  --         icons = {
+  --           webdev_colors = false,
+  --           git_placement = "after",
+  --           modified_placement = "after",
+  --           glyphs = {
+  --             git = {
+  --               -- Git style symbols
+  --               unstaged = "U",
+  --               staged = "A",
+  --               unmerged = "M",
+  --               renamed = "R",
+  --               untracked = "?",
+  --               deleted = "D",
+  --               ignored = "!",
+  --             },
+  --           },
+  --         },
+
+  --         special_files = {
+  --           "Cargo.toml",
+  --           "Makefile",
+  --           "CMakeLists.txt",
+  --           "config.bash",
+  --           "config.sh",
+  --           "config",
+  --           "README.md",
+  --           "readme.md",
+  --           "LICENSE",
+  --           "DEVELOPMENT.md",
+  --           "DEVELOPING.md",
+  --           "package.json",
+  --           ".nvimrc",
+  --         },
+  --       },
+  --     })
+
+  --     local prev = { new_name = "", old_name = "" }
+  --     vim.api.nvim_create_autocmd("User", {
+  --       pattern = "NvimTreeSetup",
+  --       callback = function()
+  --         local events = require("nvim-tree.api").events
+  --         events.subscribe(events.Event.NodeRenamed, function(data)
+  --           if prev.new_name ~= data.new_name or prev.old_name ~= data.old_name then
+  --             data = data
+  --             Snacks.rename.on_rename_file(data.old_name, data.new_name)
+  --           end
+  --         end)
+  --       end,
+  --     })
+  --   end,
+  -- },
+}
+-- OR setup with some options

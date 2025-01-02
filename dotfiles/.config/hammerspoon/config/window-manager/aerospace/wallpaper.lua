@@ -228,10 +228,12 @@ module.start = function()
   end
 
   init()
+
   hs.screen.watcher.newWithActiveScreen(init):start()
   hs.ipc.localPort("aerospace:onWallpapersChanged", function()
     raiseWallpaper()
   end)
+
   -- Refresh the wallpaper every hour.
   hs.timer.doEvery(60 * 60, init)
 end
