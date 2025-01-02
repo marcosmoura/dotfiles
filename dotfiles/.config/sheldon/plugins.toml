@@ -39,6 +39,11 @@ github = "zsh-users/zsh-autosuggestions"
 use = ["{{ name }}.zsh"]
 apply = ["defer"]
 
+[plugins.dotfiles-completions]
+local = "~/.config/zsh/modules/completions"
+use = ["*.plugin.zsh"]
+apply = ["defer"]
+
 
 # omz plugins
 # ----------------------
@@ -51,7 +56,7 @@ use = ["{compfix,completion,git,grep,history,key-bindings}.zsh"]
 [plugins.ohmyzsh-plugins]
 github = "ohmyzsh/ohmyzsh"
 dir = "plugins"
-use = ["{aliases,cp,dircyclegh,zoxide,}/*.plugin.zsh"]
+use = ["{aliases,cp,dircycle,github,zoxide}/*.plugin.zsh"]
 
 
 # Other plugins
@@ -91,4 +96,4 @@ apply = ["defer"]
 
 [plugins.dotfiles]
 local = "~/.config/zsh/modules"
-use = ["*.plugin.zsh", "!{colors,compinit,macOS}/*.plugin.zsh"]
+use = ["*.plugin.zsh", "!{colors,completions,compinit,macOS}/*.plugin.zsh"]

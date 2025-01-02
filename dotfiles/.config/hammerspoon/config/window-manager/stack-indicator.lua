@@ -1,6 +1,6 @@
 local debounce = require("config.utils.debounce")
-local executeYabai = require("config.utils.executeYabai")
 local memoize = require("config.utils.memoize")
+local os = require("config.utils.os")
 local windows = require("config.utils.windows")
 
 local canvasMap = {}
@@ -12,22 +12,69 @@ local indicator = {
 
 local module = {}
 
-local getSpaceData = function()
-  local space = executeYabai("-m query --spaces --space", { json = true })
-  local label = space.label
-  local isStack = space.type == "stack"
+--- Gets all windows in the current space.
+--- @return hs.window[]
+local getAllWindows = function()
+  if os.yabai.isRunning() then
+    return windows.getCurrentSpaceWindows()
+  end
 
-  return label, isStack
+  if os.aerospace.isRunning() then
+    local windows = os.aerospace.execute("list-windows --workspace focused --json", { format = "json" })
+
+    return hs.fnutils.map(windows, function(window)
+      return hs.window(window["window-id"])
+    end) or {}
+  end
+
+  return {}
 end
 
+--- Gets the current space data.
+--- @return string, boolean - The space label and whether the space is a stack.
+local getSpaceData = function()
+  if os.yabai.isRunning() then
+    local space = os.yabai.execute("-m query --spaces --space", { json = true })
+    local label = space.label
+    local isStack = space.type == "stack"
+
+    return label, isStack
+  end
+
+  if os.aerospace.isRunning() then
+    local label = os.aerospace.execute("list-workspaces --focused", { format = "string" })
+    local isStack = label ~= "communication"
+
+    if type(label) == "string" then
+      return label, isStack
+    end
+
+    return "", isStack
+  end
+
+  return "", false
+end
+
+--- Removes all elements from the canvas.
+--- @param canvas hs.canvas The canvas to remove elements from.
 local removeCanvasElements = function(canvas)
   while canvas:elementCount() > 0 do
     canvas:removeElement(1)
   end
 end
 
-local setCanvasFrame = function(canvas, focusedWindow)
-  local frame = focusedWindow:frame()
+--- Sets the frame of the canvas based on the focused window's frame.
+--- @param canvas hs.canvas The canvas to set the frame for.
+--- @param focusedWindow hs.window The currently focused window.
+--- @param windows hs.window[] The windows to draw indicators for.
+local setCanvasFrame = function(canvas, focusedWindow, windows)
+  local frame = {}
+
+  if os.yabai.isRunning() then
+    frame = focusedWindow:frame()
+  else
+    frame = windows[1]:frame()
+  end
 
   canvas:frame({
     w = frame.w,
@@ -47,7 +94,7 @@ local draw = memoize(function(canvas, windows)
     return
   end
 
-  setCanvasFrame(canvas, focusedWindow)
+  setCanvasFrame(canvas, focusedWindow, windows)
 
   for index, window in ipairs(windows) do
     local id = window:id()
@@ -79,6 +126,7 @@ local draw = memoize(function(canvas, windows)
   canvas:show()
 end)
 
+--- Debounced function to handle window changes.
 local onWindowChanged = debounce(function()
   local label, isStack = getSpaceData()
   local canvas = canvasMap[label]
@@ -92,10 +140,14 @@ local onWindowChanged = debounce(function()
     return
   end
 
-  draw(canvas, windows.getCurrentSpaceWindows())
+  draw(canvas, getAllWindows())
 end, 0.1)
 
-local onIndicatorClick = function(_, _, id)
+--- Handles the click event on the indicator.
+--- @param _ hs.canvas The canvas.
+--- @param __ string The event type.
+--- @param id number The window id.
+local onIndicatorClick = function(_, __, id)
   local window = hs.window.get(id)
 
   if not window then
@@ -105,11 +157,22 @@ local onIndicatorClick = function(_, _, id)
   window:focus()
 end
 
+--- Debounced function to handle space changes.
 local onSpaceChange = debounce(function()
   local label, isStack = getSpaceData()
   local canvas = canvasMap[label]
+  local allWindows = getAllWindows()
 
-  if canvas or not isStack then
+  for _, canvas in pairs(canvasMap) do
+    canvas:hide()
+  end
+
+  if canvas then
+    draw(canvas, allWindows)
+    return
+  end
+
+  if not isStack then
     return
   end
 
@@ -124,9 +187,10 @@ local onSpaceChange = debounce(function()
   canvas:level(hs.canvas.windowLevels.normal - 1)
   canvas:hide()
 
-  draw(canvas, windows.getCurrentSpaceWindows())
+  draw(canvas, allWindows)
 end, 0.1)
 
+--- Debounced function to handle display changes.
 local onDisplayChange = debounce(function()
   canvasMap = {}
   onSpaceChange()
@@ -136,6 +200,9 @@ module.start = function()
   hs.ipc.localPort("yabai:onDisplaysChanged", onDisplayChange)
   hs.ipc.localPort("yabai:onSpacesChanged", onSpaceChange)
   hs.ipc.localPort("yabai:onWindowsChanged", onWindowChanged)
+
+  hs.ipc.localPort("aerospace:onSpacesChanged", onSpaceChange)
+  hs.ipc.localPort("aerospace:onWindowsChanged", onWindowChanged)
 end
 
 return module

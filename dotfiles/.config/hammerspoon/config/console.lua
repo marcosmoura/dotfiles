@@ -3,6 +3,7 @@ local green = colors.green.hex
 
 local module = {}
 
+--- Prints all available colors in the Catppuccin palette
 local printAvailableColors = function()
   local colorNames = {}
 

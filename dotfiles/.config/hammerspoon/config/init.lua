@@ -14,14 +14,15 @@ module.setup = function()
   -- Load all modules
   require("config.caffeine").start()
   require("config.caps-lock").start()
-  require("config.wallpaper").start()
-  require("config.window-manager").start(true)
 
   -- Load modules that create a watcher
   require("config.audio").start()
   require("config.hold-to-quit").start()
-  require("config.weather").start()
   require("config.wifi").start()
+
+  -- Load canvas modules
+  require("config.window-manager").start()
+  require("config.weather").start()
 
   local assets = require("config.utils.assets")
   local alert = require("config.utils.alert")

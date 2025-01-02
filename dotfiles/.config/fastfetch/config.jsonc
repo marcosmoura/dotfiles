@@ -55,9 +55,6 @@
     {
       "type": "battery",
       "key": "Battery   "
-    },
-    {
-      "type": "break"
     }
   ]
 }

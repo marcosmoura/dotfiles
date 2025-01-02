@@ -1,5 +1,13 @@
 local assetsPath = "~/.config/hammerspoon/assets/"
 
+--- @class IconSize
+--- @field w number
+--- @field h number
+
+--- Create and cache an icon
+--- @param path string
+--- @param size IconSize
+--- @return hs.image|nil
 local prepareIcon = function(path, size)
   local icon = path and hs.image.imageFromPath(assetsPath .. path) or nil
 
@@ -28,4 +36,5 @@ return {
   wifiOn = prepareIcon("wifi-on.png", { w = 32, h = 32 }),
   wifiOff = prepareIcon("wifi-off.png", { w = 32, h = 32 }),
   settings = prepareIcon("settings.png", { w = 32, h = 32 }),
+  notPlaying = prepareIcon("not-playing.png", { w = 24, h = 24 }),
 }

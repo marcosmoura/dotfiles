@@ -21,14 +21,27 @@ local defaultAlertStyle = {
 
 hs.alert.defaultStyle = deepMerge(hs.alert.defaultStyle, defaultAlertStyle)
 
+--- Show an alert with a message and an image
+--- @param message string
+--- @param image hs.image|nil
+--- @param style table|nil
+--- @param duration number|nil
 local showAlert = function(message, image, style, duration)
   return hs.alert.showWithImage(message, image, deepMerge(defaultAlertStyle, style or {}), duration or 1)
 end
 
+--- Show an info alert with a message
+--- @param message string
+--- @param duration number
+--- @return hs.alert|nil
 module.info = function(message, duration)
   return showAlert(message, assets.info, nil, duration)
 end
 
+--- Show an error alert with a message
+--- @param message string
+--- @param duration number
+--- @return hs.alert|nil
 module.error = function(message, duration)
   return showAlert(message, assets.error, {
     fillColor = { hex = colors.red.hex },
@@ -36,6 +49,10 @@ module.error = function(message, duration)
   }, duration)
 end
 
+--- Show a success alert with a message
+--- @param message string
+--- @param duration number
+--- @return hs.alert|nil
 module.success = function(message, duration)
   return showAlert(message, assets.success, {
     fillColor = { hex = colors.green.hex },
@@ -43,6 +60,10 @@ module.success = function(message, duration)
   }, duration)
 end
 
+--- Show a warning alert with a message
+--- @param message string
+--- @param duration number
+--- @return hs.alert|nil
 module.warning = function(message, duration)
   return showAlert(message, assets.warning, {
     fillColor = { hex = colors.peach.hex },
@@ -50,8 +71,13 @@ module.warning = function(message, duration)
   }, duration)
 end
 
-module.custom = function(message, iconPath, config, duration)
-  return showAlert(message, iconPath, config, duration)
+--- Show a custom alert with a message, an icon path, a config and a duration
+--- @param message string
+--- @param image hs.image|nil
+--- @param config table|nil
+--- @param duration number|nil
+module.custom = function(message, image, config, duration)
+  return showAlert(message, image, config, duration)
 end
 
 return module

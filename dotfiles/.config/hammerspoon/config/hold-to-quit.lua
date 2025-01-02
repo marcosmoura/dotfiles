@@ -1,9 +1,5 @@
 local alert = require("config.utils.alert")
 
-local function getCurrentApp()
-  return hs.application.frontmostApplication()
-end
-
 local module = {}
 
 module.start = function()
@@ -32,7 +28,7 @@ module.start = function()
       function holdToQuit:onKeyDown()
         self.timer:start()
 
-        local app = getCurrentApp()
+        local app = hs.application.frontmostApplication()
         local appName = app:name()
 
         if appName == "Finder" then
@@ -44,7 +40,7 @@ module.start = function()
       end
 
       holdToQuit.timer = hs.timer.delayed.new(1.5, function()
-        local app = getCurrentApp()
+        local app = hs.application.frontmostApplication()
 
         if app:name() == "Finder" then
           alert.warning("You can't quit Finder!", 1)

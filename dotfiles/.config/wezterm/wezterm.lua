@@ -12,7 +12,7 @@ end
 config.font = wezterm.font_with_fallback({
   {
     family = "Maple Mono",
-    weight = "Medium",
+    weight = "Regular",
   },
   {
     family = "Symbols Nerd Font Mono",
@@ -23,7 +23,7 @@ config.font = wezterm.font_with_fallback({
   },
 })
 config.cell_width = 0.95
-config.font_size = 17.1
+config.font_size = 17
 config.line_height = 1.3
 config.bold_brightens_ansi_colors = "BrightOnly"
 config.allow_square_glyphs_to_overflow_width = "Always"
@@ -46,8 +46,8 @@ config.allow_square_glyphs_to_overflow_width = "Always"
 -- [[ WINDOW AND PANES CONFIGURATION ]]
 --
 config.window_padding = {
-  left = "3cell",
-  right = "3cell",
+  left = "20px",
+  right = "20px",
   top = "8px",
   bottom = "8px",
 }
@@ -68,8 +68,8 @@ config.inactive_pane_hsb = {
 --
 -- [[ DEFAULT APP CONFIGURATION ]]
 --
-config.max_fps = 144
-config.animation_fps = 144
+config.max_fps = 240
+config.animation_fps = 240
 config.front_end = "WebGpu"
 config.webgpu_power_preference = "HighPerformance"
 config.enable_kitty_keyboard = false
@@ -119,25 +119,18 @@ config.default_cwd = "~/Projects"
 
 wezterm.on("gui-startup", function(cmd)
   local args = {}
+
   if cmd then
     args = cmd.args
   end
 
-  local project_dir = wezterm.home_dir .. "/Projects/fluent/fluentui"
-
-  mux.spawn_window({
-    cwd = project_dir,
+  local windowParams = {
+    cwd = wezterm.home_dir .. "/Projects/fluent/fluentui",
     args = args,
-  })
+  }
 
-  local _, second_panel = mux.spawn_window({
-    cwd = project_dir,
-    args = args,
-  })
-
-  wezterm.time.call_after(1, function()
-    second_panel:send_text("clear\n")
-  end)
+  mux.spawn_window(windowParams)
+  mux.spawn_window(windowParams)
 end)
 
 return config

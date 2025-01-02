@@ -1,84 +1,91 @@
 local colors = require("config.utils.colors")
-local deepMerge = require("config.utils.deepMerge")
 local memoize = require("config.utils.memoize")
-local module = {}
+local widgets = require("config.utils.widgets")
 
-local countryMap = {
-  ["Czech Republic"] = "Czechia",
-  ["United Kingdom"] = "UK",
-  ["United States of America"] = "USA",
-}
-local weatherCodeMap = {
-  ["113"] = "Sunny",
-  ["116"] = "PartlyCloudy",
-  ["119"] = "Cloudy",
-  ["122"] = "VeryCloudy",
-  ["143"] = "Fog",
-  ["176"] = "LightShowers",
-  ["179"] = "LightSleetShowers",
-  ["182"] = "LightSleet",
-  ["185"] = "LightSleet",
-  ["200"] = "ThunderyShowers",
-  ["227"] = "LightSnow",
-  ["230"] = "HeavySnow",
-  ["248"] = "Fog",
-  ["260"] = "Fog",
-  ["263"] = "LightShowers",
-  ["266"] = "LightRain",
-  ["281"] = "LightSleet",
-  ["284"] = "LightSleet",
-  ["293"] = "LightRain",
-  ["296"] = "LightRain",
-  ["299"] = "HeavyShowers",
-  ["302"] = "HeavyRain",
-  ["305"] = "HeavyShowers",
-  ["308"] = "HeavyRain",
-  ["311"] = "LightSleet",
-  ["314"] = "LightSleet",
-  ["317"] = "LightSleet",
-  ["320"] = "LightSnow",
-  ["323"] = "LightSnowShowers",
-  ["326"] = "LightSnowShowers",
-  ["329"] = "HeavySnow",
-  ["332"] = "HeavySnow",
-  ["335"] = "HeavySnowShowers",
-  ["338"] = "HeavySnow",
-  ["350"] = "LightSleet",
-  ["353"] = "LightShowers",
-  ["356"] = "HeavyShowers",
-  ["359"] = "HeavyRain",
-  ["362"] = "LightSleetShowers",
-  ["365"] = "LightSleetShowers",
-  ["368"] = "LightSnowShowers",
-  ["371"] = "HeavySnowShowers",
-  ["374"] = "LightSleetShowers",
-  ["377"] = "LightSleet",
-  ["386"] = "ThunderyShowers",
-  ["389"] = "ThunderyHeavyRain",
-  ["392"] = "ThunderySnowShowers",
-  ["395"] = "HeavySnowShowers",
-}
 local iconMap = {
-  Cloudy = "☁️",
-  Fog = "🌫",
-  HeavyRain = "🌧",
-  HeavyShowers = "🌧",
-  HeavySnow = "❄️",
-  HeavySnowShowers = "❄️",
-  LightRain = "🌦",
-  LightShowers = "🌦",
-  LightSleet = "🌧",
-  LightSleetShowers = "🌧",
-  LightSnow = "🌨",
-  LightSnowShowers = "🌨",
-  PartlyCloudy = "⛅️",
-  Sunny = "☀️",
-  ThunderyHeavyRain = "🌩",
-  ThunderyShowers = "⛈",
-  ThunderySnowShowers = "⛈",
-  Unknown = "✨",
-  VeryCloudy = "☁️",
+  ["snow"] = "❄️",
+  ["snow-showers-day"] = "🌨️",
+  ["snow-showers-night"] = "🌨️",
+  ["thunder-rain"] = "⛈",
+  ["thunder-showers-day"] = "⛈",
+  ["thunder-showers-night"] = "⛈",
+  ["rain"] = "🌧",
+  ["showers-day"] = "🌦",
+  ["showers-night"] = "🌨️",
+  ["fog"] = "🌫",
+  ["wind"] = "💨",
+  ["cloudy"] = "☁️",
+  ["partly-cloudy-day"] = "⛅",
+  ["partly-cloudy-night"] = "☁️",
+  ["clear-day"] = "☀️",
+  ["clear-night"] = "🌙",
 }
+
+local moonPhaseIconMap = {
+  newMoon = "🌑",
+  waxingCrescent = "🌒",
+  firstQuarter = "🌓",
+  waxingGibbous = "🌔",
+  fullMoon = "🌕",
+  waningGibbous = "🌖",
+  lastQuarter = "🌗",
+  waningCrescent = "🌘",
+  unknown = "🌚",
+}
+
+--- @alias MoonPhase "newMoon" | "waxingCrescent" | "firstQuarter" | "waxingGibbous" | "fullMoon" | "waningGibbous" | "lastQuarter" | "waningCrescent" | "unknown"
+
+--- @class Weather
+--- @field temperature string
+--- @field condition string
+--- @field moonPhase number
+--- @field location string
+--- @field icon string
+
+--- @class LocationTable - a table specifying location coordinates containing one or more of the following key-value pairs
+--- @field latitude number - a number specifying the latitude in degrees. Positive values indicate latitudes north of the equator. Negative values indicate latitudes south of the equator. When not specified in a table being used as an argument, this defaults to 0.0.
+--- @field longitude number - a number specifying the longitude in degrees. Measurements are relative to the zero meridian, with positive values extending east of the meridian and negative values extending west of the meridian. When not specified in a table being used as an argument, this defaults to 0.0.
+--- @field altitude number - a number indicating altitude above (positive) or below (negative) sea-level. When not specified in a table being used as an argument, this defaults to 0.0.
+--- @field horizontalAccuracy number - a number specifying the radius of uncertainty for the location, measured in meters. If negative, the `latitude` and `longitude` keys are invalid and should not be trusted. When not specified in a table being used as an argument, this defaults to 0.0.
+--- @field verticalAccuracy number - a number specifying the accuracy of the altitude value in meters. If negative, the `altitude` key is invalid and should not be trusted. When not specified in a table being used as an argument, this defaults to -1.0.
+--- @field course number - a number specifying the direction in which the device is traveling. If this value is negative, then the value is invalid and should not be trusted. On current Macintosh models, this will almost always be a negative number. When not specified in a table being used as an argument, this defaults to -1.0.
+--- @field speed number - a number specifying the instantaneous speed of the device in meters per second. If this value is negative, then the value is invalid and should not be trusted. On current Macintosh models, this will almost always be a negative number. When not specified in a table being used as an argument, this defaults to -1.0.
+--- @field timestamp number - a number specifying the time at which this location was determined. This number is the number of seconds since January 1, 1970 at midnight, GMT, and is a floating point number, so you should use `math.floor` on this number before using it as an argument to Lua's `os.date` function. When not specified in a table being used as an argument, this defaults to the current time.
+
+--- @class Geocoder
+--- @field name string - a string containing the name of the location, if known.
+--- @field timezone string - a string containing the timezone identifier for the location, if known.
+--- @field countryCode string - a string containing the ISO 3166-1 alpha-2 country code for the location, if known.
+--- @field country string - a string containing the name of the country for the location, if known.
+--- @field administrativeArea string - a string containing the name of the administrative area for the location, if known.
+--- @field subAdministrativeArea string - a string containing the name of the sub-administrative area for the location, if known.
+--- @field locality string - a string containing the name of the locality for the location, if known.
+--- @field subLocality string - a string containing the name of the sub-locality for the location, if known.
+
+--- Get the moon phase name based on the phase
+--- @param phase number
+--- @return MoonPhase
+local getMoonPhaseName = function(phase)
+  if phase >= 0 and phase < 0.25 then
+    return "newMoon"
+  elseif phase >= 0.25 and phase < 0.5 then
+    return "waxingCrescent"
+  elseif phase == 0.25 then
+    return "firstQuarter"
+  elseif phase >= 0.5 and phase < 0.75 then
+    return "waxingGibbous"
+  elseif phase == 0.5 then
+    return "fullMoon"
+  elseif phase >= 0.75 and phase < 1 then
+    return "waningGibbous"
+  elseif phase == 0.75 then
+    return "lastQuarter"
+  elseif phase >= 0.75 and phase <= 1 then
+    return "waningCrescent"
+  end
+
+  return "unknown"
+end
 
 local fontSize = 13
 local iconFrame = 36
@@ -86,35 +93,44 @@ local spacing = 12
 local padding = 4
 local gap = 20
 
+local defaultLatLong = {
+  latitude = 50.077152249886,
+  longitude = 14.441415779226,
+}
+local apiKeysPath = "~/.config/hammerspoon/api_keys.json"
+local canvas = nil
+local currentLocation = {}
+local canvasUpdateTimer = nil
+local locationUpdateTimer = nil
+local screenWatcher = nil
+
+--- Focus the Weather app when the canvas is clicked
 local onCanvasClick = function()
   hs.application.launchOrFocus("Weather")
 end
 
-local createCanvas = function()
-  local screen = hs.screen.mainScreen()
-  local screenFrame = screen:fullFrame()
+--- Get the screen frame
+local getScreenFrame = function()
+  return hs.screen.primaryScreen():fullFrame()
+end
 
+--- Create the weather canvas
+--- @return hs.canvas
+local createCanvas = function()
+  local screenFrame = getScreenFrame()
   local canvasFrame = {
     x = gap,
     y = screenFrame.y + screenFrame.h - iconFrame - padding * 2 - 13,
     w = screenFrame.w / 3 + padding * 2,
     h = iconFrame + padding * 2,
   }
-  local canvas = hs.canvas.new(canvasFrame)
-
-  if not canvas then
-    return nil
-  end
-
-  canvas:level(hs.canvas.windowLevels.normal - 1)
-  canvas:behavior(hs.canvas.windowBehaviors.canJoinAllSpaces)
-  canvas:mouseCallback(onCanvasClick)
+  local canvas = widgets.create(canvasFrame, onCanvasClick)
 
   canvas:insertElement({
     type = "rectangle",
     action = "clip",
     trackMouseDown = true,
-    roundedRectRadii = { xRadius = 8, yRadius = 8 },
+    roundedRectRadii = { xRadius = 9, yRadius = 9 },
   })
   canvas:insertElement({
     type = "rectangle",
@@ -136,7 +152,7 @@ local createCanvas = function()
     type = "rectangle",
     action = "fill",
     trackMouseDown = true,
-    roundedRectRadii = { xRadius = 6, yRadius = 6 },
+    roundedRectRadii = { xRadius = 7, yRadius = 7 },
     fillColor = { hex = colors.crust.hex, alpha = 0.325 },
     frame = {
       w = iconFrame,
@@ -163,21 +179,8 @@ local createCanvas = function()
   return canvas
 end
 
-local mergeWithDefaultStyle = memoize(function(style)
-  return deepMerge({
-    font = {
-      name = "Maple Mono",
-      size = fontSize,
-    },
-    color = { hex = "#fff" },
-    shadow = {
-      offset = { h = -1, w = 0 },
-      color = { hex = "#000", alpha = 0.4 },
-      blurRadius = 2,
-    },
-  }, style)
-end)
-
+--- Get the weather string
+--- @param weather Weather
 local getWeatherString = function(weather)
   return string.format("%s: %s (%s)", weather.location, weather.temperature, weather.condition)
 end
@@ -185,15 +188,22 @@ end
 local getWeatherStyledText = memoize(function(weather)
   local message = getWeatherString(weather)
 
-  return hs.styledtext.new(message, mergeWithDefaultStyle({}))
+  return hs.styledtext.new(message, widgets.getTextStyle({}))
 end)
 
+local getNoWeatherStyledText = memoize(function(message)
+  return hs.styledtext.new(message, widgets.getTextStyle({}))
+end)
+
+--- Get weather icon
+--- @param icon string
+--- @return hs.styledtext|nil
 local getWeatherIcon = function(icon)
   local fullSize = fontSize + 8
 
   return hs.styledtext.new(
     icon,
-    mergeWithDefaultStyle({
+    widgets.getTextStyle({
       font = {
         name = "Symbols Nerd Font Mono",
         size = fullSize,
@@ -203,14 +213,17 @@ local getWeatherIcon = function(icon)
   )
 end
 
+--- Update the canvas
+--- @param canvas hs.canvas
+--- @param weather Weather
 local updateCanvas = memoize(function(canvas, weather)
-  if not canvas or not weather then
+  if not canvas then
     canvas:hide()
     return
   end
 
-  local weatherText = getWeatherStyledText(weather)
-  local weatherIcon = getWeatherIcon(weather.icon)
+  local weatherText = weather and getWeatherStyledText(weather) or getNoWeatherStyledText("No weather available! :(")
+  local weatherIcon = weather and getWeatherIcon(weather.icon) or "🌚"
 
   if not weatherText or not weatherIcon then
     return
@@ -227,7 +240,7 @@ local updateCanvas = memoize(function(canvas, weather)
 
   local textWidth = textDrawing.w
   local fullCanvasWidth = textWidth + iconFrame + spacing * 2 + padding
-  local screenFrame = hs.screen.mainScreen():fullFrame()
+  local screenFrame = getScreenFrame()
 
   canvas[1].frame.w = fullCanvasWidth
   canvas[4].frame.x = textWidth + spacing * 2
@@ -237,90 +250,177 @@ local updateCanvas = memoize(function(canvas, weather)
     x = screenFrame.x + screenFrame.w - fullCanvasWidth - gap + padding / 2,
     y = screenFrame.y + screenFrame.h - iconFrame - padding * 2 - 13,
   })
+
+  local canvasFrame = canvas:frame()
+
+  if not canvasFrame then
+    return
+  end
+
   canvas:size({
     w = fullCanvasWidth,
-    h = canvas:frame().h,
+    h = canvasFrame.h,
   })
   canvas:show()
 end)
 
-local getLocation = function()
-  local locationData = {}
+--- Set the current location
+--- @param location LocationTable|nil
+local setLocation = function(location)
+  if location then
+    currentLocation = location
+  else
+    currentLocation = {}
+  end
 
+  if DEBUG then
+    print("Current Location:")
+    print("Latitude: " .. (currentLocation.latitude or "N/A"))
+    print("Longitude: " .. (currentLocation.longitude or "N/A"))
+    print("Altitude: " .. (currentLocation.altitude or "N/A"))
+    print("Horizontal Accuracy: " .. (currentLocation.horizontalAccuracy or "N/A"))
+    print("Vertical Accuracy: " .. (currentLocation.verticalAccuracy or "N/A"))
+  end
+end
+
+--- Update the location
+local updateLocation = function()
   if hs.location.servicesEnabled() and hs.location.authorizationStatus() == "authorized" then
-    hs.location.start()
-
-    local location = hs.location.get()
-
-    if location then
-      locationData = {
-        latitude = location.latitude,
-        longitude = location.longitude,
-        altitude = location.altitude,
-        horizontalAccuracy = location.horizontalAccuracy,
-        verticalAccuracy = location.verticalAccuracy,
-      }
-    else
-      print("Unable to retrieve location information.")
-      return nil
-    end
-
-    hs.location.stop()
+    setLocation(hs.location.get())
   else
     print("Location services are not enabled.")
-    return nil
   end
-
-  return locationData
 end
 
-local updateWeather = function(canvas)
-  local fetchLocation = true
+--- Set the location watcher
+--- @param updateWeather function
+local setLocationWatcher = function(updateWeather)
+  hs.location.start()
 
-  return function()
-    local location = nil
+  local location = hs.location.get()
 
-    if fetchLocation then
-      location = getLocation()
+  setLocation(location)
 
-      if not location then
-        fetchLocation = false
-      end
-    end
-
-    hs.http.asyncGet("https://wttr.in/?format=j1", nil, function(_, body)
-      local response = hs.json.decode(body)
-
-      if not response then
-        return
+  if not location then
+    hs.timer.doAfter(0.1, function()
+      -- Force a location update
+      if DEBUG then
+        print("Forcing location update")
       end
 
-      local current = response.current_condition[1]
-      local area = response.nearest_area[1]
-      local country = area.country[1].value
-      local weather = {
-        temperature = current.FeelsLikeC .. "°C",
-        condition = current.weatherDesc[1].value,
-        icon = iconMap[weatherCodeMap[current.weatherCode]],
-        location = area.areaName[1].value .. ", " .. (countryMap[country] or country),
-      }
-
-      print("Weather: " .. getWeatherString(weather))
-      updateCanvas(canvas, weather)
+      hs.wifi.availableNetworks()
     end)
   end
+
+  hs.location.register("weather-tracker", function(location)
+    setLocation(location)
+    updateWeather()
+  end, 100)
 end
 
-local canvas = createCanvas()
-local timer = nil
+--- Get the weather API URL
+--- @param location LocationTable
+--- @return string|nil
+local getWeatherApiUrl = function(location)
+  if not hs.fs.attributes(apiKeysPath) then
+    hs.json.write(apiKeysPath, {})
+    print("Please add your API keys to " .. apiKeysPath)
+
+    return
+  end
+
+  local apiKeys = hs.json.read(apiKeysPath) or {}
+  local url = string.format(
+    "https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/%s,%s/today?key=%s",
+    location.latitude,
+    location.longitude,
+    apiKeys.visualCrossing
+  )
+
+  local args = {
+    unitGroup = "metric",
+    elements = "name,address,resolvedAddress,feelslike,moonphase,conditions,description,icon",
+    include = "alerts,current,fcst,days",
+    iconSet = "icons2",
+    contentType = "json",
+  }
+
+  for key, value in pairs(args) do
+    url = url .. "&" .. key .. "=" .. value
+  end
+
+  return url
+end
+
+--- Fetch the weather
+--- @param location LocationTable
+--- @param geocoder Geocoder|nil
+local fetch = function(location, geocoder)
+  hs.http.asyncGet(getWeatherApiUrl(location), nil, function(_, body)
+    if not body then
+      return
+    end
+
+    local response = hs.json.decode(body)
+
+    if not response then
+      return
+    end
+
+    local moonPhase = getMoonPhaseName(response.currentConditions.moonphase)
+    local iconName = response.currentConditions.icon
+    local icon = iconMap[iconName]
+
+    if iconName == "clear-night" or iconName == "partly-cloudy-night" then
+      icon = moonPhaseIconMap[moonPhase]
+    end
+
+    updateCanvas(canvas, {
+      temperature = math.ceil(response.days[1].feelslike) .. "°C",
+      condition = response.currentConditions.conditions,
+      moonPhase = response.currentConditions.moonphase,
+      location = geocoder and (geocoder.name or hs.fnutils.split(geocoder.timezone, "/")[2]),
+      icon = icon,
+    })
+  end)
+end
+
+--- Update the weather canvas
+local updateWeatherCanvas = function()
+  if not (currentLocation.latitude and currentLocation.longitude) then
+    fetch(defaultLatLong, nil)
+    return
+  end
+
+  hs.location.geocoder.lookupLocation(currentLocation, function(status, results)
+    if not (status and results) then
+      fetch(defaultLatLong, nil)
+      return
+    end
+
+    fetch(currentLocation, results[1])
+  end)
+end
+
+local module = {}
 
 module.start = function()
-  local updater = updateWeather(canvas)
+  canvas = createCanvas()
+
+  -- Fetch location every minute
+  locationUpdateTimer = hs.timer.new(60, updateLocation)
 
   -- Fetch weather every 10 minutes
-  timer = hs.timer.new(10 * 60, updater)
-  updater()
-  timer:start()
+  canvasUpdateTimer = hs.timer.new(10 * 60, updateWeatherCanvas)
+
+  -- Watch for screen changes
+  screenWatcher = hs.screen.watcher.newWithActiveScreen(updateWeatherCanvas):start()
+
+  -- Start watchers and update weather canvas
+  canvasUpdateTimer:start()
+  locationUpdateTimer:start()
+  screenWatcher:start()
+  setLocationWatcher(updateWeatherCanvas)
 end
 
 return module
