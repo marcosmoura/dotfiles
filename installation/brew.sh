@@ -34,9 +34,11 @@ brew install borders
 brew install bottom
 brew install bun
 brew install camdencheek/brew/fre
+brew install chafa
 brew install cmake
 brew install cocoapods
 brew install code-minimap
+brew install colorscript
 brew install coreutils
 brew install curl
 brew install deno
@@ -71,6 +73,7 @@ brew install grep
 brew install hyperfine
 brew install jpeg-xl
 brew install jq
+brew install jstkdng/programs/ueberzugpp
 brew install koekeishiya/formulae/yabai
 brew install lazygit
 brew install libarchive
@@ -80,6 +83,7 @@ brew install llvm
 brew install llvm@16
 brew install lpeg
 brew install lua
+brew install lua-language-server
 brew install luajit
 brew install luarocks
 brew install marcosmoura/homebrew-tap/tsv-utils
@@ -124,6 +128,7 @@ brew install tree-sitter
 brew install tsv-utils
 brew install unar
 brew install unbound
+brew install viu
 brew install vivid
 brew install wallpaper
 brew install wangle
@@ -187,7 +192,6 @@ brew install --cask --no-quarantine stats
 brew install --cask --no-quarantine visual-studio-code
 brew install --cask --no-quarantine vlc
 brew install --cask --no-quarantine webpquicklook
-brew install --cask --no-quarantine wezterm
 brew install --cask --no-quarantine whatsapp@beta
 brew install --cask --no-quarantine zoom
 mas install 497799835 # Xcode

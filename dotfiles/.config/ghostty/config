@@ -4,7 +4,7 @@ font-family = Maple mono
 font-family = Symbols Nerd Font Mono
 font-family = Apple Color Emoji
 font-size = 18
-font-variation = wght=450
+font-variation = wght=500
 font-variation-bold = wght=650
 
 theme = catppuccin-mocha
