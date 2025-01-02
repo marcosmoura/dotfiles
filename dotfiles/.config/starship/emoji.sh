@@ -1,40 +1,36 @@
-#!/usr/bin/env zsh
+#!/bin/bash
 
 function random_emoji {
   printf "%s\0" "$@" | shuf -z -n1 | tr -d '\0'
 }
 
-function current_emoji {
-  local day=$(date +%d)
-  local month=$(date +%m)
-  local day_of_week=$(date +%u)
-  local dir=$PWD
+local day=$(date +%d)
+local month=$(date +%m)
+local day_of_week=$(date +%u)
+local dir=$PWD
 
-  day=${day#0}
-  month=${month#0}
+day=${day#0}
+month=${month#0}
 
-  # birthday
-  if [[ $month -eq 10 && $day -eq 15 ]]; then
-    echo "🎂"
-  # halloween
-  elif [[ $month -eq 10 && $day -eq 31 ]]; then
-    random_emoji "👹" "👺" "👻" "💀" "🎃" "🧛🏻‍♂️" "🧟‍♂️" "🕷" "🕸"
-  # Friday the 13th
-  elif [[ $day_of_week -eq 2 && $day -eq 13 ]]; then
-    random_emoji "👻" "💀"
-  # christmas
-  elif [[ $month -eq 12 && $day -le 25 ]]; then
-    random_emoji "🎅🏻" "🎄" "🎁" "☃️" "⛄️"
-  # new years eve
-  elif [[ $month -eq 12 && $day -eq 31 ]]; then
-    random_emoji "🍾" "🥂" "🎊" "🎉"
-  # Fluent UI directory
-  elif [[ $dir =~ "fluent" ]]; then
-    echo "󰍲󠀠 󠀠"
-  # Dotfiles
-  elif [[ $dir =~ "dotfiles" ]]; then
-    echo "🤍"
-  fi
-}
-
-current_emoji
+# birthday
+if [[ $month -eq 10 && $day -eq 15 ]]; then
+  echo "🎂"
+# halloween
+elif [[ $month -eq 10 && $day -eq 31 ]]; then
+  random_emoji "👹" "👺" "👻" "💀" "🎃" "🧛🏻‍♂️" "🧟‍♂️" "🕷" "🕸"
+# Friday the 13th
+elif [[ $day_of_week -eq 2 && $day -eq 13 ]]; then
+  random_emoji "👻" "💀"
+# christmas
+elif [[ $month -eq 12 && $day -le 25 ]]; then
+  random_emoji "🎅🏻" "🎄" "🎁" "☃️" "⛄️"
+# new years eve
+elif [[ $month -eq 12 && $day -eq 31 ]]; then
+  random_emoji "🍾" "🥂" "🎊" "🎉"
+# Fluent UI directory
+elif [[ $dir =~ "fluent" ]]; then
+  echo "󰍲󠀠 󠀠"
+# Dotfiles
+elif [[ $dir =~ "dotfiles" ]]; then
+  echo "🤍"
+fi

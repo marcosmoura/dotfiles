@@ -3,6 +3,8 @@ local assets = require("config.utils.assets")
 
 local menubarItem = hs.menubar.new()
 
+--- Update the menubar icon and tooltip
+--- @param showAlert boolean
 local updateMenubar = function(showAlert)
   if menubarItem == nil then
     return
@@ -22,16 +24,22 @@ local updateMenubar = function(showAlert)
   end
 end
 
+--- Enable caffeinate
+--- @param showAlert boolean
 local caffeinate = function(showAlert)
   hs.caffeinate.set("displayIdle", true)
   updateMenubar(showAlert)
 end
 
+--- Disable caffeinate
+--- @param showAlert boolean
 local uncaffeinate = function(showAlert)
   hs.caffeinate.set("displayIdle", false)
   updateMenubar(showAlert)
 end
 
+--- Handle caffeinate events
+--- @param event string
 local onCaffeinate = function(event)
   if event == hs.caffeinate.watcher.screensDidLock then
     uncaffeinate(true)

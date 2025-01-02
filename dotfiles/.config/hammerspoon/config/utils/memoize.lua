@@ -1,3 +1,6 @@
+--- Memoizes a function.
+--- @param fn function The function to memoize.
+--- @return function
 local function memoize(fn)
   local cache = {}
 

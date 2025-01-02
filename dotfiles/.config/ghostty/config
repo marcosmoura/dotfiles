@@ -1,0 +1,40 @@
+adjust-cell-height = 23%
+adjust-cell-width = -1
+font-family = Maple mono
+font-family = Symbols Nerd Font Mono
+font-family = Apple Color Emoji
+font-size = 18
+font-variation = wght=450
+font-variation-bold = wght=650
+
+theme = catppuccin-mocha
+
+cursor-click-to-move = true
+cursor-style = bar
+
+background-blur-radius = 48
+background-opacity = 0.88
+unfocused-split-opacity = 0.9
+
+macos-icon = custom-style
+macos-icon-frame = plastic
+macos-icon-ghost-color = #DFEBF5
+macos-icon-screen-color = #74B0CF
+macos-option-as-alt = true
+macos-titlebar-style = hidden
+
+window-colorspace = display-p3
+window-padding-x = 24, 24
+window-padding-y = 24, 24
+window-theme = light
+window-vsync = true
+
+clipboard-trim-trailing-spaces = true
+copy-on-select = true
+desktop-notifications = true
+quit-after-last-window-closed = true
+shell-integration = zsh
+shell-integration-features = true
+window-inherit-font-size = true
+window-inherit-working-directory = true
+working-directory = "~/Projects/fluent/fluentui"

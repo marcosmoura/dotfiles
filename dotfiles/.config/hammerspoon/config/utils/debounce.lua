@@ -1,3 +1,7 @@
+--- Debounce a function
+--- @param fn function
+--- @param timeout number
+--- @return function
 local debounce = function(fn, timeout)
   local timer = nil
 

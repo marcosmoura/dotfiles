@@ -1,7 +1,8 @@
+local assets = require("config.utils.assets")
 local colors = require("config.utils.colors")
-local deepMerge = require("config.utils.deepMerge")
-local execute = require("config.utils.execute")
 local memoize = require("config.utils.memoize")
+local os = require("config.utils.os")
+local widgets = require("config.utils.widgets")
 
 local fontSize = 13
 local artworkWidth = 36
@@ -11,6 +12,9 @@ local gap = 20
 
 local artworkCache = {}
 
+--- Get the Spotify artwork
+--- @param trackName string
+--- @return hs.image|nil
 local getSpotifyArtwork = memoize(function(trackName)
   if artworkCache[trackName] then
     return artworkCache[trackName]
@@ -35,6 +39,8 @@ local getSpotifyArtwork = memoize(function(trackName)
   return image
 end)
 
+--- Get the Apple Music artwork extension
+--- @return string|nil
 local getAppleMusicArtworkExtension = function()
   local success, ext = hs.osascript.applescript([[
     tell application "Music" to tell artwork 1 of current track
@@ -53,11 +59,15 @@ local getAppleMusicArtworkExtension = function()
   return ext
 end
 
+--- Get the Apple Music artwork path
+--- @param extension string
+--- @param trackName string
+--- @return string|nil
 local getAppleMusicArtworkPath = memoize(function(extension, trackName)
   local tempDir = "/tmp/hammerspoon-temp/artworks"
   local artworkPath = tempDir .. "/" .. hs.hash.SHA1(trackName) .. extension
 
-  local _, success = execute("mkdir -p " .. tempDir)
+  local _, success = os.execute("/bin/mkdir", { "-p", tempDir })
 
   if not success then
     return nil
@@ -66,6 +76,9 @@ local getAppleMusicArtworkPath = memoize(function(extension, trackName)
   return artworkPath
 end)
 
+--- Find the Apple Music artwork
+--- @param trackName string
+--- @return string|nil
 local findAppleMusicArtwork = memoize(function(trackName)
   local pngPath = getAppleMusicArtworkPath(".png", trackName)
   local jpgPath = getAppleMusicArtworkPath(".jpg", trackName)
@@ -81,6 +94,9 @@ local findAppleMusicArtwork = memoize(function(trackName)
   return nil
 end)
 
+--- Fetch the Apple Music artwork
+--- @param trackName string
+--- @return string|nil
 local fetchAppleMusicArtwork = memoize(function(trackName)
   local artworkPath = findAppleMusicArtwork(trackName)
 
@@ -126,6 +142,9 @@ local fetchAppleMusicArtwork = memoize(function(trackName)
   return artworkPath
 end)
 
+--- Get the Apple Music artwork
+--- @param trackName string
+--- @return hs.image|nil
 local getAppleMusicArtwork = memoize(function(trackName)
   if artworkCache[trackName] then
     return artworkCache[trackName]
@@ -150,6 +169,9 @@ local getAppleMusicArtwork = memoize(function(trackName)
   return image
 end)
 
+--- Check if the player is running
+--- @param name string
+--- @return boolean
 local isPlayerRunning = function(name)
   local player = hs.application.find(name, true)
 
@@ -160,6 +182,10 @@ local isPlayerRunning = function(name)
   return player:isRunning()
 end
 
+--- Check if the player is active
+--- @param name string
+--- @param module hs.spotify|hs.itunes
+--- @return boolean
 local isPlayer = function(name, module)
   local isRunning = isPlayerRunning(name)
 
@@ -172,6 +198,16 @@ local isPlayer = function(name, module)
   return false
 end
 
+--- @class Music
+--- @field player string
+--- @field isPlaying boolean
+--- @field track string
+--- @field artist string
+--- @field album string
+--- @field artwork hs.image|nil
+
+--- Get the current music
+--- @return Music|nil
 local getCurrentMusic = function()
   if isPlayer("Music", hs.itunes) then
     local trackName = hs.itunes.getCurrentTrack()
@@ -202,25 +238,9 @@ local getCurrentMusic = function()
   return nil
 end
 
-local mergeWithDefaultStyle = memoize(function(style)
-  return deepMerge({
-    font = {
-      name = "Maple Mono",
-      size = fontSize,
-    },
-    color = { hex = "#fff" },
-    paragraphStyle = {
-      maximumArtworkWidth = artworkWidth,
-      minimumArtworkWidth = artworkWidth,
-    },
-    shadow = {
-      offset = { h = -1, w = 0 },
-      color = { hex = "#000", alpha = 0.4 },
-      blurRadius = 2,
-    },
-  }, style)
-end)
-
+--- Get the music icon
+--- @param name string
+--- @return string
 local getMusicIcon = function(name)
   if name == "Apple Music" then
     return ""
@@ -233,6 +253,10 @@ local getMusicIcon = function(name)
   return "󰎆"
 end
 
+--- Get the normalized track info
+--- @param info string
+--- @param truncateNumber number
+--- @return string
 local getNormalizedTrackInfo = memoize(function(info, truncateNumber)
   local shouldTruncate = truncateNumber ~= 0 and string.len(info) > truncateNumber
   local normalized = string.gsub(info, "^%s*(.-)%s*$", "%1")
@@ -245,6 +269,9 @@ local getNormalizedTrackInfo = memoize(function(info, truncateNumber)
   return normalized
 end)
 
+--- Get the music styled text
+--- @param currentMusic Music
+--- @return hs.styledtext|nil
 local getMusicStyledText = memoize(function(currentMusic)
   local trackTruncateNumber = 50
   local artistTruncateNumber = 35
@@ -259,41 +286,44 @@ local getMusicStyledText = memoize(function(currentMusic)
   local artistName = getNormalizedTrackInfo(currentMusic.artist, artistTruncateNumber)
   local message = string.format("__%s - %s", trackName, artistName)
 
-  return hs.styledtext.new(message, mergeWithDefaultStyle({}))
+  return hs.styledtext.new(message, widgets.getTextStyle({}))
 end)
 
+--- Get the music state icon
+--- @param isPlaying boolean
+--- @return hs.styledtext|nil
 local getMusicStateIcon = function(isPlaying)
   local icon = isPlaying and "" or " "
 
   return hs.styledtext.new(
     icon,
-    mergeWithDefaultStyle({
+    widgets.getTextStyle({
       font = {
         name = "Symbols Nerd Font Mono",
         size = fontSize + 2,
       },
-      lineBreak = "truncateTail",
-      allowsTighteningForTruncation = true,
     })
   )
 end
 
+--- Get the app icon styled text
+--- @param currentMusic Music
+--- @return hs.styledtext|nil
 local getAppIconStyledText = memoize(function(currentMusic)
   local icon = getMusicIcon(currentMusic.player)
 
   return hs.styledtext.new(
     icon .. " ",
-    mergeWithDefaultStyle({
+    widgets.getTextStyle({
       font = {
         name = "Symbols Nerd Font Mono",
         size = fontSize + 2,
       },
-      lineBreak = "truncateTail",
-      allowsTighteningForTruncation = true,
     })
   )
 end)
 
+--- Handle the canvas click
 local onCanvasClick = function()
   if isPlayer("Music", hs.itunes) then
     hs.application.launchOrFocus("Music")
@@ -306,9 +336,15 @@ local onCanvasClick = function()
   end
 end
 
+--- Get the screen frame
+--- @return hs.geometry
+local getScreenFrame = function()
+  return hs.screen.primaryScreen():fullFrame()
+end
+
+--- Create the canvas
 local createCanvas = function()
-  local screen = hs.screen.mainScreen()
-  local screenFrame = screen:fullFrame()
+  local screenFrame = getScreenFrame()
 
   local canvasFrame = {
     x = gap - padding / 2,
@@ -316,21 +352,13 @@ local createCanvas = function()
     w = screenFrame.w / 3 + padding * 2,
     h = artworkWidth + padding * 2,
   }
-  local canvas = hs.canvas.new(canvasFrame)
-
-  if not canvas then
-    return nil
-  end
-
-  canvas:level(hs.canvas.windowLevels.normal - 1)
-  canvas:behavior(hs.canvas.windowBehaviors.canJoinAllSpaces)
-  canvas:mouseCallback(onCanvasClick)
+  local canvas = widgets.create(canvasFrame, onCanvasClick)
 
   canvas:insertElement({
     type = "rectangle",
     action = "clip",
     trackMouseDown = true,
-    roundedRectRadii = { xRadius = 8, yRadius = 8 },
+    roundedRectRadii = { xRadius = 9, yRadius = 9 },
   })
   canvas:insertElement({
     type = "rectangle",
@@ -340,9 +368,22 @@ local createCanvas = function()
   })
   canvas:insertElement({
     type = "rectangle",
+    action = "fill",
+    trackMouseDown = true,
+    roundedRectRadii = { xRadius = 7, yRadius = 7 },
+    fillColor = { hex = colors.crust.hex, alpha = 0.325 },
+    frame = {
+      w = artworkWidth,
+      h = artworkWidth,
+      x = padding,
+      y = padding,
+    },
+  })
+  canvas:insertElement({
+    type = "rectangle",
     action = "clip",
     trackMouseDown = true,
-    roundedRectRadii = { xRadius = 6, yRadius = 6 },
+    roundedRectRadii = { xRadius = 7, yRadius = 7 },
     frame = {
       w = artworkWidth,
       h = artworkWidth,
@@ -379,43 +420,74 @@ local createCanvas = function()
   return canvas
 end
 
-local updateCurrentMusic = memoize(function(canvas, currentMusic)
-  if not currentMusic or currentMusic.track == "" then
+--- Recalculate the canvas size
+--- @param canvas hs.canvas
+local recalculateCanvasSize = function(canvas)
+  local textDrawing = hs.drawing.getTextDrawingSize(canvas[7].text)
+
+  if not textDrawing then
     canvas:hide()
     return
   end
 
-  local music = getMusicStyledText(currentMusic)
-  local playerIcon = getAppIconStyledText(currentMusic)
-  local stateIcon = getMusicStateIcon(currentMusic.isPlaying)
-
-  if not music or not playerIcon or not stateIcon then
-    return
-  end
-
-  canvas[4].image = currentMusic.artwork
-  canvas[6].text = music:setString(stateIcon, 2, 2):setString(playerIcon, 1, 1)
-
-  local textDrawing = hs.drawing.getTextDrawingSize(canvas[6].text)
-
-  if not textDrawing then
-    return
-  end
-
   local fullCanvasWidth = textDrawing.w + artworkWidth + spacing * 2 + padding
+  local frame = canvas:frame()
 
   canvas[1].frame.w = fullCanvasWidth
   canvas:size({
     w = fullCanvasWidth,
-    h = canvas:frame().h,
+    h = frame and frame.h or 0,
   })
   canvas:show()
+end
+
+--- Update the current music
+--- @param canvas hs.canvas
+--- @param currentMusic Music
+local updateCurrentMusic = memoize(function(canvas, currentMusic)
+  local hasMusicPlaying = currentMusic and currentMusic.track ~= ""
+
+  if hasMusicPlaying then
+    local music = getMusicStyledText(currentMusic)
+    local playerIcon = getAppIconStyledText(currentMusic)
+    local stateIcon = getMusicStateIcon(currentMusic.isPlaying)
+    local text = music:setString(stateIcon, 2, 2):setString(playerIcon, 1, 1)
+
+    if not music or not playerIcon or not stateIcon then
+      canvas:hide()
+      return
+    end
+
+    canvas[5].image = currentMusic.artwork
+    canvas[5].frame = {
+      w = artworkWidth,
+      h = artworkWidth,
+      x = padding,
+      y = padding,
+    }
+    canvas[7].text = text
+  else
+    local size = assets.notPlaying:size()
+    local iconSize = size and size.w or 0
+
+    canvas[5].image = assets.notPlaying
+    canvas[5].frame = {
+      w = iconSize,
+      h = iconSize,
+      x = padding + (artworkWidth - iconSize) / 2,
+      y = padding + (artworkWidth - iconSize) / 2,
+    }
+    canvas[7].text = hs.styledtext.new("No music playing :(", widgets.getTextStyle({}))
+  end
+
+  recalculateCanvasSize(canvas)
 end)
 
 local module = {}
 
 local canvas = createCanvas()
 local timer = nil
+local screenWatcher = nil
 
 module.start = function()
   local update = function()
@@ -428,23 +500,14 @@ module.start = function()
       timer = nil
     end
 
-    timer = hs.timer.doEvery(1, update)
+    timer = hs.timer.doEvery(0.5, update)
   end
 
-  local event = hs.eventtap.new({ hs.eventtap.event.types.systemDefined }, function(event)
-    local systemKey = event:systemKey().key
-    local events = { "PLAY", "NEXT", "PREVIOUS" }
-
-    if hs.fnutils.contains(events, systemKey) then
-      update()
-      createTimer()
-    end
-  end)
+  screenWatcher = hs.screen.watcher.newWithActiveScreen(update)
 
   update()
   createTimer()
-
-  event:start()
+  screenWatcher:start()
 end
 
 return module

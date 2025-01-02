@@ -1,0 +1,199 @@
+# 'start-at-login' needs to be 'true' for 'after-login-command' to work
+after-login-command = []
+
+# 'after-startup-command' is run after 'after-login-command'
+after-startup-command = [
+  'workspace browser',
+  'layout accordion',
+
+  'workspace design',
+  'layout accordion',
+
+  'workspace communication',
+  'layout floating',
+
+  'workspace browser',
+]
+
+start-at-login = true
+enable-normalization-flatten-containers = false
+enable-normalization-opposite-orientation-for-nested-containers = true
+accordion-padding = 0
+default-root-container-layout = 'tiles'
+default-root-container-orientation = 'auto'
+
+on-focused-monitor-changed = [
+  "exec-and-forget /bin/bash -c 'hs -m \"aerospace:onWindowsChanged\"'",
+]
+on-focus-changed = [
+  "exec-and-forget /bin/bash -c 'hs -m \"aerospace:onWindowsChanged\"'",
+]
+exec-on-workspace-change = [
+  '/bin/bash',
+  '-c',
+  "hs -m 'aerospace:onSpacesChanged'; hs -m 'aerospace:onWallpapersChanged'",
+]
+
+
+[key-mapping]
+preset = 'qwerty'
+
+[key-mapping.key-notation-to-key-code]
+files = 'f'
+terminal = 't'
+code = 'c'
+browser = 'b'
+design = 'd'
+music = 'm'
+communication = 'n'
+mail = 'o'
+passwords = 'p'
+misc = 'r'
+
+[gaps]
+inner.horizontal = 20
+inner.vertical = 20
+outer.left = 20
+outer.bottom = 20
+outer.top = 20
+outer.right = 20
+
+[mode.main.binding]
+# Misc
+ctrl-cmd-e = 'balance-sizes'
+ctrl-cmd-shift-e = ['balance-sizes', 'flatten-workspace-tree']
+ctrl-cmd-b = 'layout tiles'
+ctrl-cmd-f = 'layout floating tiling'
+ctrl-cmd-m = 'layout accordion tiling'
+ctrl-cmd-c = 'split horizontal'
+ctrl-cmd-v = 'split vertical'
+
+# Disable built-in shortcuts
+cmd-h = []     # Disable "hide application"
+cmd-alt-h = [] # Disable "hide others"
+
+# Switch between workspaces
+alt-1 = 'workspace files'
+ctrl-1 = 'workspace files'
+
+alt-2 = 'workspace terminal'
+ctrl-2 = 'workspace terminal'
+
+alt-3 = 'workspace code'
+ctrl-3 = 'workspace code'
+
+alt-4 = 'workspace browser'
+ctrl-4 = 'workspace browser'
+
+alt-5 = 'workspace design'
+ctrl-5 = 'workspace design'
+
+alt-6 = 'workspace music'
+ctrl-6 = 'workspace music'
+
+alt-7 = 'workspace communication'
+ctrl-7 = 'workspace communication'
+
+alt-8 = 'workspace mail'
+ctrl-8 = 'workspace mail'
+
+alt-9 = 'workspace passwords'
+ctrl-9 = 'workspace passwords'
+
+alt-0 = 'workspace misc'
+ctrl-0 = 'workspace misc'
+
+
+ctrl-right = 'workspace next'
+ctrl-left = 'workspace prev'
+
+# Space - Files
+[[on-window-detected]]
+if.app-id = 'com.apple.finder'
+run = "move-node-to-workspace files"
+
+
+# Space - Terminal
+[[on-window-detected]]
+if.app-id = 'com.github.wez.wezterm'
+run = "move-node-to-workspace terminal"
+
+[[on-window-detected]]
+if.app-id = 'net.kovidgoyal.kitty'
+run = "move-node-to-workspace terminal"
+
+[[on-window-detected]]
+if.app-id = "com.mitchellh.ghostty"
+run = ["move-node-to-workspace terminal"]
+
+[[on-window-detected]]
+if.app-id = "com.mitchellh.ghostty"
+run = ["layout tiling"]
+
+
+# Space - Code
+[[on-window-detected]]
+if.app-id = 'com.microsoft.VSCode'
+run = "move-node-to-workspace code"
+
+
+# Space - Browser
+[[on-window-detected]]
+if.app-id = 'com.google.Chrome'
+run = "move-node-to-workspace browser"
+
+[[on-window-detected]]
+if.app-id = 'company.thebrowser.Browser'
+run = "move-node-to-workspace browser"
+
+[[on-window-detected]]
+if.app-id = 'com.microsoft.Edge'
+run = "move-node-to-workspace browser"
+
+[[on-window-detected]]
+if.app-id = 'org.mozilla.firefox'
+run = "move-node-to-workspace browser"
+
+
+# Space - Design
+[[on-window-detected]]
+if.app-id = 'com.figma.Desktop'
+run = "move-node-to-workspace design"
+
+
+# Space - Music
+[[on-window-detected]]
+if.app-id = 'com.spotify.client'
+run = "move-node-to-workspace music"
+
+[[on-window-detected]]
+if.app-id = 'com.apple.Music'
+run = "move-node-to-workspace music"
+
+
+# Space - Communication
+[[on-window-detected]]
+if.app-id = 'com.microsoft.teams2'
+run = 'move-node-to-workspace communication'
+
+[[on-window-detected]]
+if.app-id = 'net.whatsapp.WhatsApp'
+run = 'move-node-to-workspace communication'
+
+
+# Space - Mail
+[[on-window-detected]]
+if.app-id = 'com.microsoft.Outlook'
+run = 'move-node-to-workspace mail'
+
+
+# Space - Passwords
+[[on-window-detected]]
+if.app-id = 'me.proton.pass.electron'
+run = 'move-node-to-workspace passwords'
+
+
+# Space - Misc
+[[on-window-detected]]
+if.app-id = 'com.microsoft.rdc.macos'
+run = 'move-node-to-workspace misc'

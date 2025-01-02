@@ -9,8 +9,4 @@ if #luarocks > 0 then
   package.cpath = package.cpath .. ";" .. lrCpath
 end
 
-Print = function(...)
-  hs.printf(hs.inspect(...))
-end
-
 noop = function() end

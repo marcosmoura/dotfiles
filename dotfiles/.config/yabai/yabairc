@@ -1,6 +1,5 @@
 ## Global settings
 yabai -m config auto_balance on
-yabai -m config external_bar all:25:0
 yabai -m config focus_follows_mouse off
 yabai -m config mouse_action1 move
 yabai -m config mouse_action2 resize

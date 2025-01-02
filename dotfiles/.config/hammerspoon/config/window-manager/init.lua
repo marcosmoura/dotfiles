@@ -1,50 +1,33 @@
-local execute = require("config.utils.execute")
-local executeYabai = require("config.utils.executeYabai")
+local os = require("config.utils.os")
 
 local module = {}
+local brewPath = "/opt/homebrew/bin/brew"
 
+--- Check if the borders service is running
+--- @return boolean
 local hasBordersService = function()
-  local bordersService = execute("/opt/homebrew/bin/brew", "services info borders --json", {
-    json = true,
-    silent = true,
-  })
+  local bordersService = os.execute(brewPath, "services info borders --json", { json = true })
 
   return bordersService and bordersService[1] and bordersService[1].running
 end
 
-local isYabaiRunning = function()
-  local services = execute("launchctl list")
-  local normalizedServices = type(services) == "table" and table.concat(services, "") or services
-  local matchesYabai = string.find(normalizedServices, "yabai")
-
-  return matchesYabai ~= nil and matchesYabai ~= ""
+--- Enable the borders service if it's not running
+local enableBordersIfNeeded = function()
+  if not hasBordersService() then
+    os.execute(brewPath, "services start borders", { silent = true })
+  end
 end
 
-module.start = function(withYabai)
-  local hasBordersEnabled = hasBordersService()
-
-  --[[ TODO: Unify all window management modules into a single module ]]
-  require("config.window-manager.bindings").start()
-
-  if withYabai then
-    if not isYabaiRunning() then
-      executeYabai("--start-service", { silent = true })
-    end
-
-    if not hasBordersEnabled then
-      execute("/opt/homebrew/bin/brew", "services start borders", { silent = true })
-    end
-
-    require("config.window-manager.stack-indicator").start() -- New module
+module.start = function()
+  if os.aerospace.isRunning() then
+    require("config.window-manager.aerospace").start()
+    enableBordersIfNeeded()
   else
-    executeYabai("--stop-service", { silent = true })
-
-    if not hasBordersEnabled then
-      require("config.window-manager.experimental.borders").start() -- New module
-    end
-
-    require("config.window-manager.experimental.tiling").start() -- New module
+    require("config.window-manager.yabai").start()
+    enableBordersIfNeeded()
   end
+
+  -- require("config.window-manager.stack-indicator").start()
 end
 
 return module

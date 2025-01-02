@@ -3,6 +3,16 @@
 # For a (much) more advanced configuration example see my dotfiles:
 # https://github.com/FelixKratz/dotfiles
 
+# Function to convert a hex color to a transparent hex color
+# Usage: hexToTransparentHex "#ffffff" 90
+# This will return "0x1Affffff"
+function hexToTransparentHex() {
+  local hex=$1
+  local alpha=$(printf "%x" $(($2 * 255 / 100)))
+
+  echo "0x$alpha${hex:1}"
+}
+
 PLUGIN_DIR="$CONFIG_DIR/plugins"
 
 ##### Bar Appearance #####
@@ -15,6 +25,11 @@ PLUGIN_DIR="$CONFIG_DIR/plugins"
 bar=(
   position=top
   font_smoothing=on
+  padding_left=8
+  padding_right=12
+  color=0x00ffffff
+  height=25
+  y_offset=-25
 )
 sketchybar --bar "${bar[@]}"
 yabai -m config external_bar all:25:0
@@ -24,13 +39,15 @@ yabai -m config external_bar all:25:0
 # For a full list of all available item properties see:
 # https://felixkratz.github.io/SketchyBar/config/items
 
+labelColor=$(hexToTransparentHex "#ffffff" 90)
+
 default=(
   padding_left=6
   padding_right=6
-  icon.font="Symbols Nerd Font Mono:Regular:14.0"
+  icon.font="Symbols Nerd Font Mono:Regular:13.0"
   label.font="Maple Mono:Regular:14.0"
-  icon.color=0xffffffff
-  label.color=0xffffffff
+  icon.color="$labelColor"
+  label.color="$labelColor"
   icon.padding_left=4
   icon.padding_right=4
   label.padding_left=6
@@ -51,11 +68,11 @@ for i in "${!SPACE_ICONS[@]}"; do
     padding_left=2
     padding_right=2
     label="${SPACE_ICONS[i]}"
-    label.padding_left=12
-    label.padding_right=12
-    background.color=0x40ffffff
+    label.padding_left=8
+    label.padding_right=8
+    background.color=0xff313244
     background.corner_radius=6
-    background.height=25
+    background.height=20
     icon.drawing=off
     script="$PLUGIN_DIR/space.sh"
     click_script="$PLUGIN_DIR/space_click.sh $sid"
@@ -85,7 +102,7 @@ sketchybar --add item chevron center \
 # https://felixkratz.github.io/SketchyBar/config/events
 
 sketchybar --add item clock right \
-  --set clock update_freq=10 icon= script="$PLUGIN_DIR/clock.sh" \
+  --set clock update_freq=1 icon= script="$PLUGIN_DIR/clock.sh" \
   --add item volume right \
   --set volume script="$PLUGIN_DIR/volume.sh" \
   --subscribe volume volume_change \
@@ -96,3 +113,5 @@ sketchybar --add item clock right \
 ##### Force all scripts to run the first time (never do this in a script) #####
 sketchybar --update
 sketchybar --hotload true
+sleep 0.2
+sketchybar --animate circ 20 --bar y_offset=0

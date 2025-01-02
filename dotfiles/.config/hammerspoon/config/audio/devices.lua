@@ -2,6 +2,10 @@ local memoize = require("config.utils.memoize")
 
 local module = {}
 
+--- Find a device by name
+--- @param devices hs.audiodevice[]
+--- @param name string
+--- @return hs.audiodevice|nil
 local findDeviceByName = memoize(function(devices, name)
   if not (devices or name) then
     return
@@ -22,6 +26,9 @@ local findDeviceByName = memoize(function(devices, name)
   end)
 end)
 
+--- Get the target output device
+--- @param devices hs.audiodevice[]
+--- @return hs.audiodevice|nil
 local getTargetOutputDevice = memoize(function(devices)
   local airpods = findDeviceByName(devices, "airpods")
   local teamsAudio = findDeviceByName(devices, "microsoft teams audio")
@@ -48,10 +55,15 @@ local getTargetOutputDevice = memoize(function(devices)
   return nil
 end)
 
+--- Normalize the audio balance
+--- @param balance number
+--- @return string
 local normalizeBalance = function(balance)
   return string.format("%.4f", balance)
 end
 
+--- Set the speakers balance
+--- @param devices hs.audiodevice[]
 local setSpeakersBalance = memoize(function(devices)
   local speakers = findDeviceByName(devices, "external speakers")
 
@@ -59,7 +71,7 @@ local setSpeakersBalance = memoize(function(devices)
     return
   end
 
-  local targetAudioBalance = 0.4625
+  local targetAudioBalance = 0.45
 
   if normalizeBalance(speakers:balance()) == normalizeBalance(targetAudioBalance) then
     return
@@ -70,6 +82,7 @@ local setSpeakersBalance = memoize(function(devices)
   speakers:setBalance(targetAudioBalance)
 end)
 
+--- Handle the output device change
 local handleOutputDeviceChange = function()
   local current = hs.audiodevice.defaultOutputDevice()
   local outputDevices = hs.audiodevice.allOutputDevices()
@@ -86,6 +99,7 @@ local handleOutputDeviceChange = function()
   print("Default output device set to " .. targetDevice:name())
 end
 
+--- Handle the input device change
 local handleInputDeviceChange = function()
   local inputDevices = hs.audiodevice.allInputDevices()
 
@@ -103,6 +117,7 @@ local handleInputDeviceChange = function()
   print("Default input device set to " .. targetDevice:name())
 end
 
+--- Handle the audio device change
 local onAudioDeviceChange = function()
   handleOutputDeviceChange()
   handleInputDeviceChange()

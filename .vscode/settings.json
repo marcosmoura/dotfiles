@@ -1,17 +1,25 @@
 {
-  "Lua.workspace.library": [
-    "~/.config/hammerspoon/Spoons/EmmyLua.spoon/annotations"
-  ],
+  "[lua]": {
+    "editor.defaultFormatter": "JohnnyMorganz.stylua"
+  },
   "cSpell.words": [
     "applescript",
     "audiodevice",
     "caffeinate",
     "eventtap",
     "fnutils",
+    "ghostty",
+    "hammerspoon",
     "hidutil",
     "minifuse",
     "osascript",
+    "sketchybar",
+    "Sketchybar",
     "syncinstall",
     "uncaffeinate"
-  ]
+  ],
+  "Lua.workspace.library": [
+    "~/.config/hammerspoon/Spoons/EmmyLua.spoon/annotations"
+  ],
+  "stylua.targetReleaseVersion": "latest"
 }

@@ -66,8 +66,9 @@ crust = "#11111b"
 
 [custom.clock-emoji]
 when = true
-command = 'echo "" | cut -c $(($(date +%H)%12+1))'
-format = "[$output](bold white)"
+command = 'sh ~/.config/starship/clock.sh'
+format = "[$output](bold white) "
+ignore_timeout = true
 
 [custom.special-emoji]
 when = true

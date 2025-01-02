@@ -4,6 +4,9 @@ local debounce = require("config.utils.debounce")
 
 local module = {}
 
+--- Show a wifi alert
+--- @param message string
+--- @param icon hs.image
 local showWifiAlert = function(message, icon)
   alert.custom(message, icon, {}, 2)
 end
@@ -11,6 +14,7 @@ end
 module.start = function()
   local currentWifi = nil
 
+  --- Debounced wifi change handler
   local onWifiChange = debounce(function()
     local newWifi = hs.wifi.currentNetwork()
 
@@ -29,7 +33,7 @@ module.start = function()
 
   local watcher = hs.wifi.watcher.new(onWifiChange)
 
-  hs.timer.doAfter(0.5, function()
+  hs.timer.doAfter(1, function()
     currentWifi = hs.wifi.currentNetwork()
     watcher:start()
   end)

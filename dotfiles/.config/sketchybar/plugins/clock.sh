@@ -4,5 +4,6 @@
 # the item invoking this script:
 # https://felixkratz.github.io/SketchyBar/config/events#events-and-scripting
 
-sketchybar --set "$NAME" label="$(date '+%d/%m %H:%M')"
-
+# The date command is used to get the current date and time
+# Format: Tue Nov 24 14:15:00
+sketchybar --set "$NAME" label="$(date '+%a %b %d %H:%M:%S')"

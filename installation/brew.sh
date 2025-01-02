@@ -24,6 +24,7 @@ brew tap homebrew/services
 brew -v update
 brew upgrade
 
+brew install aerospace
 brew install aom
 brew install bandwhich
 brew install bash
@@ -83,6 +84,7 @@ brew install luajit
 brew install luarocks
 brew install marcosmoura/homebrew-tap/tsv-utils
 brew install mas
+brew install mise
 brew install moreutils
 brew install navi
 brew install ncdu
@@ -149,10 +151,10 @@ brew install --cask --no-quarantine font-fira-code
 brew install --cask --no-quarantine font-hanken-grotesk
 brew install --cask --no-quarantine font-inter
 brew install --cask --no-quarantine font-jetbrains-mono
-brew install --cask --no-quarantine font-maple
+brew install --cask --no-quarantine font-maple-mono
 brew install --cask --no-quarantine font-sf-mono
 brew install --cask --no-quarantine font-symbols-only-nerd-font
-brew install --cask --no-quarantine google-chrome-canary
+brew install --cask --no-quarantine ghostty
 brew install --cask --no-quarantine hammerspoon
 brew install --cask --no-quarantine imageoptim
 brew install --cask --no-quarantine jordanbaird-ice

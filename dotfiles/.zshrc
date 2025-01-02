@@ -61,14 +61,12 @@ fi
 eval "$(sheldon source)"
 eval "$(sheldon completions --shell zsh)"
 
-# FZF
-source <(fzf --zsh)
-
-# Direnv
-eval "$(direnv hook zsh)"
-
-# Luarocks
-eval "$(luarocks path)"
+# Mise
+if [[ "$TERM_PROGRAM" == "vscode" ]]; then
+  eval "$(mise activate zsh --shims)"
+else
+  eval "$(mise activate zsh)"
+fi
 
 # Clear screen
 clear
