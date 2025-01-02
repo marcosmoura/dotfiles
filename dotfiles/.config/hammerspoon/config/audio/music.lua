@@ -4,12 +4,6 @@ local memoize = require("config.utils.memoize")
 local os = require("config.utils.os")
 local widgets = require("config.utils.widgets")
 
-local fontSize = 13
-local artworkWidth = 36
-local spacing = 12
-local padding = 4
-local gap = 20
-
 local artworkCache = {}
 
 --- Get the Spotify artwork
@@ -32,7 +26,10 @@ local getSpotifyArtwork = memoize(function(trackName)
     return nil
   end
 
-  image = image:setSize({ h = artworkWidth, w = artworkWidth })
+  image = image:setSize({
+    h = widgets.iconFrame,
+    w = widgets.iconFrame,
+  })
 
   artworkCache[trackName] = image
 
@@ -162,7 +159,7 @@ local getAppleMusicArtwork = memoize(function(trackName)
     return nil
   end
 
-  image = image:setSize({ h = artworkWidth, w = artworkWidth })
+  image = image:setSize({ h = widgets.iconFrame, w = widgets.iconFrame })
 
   artworkCache[trackName] = image
 
@@ -300,7 +297,7 @@ local getMusicStateIcon = function(isPlaying)
     widgets.getTextStyle({
       font = {
         name = "Symbols Nerd Font Mono",
-        size = fontSize + 2,
+        size = widgets.fontSize + 2,
       },
     })
   )
@@ -317,7 +314,7 @@ local getAppIconStyledText = memoize(function(currentMusic)
     widgets.getTextStyle({
       font = {
         name = "Symbols Nerd Font Mono",
-        size = fontSize + 2,
+        size = widgets.fontSize + 2,
       },
     })
   )
@@ -347,10 +344,10 @@ local createCanvas = function()
   local screenFrame = getScreenFrame()
 
   local canvasFrame = {
-    x = gap - padding / 2,
-    y = screenFrame.y + screenFrame.h - artworkWidth - padding * 2 - 14,
-    w = screenFrame.w / 3 + padding * 2,
-    h = artworkWidth + padding * 2,
+    x = widgets.gap - widgets.padding / 2,
+    y = screenFrame.y + screenFrame.h - widgets.iconFrame - widgets.padding * 2 - 14,
+    w = screenFrame.w / 3 + widgets.padding * 2,
+    h = widgets.iconFrame + widgets.padding * 2,
   }
   local canvas = widgets.create(canvasFrame, onCanvasClick)
 
@@ -358,7 +355,10 @@ local createCanvas = function()
     type = "rectangle",
     action = "clip",
     trackMouseDown = true,
-    roundedRectRadii = { xRadius = 9, yRadius = 9 },
+    roundedRectRadii = {
+      xRadius = widgets.borderRadius,
+      yRadius = widgets.borderRadius,
+    },
   })
   canvas:insertElement({
     type = "rectangle",
@@ -370,13 +370,16 @@ local createCanvas = function()
     type = "rectangle",
     action = "fill",
     trackMouseDown = true,
-    roundedRectRadii = { xRadius = 7, yRadius = 7 },
+    roundedRectRadii = {
+      xRadius = widgets.borderRadius - 2,
+      yRadius = widgets.borderRadius - 2,
+    },
     fillColor = { hex = colors.crust.hex, alpha = 0.325 },
     frame = {
-      w = artworkWidth,
-      h = artworkWidth,
-      x = padding,
-      y = padding,
+      w = widgets.iconFrame,
+      h = widgets.iconFrame,
+      x = widgets.padding,
+      y = widgets.padding,
     },
   })
   canvas:insertElement({
@@ -385,20 +388,20 @@ local createCanvas = function()
     trackMouseDown = true,
     roundedRectRadii = { xRadius = 7, yRadius = 7 },
     frame = {
-      w = artworkWidth,
-      h = artworkWidth,
-      x = padding,
-      y = padding,
+      w = widgets.iconFrame,
+      h = widgets.iconFrame,
+      x = widgets.padding,
+      y = widgets.padding,
     },
   })
   canvas:insertElement({
     type = "image",
     trackMouseDown = true,
     frame = {
-      w = artworkWidth,
-      h = artworkWidth,
-      x = padding,
-      y = padding,
+      w = widgets.iconFrame,
+      h = widgets.iconFrame,
+      x = widgets.padding,
+      y = widgets.padding,
     },
   })
   canvas:insertElement({
@@ -410,9 +413,9 @@ local createCanvas = function()
     action = "fill",
     trackMouseDown = true,
     frame = {
-      x = artworkWidth + spacing + padding,
-      y = (artworkWidth - fontSize) / 2 + padding - 2,
-      w = canvasFrame.w - (artworkWidth + spacing + padding),
+      x = widgets.iconFrame + widgets.spacing + widgets.padding,
+      y = (widgets.iconFrame - widgets.fontSize) / 2 + widgets.padding - 1,
+      w = canvasFrame.w - (widgets.iconFrame + widgets.spacing + widgets.padding),
       h = "100%",
     },
   })
@@ -430,7 +433,7 @@ local recalculateCanvasSize = function(canvas)
     return
   end
 
-  local fullCanvasWidth = textDrawing.w + artworkWidth + spacing * 2 + padding
+  local fullCanvasWidth = textDrawing.w + widgets.iconFrame + widgets.spacing * 2 + widgets.padding
   local frame = canvas:frame()
 
   canvas[1].frame.w = fullCanvasWidth
@@ -460,10 +463,10 @@ local updateCurrentMusic = memoize(function(canvas, currentMusic)
 
     canvas[5].image = currentMusic.artwork
     canvas[5].frame = {
-      w = artworkWidth,
-      h = artworkWidth,
-      x = padding,
-      y = padding,
+      w = widgets.iconFrame,
+      h = widgets.iconFrame,
+      x = widgets.padding,
+      y = widgets.padding,
     }
     canvas[7].text = text
   else
@@ -474,8 +477,8 @@ local updateCurrentMusic = memoize(function(canvas, currentMusic)
     canvas[5].frame = {
       w = iconSize,
       h = iconSize,
-      x = padding + (artworkWidth - iconSize) / 2,
-      y = padding + (artworkWidth - iconSize) / 2,
+      x = widgets.padding + (widgets.iconFrame - iconSize) / 2,
+      y = widgets.padding + (widgets.iconFrame - iconSize) / 2,
     }
     canvas[7].text = hs.styledtext.new("No music playing :(", widgets.getTextStyle({}))
   end

@@ -2,6 +2,8 @@ local deepMerge = require("config.utils.deepMerge")
 local memoize = require("config.utils.memoize")
 local module = {}
 
+local fontSize = 14
+
 --- Create a new canvas widget
 --- @param frame hs.geometry
 --- @param callback function
@@ -27,8 +29,6 @@ end
 --- @param style table
 --- @return table
 local getTextStyle = memoize(function(style)
-  local fontSize = 14
-
   return deepMerge({
     font = {
       name = "SF Pro Text",
@@ -47,5 +47,11 @@ end)
 
 module.create = create
 module.getTextStyle = getTextStyle
+module.fontSize = fontSize
+module.borderRadius = 9
+module.gap = 20
+module.iconFrame = 36
+module.spacing = 12
+module.padding = 4
 
 return module
