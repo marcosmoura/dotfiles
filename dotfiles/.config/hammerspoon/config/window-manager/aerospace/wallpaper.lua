@@ -2,6 +2,7 @@ local memoize = require("config.utils.memoize")
 local windows = require("config.utils.windows")
 
 local radius = 12
+local wallpaperDirectory = "~/.config/wallpapers"
 
 --- The current wallpaper.
 --- @type hs.canvas|nil
@@ -148,7 +149,6 @@ end)
 --- Gets a random wallpaper from the wallpaper directory.
 --- @return string|nil - The random wallpaper.
 local getRandomWallpaper = function()
-  local wallpaperDirectory = "~/.config/wallpapers"
   local wallpaperPaths = {}
 
   for file in hs.fs.dir(wallpaperDirectory) do
@@ -186,6 +186,7 @@ local getWallpaperImage = memoize(function(wallpaperPath, screen)
   return image
 end)
 
+--- Creates a random wallpaper.
 local createWallpaper = function()
   local screen = hs.window.frontmostWindow():screen()
   local randomWallpaper = getRandomWallpaper()
@@ -199,6 +200,7 @@ local createWallpaper = function()
   currentWallpaper:show()
 end
 
+--- Raises the wallpaper above minimized windows
 local raiseWallpaper = function()
   if currentWallpaper then
     currentWallpaper:level(hs.canvas.windowLevels.desktop)
@@ -235,6 +237,9 @@ module.start = function()
 
   -- Refresh the wallpaper every hour.
   hs.timer.doEvery(60 * 60, init)
+
+  -- Reload the wallpaper when the wallpaper directory changes.
+  hs.pathwatcher.new(wallpaperDirectory, init):start()
 end
 
 return module
