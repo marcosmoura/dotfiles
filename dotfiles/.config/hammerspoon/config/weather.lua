@@ -87,12 +87,6 @@ local getMoonPhaseName = function(phase)
   return "unknown"
 end
 
-local fontSize = 13
-local iconFrame = 36
-local spacing = 12
-local padding = 4
-local gap = 20
-
 local defaultLatLong = {
   latitude = 50.077152249886,
   longitude = 14.441415779226,
@@ -119,10 +113,10 @@ end
 local createCanvas = function()
   local screenFrame = getScreenFrame()
   local canvasFrame = {
-    x = gap,
-    y = screenFrame.y + screenFrame.h - iconFrame - padding * 2 - 14,
-    w = screenFrame.w / 3 + padding * 2,
-    h = iconFrame + padding * 2,
+    x = widgets.gap,
+    y = screenFrame.y + screenFrame.h - widgets.iconFrame - widgets.padding * 2 - 14,
+    w = screenFrame.w / 3 + widgets.padding * 2,
+    h = widgets.iconFrame + widgets.padding * 2,
   }
   local canvas = widgets.create(canvasFrame, onCanvasClick)
 
@@ -130,7 +124,10 @@ local createCanvas = function()
     type = "rectangle",
     action = "clip",
     trackMouseDown = true,
-    roundedRectRadii = { xRadius = 9, yRadius = 9 },
+    roundedRectRadii = {
+      xRadius = widgets.borderRadius,
+      yRadius = widgets.borderRadius,
+    },
   })
   canvas:insertElement({
     type = "rectangle",
@@ -142,9 +139,9 @@ local createCanvas = function()
     type = "text",
     trackMouseDown = true,
     frame = {
-      x = spacing,
-      y = (iconFrame - fontSize) / 2 + padding - 2,
-      w = canvasFrame.w - (iconFrame + spacing + padding),
+      x = widgets.spacing,
+      y = (widgets.iconFrame - widgets.fontSize) / 2 + widgets.padding - 1,
+      w = canvasFrame.w - (widgets.iconFrame + widgets.spacing + widgets.padding),
       h = "100%",
     },
   })
@@ -152,21 +149,24 @@ local createCanvas = function()
     type = "rectangle",
     action = "fill",
     trackMouseDown = true,
-    roundedRectRadii = { xRadius = 7, yRadius = 7 },
+    roundedRectRadii = {
+      xRadius = widgets.borderRadius - 2,
+      yRadius = widgets.borderRadius - 2,
+    },
     fillColor = { hex = colors.crust.hex, alpha = 0.325 },
     frame = {
-      w = iconFrame,
-      h = iconFrame,
-      x = padding,
-      y = padding,
+      w = widgets.iconFrame,
+      h = widgets.iconFrame,
+      x = widgets.padding,
+      y = widgets.padding,
     },
   })
   canvas:insertElement({
     type = "text",
     trackMouseDown = true,
     frame = {
-      w = iconFrame,
-      h = iconFrame,
+      w = widgets.iconFrame,
+      h = widgets.iconFrame,
       x = 10,
       y = 12,
     },
@@ -199,7 +199,7 @@ end)
 --- @param icon string
 --- @return hs.styledtext|nil
 local getWeatherIcon = function(icon)
-  local fullSize = fontSize + 8
+  local fullSize = widgets.fontSize + 8
 
   return hs.styledtext.new(
     icon,
@@ -239,16 +239,16 @@ local updateCanvas = memoize(function(canvas, weather)
   end
 
   local textWidth = textDrawing.w
-  local fullCanvasWidth = textWidth + iconFrame + spacing * 2 + padding
+  local fullCanvasWidth = textWidth + widgets.iconFrame + widgets.spacing * 2 + widgets.padding
   local screenFrame = getScreenFrame()
 
   canvas[1].frame.w = fullCanvasWidth
-  canvas[4].frame.x = textWidth + spacing * 2
-  canvas[5].frame.x = textWidth + spacing * 2 + 6
+  canvas[4].frame.x = textWidth + widgets.spacing * 2
+  canvas[5].frame.x = textWidth + widgets.spacing * 2 + 6
 
   canvas:topLeft({
-    x = screenFrame.x + screenFrame.w - fullCanvasWidth - gap + padding / 2,
-    y = screenFrame.y + screenFrame.h - iconFrame - padding * 2 - 13,
+    x = screenFrame.x + screenFrame.w - fullCanvasWidth - widgets.gap + widgets.padding / 2,
+    y = screenFrame.y + screenFrame.h - widgets.iconFrame - widgets.padding * 2 - 13,
   })
 
   local canvasFrame = canvas:frame()
