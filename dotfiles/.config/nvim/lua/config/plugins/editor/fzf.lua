@@ -124,32 +124,29 @@ return {
     })
 
     require("which-key").add({
+      mode = "n",
+      { "<leader>f", "<cmd>FzfLua files<cr>", desc = "Find Files" },
       {
-        mode = "n",
-        { "<leader>f", "<cmd>FzfLua files<cr>", desc = "Find Files" },
-
+        "<leader>s",
+        "<cmd>FzfLua live_grep<cr>",
+        desc = "Search",
+        group = "search",
+        { "<leader>sg", "<cmd>FzfLua git_files<cr>", desc = "Git: Files" },
+        { "<leader>sb", "<cmd>FzfLua git_branches<cr>", desc = "Git: Checkout branch" },
+        { "<leader>sc", "<cmd>FzfLua git_commits<cr>", desc = "Git: List commits" },
+        { "<leader>sh", "<cmd>FzfLua help_tags<cr>", desc = "Help" },
+        { "<leader>sk", "<cmd>FzfLua keymaps<cr>", desc = "Keymaps" },
+        { "<leader>sr", "<cmd>FzfLua oldfiles<cr>", desc = "Recent files" },
+        { "<leader>st", "<cmd>FzfLua live_grep<cr>", desc = "Text" },
         {
-          "<leader>s",
-          "<cmd>FzfLua live_grep<cr>",
-          desc = "Search",
-          group = "search",
-          { "<leader>sg", "<cmd>FzfLua git_files<cr>", desc = "Git: Files" },
-          { "<leader>sb", "<cmd>FzfLua git_branches<cr>", desc = "Git: Checkout branch" },
-          { "<leader>sc", "<cmd>FzfLua git_commits<cr>", desc = "Git: List commits" },
-          { "<leader>sh", "<cmd>FzfLua help_tags<cr>", desc = "Help" },
-          { "<leader>sk", "<cmd>FzfLua keymaps<cr>", desc = "Keymaps" },
-          { "<leader>sr", "<cmd>FzfLua oldfiles<cr>", desc = "Recent files" },
-          { "<leader>st", "<cmd>FzfLua live_grep<cr>", desc = "Text" },
-          {
-            "<leader>sT",
-            function()
-              require("fzf-lua").grep({
-                search = "TODO|BUG|FIX|ISSUE|WARNING",
-                no_esc = true,
-              })
-            end,
-            desc = "Search Todo",
-          },
+          "<leader>sT",
+          function()
+            require("fzf-lua").grep({
+              search = "TODO|BUG|FIX|ISSUE|WARNING",
+              no_esc = true,
+            })
+          end,
+          desc = "Search Todo",
         },
       },
     })

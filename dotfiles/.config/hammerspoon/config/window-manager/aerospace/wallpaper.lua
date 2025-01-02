@@ -1,5 +1,4 @@
 local memoize = require("config.utils.memoize")
-local os = require("config.utils.os")
 local windows = require("config.utils.windows")
 
 local radius = 12
