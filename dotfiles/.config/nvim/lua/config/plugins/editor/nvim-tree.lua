@@ -5,6 +5,7 @@ return {
     dependencies = {
       "nvim-tree/nvim-web-devicons",
     },
+    event = "VimEnter",
     config = function()
       local nvim_tree_api = require("nvim-tree.api")
 
@@ -28,7 +29,7 @@ return {
         view = {
           adaptive_size = true,
           side = "right",
-          width = 40,
+          width = 45,
         },
         renderer = {
           group_empty = true,
@@ -87,25 +88,16 @@ return {
         end,
       })
 
-      local function open_nvim_tree(data)
-        local directory = vim.fn.isdirectory(data.file) == 1
-
-        if not directory then
-          return
-        end
-
-        vim.cmd.enew()
-        vim.cmd.bw(data.buf)
-        vim.cmd.cd(data.file)
-
-        nvim_tree_api.tree.open({
-          focus = false,
-          find_file = true,
-        })
-      end
-
       vim.api.nvim_create_autocmd({ "BufWinEnter" }, {
-        callback = open_nvim_tree,
+        callback = function()
+          require("nvim-tree.api").tree.open({
+            path = vim.loop.cwd(),
+            current_window = false,
+            find_file = true,
+            update_root = false,
+            focus = false,
+          })
+        end,
       })
 
       vim.api.nvim_create_autocmd("QuitPre", {
@@ -142,7 +134,7 @@ return {
             focus = true,
           })
         end,
-        desc = "Toggle NvimTree",
+        desc = "Toggle File Explorer",
       })
     end,
   },
