@@ -10,49 +10,34 @@ return {
       local nvim_tree_api = require("nvim-tree.api")
 
       require("nvim-tree").setup({
-        sort = {
-          sorter = "case_sensitive",
-        },
-        diagnostics = {
-          enable = true,
-          show_on_dirs = false,
-        },
+        filters = { dotfiles = false },
+        disable_netrw = true,
+        hijack_cursor = true,
         sync_root_with_cwd = true,
-        open_on_tab = false,
-        filters = {
-          dotfiles = false,
-          custom = {},
-        },
-        git = {
+        update_focused_file = {
           enable = true,
+          update_root = false,
         },
         view = {
-          adaptive_size = true,
-          side = "right",
+          preserve_window_proportions = true,
           width = 45,
+          side = "right",
         },
         renderer = {
-          group_empty = true,
+          root_folder_label = false,
           highlight_git = true,
-          highlight_diagnostics = true,
-          highlight_bookmarks = "all",
-          highlight_clipboard = "all",
-
+          indent_markers = { enable = true },
           icons = {
-            webdev_colors = false,
-            git_placement = "after",
-            modified_placement = "after",
             glyphs = {
-              git = {
-                -- Git style symbols
-                unstaged = "U",
-                staged = "A",
-                unmerged = "M",
-                renamed = "R",
-                untracked = "?",
-                deleted = "D",
-                ignored = "!",
+              default = "󰈚",
+              folder = {
+                default = "",
+                empty = "",
+                empty_open = "",
+                open = "",
+                symlink = "",
               },
+              git = { unmerged = "" },
             },
           },
           special_files = {
@@ -82,7 +67,7 @@ return {
           events.subscribe(events.Event.NodeRenamed, function(data)
             if prev.new_name ~= data.new_name or prev.old_name ~= data.old_name then
               data = data
-              Snacks.rename.on_rename_file(data.old_name, data.new_name)
+              require("snacks").rename.on_rename_file(data.old_name, data.new_name)
             end
           end)
         end,

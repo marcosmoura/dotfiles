@@ -7,39 +7,38 @@ return {
       "folke/which-key.nvim",
     },
     config = function()
-      require("snacks").setup(
-        ---@type snacks.Config
-        {
-          animate = {
-            duration = 20, -- ms per step
-            easing = "linear",
-            fps = 240, -- frames per second. Global setting for all animations
+      require("snacks").setup({
+        animate = {
+          duration = 20, -- ms per step
+          easing = "linear",
+          fps = 240, -- frames per second. Global setting for all animations
+        },
+        notifier = {
+          timeout = 6000, -- default timeout in ms
+        },
+        bigfile = { enabled = true },
+        dashboard = {
+          sections = {
+            { section = "header" },
+            { icon = " ", title = "Recent Files", section = "recent_files", indent = 2, padding = 1 },
+            { icon = " ", title = "Sessions", section = "projects", indent = 2, padding = 1 },
+            { icon = " ", title = "Keymaps", section = "keys", indent = 2, padding = 1 },
+            { section = "startup" },
           },
-          notifier = {
-            timeout = 6000, -- default timeout in ms
-          },
-          bigfile = { enabled = true },
-          dashboard = {
-            sections = {
-              { section = "header" },
-              { icon = " ", title = "Recent Files", section = "recent_files", indent = 2, padding = 1 },
-              { icon = " ", title = "Sessions", section = "projects", indent = 2, padding = 1 },
-              { icon = " ", title = "Keymaps", section = "keys", indent = 2, padding = 1 },
-              { section = "startup" },
-            },
-          },
-          indent = { enabled = true },
-          lazygit = {
-            enabled = true,
-          },
-          input = { enabled = true },
-          quickfile = { enabled = true },
-          scroll = { enabled = true },
-          statuscolumn = { enabled = true },
-          terminal = { enabled = true },
-          words = { enabled = true },
-        }
-      )
+        },
+        indent = { enabled = true },
+        lazygit = {
+          enabled = true,
+        },
+        input = { enabled = true },
+        quickfile = { enabled = true },
+        scroll = { enabled = true },
+        statuscolumn = { enabled = true },
+        terminal = { enabled = true },
+        words = { enabled = true },
+      })
+
+      local Snacks = require("snacks")
 
       require("which-key").add({
         {

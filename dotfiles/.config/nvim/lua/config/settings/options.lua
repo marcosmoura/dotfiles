@@ -74,6 +74,16 @@ vim.g.markdown_recommended_style = 0
 vim.g.resession_enabled = false
 vim.g.ui_notifications_enabled = true
 
+-- Go to previous/next line with h,l,left arrow and right arrow
+-- when cursor reaches end/beginning of line
+vim.opt.whichwrap:append("<>[]hl")
+
+-- Disable some default providers
+vim.g.loaded_node_provider = 0
+vim.g.loaded_python3_provider = 0
+vim.g.loaded_perl_provider = 0
+vim.g.loaded_ruby_provider = 0
+
 -- Disable netrw
 vim.g.loaded_netrw = 1
 vim.g.loaded_netrwPlugin = 1

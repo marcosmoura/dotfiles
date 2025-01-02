@@ -11,6 +11,11 @@ return {
     dependencies = {
       "williamboman/mason.nvim",
       "hrsh7th/cmp-nvim-lsp",
+      {
+        "folke/neoconf.nvim",
+        cmd = "Neoconf",
+        opts = {},
+      },
     },
     init = function()
       -- Reserve a space in the gutter

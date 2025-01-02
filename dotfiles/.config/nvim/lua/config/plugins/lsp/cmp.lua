@@ -1,58 +1,47 @@
 local icon_map = {
   Array = "[]",
+  BladeNav = "",
   Boolean = "",
   Calendar = "",
-  Class = "",
+  Class = "󰠱",
   Codeium = "",
-  Color = "",
-  Constant = "",
-  Constructor = "",
+  Color = "󰏘",
+  Constant = "󰏿",
+  Constructor = "",
   Copilot = "",
-  Enum = "",
-  EnumMember = "",
-  Event = "",
-  Field = "",
-  File = "",
-  Folder = "",
-  Function = "",
-  Interface = "",
-  Keyword = "",
-  Method = "",
-  Module = "",
+  Enum = "",
+  EnumMember = "",
+  Event = "",
+  Field = "󰜢",
+  File = "󰈚",
+  Folder = "󰉋",
+  Function = "󰆧",
+  Interface = "",
+  Keyword = "󰌋",
+  Method = "󰆧",
+  Module = "",
   Namespace = "󰌗",
   Null = "󰟢",
   Number = "",
   Object = "󰅩",
-  Operator = "",
+  Operator = "󰆕",
   Package = "",
-  Property = "",
-  Reference = "",
-  Snippet = "",
+  Property = "󰜢",
+  Reference = "󰈇",
+  Snippet = "",
   String = "󰉿",
-  Struct = "",
+  Struct = "󰙅",
+  Supermaven = "",
   Table = "",
   TabNine = "",
   Tag = "",
-  Text = "",
-  TypeParameter = "",
-  Unit = "",
-  Value = "",
-  Variable = "",
+  Text = "󰉿",
+  TypeParameter = "󰊄",
+  Unit = "󰑭",
+  Value = "󰎠",
+  Variable = "󰀫",
   Watch = "󰥔",
 }
-
-local function border(hl_name)
-  return {
-    { "╭", hl_name },
-    { "─", hl_name },
-    { "╮", hl_name },
-    { "│", hl_name },
-    { "╯", hl_name },
-    { "─", hl_name },
-    { "╰", hl_name },
-    { "│", hl_name },
-  }
-end
 
 local function format(_, item)
   local icon = " " .. (icon_map[item.kind] or "") .. " "
@@ -131,14 +120,18 @@ return {
 
       window = {
         completion = {
-          side_padding = 1,
-          border = border("CmpBorder"),
+          scrollbar = false,
+          side_padding = 0,
+          winhighlight = "Normal:CmpPmenu,CursorLine:CmpSel,Search:None,FloatBorder:CmpBorder",
+          border = "single",
         },
+
         documentation = {
-          border = border("CmpDocBorder"),
-          winhighlight = "Normal:CmpDoc",
+          border = "single",
+          winhighlight = "Normal:CmpDoc,FloatBorder:CmpDocBorder",
         },
       },
+
       snippet = {
         expand = function(args)
           require("luasnip").lsp_expand(args.body)
@@ -150,6 +143,7 @@ return {
 
         format = format,
       },
+
       sources = cmp.config.sources({
         { name = "nvim_lsp" },
         { name = "buffer" },

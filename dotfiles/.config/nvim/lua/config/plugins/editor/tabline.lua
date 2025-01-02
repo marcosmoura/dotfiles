@@ -1,47 +1,43 @@
 return {
   {
     "akinsho/bufferline.nvim",
-    version = "*",
-    dependencies = {
-      {
-        "echasnovski/mini.bufremove",
-        config = function()
-          require("mini.bufremove").setup({
-            set_vim_settings = true,
-          })
-        end,
-      },
-    },
     event = "VeryLazy",
-    config = function()
-      local remove_buffer = function(n)
-        require("mini.bufremove").delete(n, false)
-      end
-      require("bufferline").setup({
-        highlights = require("catppuccin.groups.integrations.bufferline").get(),
-        options = {
-          themable = true,
-          separator_style = "thick",
-          hover = {
-            enabled = true,
-            delay = 200,
-            reveal = { "close" },
-          },
-          close_command = remove_buffer,
-          right_mouse_command = remove_buffer,
-          diagnostics = "nvim_lsp",
-          always_show_bufferline = true,
-          offsets = {
-            {
-              filetype = "NvimTree",
-              text = "File Explorer",
-              highlight = "Directory",
-              separator = true,
-            },
+    keys = {
+      { "<leader>bp", "<Cmd>BufferLineTogglePin<CR>", desc = "Toggle Pin" },
+      { "<leader>bP", "<Cmd>BufferLineGroupClose ungrouped<CR>", desc = "Delete Non-Pinned Buffers" },
+      { "<leader>br", "<Cmd>BufferLineCloseRight<CR>", desc = "Delete Buffers to the Right" },
+      { "<leader>bl", "<Cmd>BufferLineCloseLeft<CR>", desc = "Delete Buffers to the Left" },
+      { "<S-h>", "<cmd>BufferLineCyclePrev<cr>", desc = "Prev Buffer" },
+      { "<S-l>", "<cmd>BufferLineCycleNext<cr>", desc = "Next Buffer" },
+      { "[b", "<cmd>BufferLineCyclePrev<cr>", desc = "Prev Buffer" },
+      { "]b", "<cmd>BufferLineCycleNext<cr>", desc = "Next Buffer" },
+      { "[B", "<cmd>BufferLineMovePrev<cr>", desc = "Move buffer prev" },
+      { "]B", "<cmd>BufferLineMoveNext<cr>", desc = "Move buffer next" },
+    },
+    opts = {
+      options = {
+        close_command = function(n)
+          Snacks.bufdelete(n)
+        end,
+        right_mouse_command = function(n)
+          Snacks.bufdelete(n)
+        end,
+        diagnostics = "nvim_lsp",
+        always_show_bufferline = false,
+        offsets = {
+          {
+            filetype = "neo-tree",
+            text = "Neo-tree",
+            highlight = "Directory",
+            text_align = "left",
           },
         },
-      })
-      vim.api.nvim_create_autocmd("BufAdd", {
+      },
+    },
+    config = function(_, opts)
+      require("bufferline").setup(opts)
+      -- Fix bufferline when restoring a session
+      vim.api.nvim_create_autocmd({ "BufAdd", "BufDelete" }, {
         callback = function()
           vim.schedule(function()
             pcall(nvim_bufferline)
