@@ -76,11 +76,11 @@ end
 --------------------
 --- Reload Hammerspoon and tools
 local reloadTools = function()
+  hs.reload()
   os.aerospace.execute("mode service", { silent = true })
   os.aerospace.execute("reload-config", { silent = true })
   os.aerospace.execute("mode main", { silent = true })
   os.aerospace.execute("balance-sizes", { silent = true })
-  hs.reload()
 end
 
 hs.hotkey.bind({ "cmd", "ctrl" }, "R", reloadTools)
