@@ -25,7 +25,7 @@ return {
     }
 
     local function stbufnr()
-      return vim.api.nvim_win_get_buf(vim.g.statusline_winid)
+      return vim.api.nvim_win_get_buf(vim.g.statusline_winid or 0)
     end
 
     local function is_starter_page()
@@ -33,11 +33,18 @@ return {
     end
 
     local function section_git()
-      -- if not vim.b[stbufnr()].gitsigns_head or vim.b[stbufnr()].gitsigns_git_status then
-      --   return ""
-      -- end
+      if not vim.b[stbufnr()].gitsigns_head or vim.b[stbufnr()].gitsigns_git_status then
+        return ""
+      end
 
-      -- return string.format(" %s %s", icons.git, vim.b[stbufnr()].gitsigns_status_dict.head)
+      local git_status = vim.b[stbufnr()].gitsigns_status_dict
+
+      local added = (git_status.added and git_status.added ~= 0) and ("  " .. git_status.added) or ""
+      local changed = (git_status.changed and git_status.changed ~= 0) and ("  " .. git_status.changed) or ""
+      local removed = (git_status.removed and git_status.removed ~= 0) and ("  " .. git_status.removed) or ""
+      local branch_name = " " .. git_status.head
+
+      return " " .. branch_name .. added .. changed .. removed
     end
 
     local function section_fileinfo(args)

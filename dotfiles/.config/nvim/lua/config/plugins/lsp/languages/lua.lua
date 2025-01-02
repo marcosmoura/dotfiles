@@ -1,21 +1,19 @@
 return {
   {
-    "echasnovski/mini.doc",
-    version = "*",
-  },
-  {
     "folke/lazydev.nvim",
-    ft = "lua", -- only load on lua files
-    opts = {
-      library = {
-        {
-          path = "~/.config/hammerspoon/Spoons/EmmyLua.spoon/annotations",
-          words = { "hs%." },
-        },
-      },
-    },
+    ft = "lua",
+    cmd = "LazyDev",
     config = function()
       require("lspconfig").lua_ls.setup({
+        library = {
+          {
+            path = "~/.config/hammerspoon/Spoons/EmmyLua.spoon/annotations",
+            words = { "hs%." },
+          },
+          { path = "${3rd}/luv/library", words = { "vim%.uv" } },
+          { path = "snacks.nvim", words = { "Snacks" } },
+          { path = "lazy.nvim", words = { "LazyVim" } },
+        },
         settings = {
           telemetry = {
             enable = false,

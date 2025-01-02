@@ -5,6 +5,10 @@ return {
     "MunifTanjim/nui.nvim",
   },
   config = function()
+    if vim.o.filetype == "lazy" then
+      vim.cmd([[messages clear]])
+    end
+
     require("noice").setup({
       lsp = {
         override = {
