@@ -364,7 +364,7 @@ local createCanvas = function()
     type = "rectangle",
     action = "fill",
     trackMouseDown = true,
-    fillColor = { hex = colors.crust.hex, alpha = 0.5 },
+    fillColor = { hex = colors.crust.hex, alpha = 0.625 },
   })
   canvas:insertElement({
     type = "rectangle",
