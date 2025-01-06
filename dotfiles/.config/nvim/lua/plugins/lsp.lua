@@ -1,0 +1,36 @@
+return {
+  { import = "lazyvim.plugins.extras.formatting.prettier" },
+  { import = "lazyvim.plugins.extras.lang.astro" },
+  { import = "lazyvim.plugins.extras.lang.git" },
+  { import = "lazyvim.plugins.extras.lang.json" },
+  { import = "lazyvim.plugins.extras.lang.markdown" },
+  { import = "lazyvim.plugins.extras.lang.rust" },
+  { import = "lazyvim.plugins.extras.lang.toml" },
+  { import = "lazyvim.plugins.extras.lang.typescript" },
+  { import = "lazyvim.plugins.extras.lsp.neoconf" },
+  { import = "lazyvim.plugins.extras.test.core" },
+  { import = "lazyvim.plugins.extras.util.dot" },
+
+  {
+    "williamboman/mason.nvim",
+    opts = {
+      ensure_installed = {
+        "bash-language-server",
+        "codespell",
+        "css-lsp",
+        "emmet-ls",
+        "eslint_d",
+        "html-lsp",
+        "json-lsp",
+        "lua-language-server",
+        "luacheck",
+        "marksman",
+        "prettierd",
+        "shellcheck",
+        "shfmt",
+        "stylua",
+        "yaml-language-server",
+      },
+    },
+  },
+}
