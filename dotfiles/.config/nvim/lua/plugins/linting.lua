@@ -19,5 +19,15 @@ return {
         ["_"] = { "trim_whitespace" },
       },
     },
+    init = function()
+      local lint = require("lint")
+
+      vim.api.nvim_create_autocmd({ "TextChanged", "InsertEnter", "InsertLeave" }, {
+        group = vim.api.nvim_create_augroup("lint", { clear = true }),
+        callback = function()
+          lint.try_lint()
+        end,
+      })
+    end,
   },
 }
