@@ -127,10 +127,8 @@ return {
       mode = "n",
       { "<leader>f", "<cmd>FzfLua files<cr>", desc = "Find Files" },
       {
-        "<leader>s",
-        "<cmd>FzfLua live_grep<cr>",
-        desc = "Search",
-        group = "search",
+        group = "Search",
+        { "<leader>ss", "<cmd>FzfLua live_grep<cr>", desc = "Search" },
         { "<leader>sg", "<cmd>FzfLua git_files<cr>", desc = "Git: Files" },
         { "<leader>sb", "<cmd>FzfLua git_branches<cr>", desc = "Git: Checkout branch" },
         { "<leader>sc", "<cmd>FzfLua git_commits<cr>", desc = "Git: List commits" },

@@ -34,11 +34,11 @@ return {
     },
     opts = {
       signs = {
-        delete = { text = "󰍵" },
-        changedelete = { text = "󱕖" },
         add = { text = bold_line_left },
         change = { text = bold_line_left },
+        delete = { text = triangle },
         topdelete = { text = triangle },
+        changedelete = { text = bold_line_left },
         untracked = { text = triangle },
       },
       signcolumn = true,
