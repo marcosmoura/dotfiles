@@ -1,8 +1,10 @@
 local memoize = require("config.utils.memoize")
+local os = require("config.utils.os")
 local windows = require("config.utils.windows")
 
 local radius = 12
 local wallpaperDirectory = "~/.config/wallpapers"
+local wallpaperPrefixPath = "/tmp/hammerspoon-temp/wallpapers/"
 
 --- The current wallpaper.
 --- @type hs.canvas|nil
@@ -110,6 +112,36 @@ local function getElements(image, frame, cornerData, menubarHeight)
   return elements
 end
 
+--- Ensures the wallpaper directory exists
+local ensureWallpaperDir = function()
+  if hs.fs.attributes(wallpaperPrefixPath) == nil then
+    os.execute("mkdir", "-p " .. wallpaperPrefixPath)
+  end
+end
+
+--- Removes all wallpapers.
+local removeAllWallpapers = function()
+  os.execute("rm", "-rf " .. wallpaperPrefixPath)
+end
+
+--- Applies the wallpaper at the given path.
+--- @param image hs.image - The image to apply as the wallpaper.
+local applyWallpaper = function(image)
+  local focusedWindow = hs.window.frontmostWindow()
+  local wallpaperPath = wallpaperPrefixPath .. hs.host.uuid() .. ".jpg"
+
+  if not focusedWindow then
+    return
+  end
+
+  removeAllWallpapers()
+  ensureWallpaperDir()
+
+  image:saveToFile(wallpaperPath)
+
+  focusedWindow:screen():desktopImageURL("file://" .. wallpaperPath)
+end
+
 --- Creates a wallpaper with corners for the given image and screen.
 --- @param image hs.image - The image to create the wallpaper with corners for.
 --- @param screen hs.screen - The screen to create the wallpaper with corners for.
@@ -137,13 +169,18 @@ local createWallpaperWithCorners = memoize(function(image, screen)
     return
   end
 
-  return canvas
+  canvas
     :appendElements(elements)
     :behavior({
       hs.canvas.windowBehaviors.canJoinAllSpaces,
       hs.canvas.windowBehaviors.stationary,
     })
     :level(hs.canvas.windowLevels.normal)
+    :show()
+
+  applyWallpaper(canvas:imageFromCanvas())
+
+  return canvas
 end)
 
 --- Gets a random wallpaper from the wallpaper directory.
@@ -197,7 +234,6 @@ local createWallpaper = function()
   end
 
   currentWallpaper = createWallpaperWithCorners(image, screen)
-  currentWallpaper:show()
 end
 
 --- Raises the wallpaper above minimized windows
