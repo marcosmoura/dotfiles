@@ -163,3 +163,15 @@ end)
 hs.hotkey.bind({ "cmd", "shift" }, "`", function()
   cycleWindows(1)
 end)
+
+local module = {}
+
+module.start = function()
+  local onSpaceChanged = function()
+    caffeine.caffeinate(false)
+  end
+
+  hs.ipc.localPort("aerospace:sleepOnSpacesChanged", onSpaceChanged)
+end
+
+return module
