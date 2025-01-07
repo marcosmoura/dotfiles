@@ -24,8 +24,8 @@ macos-option-as-alt = true
 macos-titlebar-style = hidden
 
 window-colorspace = display-p3
-window-padding-x = 24, 24
-window-padding-y = 24, 24
+window-padding-x = 16,16
+window-padding-y = 16,16
 window-theme = light
 window-vsync = true
 

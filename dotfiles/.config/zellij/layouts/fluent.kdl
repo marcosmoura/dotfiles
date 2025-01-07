@@ -1,19 +1,45 @@
 layout {
-  pane  {
-    split_direction "vertical"
-
-    pane {
-      name "main"
-    }
-
-    pane {
-      name "git"
-    }
+  pane_template {
+    name "fluent-dir"
+    cwd "~/Projects/fluent/fluentui"
   }
 
-  pane {
+  pane_template {
+    name "status_bar"
     borderless true
-    size 1
-    plugin location="zellij:compact-bar"
+    plugin location="status_bar"
+  }
+
+  tab name="Vim" {
+    fluent-dir name="Neovim" {
+      command "nvim"
+      args "."
+      borderless true
+    }
+
+    status_bar size="1"
+  }
+
+  tab name="Terminal" {
+    pane split_direction="vertical" {
+      fluent-dir {
+        name "Terminal 1"
+      }
+
+      fluent-dir {
+        name "Terminal 2"
+      }
+    }
+
+    status_bar size="1"
+  }
+
+  tab name="Misc" {
+    fluent-dir {
+      name "Panel"
+      borderless true
+    }
+
+    status_bar size="1"
   }
 }
