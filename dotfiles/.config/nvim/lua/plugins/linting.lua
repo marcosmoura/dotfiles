@@ -16,7 +16,6 @@ return {
         zsh = { "shellcheck" },
         lua = { "luacheck" },
         ["*"] = { "codespell" },
-        ["_"] = { "trim_whitespace" },
       },
     },
     init = function()
