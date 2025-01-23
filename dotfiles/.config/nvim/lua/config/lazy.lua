@@ -54,7 +54,6 @@ require("lazy").setup({
         "optwin",
         "rplugin",
         "rrhelper",
-        "spellfile_plugin",
         "synmenu",
         "syntax",
         "tar",

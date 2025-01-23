@@ -9,7 +9,13 @@ return {
   {
     "catppuccin",
     opts = {
-      integrations = { blink_cmp = true },
+      lavour = "mocha",
+      background = {
+        dark = "mocha",
+      },
+      integrations = {
+        blink_cmp = true,
+      },
     },
   },
 }
