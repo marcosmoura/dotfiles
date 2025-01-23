@@ -8,6 +8,7 @@ vim.opt.relativenumber = false
 vim.opt.softtabstop = 2
 vim.opt.swapfile = false
 vim.opt.undodir = os.getenv("HOME") .. "/.vim/nvim-undodir"
+vim.o.cmdheight = 0
 
 -- Globals
 vim.g.autoformat_enabled = true
@@ -31,3 +32,38 @@ vim.g.loaded_ruby_provider = 0
 -- Disable netrw
 vim.g.loaded_netrw = 1
 vim.g.loaded_netrwPlugin = 1
+
+-- LazyVim settings
+vim.g.lazyvim_picker = "fzf"
+vim.g.lazyvim_picker = "snacks"
+vim.g.lazyvim_cmp = "blink.cmp"
+
+-- Underscore as word character
+vim.cmd("set iskeyword-=_", false)
+
+-- Neovide
+if vim.g.neovide then
+  vim.g.neovide_text_gamma = 0.01
+  vim.g.neovide_text_contrast = 0.01
+  vim.opt.linespace = 3
+
+  vim.g.neovide_padding_top = 6
+  vim.g.neovide_padding_bottom = 0
+  vim.g.neovide_padding_left = 6
+  vim.g.neovide_padding_right = 0
+
+  vim.g.neovide_scroll_animation_length = 0.2
+  vim.g.neovide_confirm_quit = true
+  vim.g.neovide_cursor_animate_in_insert_mode = true
+  vim.g.neovide_cursor_animation_length = 0.05
+  vim.g.neovide_cursor_trail_size = 0
+  vim.g.neovide_cursor_smooth_blink = true
+
+  vim.g.neovide_floating_shadow = false
+  vim.g.neovide_transparency = 0.9
+  vim.g.neovide_window_blurred = true
+
+  vim.g.neovide_refresh_rate = 240
+
+  vim.api.nvim_set_current_dir("~/Projects")
+end
