@@ -1,14 +1,16 @@
 # FZF
 source <(fzf --zsh)
 
-# Direnv
-eval "$(direnv hook zsh)"
-
 # Luarocks
 eval "$(luarocks path)"
 
-# GH
-eval "$(gh completion -s zsh)"
-eval "$(gh copilot alias zsh)"
-alias cop=ghcs
-alias cop-e=ghce
+# Rust
+source $HOME/.cargo/env
+
+# Ruby
+export RBENV_VERSION=$(rbenv install -l -s | grep -v - | tail -1)
+eval "$(rbenv init - zsh)"
+rbenv global $RBENV_VERSION
+
+# Sheldon
+eval "$(sheldon completions --shell zsh)"
