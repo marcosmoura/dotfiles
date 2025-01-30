@@ -1,6 +1,6 @@
 layout {
   pane_template {
-    name "fluent-dir"
+    name "fluent-pane"
     cwd "~/Projects/fluent/fluentui"
   }
 
@@ -10,36 +10,31 @@ layout {
     plugin location="status_bar"
   }
 
-  tab name="Vim" {
-    fluent-dir name="Neovim" {
-      command "nvim"
+  tab name="editor" {
+    status_bar size="1"
+
+    fluent-pane {
+      name "neovim"
+      command "/opt/homebrew/bin/nvim"
       args "."
       borderless true
     }
-
-    status_bar size="1"
   }
 
-  tab name="Terminal" {
+  tab name="terminal" {
+    status_bar size="1"
+
     pane split_direction="vertical" {
-      fluent-dir {
-        name "Terminal 1"
-      }
-
-      fluent-dir {
-        name "Terminal 2"
-      }
+      fluent-pane name="terminal"
+      fluent-pane name="terminal"
     }
-
-    status_bar size="1"
   }
 
-  tab name="Misc" {
-    fluent-dir {
-      name "Panel"
-      borderless true
-    }
-
+  tab name="other" {
     status_bar size="1"
+
+    pane split_direction="vertical" {
+      fluent-pane name="terminal"
+    }
   }
 }
