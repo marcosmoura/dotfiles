@@ -1,4 +1,4 @@
-adjust-cell-height = 23%
+adjust-cell-height = 18%
 adjust-cell-width = -1
 font-family = Maple mono
 font-family = Symbols Nerd Font Mono
@@ -16,12 +16,10 @@ background-blur-radius = 48
 background-opacity = 0.85
 unfocused-split-opacity = 0.9
 
-macos-icon = custom-style
-macos-icon-frame = plastic
-macos-icon-ghost-color = #DFEBF5
-macos-icon-screen-color = #74B0CF
 macos-option-as-alt = true
 macos-titlebar-style = hidden
+keybind = alt+left=unbind
+keybind = alt+right=unbind
 
 window-colorspace = display-p3
 window-padding-x = 16,16
@@ -36,5 +34,4 @@ quit-after-last-window-closed = true
 shell-integration = zsh
 shell-integration-features = true
 window-inherit-font-size = true
-window-inherit-working-directory = true
 working-directory = "~/Projects/fluent/fluentui"
