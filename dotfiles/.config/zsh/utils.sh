@@ -1,6 +1,9 @@
+#!/bin/bash
+
 TEXT_YELLOW=$(tput setaf 3)
 TEXT_GREEN=$(tput setaf 2)
-TEXT_BLUE=$(tput setaf 6)
+TEXT_BLUE=$(tput setaf 4)
+TEXT_CYAN=$(tput setaf 6)
 TEXT_PURPLE=$(tput setaf 5)
 TEXT_RED=$(tput setaf 1)
 TEXT_RESET=$(tput sgr0)
@@ -21,6 +24,10 @@ function print_green {
 
 function print_blue {
   print_text "$TEXT_BLUE$1$TEXT_RESET"
+}
+
+function print_cyan {
+  print_text "$TEXT_CYAN$1$TEXT_RESET"
 }
 
 function print_purple {

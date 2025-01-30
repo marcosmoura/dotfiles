@@ -2,8 +2,8 @@
 
 source ~/.config/zsh/utils.sh
 
-function updateAll {
-  print_green "💻 Updating all tools \n"
+function updateSystem {
+  print_green "💻 Updating system tools\n"
 
   authenticateBeforeUpdate
   topgrade
@@ -13,7 +13,6 @@ function updateAll {
 }
 
 function systeminfo {
-  print_yellow "\n  💻  Apple MacBook Pro 16\" / M1 Max / 64GB / 1TB\n"
+  print_yellow "\n  💻 Apple MacBook Pro 16\" / M1 Max / 64GB / 1TB\n"
   fastfetch
-  echo ""
 }
