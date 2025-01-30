@@ -11,3 +11,4 @@ fetch_head = true
 
 [commands]
 "Catppuccin Colors" = "export CATPPUCCIN_COLORS=$(vivid generate catppuccin-mocha); export LS_COLORS=$CATPPUCCIN_COLORS; echo $CATPPUCCIN_COLORS > ~/.config/zsh/static/catppuccin-colors.txt"
+"Ruby Installation" = "export RBENV_VERSION=$(rbenv install -l -s | grep -v - | tail -1); rbenv global $RBENV_VERSION; rbenv install -s \"$RBENV_VERSION\""
