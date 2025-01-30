@@ -1,0 +1,23 @@
+{
+  "$schema": "https://raw.githubusercontent.com/streetsidesoftware/cspell/main/cspell.schema.json",
+  "version": "0.2",
+  "language": "en,pt_BR",
+  "allowCompoundWords": true,
+  "enableGlobDot": true,
+  "useGitignore": true,
+  "dictionaryDefinitions": [
+    {
+      "name": "custom",
+      "path": "~/.config/cspell/dictionaries/custom.txt",
+      "addWords": true
+    }
+  ],
+  "dictionaries": ["custom", "vim", "shellscript"],
+  "languageSettings": [
+    {
+      "languageId": "lua",
+      "locale": "*",
+      "dictionaries": ["shellscript"]
+    }
+  ]
+}
