@@ -180,6 +180,8 @@ local createWallpaperWithCorners = memoize(function(image, screen)
 
   applyWallpaper(canvas:imageFromCanvas())
 
+  canvas:hide()
+
   return canvas
 end)
 
@@ -236,46 +238,20 @@ local createWallpaper = function()
   currentWallpaper = createWallpaperWithCorners(image, screen)
 end
 
---- Raises the wallpaper above minimized windows
-local raiseWallpaper = function()
-  if currentWallpaper then
-    currentWallpaper:level(hs.canvas.windowLevels.desktop)
-    currentWallpaper:hide()
-    currentWallpaper:level(hs.canvas.windowLevels.normal)
-    currentWallpaper:show()
-  end
-
-  local focusedWindow = hs.window.frontmostWindow()
-  --- @type hs.application|nil
-  local app = focusedWindow:application()
-
-  if app then
-    hs.fnutils.each(app:allWindows(), function(window)
-      window:raise()
-    end)
-  end
-end
-
 local module = {}
 
+module.changeWallpaper = createWallpaper
+
 module.start = function()
-  local init = function()
-    createWallpaper()
-    raiseWallpaper()
-  end
+  createWallpaper()
 
-  init()
-
-  hs.screen.watcher.newWithActiveScreen(init):start()
-  hs.ipc.localPort("aerospace:onWallpapersChanged", function()
-    raiseWallpaper()
-  end)
+  hs.screen.watcher.newWithActiveScreen(createWallpaper):start()
 
   -- Refresh the wallpaper every hour.
-  hs.timer.doEvery(60 * 60, init)
+  hs.timer.doEvery(60 * 60, createWallpaper)
 
   -- Reload the wallpaper when the wallpaper directory changes.
-  hs.pathwatcher.new(wallpaperDirectory, init):start()
+  hs.pathwatcher.new(wallpaperDirectory, createWallpaper):start()
 end
 
 return module
