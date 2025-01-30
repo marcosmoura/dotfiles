@@ -1,0 +1,33 @@
+fork = true
+frame = "buttonless"
+idle = false
+maximized = false
+neovim-bin = "/opt/homebrew/bin/nvim"
+no-multigrid = false
+srgb = true
+tabs = true
+theme = "dark"
+title-hidden = true
+vsync = true
+wsl = false
+
+[font]
+size = 17.0
+hinting = "full"
+edging = "subpixelantialias"
+
+[[font.normal]]
+family = "Maple Mono"
+style = "W400"
+
+[[font.normal]]
+family = 'Symbols Nerd Font Mono'
+style = "W400"
+
+[[font.normal]]
+family = 'Apple Color Emoji'
+style = "W400"
+
+[[font.bold]]
+family = "Maple Mono"
+style = "W650"
