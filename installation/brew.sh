@@ -81,6 +81,7 @@ brew install libgit2
 brew install librist
 brew install llvm
 brew install llvm@16
+brew install lolcat
 brew install lpeg
 brew install lua
 brew install lua-language-server
