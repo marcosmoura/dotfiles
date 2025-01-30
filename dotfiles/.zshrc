@@ -59,7 +59,6 @@ fi
 
 # Load sheldon
 eval "$(sheldon source)"
-eval "$(sheldon completions --shell zsh)"
 
 # Mise
 if [[ "$TERM_PROGRAM" == "vscode" ]]; then
