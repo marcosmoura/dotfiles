@@ -1,0 +1,32 @@
+layout {
+  pane_template {
+    name "fluent-pane"
+    cwd "~/Projects/personal/dotfiles"
+  }
+
+  pane_template {
+    name "status_bar"
+    borderless true
+    plugin location="status_bar"
+  }
+
+  tab name="editor" {
+    status_bar size="1"
+
+    fluent-pane {
+      name "neovim"
+      command "/opt/homebrew/bin/nvim"
+      args "."
+      borderless true
+    }
+  }
+
+  tab name="terminal" {
+    status_bar size="1"
+
+    pane split_direction="vertical" {
+      fluent-pane name="terminal"
+      fluent-pane name="terminal"
+    }
+  }
+}
