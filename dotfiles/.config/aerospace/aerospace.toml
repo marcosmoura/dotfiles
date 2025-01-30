@@ -146,6 +146,10 @@ run = ["layout tiling"]
 if.app-id = 'com.microsoft.VSCode'
 run = "move-node-to-workspace code"
 
+[[on-window-detected]]
+if.app-id = 'com.neovide.neovide'
+run = "move-node-to-workspace code"
+
 
 # Space - Browser
 [[on-window-detected]]
@@ -157,7 +161,7 @@ if.app-id = 'company.thebrowser.Browser'
 run = "move-node-to-workspace browser"
 
 [[on-window-detected]]
-if.app-id = 'com.microsoft.Edge'
+if.app-id = 'com.microsoft.edgemac.Dev'
 run = "move-node-to-workspace browser"
 
 [[on-window-detected]]
