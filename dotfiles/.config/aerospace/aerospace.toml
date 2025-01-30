@@ -75,33 +75,43 @@ cmd-alt-h = [] # Disable "hide others"
 # Switch between workspaces
 alt-1 = 'workspace files'
 ctrl-1 = 'workspace files'
+ctrl-shift-cmd-1 = 'move-node-to-workspace files'
 
 alt-2 = 'workspace terminal'
 ctrl-2 = 'workspace terminal'
+ctrl-shift-cmd-2 = 'move-node-to-workspace terminal'
 
 alt-3 = 'workspace code'
 ctrl-3 = 'workspace code'
+ctrl-shift-cmd-3 = 'move-node-to-workspace code'
 
 alt-4 = 'workspace browser'
 ctrl-4 = 'workspace browser'
+ctrl-shift-cmd-4 = 'move-node-to-workspace browser'
 
 alt-5 = 'workspace design'
 ctrl-5 = 'workspace design'
+ctrl-shift-cmd-5 = 'move-node-to-workspace design'
 
 alt-6 = 'workspace music'
 ctrl-6 = 'workspace music'
+ctrl-shift-cmd-6 = 'move-node-to-workspace music'
 
 alt-7 = 'workspace communication'
 ctrl-7 = 'workspace communication'
+ctrl-shift-cmd-7 = 'move-node-to-workspace communication'
 
 alt-8 = 'workspace mail'
 ctrl-8 = 'workspace mail'
+ctrl-shift-cmd-8 = 'move-node-to-workspace mail'
 
 alt-9 = 'workspace passwords'
 ctrl-9 = 'workspace passwords'
+ctrl-shift-cmd-9 = 'move-node-to-workspace passwords'
 
 alt-0 = 'workspace misc'
 ctrl-0 = 'workspace misc'
+ctrl-shift-cmd-0 = 'move-node-to-workspace misc'
 
 
 ctrl-right = 'workspace next'
