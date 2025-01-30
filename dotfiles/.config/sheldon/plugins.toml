@@ -42,7 +42,6 @@ apply = ["defer"]
 [plugins.dotfiles-completions]
 local = "~/.config/zsh/modules/completions"
 use = ["*.plugin.zsh"]
-apply = ["defer"]
 
 [plugins.yarn-completion]
 github = "chrisands/zsh-yarn-completions"
@@ -83,9 +82,6 @@ github = "ajeetdsouza/zoxide"
 [plugins.zsh-you-should-use]
 github = "MichaelAquilina/zsh-you-should-use"
 apply = ["defer"]
-
-[plugins.icd]
-github = "g-plane/icd"
 
 
 # Dotfiles
