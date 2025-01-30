@@ -139,9 +139,9 @@ local cycleWindows = function(direction)
     return
   end
 
-  allWindowsIds = hs.fnutils.map(allWindows, function(window)
+  local allWindowsIds = hs.fnutils.map(allWindows, function(window)
     return window["window-id"]
-  end)
+  end) or {}
 
   local focusedWindowIndex = hs.fnutils.indexOf(allWindowsIds, focusedWindow:id())
   local totalWindows = #allWindows
@@ -158,7 +158,13 @@ local cycleWindows = function(direction)
     nextWindowIndex = 1
   end
 
-  hs.window(allWindowsIds[nextWindowIndex]):focus()
+  local targetWindow = hs.window(allWindowsIds[nextWindowIndex])
+
+  if not targetWindow then
+    return
+  end
+
+  targetWindow:focus()
 end
 
 hs.hotkey.bind({ "cmd" }, "`", function()
