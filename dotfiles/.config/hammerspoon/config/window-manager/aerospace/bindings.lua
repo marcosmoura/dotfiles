@@ -1,5 +1,6 @@
 local caffeine = require("config.caffeine")
 local os = require("config.utils.os")
+local wallpaper = require("config.window-manager.aerospace.wallpaper")
 local windows = require("config.utils.windows")
 
 local directions = { "up", "down", "left", "right" }
@@ -84,6 +85,7 @@ local reloadTools = function()
 end
 
 hs.hotkey.bind({ "cmd", "ctrl" }, "R", reloadTools)
+hs.hotkey.bind({ "cmd", "ctrl", "shift" }, "W", wallpaper.changeWallpaper)
 
 --- Lock screen
 local onLockScreen = function()
@@ -94,14 +96,17 @@ end
 hs.hotkey.bind({ "cmd", "ctrl" }, "L", onLockScreen)
 hs.hotkey.bind({ "cmd", "ctrl" }, "Q", onLockScreen)
 
+-- Show desktop
 hs.hotkey.bind({ "cmd", "ctrl" }, "D", function()
   hs.spaces.toggleShowDesktop()
 end)
 
+-- Close window
 hs.hotkey.bind({ "cmd", "ctrl" }, "X", function()
   hs.window.focusedWindow():close()
 end)
 
+-- Toggle Hammerspoon console
 hs.hotkey.bind({ "cmd", "ctrl", "alt" }, "C", function()
   hs.toggleConsole()
 end)
