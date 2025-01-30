@@ -27,17 +27,23 @@ local findDeviceByName = memoize(function(devices, name)
 end)
 
 --- Get the target output device
+--- @param current hs.audiodevice
 --- @param devices hs.audiodevice[]
---- @return hs.audiodevice|nil
-local getTargetOutputDevice = memoize(function(devices)
+--- @return hs.audiodevice
+local getTargetOutputDevice = memoize(function(current, devices)
   local airpods = findDeviceByName(devices, "airpods")
   local teamsAudio = findDeviceByName(devices, "microsoft teams audio")
   local speakers = findDeviceByName(devices, "external speakers")
+  local airplay = findDeviceByName(devices, "airplay")
   local audioInterface = findDeviceByName(devices, "minifuse")
   local macbookPro = findDeviceByName(devices, "MacBook Pro")
 
   if airpods then
     return airpods
+  end
+
+  if current == airplay then
+    return current
   end
 
   if audioInterface then
@@ -52,7 +58,7 @@ local getTargetOutputDevice = memoize(function(devices)
     return macbookPro
   end
 
-  return nil
+  return current
 end)
 
 --- Normalize the audio balance
@@ -86,9 +92,9 @@ end)
 local handleOutputDeviceChange = function()
   local current = hs.audiodevice.defaultOutputDevice()
   local outputDevices = hs.audiodevice.allOutputDevices()
-  local targetDevice = getTargetOutputDevice(outputDevices) or current
+  local targetDevice = getTargetOutputDevice(current, outputDevices)
 
-  if not targetDevice or current and current:name() == targetDevice:name() then
+  if current and current:name() == targetDevice:name() then
     return
   end
 
@@ -127,9 +133,7 @@ module.start = function()
   hs.caffeinate.watcher.new(onAudioDeviceChange):start()
   hs.usb.watcher.new(onAudioDeviceChange):start()
   hs.screen.watcher.newWithActiveScreen(onAudioDeviceChange):start()
-  hs.audiodevice.watcher.setCallback(function()
-    onAudioDeviceChange()
-  end)
+  hs.audiodevice.watcher.setCallback(onAudioDeviceChange)
   hs.audiodevice.watcher.start()
 
   onAudioDeviceChange()
