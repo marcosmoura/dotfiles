@@ -1,5 +1,5 @@
-#!/usr/bin/env zsh
+#!/bin/sh
 
-source ~/.config/zsh/utils.sh
+source home/.config/zsh/utils.sh
 
 authenticateBeforeUpdate
