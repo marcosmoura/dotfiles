@@ -1,13 +1,13 @@
 # Local files
 /dist
-dotfiles/.config/crossnote
-dotfiles/.config/gh/hosts.yml
-dotfiles/.config/github-copilot
-dotfiles/.config/mume
-dotfiles/.config/raycast
-dotfiles/.config/sheldon/plugins.lock
-dotfiles/.config/sheldon/repos
-dotfiles/.config/yarn
+home/.config/crossnote
+home/.config/gh/hosts.yml
+home/.config/github-copilot
+home/.config/mume
+home/.config/raycast
+home/.config/sheldon/plugins.lock
+home/.config/sheldon/repos
+home/.config/yarn
 node_modules
 
 # General
@@ -57,6 +57,6 @@ yarn-error.log*
 *.sw?
 
 # Hammerspoon
-dotfiles/.config/hammerspoon/api_keys.json
-dotfiles/.config/hammerspoon/Spoons/*
-!dotfiles/.config/hammerspoon/Spoons/SpoonInstall.spoon
+home/.config/hammerspoon/api_keys.json
+home/.config/hammerspoon/Spoons/*
+!home/.config/hammerspoon/Spoons/SpoonInstall.spoon

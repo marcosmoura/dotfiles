@@ -11,7 +11,7 @@ function create_symlink() {
 
 shopt -s dotglob
 
-pushd ./dotfiles >/dev/null
+pushd ./home >/dev/null
 
 for file in *; do
   rm -rf "$HOME/$file"
