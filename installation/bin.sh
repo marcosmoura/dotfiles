@@ -1,3 +1,5 @@
+#!/bin/bash
+
 print_start "Compiling Zellij statusbar"
 
 ~/.config/zellij/source/statusbar/build.sh

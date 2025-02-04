@@ -135,13 +135,17 @@ keybinds {
     bind "x" { CloseFocus; SwitchToMode "Normal"; }
   }
   shared_except "locked" {
+    unbind "Alt Left"
+    unbind "Alt Right"
+    unbind "Alt Down"
+    unbind "Alt Up"
     bind "Ctrl g" { SwitchToMode "Locked"; }
     bind "Ctrl q" { Quit; }
     bind "Alt n" { NewPane; }
-    bind "Alt h" "Alt Left" { MoveFocusOrTab "Left"; }
-    bind "Alt l" "Alt Right" { MoveFocusOrTab "Right"; }
-    bind "Alt j" "Alt Down" { MoveFocus "Down"; }
-    bind "Alt k" "Alt Up" { MoveFocus "Up"; }
+    bind "Alt h" "Ctrl Alt Left" { MoveFocusOrTab "Left"; }
+    bind "Alt l" "Ctrl Alt Right" { MoveFocusOrTab "Right"; }
+    bind "Alt j" "Ctrl Alt Down" { MoveFocus "Down"; }
+    bind "Alt k" "Ctrl Alt Up" { MoveFocus "Up"; }
     bind "Alt =" "Alt +" { Resize "Increase"; }
     bind "Alt -" { Resize "Decrease"; }
     bind "Alt [" { PreviousSwapLayout; }
@@ -174,7 +178,7 @@ keybinds {
 }
 
 plugins {
-  status_bar location="file:~/.config/zellij/plugins/statusbar"
+  custom_status_bar location="file:~/.config/zellij/plugins/statusbar"
 }
 
 
@@ -206,6 +210,6 @@ ui {
 }
 
 default_tab_template {
-  plugin location="status_bar"
+  plugin location="custom_status_bar"
   children
 }

@@ -1,4 +1,4 @@
-#!/usr/bin/env zsh
+#!/bin/bash
 
 source ~/.config/zsh/utils.sh
 source ~/.config/zsh/modules/git/scripts/utils.zsh

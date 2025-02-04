@@ -1,3 +1,5 @@
+#!/bin/bash
+
 print_start "Configuring macOS..."
 
 # Close any open System Preferences panes, to prevent them from overriding

@@ -1,3 +1,5 @@
+#!/bin/bash
+
 print_start "Installing Rust"
 
 if ! brew ls --versions rust >/dev/null; then

@@ -11,6 +11,7 @@ cyberdream
 devicons
 fnutils
 folke
+frecency
 ghostty
 hammerspoon
 hidutil

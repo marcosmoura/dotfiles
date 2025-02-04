@@ -7,7 +7,7 @@ layout {
   pane_template {
     name "status_bar"
     borderless true
-    plugin location="status_bar"
+    plugin location="custom_status_bar"
   }
 
   tab name="editor" {

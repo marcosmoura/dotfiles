@@ -1,3 +1,5 @@
+#!/bin/bash
+
 print_start "Cleaning up and updating everything"
 
 print_progress "Cleaning brew cache"

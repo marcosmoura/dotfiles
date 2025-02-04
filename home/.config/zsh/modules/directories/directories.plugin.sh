@@ -1,4 +1,4 @@
-#!/usr/bin/env zsh
+#!/bin/bash
 
 setopt auto_pushd
 setopt pushd_ignore_dups
