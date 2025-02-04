@@ -1,3 +1,5 @@
+#!/bin/bash
+
 # FZF
 source <(fzf --zsh)
 

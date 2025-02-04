@@ -1,3 +1,5 @@
+#!/bin/bash
+
 print_start "Linking dotfiles\n"
 
 function create_symlink() {

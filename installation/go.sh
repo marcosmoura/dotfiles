@@ -1,3 +1,5 @@
+#!/bin/sh
+
 print_start "Installing Go"
 
 if ! brew ls --versions go >/dev/null; then

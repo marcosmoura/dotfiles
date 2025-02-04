@@ -18,6 +18,10 @@ return {
             untracked = true,
           },
         },
+        matcher = {
+          frecency = true,
+          sort_empty = true,
+        },
       },
     },
   },

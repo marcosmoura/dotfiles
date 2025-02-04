@@ -13,6 +13,8 @@ return {
       },
       mappings = {
         close = "<Esc>",
+        go_in_plus = "<D-S-Right>",
+        go_out_plus = "<D-S-Left>",
       },
     },
     keys = {

@@ -1,4 +1,4 @@
-#!/usr/bin/env zsh
+#!/bin/bash
 
 print_start "Installing Homebrew\n"
 
@@ -200,7 +200,7 @@ mas install 497799835 # Xcode
 print_text ""
 print_progress "Cleaning up\n"
 
-defaults write org.hammerspoon.Hammerspoon MJConfigFile "~/.config/hammerspoon/init.lua"
+defaults write org.hammerspoon.Hammerspoon MJConfigFile "$HOME/.config/hammerspoon/init.lua"
 brew cleanup
 
 print_text ""

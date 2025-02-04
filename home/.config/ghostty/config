@@ -22,8 +22,8 @@ keybind = alt+left=unbind
 keybind = alt+right=unbind
 
 window-colorspace = display-p3
-window-padding-x = 16,16
-window-padding-y = 16,16
+window-padding-x = 0,0
+window-padding-y = 0,0
 window-theme = light
 window-vsync = true
 

@@ -1,7 +1,11 @@
+#!/bin/bash
+
 print_start "Installing Ruby"
 
 brew install rbenv
-export RBENV_VERSION=$(rbenv install -l -s | grep -v - | tail -1)
+RBENV_VERSION=$(rbenv install -l -s | grep -v - | tail -1)
+export RBENV_VERSION
+
 eval "$(rbenv init - zsh)"
 rbenv install -s "$RBENV_VERSION"
 rbenv global "$RBENV_VERSION"

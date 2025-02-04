@@ -1,3 +1,5 @@
+#!/bin/bash
+
 print_start "Installing Node\n"
 
 which -s node
