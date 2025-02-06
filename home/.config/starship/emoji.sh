@@ -4,10 +4,10 @@ function random_emoji {
   printf "%s\0" "$@" | shuf -z -n1 | tr -d '\0'
 }
 
-local day=$(date +%d)
-local month=$(date +%m)
-local day_of_week=$(date +%u)
-local dir=$PWD
+day=$(date +%d)
+month=$(date +%m)
+day_of_week=$(date +%u)
+dir=$PWD
 
 day=${day#0}
 month=${month#0}
@@ -21,7 +21,7 @@ elif [[ $month -eq 10 && $day -eq 31 ]]; then
 # Friday the 13th
 elif [[ $day_of_week -eq 2 && $day -eq 13 ]]; then
   random_emoji "👻" "💀"
-# christmas
+# Christmas
 elif [[ $month -eq 12 && $day -le 25 ]]; then
   random_emoji "🎅🏻" "🎄" "🎁" "☃️" "⛄️"
 # new years eve
@@ -29,8 +29,8 @@ elif [[ $month -eq 12 && $day -eq 31 ]]; then
   random_emoji "🍾" "🥂" "🎊" "🎉"
 # Fluent UI directory
 elif [[ $dir =~ "fluent" ]]; then
-  echo "󰍲󠀠 󠀠"
+  echo "󰍲󠀠󠀠"
 # Dotfiles
 elif [[ $dir =~ "dotfiles" ]]; then
-  echo "🤍"
+  echo " "
 fi
