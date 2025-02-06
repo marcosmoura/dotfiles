@@ -9,6 +9,7 @@ catppuccin
 com
 cyberdream
 devicons
+fluentui
 fnutils
 folke
 frecency
