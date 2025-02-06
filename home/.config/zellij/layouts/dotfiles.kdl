@@ -6,13 +6,11 @@ layout {
 
   pane_template {
     name "status_bar"
-    borderless true
     plugin location="custom_status_bar"
+    borderless true
   }
 
   tab name="editor" {
-    status_bar size="1"
-
     fluent-pane {
       name "neovim"
       command "/opt/homebrew/bin/nvim"
@@ -22,11 +20,14 @@ layout {
   }
 
   tab name="terminal" {
-    status_bar size="1"
-
     pane split_direction="vertical" {
       fluent-pane name="terminal"
       fluent-pane name="terminal"
     }
+  }
+
+  default_tab_template {
+    status_bar size="1"
+    children
   }
 }
