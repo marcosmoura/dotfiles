@@ -9,9 +9,6 @@ local lint_events = {
 }
 
 return {
-  { import = "lazyvim.plugins.extras.linting.eslint" },
-  { import = "lazyvim.plugins.extras.lsp.none-ls" },
-
   {
     "nvimtools/none-ls.nvim",
     config = function()
