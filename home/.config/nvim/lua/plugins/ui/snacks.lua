@@ -17,6 +17,14 @@ return {
           git_files = {
             untracked = true,
           },
+          explorer = {
+            hidden = true,
+            layout = {
+              layout = {
+                position = "right",
+              },
+            },
+          },
         },
         matcher = {
           frecency = true,

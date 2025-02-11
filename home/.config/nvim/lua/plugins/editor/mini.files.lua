@@ -1,8 +1,7 @@
 return {
-  { import = "lazyvim.plugins.extras.editor.mini-files" },
-
   {
     "echasnovski/mini.files",
+    enabled = false,
     opts = {
       windows = {
         width_focus = 35,
