@@ -33,6 +33,7 @@ parser
 plex
 quasis
 segoe
+shuf
 stylis
 tabindex
 theming
