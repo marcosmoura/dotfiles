@@ -40,7 +40,7 @@ impl Tab {
         }
 
         if tab.is_sync_panes_active {
-            text.push_str(" [sync]");
+            text.push_str("  ");
         }
 
         if text.len() < 12 {
@@ -53,15 +53,14 @@ impl Tab {
 
         let fg = match palette.theme_hue {
             ThemeHue::Dark => palette.white,
-            ThemeHue::Light => palette.black,
+            ThemeHue::Light => palette.bg,
         };
 
         let bg = if tab.active {
-          color::DARKER_GRAY
+            color::DARKER_GRAY
         } else {
-          color::LIGHTER_GRAY
+            palette.bg
         };
-
         let body = style!(fg, bg).bold().paint(text);
 
         Block {

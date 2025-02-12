@@ -60,7 +60,7 @@ impl DateTime {
         {
             let text = format!(" {} ", self.date);
             let len = text.width();
-            let body = style!(palette.white, color::LIGHTER_GRAY).paint(text);
+            let body = style!(palette.white, color::DARKER_GRAY).paint(text);
 
             total_len += len;
             blocks.push(Block {
