@@ -29,10 +29,12 @@ function emoji {
     random_emoji "🍾" "🥂" "🎊" "🎉"
   # Fluent UI directory
   elif [[ $PWD =~ "fluent" ]]; then
-    echo "󰍲 "
+    echo " 󰍲  "
   # Dotfiles
   elif [[ $PWD =~ "dotfiles" ]]; then
-    echo " "
+    echo "   "
+  else
+    echo " 󰉋  "
   fi
 }
 
