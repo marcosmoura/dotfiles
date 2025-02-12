@@ -4,15 +4,9 @@ layout {
     cwd "~/Projects/personal/dotfiles"
   }
 
-  pane_template {
-    name "status_bar"
-    plugin location="custom_status_bar"
-    borderless true
-  }
-
   tab name="editor" {
     fluent-pane {
-      name "neovim"
+      name ""
       command "/opt/homebrew/bin/nvim"
       args "."
       borderless true
@@ -21,13 +15,15 @@ layout {
 
   tab name="terminal" {
     pane split_direction="vertical" {
-      fluent-pane name="terminal"
-      fluent-pane name="terminal"
+      fluent-pane name=""
+      fluent-pane name=""
     }
   }
 
   default_tab_template {
-    status_bar size="1"
+    pane borderless=true size=1 {
+      plugin location="custom_status_bar"
+    }
     children
   }
 }
