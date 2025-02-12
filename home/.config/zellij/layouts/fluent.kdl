@@ -4,17 +4,9 @@ layout {
     cwd "~/Projects/fluent/fluentui"
   }
 
-  pane_template {
-    name "status_bar"
-    borderless true
-    plugin location="custom_status_bar"
-  }
-
   tab name="editor" {
-    status_bar size="1"
-
     fluent-pane {
-      name "neovim"
+      name ""
       command "/opt/homebrew/bin/nvim"
       args "."
       borderless true
@@ -22,32 +14,33 @@ layout {
   }
 
   tab name="terminal" {
-    status_bar size="1"
-
     pane split_direction="vertical" {
-      fluent-pane name="terminal"
-      fluent-pane name="terminal"
+      fluent-pane name=""
+      fluent-pane name=""
     }
   }
 
   tab name="git" {
-    status_bar size="1"
-
     fluent-pane {
-      name "neovim"
+      name ""
       command "/opt/homebrew/bin/lazygit"
       borderless true
     }
   }
 
   tab name="gh" {
-    status_bar size="1"
-
     fluent-pane {
-      name "neovim"
+      name ""
       command "/opt/homebrew/bin/gh"
       args "dash"
       borderless true
     }
+  }
+
+  default_tab_template {
+    pane borderless=true size=1 {
+      plugin location="custom_status_bar"
+    }
+    children
   }
 }
