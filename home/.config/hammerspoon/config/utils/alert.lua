@@ -16,7 +16,7 @@ local defaultAlertStyle = {
 
   textFont = "Maple Mono",
   textSize = 24,
-  textColor = { hex = colors.text.hex },
+  textColor = { hex = colors.white.hex },
 }
 
 hs.alert.defaultStyle = deepMerge(hs.alert.defaultStyle, defaultAlertStyle)

@@ -1,3 +1,4 @@
+local alert = require("config.utils.alert")
 local caffeine = require("config.caffeine")
 local os = require("config.utils.os")
 local wallpaper = require("config.window-manager.aerospace.wallpaper")
@@ -85,7 +86,10 @@ local reloadTools = function()
 end
 
 hs.hotkey.bind({ "cmd", "ctrl" }, "R", reloadTools)
-hs.hotkey.bind({ "cmd", "ctrl", "shift" }, "W", wallpaper.changeWallpaper)
+hs.hotkey.bind({ "cmd", "ctrl", "shift" }, "W", function()
+  wallpaper.changeWallpaper()
+  alert.success("Wallpaper updated", 1)
+end)
 
 --- Lock screen
 local onLockScreen = function()
