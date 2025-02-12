@@ -8,6 +8,7 @@ home/.config/raycast
 home/.config/sheldon/plugins.lock
 home/.config/sheldon/repos
 home/.config/yarn
+home/.config/zellij/plugins
 node_modules
 
 # General
