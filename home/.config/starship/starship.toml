@@ -1,6 +1,6 @@
 "$schema" = 'https://starship.rs/config-schema.json'
 
-format = "${custom.special-emoji}$all $fill $jobs ${custom.clock-emoji} $time$line_break$character"
+format = "${custom.special-emoji} $all $fill $jobs ${custom.clock-emoji} $time$line_break$character"
 command_timeout = 1000
 palette = "catppuccin"
 
