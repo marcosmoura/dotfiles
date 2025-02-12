@@ -1,7 +1,10 @@
 [package]
 name = "zellij-statusbar"
 version = "0.1.0"
-authors = ["Alex Fedoseev <alex@fedoseev.mx>"]
+authors = [
+  "Alex Fedoseev <alex@fedoseev.mx>",
+  "Marcos Moura <contact@marcosmoura.com>",
+]
 edition = "2021"
 
 [[bin]]
@@ -9,9 +12,9 @@ name = "statusbar"
 path = "src/main.rs"
 
 [dependencies]
-zellij-tile = "0.38.2"
-zellij-tile-utils = "0.38.2"
-chrono = "0.4.26"
-colored = "2"
-ansi_term = "0.12"
-unicode-width = "0.1.8"
+zellij-tile = "0.41.2"
+zellij-tile-utils = "0.41.2"
+chrono = "0.4.39"
+colored = "3.0.0"
+ansi_term = "0.12.1"
+unicode-width = "0.2.0"
