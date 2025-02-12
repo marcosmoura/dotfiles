@@ -82,7 +82,7 @@ impl ZellijPlugin for State {
                     get_plugin_ids(),
                 );
             }
-            Event::SessionUpdate(session_info) => {
+            Event::SessionUpdate(session_info, _) => {
                 let current_session = session_info.iter().find(|s| s.is_current_session);
 
                 self.panes = current_session.unwrap().panes.clone();
