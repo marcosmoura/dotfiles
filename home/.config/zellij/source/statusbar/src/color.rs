@@ -1,6 +1,5 @@
 use zellij_tile::prelude::{InputMode, Palette, PaletteColor, ThemeHue};
 
-pub const LIGHTER_GRAY: PaletteColor = PaletteColor::Rgb((69, 71, 90));
 pub const DARKER_GRAY: PaletteColor = PaletteColor::Rgb((49, 50, 68));
 
 pub struct ModeColor {
@@ -18,6 +17,7 @@ impl ModeColor {
         let bg = match mode {
             InputMode::Locked => palette.cyan,
             InputMode::Normal => palette.green,
+            InputMode::Tmux => palette.magenta,
             _ => palette.orange,
         };
 

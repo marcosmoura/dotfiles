@@ -14,11 +14,10 @@ impl Session {
     pub fn render(name: Option<&str>, mode: InputMode, palette: Palette) -> View {
         let mut blocks = vec![];
         let mut total_len = 0;
+        let ModeColor { fg, bg } = ModeColor::new(mode, palette);
 
         // name
         if let Some(name) = name {
-            let ModeColor { fg, bg } = ModeColor::new(mode, palette);
-
             let text = format!(" {}", name.to_uppercase());
             let len = text.width();
             let body = style!(fg, bg).bold().paint(text);
@@ -33,8 +32,6 @@ impl Session {
 
         // mode
         {
-            let ModeColor { fg, bg } = ModeColor::new(mode, palette);
-
             let text = {
                 let sym = match mode {
                     InputMode::Locked => " ".to_string(),
