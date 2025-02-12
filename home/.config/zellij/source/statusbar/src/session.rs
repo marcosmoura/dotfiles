@@ -42,6 +42,8 @@ impl Session {
                     InputMode::Session => " ".to_string(),
                     InputMode::Tab => "󰓩 ".to_string(),
                     InputMode::Tmux => " ".to_string(),
+                    InputMode::RenamePane => "󰑕 ".to_string(),
+                    InputMode::RenameTab => "󰑕 ".to_string(),
                     _ => format!("{:?}", mode).to_uppercase(),
                 };
 
