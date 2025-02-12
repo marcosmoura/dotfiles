@@ -40,10 +40,11 @@ impl Session {
                     InputMode::Locked => " ".to_string(),
                     InputMode::Normal => " ".to_string(),
                     InputMode::Pane => " ".to_string(),
-                    InputMode::Tab => "󰓩 ".to_string(),
-                    InputMode::Session => " ".to_string(),
                     InputMode::Resize => "󰩨 ".to_string(),
                     InputMode::Search => " ".to_string(),
+                    InputMode::Session => " ".to_string(),
+                    InputMode::Tab => "󰓩 ".to_string(),
+                    InputMode::Tmux => " ".to_string(),
                     _ => format!("{:?}", mode).to_uppercase(),
                 };
 

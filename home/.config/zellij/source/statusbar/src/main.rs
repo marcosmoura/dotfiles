@@ -1,5 +1,6 @@
 mod color;
 mod datetime;
+mod frames;
 mod session;
 mod tabs;
 mod view;
@@ -14,6 +15,7 @@ use zellij_tile::prelude::*;
 
 use crate::{
     datetime::DateTime,
+    frames::Frames,
     session::Session,
     tabs::Tabs,
     view::{Bg, Spacer},
@@ -24,6 +26,7 @@ struct State {
     tabs: Vec<TabInfo>,
     active_tab_idx: usize,
     mode_info: ModeInfo,
+    panes: PaneManifest,
     mouse_click_pos: usize,
     should_change_tab: bool,
     now: DateTime,
@@ -35,14 +38,21 @@ impl ZellijPlugin for State {
     fn load(&mut self, configuration: BTreeMap<String, String>) {
         eprintln!("Loaded with configuration: {:#?}", configuration);
 
-        request_permission(&[PermissionType::ReadApplicationState]);
+        request_permission(&[
+            PermissionType::ReadApplicationState,
+            PermissionType::ChangeApplicationState,
+        ]);
 
         set_selectable(true); // selectable b/c we need a user input to grant the permissions
         set_timeout(1.0);
+
         subscribe(&[
-            EventType::TabUpdate,
             EventType::ModeUpdate,
             EventType::Mouse,
+            EventType::PaneUpdate,
+            EventType::PermissionRequestResult,
+            EventType::SessionUpdate,
+            EventType::TabUpdate,
             EventType::Timer,
         ]);
     }
@@ -62,6 +72,28 @@ impl ZellijPlugin for State {
             Event::ModeUpdate(mode_info) => {
                 should_render = self.mode_info != mode_info;
                 self.mode_info = mode_info;
+            }
+            Event::PaneUpdate(panes) => {
+                self.panes = panes;
+                Frames::hide_frames_conditionally(
+                    &self.panes,
+                    &self.tabs,
+                    &self.mode_info,
+                    get_plugin_ids(),
+                );
+            }
+            Event::SessionUpdate(session_info) => {
+                let current_session = session_info.iter().find(|s| s.is_current_session);
+
+                self.panes = current_session.unwrap().panes.clone();
+                self.tabs = current_session.unwrap().tabs.clone();
+
+                Frames::hide_frames_conditionally(
+                    &self.panes,
+                    &self.tabs,
+                    &self.mode_info,
+                    get_plugin_ids(),
+                );
             }
             Event::TabUpdate(tabs) => {
                 if let Some(active_tab_index) = tabs.iter().position(|t| t.active) {
