@@ -1,3 +1,38 @@
+copy_command "pbcopy"
+copy_on_select true
+default_layout "welcome"
+pane_frames false
+scroll_buffer_size 9999999
+theme "catppuccin"
+
+ui {
+  pane_frames {
+    rounded_corners true
+  }
+}
+
+plugins {
+  custom_status_bar location="file:~/.config/zellij/plugins/statusbar"
+  smart-sessions location="file:~/.config/zellij/plugins/smart-sessions"
+}
+
+themes {
+  catppuccin {
+    bg "#1e1e2e" // Base
+    fg "#cdd6f4" // Text
+    red "#f38ba8" // Red
+    green "#a6e3a1" // Green
+    blue "#89b4fa" // Blue
+    yellow "#f9e2af" // Yellow
+    magenta "#cba6f7" // Mauve
+    orange "#fab387" // Peach
+    cyan "#89dceb" // Sky
+    gray "#313244" // Surface 0
+    black "#181825" // Mantle
+    white "#cdd6f4" // Text
+  }
+}
+
 // If you'd like to override the default keybindings completely, be sure to change "keybinds" to "keybinds clear-defaults=true"
 keybinds {
   normal {
@@ -186,40 +221,5 @@ keybinds {
   }
   shared_except "tmux" "locked" {
     bind "Ctrl Space" { SwitchToMode "Tmux"; }
-  }
-}
-
-plugins {
-  custom_status_bar location="file:~/.config/zellij/plugins/statusbar"
-  smart-sessions location="file:~/.config/zellij/plugins/smart-sessions"
-}
-
-copy_command "pbcopy"
-copy_on_select true
-default_layout "compact"
-pane_frames false
-scroll_buffer_size 9999999
-theme "catppuccin"
-
-themes {
-  catppuccin {
-    bg "#1e1e2e" // Base
-    fg "#cdd6f4" // Text
-    red "#f38ba8" // Red
-    green "#a6e3a1" // Green
-    blue "#89b4fa" // Blue
-    yellow "#f9e2af" // Yellow
-    magenta "#cba6f7" // Mauve
-    orange "#fab387" // Peach
-    cyan "#89dceb" // Sky
-    gray "#313244" // Surface 0
-    black "#181825" // Mantle
-    white "#cdd6f4" // Text
-  }
-}
-
-ui {
-  pane_frames {
-    rounded_corners true
   }
 }
