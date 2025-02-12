@@ -186,10 +186,10 @@ plugins {
   custom_status_bar location="file:~/.config/zellij/plugins/statusbar"
 }
 
-
-scroll_buffer_size 9999999
 copy_command "pbcopy"
 copy_on_select true
+scroll_buffer_size 9999999
+simplified_ui true
 theme "catppuccin"
 
 themes {
@@ -212,9 +212,4 @@ ui {
   pane_frames {
     rounded_corners true
   }
-}
-
-default_tab_template {
-  plugin location="custom_status_bar"
-  children
 }
