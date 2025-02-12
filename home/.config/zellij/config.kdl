@@ -107,9 +107,16 @@ keybinds {
     bind "Esc" { UndoRenamePane; SwitchToMode "Pane"; }
   }
   session {
+    unbind "w"
     bind "Ctrl o" { SwitchToMode "Normal"; }
     bind "Ctrl s" { SwitchToMode "Scroll"; }
     bind "d" { Detach; }
+    bind "s" {
+      LaunchOrFocusPlugin "smart-sessions" {
+        floating true
+      };
+      SwitchToMode "Normal"
+    }
   }
   tmux {
     bind "Ctrl Space" { Write 2; SwitchToMode "Normal"; }
@@ -184,12 +191,14 @@ keybinds {
 
 plugins {
   custom_status_bar location="file:~/.config/zellij/plugins/statusbar"
+  smart-sessions location="file:~/.config/zellij/plugins/smart-sessions"
 }
 
 copy_command "pbcopy"
 copy_on_select true
+default_layout "compact"
+pane_frames false
 scroll_buffer_size 9999999
-simplified_ui true
 theme "catppuccin"
 
 themes {
