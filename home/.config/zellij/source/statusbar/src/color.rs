@@ -1,4 +1,4 @@
-use zellij_tile::prelude::{InputMode, Palette, PaletteColor, ThemeHue};
+use zellij_tile::prelude::{InputMode, Palette, PaletteColor};
 
 pub const DARKER_GRAY: PaletteColor = PaletteColor::Rgb((49, 50, 68));
 
@@ -9,17 +9,14 @@ pub struct ModeColor {
 
 impl ModeColor {
     pub fn new(mode: InputMode, palette: Palette) -> Self {
-        let fg = match palette.theme_hue {
-            ThemeHue::Dark => palette.black,
-            ThemeHue::Light => palette.white,
-        };
-
-        let bg = match mode {
-            InputMode::Locked => palette.cyan,
-            InputMode::Normal => palette.green,
+        let fg = match mode {
+            InputMode::Locked => palette.green,
+            InputMode::Normal => palette.blue,
             InputMode::Tmux => palette.magenta,
             _ => palette.orange,
         };
+
+        let bg = palette.bg;
 
         Self { fg, bg }
     }

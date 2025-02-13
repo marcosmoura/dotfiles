@@ -1,4 +1,5 @@
-use unicode_width::UnicodeWidthStr;
+use chrono::Utc;
+use chrono_tz::Europe::Prague as CurrentTimezone;
 
 use zellij_tile::prelude::*;
 use zellij_tile_utils::style;
@@ -12,57 +13,62 @@ pub struct Session;
 
 impl Session {
     pub fn render(name: Option<&str>, mode: InputMode, palette: Palette) -> View {
+        use unicode_width::UnicodeWidthStr;
+
         let mut blocks = vec![];
         let mut total_len = 0;
-        let ModeColor { fg, bg } = ModeColor::new(mode, palette);
 
-        // name
-        if let Some(name) = name {
-            let text = format!(" {}", name.to_uppercase());
+        let ModeColor {
+            fg: mode_fg,
+            bg: mode_bg,
+        } = ModeColor::new(mode, palette);
+
+        // date
+        {
+            let icon: String = "󱑍 ".to_string();
+            let text = format!(" {} {} ", icon, DateTime::render());
             let len = text.width();
-            let body = style!(fg, bg).bold().paint(text);
+            let body = style!(palette.white, palette.bg).paint(text);
 
             total_len += len;
             blocks.push(Block {
                 body: body.to_string(),
                 len,
                 tab_index: None,
-            })
+            });
         }
 
-        // mode
+        // session name
         {
-            let text = {
-                let sym = match mode {
-                    InputMode::Locked => " ".to_string(),
-                    InputMode::Normal => " ".to_string(),
-                    InputMode::Pane => " ".to_string(),
-                    InputMode::Resize => "󰩨 ".to_string(),
-                    InputMode::Search => " ".to_string(),
-                    InputMode::Session => " ".to_string(),
-                    InputMode::Tab => "󰓩 ".to_string(),
-                    InputMode::Tmux => " ".to_string(),
-                    InputMode::RenamePane => "󰑕 ".to_string(),
-                    InputMode::RenameTab => "󰑕 ".to_string(),
-                    _ => format!("{:?}", mode).to_uppercase(),
-                };
+            if let Some(name) = name {
+                let icon: String = " ".to_string();
+                let text = format!(" {} {} ", icon, name.to_uppercase());
+                let len = text.width();
+                let body = style!(mode_fg, mode_bg).bold().paint(text);
 
-                format!(" {} ", sym)
-            };
-            let len = text.width();
-            let body = style!(fg, bg).bold().paint(text);
-
-            total_len += len;
-            blocks.push(Block {
-                body: body.to_string(),
-                len,
-                tab_index: None,
-            })
+                total_len += len;
+                blocks.push(Block {
+                    body: body.to_string(),
+                    len,
+                    tab_index: None,
+                })
+            }
         }
 
         View {
             blocks,
             len: total_len,
         }
+    }
+}
+
+pub struct DateTime;
+
+impl DateTime {
+    pub fn render() -> String {
+        let now = Utc::now().with_timezone(&CurrentTimezone);
+        let datetime = now.format("%d/%m/%y - %H:%M").to_string();
+
+        datetime
     }
 }
