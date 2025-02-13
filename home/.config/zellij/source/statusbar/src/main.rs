@@ -1,6 +1,6 @@
 mod color;
-mod datetime;
 mod frames;
+mod indicator;
 mod session;
 mod tabs;
 mod view;
@@ -10,12 +10,13 @@ use std::{
     collections::BTreeMap,
 };
 
+use session::DateTime;
 use view::Error;
 use zellij_tile::prelude::*;
 
 use crate::{
-    datetime::DateTime,
     frames::Frames,
+    indicator::Indicator,
     session::Session,
     tabs::Tabs,
     view::{Bg, Spacer},
@@ -29,7 +30,7 @@ struct State {
     panes: PaneManifest,
     mouse_click_pos: usize,
     should_change_tab: bool,
-    now: DateTime,
+    datetime: String,
 }
 
 register_plugin!(State);
@@ -126,9 +127,10 @@ impl ZellijPlugin for State {
                 _ => {}
             },
             Event::Timer(_) => {
-                let now = DateTime::now();
-                should_render = now != self.now;
-                self.now = now;
+                let datetime = DateTime::render();
+                should_render = datetime != self.datetime;
+                self.datetime = datetime;
+
                 set_timeout(1.0);
             }
             _ => {
@@ -148,16 +150,15 @@ impl ZellijPlugin for State {
         let mode = self.mode_info.mode;
         let palette = self.mode_info.style.colors;
 
-        let mut session = Session::render(session_name.as_deref(), mode, palette);
+        let mut indicator = Indicator::render(mode, palette);
         let tabs = Tabs::render(&self.tabs, mode, palette);
-        let mut datetime = self.now.render(mode, palette);
+        let mut session = Session::render(session_name.as_deref(), mode, palette);
         let pad = Bg::render(2, palette);
 
         let mut blocks = Vec::with_capacity(cols);
+        let occupied = indicator.len + tabs.len + session.len + (pad.len * 2);
 
-        let occupied = session.len + tabs.len + datetime.len + (pad.len * 2);
-
-        blocks.append(&mut session.blocks);
+        blocks.append(&mut indicator.blocks);
         blocks.push(pad.clone());
 
         let (mut mid, spacer) = if occupied > cols {
@@ -166,13 +167,13 @@ impl ZellijPlugin for State {
                 palette,
             );
 
-            let parts_len = (session.len + pad.len, error.len, datetime.len + pad.len);
+            let parts_len = (indicator.len + pad.len, error.len, session.len + pad.len);
 
             let spacer = Spacer::render(cols, parts_len, palette);
 
             (vec![error], spacer)
         } else {
-            let parts_len = (session.len + pad.len, tabs.len, datetime.len + pad.len);
+            let parts_len = (indicator.len + pad.len, tabs.len, session.len + pad.len);
 
             let spacer = Spacer::render(cols, parts_len, palette);
 
@@ -212,7 +213,7 @@ impl ZellijPlugin for State {
         }
 
         blocks.push(pad);
-        blocks.append(&mut datetime.blocks);
+        blocks.append(&mut session.blocks);
 
         let mut bar = String::new();
         let mut cursor = 0;
