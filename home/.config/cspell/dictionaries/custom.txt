@@ -1,3 +1,4 @@
+ansi
 antialiased
 backends
 behaviour
@@ -15,6 +16,7 @@ fnutils
 folke
 frecency
 ghostty
+grey
 hammerspoon
 hidutil
 hlexists
