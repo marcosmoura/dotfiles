@@ -67,7 +67,7 @@ pub struct DateTime;
 impl DateTime {
     pub fn render() -> String {
         let now = Utc::now().with_timezone(&CurrentTimezone);
-        let datetime = now.format("%d/%m/%y - %H:%M").to_string();
+        let datetime = now.format("%a %b %d - %H:%M").to_string();
 
         datetime
     }
