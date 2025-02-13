@@ -1,11 +1,11 @@
+use ansi_term::Style;
 use chrono::Utc;
 use chrono_tz::Europe::Prague as CurrentTimezone;
 
 use zellij_tile::prelude::*;
-use zellij_tile_utils::style;
 
 use crate::{
-    color::ModeColor,
+    color::Color,
     view::{Block, View},
 };
 
@@ -16,49 +16,26 @@ impl Session {
         use unicode_width::UnicodeWidthStr;
 
         let mut blocks = vec![];
-        let mut total_len = 0;
+        let mut len = 0;
 
-        let ModeColor {
-            fg: mode_fg,
-            bg: mode_bg,
-        } = ModeColor::new(mode, palette);
+        if let Some(name) = name {
+            let mode_color = Color::mode(mode, palette);
+            let icon: String = " ".to_string();
+            let text = format!(" {} {}  ", icon, name.to_uppercase());
+            let body = Style::new()
+                .fg(Color::to_ansi(mode_color))
+                .paint(text.clone());
 
-        // date
-        {
-            let icon: String = "󱑍 ".to_string();
-            let text = format!(" {} {} ", icon, DateTime::render());
-            let len = text.width();
-            let body = style!(palette.white, palette.bg).paint(text);
+            len = text.width();
 
-            total_len += len;
             blocks.push(Block {
                 body: body.to_string(),
                 len,
                 tab_index: None,
-            });
+            })
         }
 
-        // session name
-        {
-            if let Some(name) = name {
-                let icon: String = " ".to_string();
-                let text = format!(" {} {} ", icon, name.to_uppercase());
-                let len = text.width();
-                let body = style!(mode_fg, mode_bg).bold().paint(text);
-
-                total_len += len;
-                blocks.push(Block {
-                    body: body.to_string(),
-                    len,
-                    tab_index: None,
-                })
-            }
-        }
-
-        View {
-            blocks,
-            len: total_len,
-        }
+        View { blocks, len }
     }
 }
 

@@ -1,7 +1,9 @@
+use ansi_term::Style;
 use unicode_width::UnicodeWidthStr;
 
 use zellij_tile::prelude::*;
-use zellij_tile_utils::style;
+
+use crate::color::Color;
 
 pub struct View {
     pub blocks: Vec<Block>,
@@ -20,7 +22,7 @@ pub struct Bg;
 impl Bg {
     pub fn render(cols: usize, palette: Palette) -> Block {
         let text = format!("{: <1$}", "", cols);
-        let body = style!(palette.fg, palette.bg).paint(text);
+        let body = Style::new().fg(Color::to_ansi(palette.fg)).paint(text);
 
         Block {
             body: body.to_string(),
@@ -89,7 +91,11 @@ impl Error {
     pub fn render(message: &str, palette: Palette) -> Block {
         let text = message;
         let len = text.width();
-        let body = style!(palette.white, palette.red).bold().paint(text);
+        let body = Style::new()
+            .fg(Color::to_ansi(palette.white))
+            .on(Color::to_ansi(palette.red))
+            .bold()
+            .paint(text);
 
         Block {
             body: body.to_string(),

@@ -1,10 +1,9 @@
-use unicode_width::UnicodeWidthStr;
+use ansi_term::Style;
 
 use zellij_tile::prelude::*;
-use zellij_tile_utils::style;
 
 use crate::{
-    color,
+    color::Color,
     view::{Block, View},
 };
 
@@ -43,25 +42,17 @@ impl Tab {
             text.push_str("  ");
         }
 
-        if text.len() < 12 {
-            text = format!("{:^12}", text);
+        text = format!(" {} ", text.to_uppercase());
+
+        let body = if tab.active {
+            Style::new()
+                .fg(Color::to_ansi(palette.green))
+                .bold()
+                .paint(text)
         } else {
-            text = format!(" {} ", text);
-        }
-
-        let len = text.width();
-
-        let fg = match palette.theme_hue {
-            ThemeHue::Dark => palette.white,
-            ThemeHue::Light => palette.bg,
+            Style::new().fg(Color::to_ansi(palette.fg)).paint(text)
         };
-
-        let bg = if tab.active {
-            color::DARKER_GRAY
-        } else {
-            palette.bg
-        };
-        let body = style!(fg, bg).bold().paint(text);
+        let len = body.len();
 
         Block {
             body: body.to_string(),

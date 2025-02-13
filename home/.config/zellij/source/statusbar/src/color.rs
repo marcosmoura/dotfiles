@@ -1,23 +1,22 @@
+use ansi_term::Color as AnsiColor;
 use zellij_tile::prelude::{InputMode, Palette, PaletteColor};
 
-pub const DARKER_GRAY: PaletteColor = PaletteColor::Rgb((49, 50, 68));
+pub struct Color;
 
-pub struct ModeColor {
-    pub fg: PaletteColor,
-    pub bg: PaletteColor,
-}
-
-impl ModeColor {
-    pub fn new(mode: InputMode, palette: Palette) -> Self {
-        let fg = match mode {
+impl Color {
+    pub fn mode(mode: InputMode, palette: Palette) -> PaletteColor {
+        match mode {
             InputMode::Locked => palette.green,
             InputMode::Normal => palette.blue,
             InputMode::Tmux => palette.magenta,
             _ => palette.orange,
-        };
+        }
+    }
 
-        let bg = palette.bg;
-
-        Self { fg, bg }
+    pub fn to_ansi(color: PaletteColor) -> AnsiColor {
+        match color {
+            PaletteColor::Rgb((r, g, b)) => AnsiColor::RGB(r, g, b),
+            PaletteColor::EightBit(color) => AnsiColor::Fixed(color),
+        }
     }
 }
