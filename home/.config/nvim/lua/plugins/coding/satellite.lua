@@ -8,6 +8,7 @@ return {
     },
     config = function()
       require("satellite").setup({
+        winblend = 0,
         excluded_filetypes = {
           "prompt",
           "TelescopePrompt",

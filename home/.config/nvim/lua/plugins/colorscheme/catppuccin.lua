@@ -10,6 +10,7 @@ return {
     "catppuccin",
     opts = {
       lavour = "mocha",
+      transparent_background = true,
       background = {
         dark = "mocha",
       },

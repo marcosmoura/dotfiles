@@ -65,11 +65,36 @@ return {
         return fallback or {}
       end
 
+      local colors = require("catppuccin.palettes.mocha")
+
+      colors.bg = "NONE"
+
       return {
         options = {
           component_separators = { left = " ", right = " " },
           section_separators = { left = " ", right = " " },
-          theme = "cyberdream",
+          theme = {
+            normal = {
+              a = { fg = colors.blue, bg = colors.bg },
+              b = { fg = colors.cyan, bg = colors.bg },
+              c = { fg = colors.text, bg = colors.bg },
+              x = { fg = colors.text, bg = colors.bg },
+              y = { fg = colors.magenta, bg = colors.bg },
+              z = { fg = colors.grey, bg = colors.bg },
+            },
+            insert = {
+              a = { fg = colors.green, bg = colors.bg },
+              z = { fg = colors.grey, bg = colors.bg },
+            },
+            visual = {
+              a = { fg = colors.magenta, bg = colors.bg },
+              z = { fg = colors.grey, bg = colors.bg },
+            },
+            terminal = {
+              a = { fg = colors.orange, bg = colors.bg },
+              z = { fg = colors.grey, bg = colors.bg },
+            },
+          },
           globalstatus = vim.o.laststatus == 3,
           disabled_filetypes = {
             statusline = { "snacks_dashboard" },
