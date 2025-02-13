@@ -1,10 +1,10 @@
+use ansi_term::Style;
 use unicode_width::UnicodeWidthStr;
 
 use zellij_tile::prelude::*;
-use zellij_tile_utils::style;
 
 use crate::{
-    color::ModeColor,
+    color::Color,
     view::{Block, View},
 };
 
@@ -14,7 +14,7 @@ impl Indicator {
     pub fn render(mode: InputMode, palette: Palette) -> View {
         let mut blocks = vec![];
         let mut total_len = 0;
-        let ModeColor { fg, bg } = ModeColor::new(mode, palette);
+        let mode_color = Color::mode(mode, palette);
 
         // mode
         {
@@ -37,7 +37,10 @@ impl Indicator {
                 format!(" {} {} ", icon, mode_str)
             };
             let len = text.width();
-            let body = style!(fg, bg).bold().paint(text);
+            let body = Style::new()
+                .fg(Color::to_ansi(mode_color))
+                .bold()
+                .paint(text);
 
             total_len += len;
             blocks.push(Block {
