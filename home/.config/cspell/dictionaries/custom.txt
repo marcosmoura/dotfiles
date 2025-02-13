@@ -6,6 +6,7 @@ caffeinate
 callout
 cantarell
 catppuccin
+chrono
 com
 cyberdream
 devicons
