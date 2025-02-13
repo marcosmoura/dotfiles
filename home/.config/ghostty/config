@@ -13,7 +13,7 @@ cursor-click-to-move = true
 cursor-style = bar
 
 background-blur-radius = 48
-background-opacity = 0.85
+background-opacity = 0.9
 unfocused-split-opacity = 0.9
 
 macos-option-as-alt = true
@@ -22,8 +22,8 @@ keybind = alt+left=unbind
 keybind = alt+right=unbind
 
 window-colorspace = display-p3
-window-padding-x = 0,0
-window-padding-y = 0,0
+window-padding-x = 8,8
+window-padding-y = 8,8
 window-theme = light
 window-vsync = true
 
