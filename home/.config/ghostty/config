@@ -23,7 +23,7 @@ keybind = alt+right=unbind
 
 window-colorspace = display-p3
 window-padding-x = 8,8
-window-padding-y = 8,8
+window-padding-y = 8,4
 window-theme = light
 window-vsync = true
 
