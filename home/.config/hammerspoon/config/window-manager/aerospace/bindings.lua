@@ -179,37 +179,6 @@ hs.hotkey.bind({ "cmd", "shift" }, "`", function()
   cycleWindows(1)
 end)
 
---- Open Ghostty with Zellij
---- @param session string
-local openGhosttyWithZellij = function(session)
-  local ghosttyInstance = hs.application.find("Ghostty")
-
-  if ghosttyInstance then
-    ghosttyInstance:kill9()
-  end
-
-  hs.timer.doAfter(0.5, function()
-    os.execute("open", {
-      "-na",
-      "Ghostty",
-      "--args",
-      "--window-padding-x=0,0",
-      "--window-padding-y=0,0",
-      '--initial-command="/opt/homebrew/bin/zellij attach ' .. session .. '"',
-    }, {
-      silent = true,
-    })
-  end)
-end
-
-hs.hotkey.bind({ "cmd", "ctrl" }, "G", function()
-  openGhosttyWithZellij("FluentUI")
-end)
-
-hs.hotkey.bind({ "cmd", "ctrl", "alt" }, "G", function()
-  openGhosttyWithZellij("Dotfiles")
-end)
-
 local module = {}
 
 module.start = function()
