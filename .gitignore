@@ -9,6 +9,7 @@ home/.config/sheldon/plugins.lock
 home/.config/sheldon/repos
 home/.config/yarn
 home/.config/zellij/plugins
+home/.config/yazi/plugins
 node_modules
 
 # General
