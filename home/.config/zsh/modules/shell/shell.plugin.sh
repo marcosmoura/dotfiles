@@ -1,6 +1,6 @@
 #!/bin/bash
 
-source ~/.config/zsh/utils.sh
+source "~/.config/zsh/utils.sh"
 
 # Open zsh config
 alias dotfiles="code ~/Projects/dotfiles"
@@ -33,6 +33,9 @@ alias chmox='chmod -x'
 # Better bottom
 alias bottom='btm'
 
+# Zellij alias
+alias zl='zellij'
+
 # Better FZF
 export FZF_DEFAULT_OPTS=" \
 --color=fg:#cdd6f4,header:#f38ba8,info:#cba6f7,pointer:#f5e0dc,gutter:-1 \
@@ -46,7 +49,7 @@ function fzfu() {
 }
 
 # Better Glamour
-export GLAMOUR_STYLE="~/.config/glamour/catppuccin.json"
+export GLAMOUR_STYLE="$HOME/.config/glamour/catppuccin.json"
 
 # Better tree
 alias tree="tree --gitignore --dirsfirst --sort name -C"
