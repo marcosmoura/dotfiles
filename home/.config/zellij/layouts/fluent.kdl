@@ -5,11 +5,19 @@ layout {
   }
 
   tab name="editor" {
-    fluent-pane {
-      name ""
-      command "/opt/homebrew/bin/nvim"
-      args "."
-      borderless true
+    pane split_direction="vertical" {
+      fluent-pane {
+        name "neovim"
+        command "/opt/homebrew/bin/nvim"
+        args "."
+      }
+
+      pane {
+        name "file explorer"
+        command "/opt/homebrew/bin/yazi"
+        args "--client-id" "999"
+        size 45
+      }
     }
   }
 

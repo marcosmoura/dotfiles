@@ -7,6 +7,9 @@ return {
         timeout = 6000,
         top_down = false,
       },
+      explorer = {
+        enabled = false,
+      },
     },
   },
 }
