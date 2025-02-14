@@ -21,7 +21,7 @@ impl Session {
         if let Some(name) = name {
             let mode_color = Color::mode(mode, palette);
             let icon: String = " ".to_string();
-            let text = format!(" {} {}  ", icon, name.to_uppercase());
+            let text = format!(" {} {} ", icon, name.to_uppercase());
             let body = Style::new()
                 .fg(Color::to_ansi(mode_color))
                 .paint(text.clone());
