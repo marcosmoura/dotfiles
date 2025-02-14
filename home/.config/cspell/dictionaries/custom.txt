@@ -7,6 +7,7 @@ caffeinate
 callout
 cantarell
 catppuccin
+chmox
 chrono
 com
 cyberdream
@@ -41,6 +42,7 @@ stylis
 tabindex
 theming
 titlebar
+tldr
 uncaffeinate
 uuid
 wezterm
