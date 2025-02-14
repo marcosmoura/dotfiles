@@ -20,15 +20,7 @@ layout {
     }
   }
 
-  tab name="git" {
-    fluent-pane {
-      name ""
-      command "/opt/homebrew/bin/lazygit"
-      borderless true
-    }
-  }
-
-  tab name="gh" {
+  tab name="github" {
     fluent-pane {
       name ""
       command "/opt/homebrew/bin/gh"
