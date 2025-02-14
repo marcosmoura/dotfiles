@@ -48,4 +48,5 @@ uuid
 wezterm
 wifi
 yabai
+yazi
 zellij
