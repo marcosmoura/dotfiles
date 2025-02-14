@@ -42,7 +42,7 @@ impl Tab {
             text.push_str("  ");
         }
 
-        text = format!(" {} ", text.to_uppercase());
+        text = format!("  {}  ", text.to_uppercase());
 
         let body = if tab.active {
             Style::new()
