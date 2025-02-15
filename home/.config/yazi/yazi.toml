@@ -1,16 +1,8 @@
 [manager]
-linemore = ["none"]
-ratio = [0, 1, 0]
 show_hidden = true
 show_symlink = true
 sort_by = "natural"
 sort_dir_first = true
-title_format = ""
 
 [preview]
 syntect_theme = "~/.config/bat/themes/Catppuccin.tmTheme"
-
-[opener]
-edit = [
-  { run = 'sh ~/.config/yazi/open-in-nvim.sh "$@"', block = true, for = "unix" },
-]
