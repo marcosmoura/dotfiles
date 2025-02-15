@@ -40,7 +40,6 @@ require("lazy").setup({
     { import = "lazyvim.plugins.extras.editor.dial" },
     { import = "lazyvim.plugins.extras.editor.inc-rename" },
     { import = "lazyvim.plugins.extras.editor.snacks_picker" },
-    { import = "lazyvim.plugins.extras.editor.mini-files" },
 
     --- [[ Formatting ]]
     { import = "lazyvim.plugins.extras.formatting.prettier" },
