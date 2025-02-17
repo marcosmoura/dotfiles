@@ -21,7 +21,7 @@ layout {
 
   default_tab_template {
     pane borderless=true size=1 {
-      plugin location="custom_status_bar"
+      plugin location="custom-status-bar"
     }
     children
   }
