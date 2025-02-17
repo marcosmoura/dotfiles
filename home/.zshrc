@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 # Paths
 export XDG_CONFIG_HOME=${XDG_CONFIG_HOME:-$HOME/.config}
 export PATH=/usr/local/bin:$PATH
@@ -53,7 +55,7 @@ eval "$(starship init zsh)"
 # SSH Agent
 SSH_AGENT_INSTANCES=$(pgrep ssh-agent)
 if [ -z "${SSH_AGENT_INSTANCES}" ]; then
-  eval $(ssh-agent -s)
+  eval "$(ssh-agent -s)"
   trap "ssh-agent -k" exit
 fi
 
