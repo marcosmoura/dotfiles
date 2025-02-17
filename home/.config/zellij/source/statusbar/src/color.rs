@@ -6,7 +6,7 @@ pub struct Color;
 impl Color {
     pub fn mode(mode: InputMode, palette: Palette) -> PaletteColor {
         match mode {
-            InputMode::Locked => palette.green,
+            InputMode::Locked => palette.yellow,
             InputMode::Normal => palette.blue,
             InputMode::Tmux => palette.magenta,
             _ => palette.orange,
