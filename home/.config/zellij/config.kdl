@@ -12,8 +12,19 @@ ui {
 }
 
 plugins {
-  custom_status_bar location="file:~/.config/zellij/plugins/statusbar"
+  custom-status-bar location="file:~/.config/zellij/plugins/statusbar"
   smart-sessions location="file:~/.config/zellij/plugins/smart-sessions"
+
+  autolock location="file:~/.config/zellij/plugins/autolock.wasm" {
+    is_enabled true
+    triggers "nvim|vim|fzf|lazygit"
+    reaction_seconds "0.15"
+  }
+}
+
+load_plugins {
+  autolock
+  smart-sessions
 }
 
 themes {
@@ -35,12 +46,11 @@ themes {
 
 // If you'd like to override the default keybindings completely, be sure to change "keybinds" to "keybinds clear-defaults=true"
 keybinds {
-  normal {
-    // uncomment this and adjust key if using copy_on_select=false
-    // bind "Alt c" { Copy; }
-  }
   locked {
-    bind "Ctrl g" { SwitchToMode "Normal"; }
+    bind "Ctrl g" {
+      MessagePlugin "autolock" { payload "disable"; };
+      SwitchToMode "Normal";
+    }
   }
   resize {
     bind "Ctrl n" { SwitchToMode "Normal"; }
@@ -111,8 +121,6 @@ keybinds {
     bind "Ctrl b" "PageUp" "Left" "h" { PageScrollUp; }
     bind "d" { HalfPageScrollDown; }
     bind "u" { HalfPageScrollUp; }
-    // uncomment this and adjust key if using copy_on_select=false
-    // bind "Alt c" { Copy; }
   }
   search {
     bind "Ctrl s" { SwitchToMode "Normal"; }
@@ -180,18 +188,22 @@ keybinds {
     bind "Space" { NextSwapLayout; }
     bind "x" { CloseFocus; SwitchToMode "Normal"; }
   }
+  shared {
+    bind "Alt h" "Ctrl Alt Left" { MoveFocusOrTab "Left"; }
+    bind "Alt l" "Ctrl Alt Right" { MoveFocusOrTab "Right"; }
+    bind "Alt j" "Ctrl Alt Down" { MoveFocus "Down"; }
+    bind "Alt k" "Ctrl Alt Up" { MoveFocus "Up"; }
+  }
   shared_except "locked" {
     unbind "Alt Left"
     unbind "Alt Right"
     unbind "Alt Down"
     unbind "Alt Up"
-    bind "Ctrl g" { SwitchToMode "Locked"; }
+    bind "Ctrl g" {
+      MessagePlugin "autolock" { payload "enable"; };
+    }
     bind "Ctrl q" { Quit; }
     bind "Alt n" { NewPane; }
-    bind "Alt h" "Ctrl Alt Left" { MoveFocusOrTab "Left"; }
-    bind "Alt l" "Ctrl Alt Right" { MoveFocusOrTab "Right"; }
-    bind "Alt j" "Ctrl Alt Down" { MoveFocus "Down"; }
-    bind "Alt k" "Ctrl Alt Up" { MoveFocus "Up"; }
     bind "Alt =" "Alt +" { Resize "Increase"; }
     bind "Alt -" { Resize "Decrease"; }
     bind "Alt [" { PreviousSwapLayout; }
