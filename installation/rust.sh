@@ -11,5 +11,6 @@ print_progress "Installing Rust packages"
 cargo install binocular-cli
 cargo install cargo-update
 cargo install cargo-cache
+cargo install zellij-runner
 
 print_success "Rust installed! \n"

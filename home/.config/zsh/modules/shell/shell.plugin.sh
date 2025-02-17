@@ -17,7 +17,6 @@ alias egrep='egrep --color=auto'
 # sudo editors
 alias vim='nvim'
 alias svim='sudo nvim'
-alias slvim='sudo lvim'
 alias snano='sudo nano'
 
 # Better du
@@ -34,7 +33,13 @@ alias chmox='chmod -x'
 alias bottom='btm'
 
 # Zellij alias
+export ZELLIJ_RUNNER_LAYOUTS_DIR="$HOME/.config/zellij/layouts"
+export ZELLIJ_RUNNER_BANNERS_DIR="$HOME/.config/zellij/banners"
+export ZELLIJ_RUNNER_ROOT_DIR="$HOME/Projects"
+export ZELLIJ_RUNNER_IGNORE_DIRS="node_modules,target"
+
 alias zl='zellij'
+alias zr='zellij-runner'
 
 # Better FZF
 export FZF_DEFAULT_OPTS=" \
