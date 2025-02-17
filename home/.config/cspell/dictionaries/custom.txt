@@ -23,11 +23,14 @@ hidutil
 hlexists
 hlgroup
 jsonlint
+lazyrepo
 lazyvim
 lualine
 macbook
 minifuse
 msteams
+neoconf
+neogen
 neoui
 neovide
 noice
@@ -48,5 +51,7 @@ uuid
 wezterm
 wifi
 yabai
+yanky
 yazi
 zellij
+zide
