@@ -24,6 +24,7 @@ impl Session {
             let text = format!(" {} {} ", icon, name.to_uppercase());
             let body = Style::new()
                 .fg(Color::to_ansi(mode_color))
+                .bold()
                 .paint(text.clone());
 
             len = text.width();

@@ -50,7 +50,10 @@ impl Tab {
                 .bold()
                 .paint(text)
         } else {
-            Style::new().fg(Color::to_ansi(palette.fg)).paint(text)
+            Style::new()
+                .fg(Color::to_ansi(palette.fg))
+                .bold()
+                .paint(text)
         };
         let len = body.len();
 
