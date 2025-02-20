@@ -1,7 +1,5 @@
 #!/bin/bash
 
-source "~/.config/zsh/utils.sh"
-
 # Open zsh config
 alias dotfiles="code ~/Projects/dotfiles"
 
