@@ -7,7 +7,7 @@ HASH="%C(yellow bold)%h"
 AUTHOR="%C(green bold)%aN"
 DATE="%>>(18,trunc)%C(blue bold)%ad"
 MESSAGE="%<(70,trunc)%C(reset)%s"
-FORMAT=$(join_by_char $LOG_SEPARATOR $HASH $AUTHOR $DATE $MESSAGE)
+export GIT_LOG_FORMAT=$(join_by_char $LOG_SEPARATOR $HASH $AUTHOR $DATE $MESSAGE)
 
 function format_log() {
   PRETTY_PRINT=$(tsv-pretty -x -l=25 -e -f -d=$LOG_SEPARATOR <<<$1)
