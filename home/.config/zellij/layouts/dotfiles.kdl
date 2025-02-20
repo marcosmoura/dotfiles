@@ -8,7 +8,6 @@ layout {
     fluent-pane {
       name "neovim"
       command "/opt/homebrew/bin/nvim"
-      args "."
     }
   }
 

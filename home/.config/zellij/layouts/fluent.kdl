@@ -8,14 +8,13 @@ layout {
     fluent-pane {
       name "neovim"
       command "/opt/homebrew/bin/nvim"
-      args "."
     }
   }
 
   tab name="terminal" {
     pane split_direction="vertical" {
-      fluent-pane name=""
-      fluent-pane name=""
+      fluent-pane name="terminal"
+      fluent-pane name="terminal"
     }
   }
 
