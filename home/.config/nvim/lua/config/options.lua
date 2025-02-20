@@ -1,7 +1,7 @@
 -- Vim options
 vim.opt.backup = false
 vim.opt.colorcolumn = "120"
-vim.opt.guicursor = "i-ci:ver25-Cursor/lCursor-blinkwait1000-blinkon150-blinkoff150"
+vim.opt.guicursor = "i-ci:ver100,a:blinkon50"
 vim.opt.hlsearch = false
 vim.opt.incsearch = true
 vim.opt.relativenumber = false
@@ -9,6 +9,7 @@ vim.opt.softtabstop = 2
 vim.opt.swapfile = false
 vim.opt.undodir = os.getenv("HOME") .. "/.vim/nvim-undodir"
 vim.o.cmdheight = 0
+vim.o.completeopt = "menu,menuone,noselect,noinsert"
 
 -- Globals
 vim.g.autoformat_enabled = true
