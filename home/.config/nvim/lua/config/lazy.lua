@@ -29,17 +29,18 @@ require("lazy").setup({
     { import = "lazyvim.plugins.extras.ai.copilot-chat" },
 
     --- [[ Coding ]]
+    { import = "lazyvim.plugins.extras.coding.luasnip" },
     { import = "lazyvim.plugins.extras.coding.mini-comment" },
     { import = "lazyvim.plugins.extras.coding.mini-surround" },
     { import = "lazyvim.plugins.extras.coding.neogen" },
     { import = "lazyvim.plugins.extras.coding.yanky" },
     { import = "lazyvim.plugins.extras.editor.mini-move" },
-    { import = "lazyvim.plugins.extras.util.mini-hipatterns" },
 
     --- [[ Editor ]]
     { import = "lazyvim.plugins.extras.editor.dial" },
     { import = "lazyvim.plugins.extras.editor.inc-rename" },
     { import = "lazyvim.plugins.extras.editor.snacks_picker" },
+    { import = "lazyvim.plugins.extras.editor.refactoring" },
 
     --- [[ Formatting ]]
     { import = "lazyvim.plugins.extras.formatting.prettier" },
