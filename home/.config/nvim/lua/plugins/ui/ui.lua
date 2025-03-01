@@ -30,7 +30,7 @@ return {
       {
         "<leader>e",
         "<cmd>Yazi cwd<cr>",
-        desc = "Open the file manager in nvim's working directory",
+        desc = "Open yazi at the root directory",
       },
     },
     opts = {
