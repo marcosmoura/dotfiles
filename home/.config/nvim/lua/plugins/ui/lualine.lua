@@ -72,7 +72,7 @@ return {
       return {
         options = {
           component_separators = { left = " ", right = " " },
-          section_separators = { left = " ", right = " " },
+          section_separators = { left = "", right = "" },
           theme = {
             normal = {
               a = { fg = colors.blue, bg = colors.bg },
