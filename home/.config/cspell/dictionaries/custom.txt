@@ -35,6 +35,7 @@ neoui
 neovide
 noice
 nowrap
+nvimtools
 osascript
 parser
 plex
