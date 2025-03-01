@@ -11,6 +11,7 @@ local lint_events = {
 return {
   {
     "nvimtools/none-ls.nvim",
+    event = lint_events,
     config = function()
       local null_ls = require("null-ls")
 
@@ -89,7 +90,6 @@ return {
     "mfussenegger/nvim-lint",
     opts = {
       events = lint_events,
-
       linters_by_ft = {
         bash = { "cspell", "shellcheck" },
         css = { "cspell", "stylelint" },
