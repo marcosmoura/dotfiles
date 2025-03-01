@@ -35,9 +35,10 @@ vim.g.loaded_netrw = 1
 vim.g.loaded_netrwPlugin = 1
 
 -- LazyVim settings
-vim.g.lazyvim_picker = "fzf"
 vim.g.lazyvim_picker = "snacks"
 vim.g.lazyvim_cmp = "blink.cmp"
+vim.g.root_spec = { ".git", "lsp", "cwd" }
+vim.g.lazyvim_cmp = "blink"
 
 -- Underscore as word character
 vim.cmd("set iskeyword-=_", false)
