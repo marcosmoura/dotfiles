@@ -75,6 +75,9 @@ require("lazy").setup({
     --- [[ Custom Plugins ]]
     { import = "plugins" },
   },
+  ui = {
+    border = "rounded",
+  },
   defaults = {
     lazy = false,
     version = false,
