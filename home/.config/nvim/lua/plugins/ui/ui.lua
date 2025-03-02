@@ -29,6 +29,11 @@ return {
       },
       {
         "<leader>e",
+        "<cmd>Yazi<cr>",
+        desc = "Open yazi at the current file",
+      },
+      {
+        "<leader>E",
         "<cmd>Yazi cwd<cr>",
         desc = "Open yazi at the root directory",
       },
