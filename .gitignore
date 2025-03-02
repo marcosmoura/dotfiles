@@ -10,6 +10,7 @@ home/.config/sheldon/repos
 home/.config/yarn
 home/.config/zellij/plugins
 home/.config/yazi/plugins
+home/.config/helix/runtime
 node_modules
 
 # General
