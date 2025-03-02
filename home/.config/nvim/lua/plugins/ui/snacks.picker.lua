@@ -10,6 +10,9 @@ return {
           git_files = {
             untracked = true,
           },
+          grep = {
+            hidden = true,
+          },
           explorer = {
             hidden = true,
             layout = {
