@@ -26,6 +26,7 @@ jsonlint
 lazyrepo
 lazyvim
 lualine
+luasnip
 macbook
 minifuse
 msteams
@@ -33,6 +34,7 @@ neoconf
 neogen
 neoui
 neovide
+nlua
 noice
 nowrap
 nvimtools
