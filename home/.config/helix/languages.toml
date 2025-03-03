@@ -1,25 +1,3 @@
-use-grammars = { only = [
-  "bash",
-  "comment",
-  "css",
-  "git-attributes",
-  "git-commit",
-  "git-config",
-  "git-ignore",
-  "git-rebase",
-  "html",
-  "javascript",
-  "json",
-  "kdl",
-  "lua",
-  "markdown",
-  "rust",
-  "toml",
-  "typescript",
-  "xml",
-  "yaml",
-] }
-
 [[language]]
 name = "bash"
 auto-format = true
