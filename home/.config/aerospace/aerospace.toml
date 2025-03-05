@@ -113,9 +113,13 @@ alt-0 = 'workspace misc'
 ctrl-0 = 'workspace misc'
 ctrl-shift-cmd-0 = 'move-node-to-workspace misc'
 
-
 ctrl-right = 'workspace next'
 ctrl-left = 'workspace prev'
+
+[workspace-to-monitor-force-assignment]
+'mail' = 'secondary'
+'music' = 'secondary'
+'passwords' = 'secondary'
 
 # Space - Files
 [[on-window-detected]]
