@@ -3,9 +3,10 @@
   email = marcosvmmoura@gmail.com
 
 [filter "lfs"]
-  clean = git-lfs clean %f
-  smudge = git-lfs smudge %f
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
   required = true
+	process = git-lfs filter-process
 
 [alias]
   # List aliases
@@ -22,7 +23,7 @@
   p = !"git pull; git submodule foreach git pull origin master"
 
   # Sync current branch with remote fork
-  sync-fork = !zsh ~/.config/zsh/modules/git/scripts/sync-fork.zsh
+  sync-fork = !zsh ~/.config/zsh/modules/git/scripts/sync-fork.sh
 
   # Push to origin
   po = push -u
@@ -31,13 +32,13 @@
   m = merge --no-ff
 
   # View abbreviated SHA, author, date and description of the latest 25 commits
-  l = !zsh ~/.config/zsh/modules/git/scripts/better-log.zsh
+  l = !zsh ~/.config/zsh/modules/git/scripts/better-log.sh
 
   # Log Commits by name
-  fm = !zsh ~/.config/zsh/modules/git/scripts/find-commit-by-message.zsh
+  fm = !zsh ~/.config/zsh/modules/git/scripts/find-commit-by-message.sh
 
   # Log Commits by path
-  fc = !zsh ~/.config/zsh/modules/git/scripts/find-commit-by-path.zsh
+  fc = !zsh ~/.config/zsh/modules/git/scripts/find-commit-by-path.sh
 
   # Get log graph
   graph = log --abbrev-commit --color --graph
@@ -71,10 +72,10 @@
   add-to-last-commit = commit --amend --reuse-message=HEAD
 
   # Credit an author on the latest commit
-  give-credit = !zsh ~/.config/zsh/modules/git/scripts/commit-with-credits.zsh
+  give-credit = !zsh ~/.config/zsh/modules/git/scripts/commit-with-credits.sh
 
   # Remove all "merged" branches
-  delete-merged = !zsh ~/.config/zsh/modules/git/scripts/delete-merged.zsh
+  delete-merged = !zsh ~/.config/zsh/modules/git/scripts/delete-merged.sh
 
   # List contributors with number of commits
   contributors = shortlog --summary --numbered
@@ -188,3 +189,11 @@
 
 [interactive]
   diffFilter = delta --color-only
+[credential]
+	helper = osxkeychain
+	helper =
+	helper = /usr/local/share/gcm-core/git-credential-manager
+[credential "https://dev.azure.com"]
+	useHttpPath = true
+[credential "azrepos:org/office"]
+	username = marcosmoura@microsoft.com

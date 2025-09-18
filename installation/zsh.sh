@@ -1,25 +1,26 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-print_start "Installing zsh"
+print_start "Configuring zsh"
 
-ZSH_DIR=$(which zsh)
+ZSH_DIR=$(command -v zsh)
 
-if ! brew ls --versions zsh >/dev/null; then
-  brew install zsh
+if ! grep -Fxq "$ZSH_DIR" /etc/shells; then
+  print_progress "Adding zsh to /etc/shells"
+  echo "$ZSH_DIR" | sudo tee -a /etc/shells >/dev/null
 fi
 
-print_progress "Adding zsh to /etc/shells"
-sudo sh -c 'echo $ZSH_DIR >> /etc/shells'
-
-if ! echo "$SHELL" | grep -Fxq "$ZSH_DIR"; then
+if [ "$SHELL" != "$ZSH_DIR" ]; then
   print_progress "Setting as default shell"
   chsh -s "$ZSH_DIR"
 fi
 
-if ! brew ls --versions sheldon >/dev/null; then
-  brew install sheldon
-  sheldon lock --reinstall
-  source ~/.zshrc
+if ! command -v sheldon >/dev/null 2>&1; then
+  brew install sheldon || true
 fi
 
-print_success "zsh installed! \n"
+if command -v sheldon >/dev/null 2>&1; then
+  print_progress "Refreshing sheldon plugins"
+  sheldon lock --reinstall || true
+fi
+
+print_success "zsh configured!"

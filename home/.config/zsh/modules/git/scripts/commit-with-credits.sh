@@ -1,8 +1,8 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 source ~/.config/zsh/utils.sh
-source ~/.config/zsh/modules/git/scripts/utils.zsh
-source ~/.config/zsh/modules/git/git.plugin.zsh
+source ~/.config/zsh/modules/git/scripts/utils.sh
+source ~/.config/zsh/modules/git/git.plugin.sh
 
 COMMIT_NAME=$1
 COMMIT_EMAIL=$2

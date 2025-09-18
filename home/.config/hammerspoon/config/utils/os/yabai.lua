@@ -13,11 +13,9 @@ end
 --- Check if yabai is running
 --- @return boolean
 local isRunning = function()
-  local services = os.execute("launchctl list")
-  local normalizedServices = type(services) == "table" and table.concat(services, "") or services
-  local matchesYabai = string.find(tostring(normalizedServices), "yabai")
+  local yabai = hs.application.get("yabai")
 
-  return matchesYabai ~= nil and matchesYabai ~= ""
+  return yabai and yabai:isRunning()
 end
 
 return {

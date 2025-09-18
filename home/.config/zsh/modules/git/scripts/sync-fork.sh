@@ -1,8 +1,8 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 source ~/.config/zsh/utils.sh
-source ~/.config/zsh/modules/git/scripts/utils.zsh
-source ~/.config/zsh/modules/git/git.plugin.zsh
+source ~/.config/zsh/modules/git/scripts/utils.sh
+source ~/.config/zsh/modules/git/git.plugin.sh
 
 CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD 2>/dev/null)
 TARGET_BRANCH=$1

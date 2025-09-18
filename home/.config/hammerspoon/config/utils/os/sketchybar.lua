@@ -1,11 +1,12 @@
 local execute = require("config.utils.os.execute")
 
-local sketchyBarPath = "/opt/homebrew/bin/sketchybar"
+local sketchyBarName = "sketchybar-top"
+local sketchyBarPath = "/opt/homebrew/bin/" .. sketchyBarName
 
 --- Check if SketchyBar is running
 --- @return boolean
 local isRunning = function()
-  local sketchyBar = hs.application.get("SketchyBar")
+  local sketchyBar = hs.application.get(sketchyBarName)
 
   return sketchyBar and sketchyBar.isRunning and sketchyBar:isRunning()
 end

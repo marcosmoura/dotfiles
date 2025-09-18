@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Open zsh config
 alias dotfiles="code ~/Projects/dotfiles"
@@ -26,18 +26,6 @@ alias man='batman'
 
 # Chmod -x
 alias chmox='chmod -x'
-
-# Better bottom
-alias bottom='btm'
-
-# Zellij alias
-export ZELLIJ_RUNNER_LAYOUTS_DIR="$HOME/.config/zellij/layouts"
-export ZELLIJ_RUNNER_BANNERS_DIR="$HOME/.config/zellij/banners"
-export ZELLIJ_RUNNER_ROOT_DIR="$HOME/Projects"
-export ZELLIJ_RUNNER_IGNORE_DIRS="node_modules,target"
-
-alias zl='zellij'
-alias zr='zellij-runner'
 
 # Better FZF
 export FZF_DEFAULT_OPTS=" \

@@ -1,12 +1,13 @@
 #!/bin/bash
 
 options=(
-  blur_radius=8.0
+  blur_radius=16.0
   hidpi=on
   style=round
-  width=5.0
+  width=8
   active_color=0xFFFFFFFF
-  inactive_color=0x44FFFFFF
+  inactive_color=0x50FFFFFF
+  blacklist="Electron"
 )
 
 borders "${options[@]}"

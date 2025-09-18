@@ -1,7 +1,7 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 source ~/.config/zsh/utils.sh
-source ~/.config/zsh/modules/git/scripts/utils.zsh
+source ~/.config/zsh/modules/git/scripts/utils.sh
 
 BRANCH_NAME=$1
 

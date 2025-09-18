@@ -1,26 +1,42 @@
-#!/usr/bin/env bash
-
-# Paths
-export XDG_CONFIG_HOME=${XDG_CONFIG_HOME:-$HOME/.config}
-export PATH=/usr/local/bin:$PATH
-export PATH=/usr/local/opt:$PATH
-export PATH=$HOME/.local/bin:$PATH
-export PATH=$HOME/.rbenv/shims:$PATH
-export PATH=$HOME/.yarn/bin:$PATH
-export PATH=$HOME/.config/yarn/global/node_modules/.bin:$PATH
-export PATH=$HOME/go/bin:$PATH
-export PATH=$HOME/.cargo/bin:$PATH
-export PATH=$HOME/.local/share/venv/bin/python:$PATH
-export PATH=$HOME/.local/share/venv/bin/pip:$PATH
-
 # Homebrew
 eval "$(/opt/homebrew/bin/brew shellenv)"
 if type brew &>/dev/null; then
   FPATH="$(brew --prefix)/share/zsh/site-functions:${FPATH}"
 fi
 
+# Paths
+export XDG_CONFIG_HOME=${XDG_CONFIG_HOME:-$HOME/.config}
+
+# Path helper to avoid duplicate entries
+path_prepend() {
+  [ -d "$1" ] || return 0
+  case ":$PATH:" in
+  *":$1:"*) ;; # already present
+  *) PATH="$1:$PATH" ;;
+  esac
+}
+
+local paths=(
+  /usr/local/bin
+  /usr/local/opt
+  "$HOME/.local/bin"
+  "$HOME/.rbenv/shims"
+  "$HOME/.yarn/bin"
+  "$HOME/.config/yarn/global/node_modules/.bin"
+  "$HOME/go/bin"
+  "$HOME/.cargo/bin"
+  "$HOME/.local/share/venv/bin"
+)
+
+for p in $paths; do
+  path_prepend $p
+done
+
+# Avoid duplicate entries in PATH
+typeset -U path PATH
+
 # Preferred editor
-export EDITOR=vim
+export EDITOR=$(which nvim)
 
 # Prefer US English and use UTF-8.
 export LANG="en_US.UTF-8"
@@ -61,13 +77,6 @@ fi
 
 # Load sheldon
 eval "$(sheldon source)"
-
-# Mise
-if [[ "$TERM_PROGRAM" == "vscode" ]]; then
-  eval "$(mise activate zsh --shims)"
-else
-  eval "$(mise activate zsh)"
-fi
 
 # Clear screen
 clear

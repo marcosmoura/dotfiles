@@ -11,33 +11,33 @@ yabai -m config window_shadow off
 
 ## General space settings
 yabai -m config layout bsp
-yabai -m config top_padding 20
-yabai -m config right_padding 20
-yabai -m config bottom_padding 20
-yabai -m config left_padding 20
-yabai -m config window_gap 20
+yabai -m config top_padding 12
+yabai -m config right_padding 14
+yabai -m config bottom_padding 14
+yabai -m config left_padding 14
+yabai -m config window_gap 14
 
-## Label spaces
-yabai -m space 1 --label finder
-yabai -m space 2 --label terminal
-yabai -m space 3 --label code
-yabai -m space 4 --label browser
-yabai -m space 5 --label design
-yabai -m space 6 --label music
-yabai -m space 7 --label communication
-yabai -m space 8 --label events
-yabai -m space 9 --label productivity
-yabai -m space 10 --label misc
+#### Screen 1
+####################################################################################################
+
+yabai -m space 1 --label terminal
+yabai -m space 2 --label code
+yabai -m space 3 --label browser
+yabai -m space 4 --label music
+yabai -m space 5 --label figma
+yabai -m space 6 --label communication
+yabai -m space 7 --label misc
 
 ## Spaces layouts
 yabai -m config --space code layout stack
 yabai -m config --space browser layout stack
-yabai -m config --space music layout stack
 yabai -m config --space communication layout float
 yabai -m config --space misc layout float
 
-#### Screen 1
-####################################################################################################
+## Space - Terminal
+yabai -m rule --add label="Ghostty" app="^Ghostty$" space="terminal"
+yabai -m rule --add label="WezTerm" app="^WezTerm$" space="terminal"
+yabai -m rule --add label="Terminal" app="^Terminal$" space="terminal"
 
 ## Space - Code
 yabai -m rule --add label="Visual Studio Code" app="^Visual Studio Code - Insiders$" space="code"
@@ -50,39 +50,39 @@ yabai -m rule --add label="Edge" app="^Microsoft Edge" space="browser"
 yabai -m rule --add label="Firefox" app="^Firefox" space="browser"
 yabai -m rule --add label="Safari" app="^Safari$" space="browser"
 
+## Space - Figma
+yabai -m rule --add label="Figma" app="^Figma$" space="figma"
+
 ## Space - Music
 yabai -m rule --add label="Spotify" app="^Spotify$" space="music"
 yabai -m rule --add label="Music" app="Music$" space="music"
 
 ## Space - Communication
+yabai -m rule --add label="Microsoft Teams" app="Microsoft Teams" space="communication" grid="2560:2560:320:320:1920:1920" manage=off
 yabai -m rule --add label="WhatsApp" title="WhatsApp" space="communication" grid="2560:2560:320:320:1920:1920" manage=off
 yabai -m rule --add label="Discord" app="Discord" space="communication" grid="2560:2560:320:320:1920:1920" manage=off
-yabai -m rule --add label="Microsoft Teams" app="Microsoft Teams" space="communication" grid="2560:2560:320:320:1920:1920" manage=off
 
-## Space - Events
-yabai -m rule --add label="Outlook" app="^Outlook$" space="events"
-yabai -m rule --add label="Calendar" app="^Calendar$" space="events"
+## Space - Misc
+yabai -m rule --add label="Fortin Nameless Suite X" app="^Fortin Nameless Suite X$" space="misc"
+yabai -m rule --add label="Archetype Apps" app="^Archetype" space="misc"
 
 #### Screen 2
 ####################################################################################################
 
+yabai -m space 8 --label finder
+yabai -m space 9 --label outlook
+yabai -m space 10 --label productivity
+
 ## Space - Finder
 yabai -m rule --add label="Finder" app="^Finder$" space="finder"
 
-## Space - Terminal
-yabai -m rule --add label="Terminal" app="^Terminal$" space="terminal"
-yabai -m rule --add label="kitty" app="^kitty$" space="terminal"
-yabai -m rule --add label="WezTerm" app="^WezTerm$" space="terminal"
-
-## Space - Design
-yabai -m rule --add label="Figma" app="^Figma$" space="design"
+## Space - Outlook
+yabai -m rule --add label="Outlook" app="^Outlook$" space="outlook"
+yabai -m rule --add label="Calendar" app="^Calendar$" space="outlook"
 
 ## Space - Productivity
-yabai -m rule --add label="Notion" app="^Notion$" space="productivity"
-yabai -m rule --add label="Bitwarden" app="^Bitwarden$" space="productivity"
-
-# Space - Remote
-yabai -m rule --add label="Microsoft Remote Desktop" app="^Microsoft Remote Desktop$" space="misc"
+yabai -m rule --add label="Proton Pass" app="^Proton Pass$" space="productivity"
+yabai -m rule --add label="Reminders" app="^Reminders$" space="productivity"
 
 #### All Screens
 ####################################################################################################
@@ -111,34 +111,5 @@ yabai -m rule --add manage=off title="^Opening"
 #### Events
 ####################################################################################################
 
-yabai -m signal --add event=system_woke action="zsh ~/.config/zsh/modules/yabai/scripts/reload-yabai.zsh"
-yabai -m signal --add event=display_added action="zsh ~/.config/zsh/modules/yabai/scripts/reload-yabai.zsh"
-yabai -m signal --add event=display_moved action="zsh ~/.config/zsh/modules/yabai/scripts/reload-yabai.zsh"
-yabai -m signal --add event=display_resized action="zsh ~/.config/zsh/modules/yabai/scripts/reload-yabai.zsh"
-yabai -m signal --add event=display_changed action="zsh ~/.config/zsh/modules/yabai/scripts/reload-yabai.zsh"
-yabai -m signal --add event=dock_did_restart action="zsh ~/.config/zsh/modules/yabai/scripts/reload-yabai.zsh"
-
-yabai -m signal --add event=space_changed action="hs -m 'yabai:onSpacesChanged'"
-yabai -m signal --add event=dock_did_restart action="hs -m 'yabai:onSpacesChanged'"
-yabai -m signal --add event=system_woke action="hs -m 'yabai:onSpacesChanged'"
-yabai -m signal --add event=system_woke action="hs -m 'yabai:onSystemWoke'"
-
-yabai -m signal --add event=display_added action="hs -m 'yabai:onDisplaysChanged'"
-yabai -m signal --add event=display_moved action="hs -m 'yabai:onDisplaysChanged'"
-yabai -m signal --add event=display_resized action="hs -m 'yabai:onDisplaysChanged'"
-yabai -m signal --add event=display_changed action="hs -m 'yabai:onDisplaysChanged'"
-
-yabai -m signal --add event=application_launched action="hs -m 'yabai:onWindowsChanged'"
-yabai -m signal --add event=application_terminated action="hs -m 'yabai:onWindowsChanged'"
-yabai -m signal --add event=application_front_switched action="hs -m 'yabai:onWindowsChanged'"
-yabai -m signal --add event=application_activated action="hs -m 'yabai:onWindowsChanged'"
-yabai -m signal --add event=application_deactivated action="hs -m 'yabai:onWindowsChanged'"
-yabai -m signal --add event=application_visible action="hs -m 'yabai:onWindowsChanged'"
-yabai -m signal --add event=application_hidden action="hs -m 'yabai:onWindowsChanged'"
-yabai -m signal --add event=window_created action="hs -m 'yabai:onWindowsChanged'"
-yabai -m signal --add event=window_destroyed action="hs -m 'yabai:onWindowsChanged'"
-yabai -m signal --add event=window_focused action="hs -m 'yabai:onWindowsChanged'"
-yabai -m signal --add event=window_moved action="hs -m 'yabai:onWindowsChanged'"
-yabai -m signal --add event=window_resized action="hs -m 'yabai:onWindowsChanged'"
-yabai -m signal --add event=window_minimized action="hs -m 'yabai:onWindowsChanged'"
-yabai -m signal --add event=window_deminimized action="hs -m 'yabai:onWindowsChanged'"
+yabai -m signal --add event="space_changed" action="sketchybar-bottom --trigger space_changed"
+yabai -m signal --add event="application_front_switched" action="sketchybar-bottom --trigger space_changed"

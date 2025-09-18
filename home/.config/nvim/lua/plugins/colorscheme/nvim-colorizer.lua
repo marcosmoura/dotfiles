@@ -5,6 +5,9 @@ local names_enabled = {
 return {
   {
     "NvChad/nvim-colorizer.lua",
+    cond = function()
+      return not vim.g.vscode
+    end,
     event = "BufReadPre",
     opts = {
       filetypes = {

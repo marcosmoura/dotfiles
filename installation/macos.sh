@@ -1,6 +1,13 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-print_start "Configuring macOS..."
+# Environment variables supported:
+#   DOTFILES_TIMEZONE                 Override timezone (default Europe/Prague)
+#   DOTFILES_ENABLE_LEGACY_DEBUG=1    Enable legacy debug / dashboard settings
+
+print_start "Configuring macOS"
+
+# Capture macOS version early for conditional tweaks
+MACOS_VERSION="$(sw_vers -productVersion 2>/dev/null | awk -F '.' '{print $1"."$2}')"
 
 # Close any open System Preferences panes, to prevent them from overriding
 # settings we’re about to change
@@ -10,14 +17,11 @@ osascript -e 'tell application "System Preferences" to quit'
 # General UI/UX
 ###############################################################################
 
-# Disable the sound effects on boot
-sudo nvram SystemAudioVolume=" "
+# Disable the sound effects on boot (ignore failure on Apple Silicon if restricted)
+sudo nvram SystemAudioVolume=" " 2>/dev/null || print_info "Skipping SystemAudioVolume (not supported)"
 
 # Finder: show hidden files by default
 defaults write com.apple.finder AppleShowAllFiles -bool true
-
-# Disable menubar transparency
-defaults write NSGlobalDomain AppleEnableMenuBarTransparency -bool false
 
 # Make Dock icons of hidden applications translucent
 defaults write com.apple.dock showhidden -bool true
@@ -28,17 +32,18 @@ defaults write com.apple.dock show-recents -bool false
 # Reset Launchpad, but keep the desktop wallpaper intact
 find "${HOME}/Library/Application Support/Dock" -name "*-*.db" -maxdepth 1 -delete
 
-# Add iOS & Watch Simulator to Launchpad
-sudo ln -sf "/Applications/Xcode.app/Contents/Developer/Applications/Simulator.app" "/Applications/Simulator.app"
+# Add iOS & Watch Simulator to Launchpad (ignore if Xcode not yet installed)
+if [ -d "/Applications/Xcode.app/Contents/Developer/Applications/Simulator.app" ]; then
+  sudo ln -sf "/Applications/Xcode.app/Contents/Developer/Applications/Simulator.app" "/Applications/Simulator.app"
+else
+  print_info "Xcode not installed yet; skipping Simulator symlink"
+fi
 
 # Set sidebar icon size to small
 defaults write NSGlobalDomain NSTableViewDefaultSizeMode -int 1
 
 # Always show scrollbars
-defaults write NSGlobalDomain AppleShowScrollBars -string "Automatic"
-
-# Increase window resize speed for Cocoa applications
-defaults write NSGlobalDomain NSWindowResizeTime -float 0.1
+defaults write NSGlobalDomain AppleShowScrollBars -string "Always"
 
 # Expand save panel by default
 defaults write NSGlobalDomain NSNavPanelExpandedStateForSaveMode -bool true
@@ -67,12 +72,6 @@ defaults write NSGlobalDomain NSTextShowsControlCharacters -bool true
 # Disable Resume system-wide
 defaults write com.apple.systempreferences NSQuitAlwaysKeepsWindows -bool false
 
-# Disable automatic termination of inactive apps
-defaults write NSGlobalDomain NSDisableAutomaticTermination -bool true
-
-# Set Help Viewer windows to non-floating mode
-defaults write com.apple.helpviewer DevMode -bool true
-
 # Reveal IP address, hostname, OS version, etc. when clicking the clock
 # in the login window
 sudo defaults write /Library/Preferences/com.apple.loginwindow AdminHostInfo HostName
@@ -96,9 +95,6 @@ defaults write NSGlobalDomain NSAutomaticSpellingCorrectionEnabled -bool false
 # SSD-specific tweaks
 ###############################################################################
 
-# Disable local Time Machine snapshots
-sudo tmutil disablelocal
-
 # Change hibernation mode and delete last image
 # Check current setting using `pmset -g | grep hibernatemode`
 # OS X hibernation has three modes:
@@ -112,15 +108,9 @@ sudo tmutil disablelocal
 
 sudo pmset -a hibernatemode 0
 
-# Disable the sudden motion sensor as it’s not useful for SSDs
-sudo pmset -a sms 0
-
 ###############################################################################
 # Trackpad, mouse, keyboard, Bluetooth accessories, and input
 ###############################################################################
-
-# Increase sound quality for Bluetooth headphones/headsets
-defaults write com.apple.BluetoothAudioAgent "Apple Bitpool Min (editable)" -int 40
 
 # Enable full keyboard access for all controls
 # (e.g. enable Tab in modal dialogs)
@@ -140,8 +130,16 @@ defaults write -g ApplePressAndHoldEnabled -bool false
 defaults write NSGlobalDomain KeyRepeat -int 1
 defaults write NSGlobalDomain InitialKeyRepeat -int 10
 
-# Set the timezone; see `systemsetup -listtimezones` for other values
-sudo systemsetup -settimezone "Europe/Amsterdam" >/dev/null
+# Set the timezone (overridable). See `systemsetup -listtimezones` for values.
+TIMEZONE="${DOTFILES_TIMEZONE:-Europe/Prague}"
+if command -v systemsetup >/dev/null 2>&1; then
+  CURRENT_TZ=$(sudo systemsetup -gettimezone 2>/dev/null | awk -F': ' '{print $2}')
+  if [ "$CURRENT_TZ" != "$TIMEZONE" ] && [ -n "$TIMEZONE" ]; then
+    sudo systemsetup -settimezone "$TIMEZONE" >/dev/null || print_info "Could not set timezone to $TIMEZONE"
+  fi
+else
+  print_info "systemsetup not available; skipping timezone configuration"
+fi
 
 # Disable text replacement
 defaults write -g WebAutomaticTextReplacementEnabled -bool false
@@ -160,21 +158,12 @@ defaults write com.apple.screencapture type -string "png"
 # Disable shadow in screenshots
 defaults write com.apple.screencapture disable-shadow -bool true
 
-# Enable subpixel font rendering on non-Apple LCDs
-defaults write NSGlobalDomain AppleFontSmoothing -int 2
-
-# Enable HiDPI display modes (requires restart)
-sudo defaults write /Library/Preferences/com.apple.windowserver DisplayResolutionEnabled -bool true
-
 ###############################################################################
 # Finder
 ###############################################################################
 
 # Finder: allow quitting via ⌘ + Q; doing so will also hide desktop icons
 defaults write com.apple.finder QuitMenuItem -bool true
-
-# Finder: disable window animations and Get Info animations
-defaults write com.apple.finder DisableAllAnimations -bool true
 
 # Show icons for hard drives, servers, and removable media on the desktop
 defaults write com.apple.finder ShowExternalHardDrivesOnDesktop -bool true
@@ -184,9 +173,6 @@ defaults write com.apple.finder ShowRemovableMediaOnDesktop -bool true
 
 # Finder: show all filename extensions
 defaults write NSGlobalDomain AppleShowAllExtensions -bool true
-
-# Finder: hide status bar
-defaults write com.apple.finder ShowStatusBar -bool true
 
 # Finder: hide path bar
 defaults write com.apple.finder ShowPathbar -bool false
@@ -278,7 +264,7 @@ defaults write -g NSAutomaticWindowAnimationsEnabled -bool false
 defaults write com.apple.dock mouse-over-hilite-stack -bool true
 
 # Set the icon size of Dock items to 38 pixels
-defaults write com.apple.dock tilesize -int 40
+defaults write com.apple.dock tilesize -int 38
 
 # Change minimize/maximize window effect
 defaults write com.apple.dock mineffect -string "scale"
@@ -303,15 +289,9 @@ defaults write com.apple.dock launchanim -bool false
 # Speed up Mission Control animations
 defaults write com.apple.dock expose-animation-duration -float 0.1
 
-# Don’t group windows by application in Mission Control
+# Group windows by application in Mission Control
 # (i.e. use the old Exposé behavior instead)
 defaults write com.apple.dock expose-group-by-app -bool true
-
-# Disable Dashboard
-defaults write com.apple.dashboard mcx-disabled -bool true
-
-# Don’t show Dashboard as a Space
-defaults write com.apple.dock dashboard-in-overlay -bool true
 
 # Don’t automatically rearrange Spaces based on most recent use
 defaults write com.apple.dock mru-spaces -bool false
@@ -342,9 +322,6 @@ defaults write com.apple.terminal StringEncodings -array 4
 # Prevent Time Machine from prompting to use new hard drives as backup volume
 defaults write com.apple.TimeMachine DoNotOfferNewDisksForBackup -bool true
 
-# Disable local Time Machine backups
-hash tmutil &>/dev/null && sudo tmutil disablelocal
-
 ###############################################################################
 # Activity Monitor
 ###############################################################################
@@ -366,24 +343,22 @@ defaults write com.apple.ActivityMonitor SortDirection -int 0
 # Address Book, Dashboard, iCal, TextEdit, and Disk Utility
 ###############################################################################
 
-# Enable the debug menu in Address Book
-defaults write com.apple.addressbook ABShowDebugMenu -bool true
-
-# Enable Dashboard dev mode (allows keeping widgets on the desktop)
-defaults write com.apple.dashboard devmode -bool true
-
-# Enable the debug menu in iCal (pre-10.8)
-defaults write com.apple.iCal IncludeDebugMenu -bool true
+if [ "${DOTFILES_ENABLE_LEGACY_DEBUG:-0}" = "1" ]; then
+  # Enable the debug menu in Address Book (legacy)
+  defaults write com.apple.addressbook ABShowDebugMenu -bool true
+  # Enable Dashboard dev mode only on versions where Dashboard existed (<10.15)
+  if [ -n "$MACOS_VERSION" ] && printf '%s\n10.15\n' "$MACOS_VERSION" | sort -V | head -1 | grep -qv 10.15; then
+    defaults write com.apple.dashboard devmode -bool true
+  fi
+  # Enable the debug menu in iCal (very old macOS versions)
+  defaults write com.apple.iCal IncludeDebugMenu -bool true
+fi
 
 # Use plain text mode for new TextEdit documents
 defaults write com.apple.TextEdit RichText -int 0
 # Open and save files as UTF-8 in TextEdit
 defaults write com.apple.TextEdit PlainTextEncoding -int 4
 defaults write com.apple.TextEdit PlainTextEncodingForWrite -int 4
-
-# Enable the debug menu in Disk Utility
-defaults write com.apple.DiskUtility DUDebugMenuEnabled -bool true
-defaults write com.apple.DiskUtility advanced-image-options -bool true
 
 ###############################################################################
 # WezTerm

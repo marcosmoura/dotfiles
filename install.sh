@@ -1,30 +1,39 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-. home/.config/zsh/utils.sh
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+cd "$SCRIPT_DIR" || exit 1
+
+# shellcheck disable=SC1091
+source home/.config/zsh/utils.sh
+
+clear
 
 print_purple "$TEXT_SEPARATOR"
 print_purple "          Marcos Moura Dotfiles          "
-print_purple "$TEXT_SEPARATOR\n"
+print_purple "$TEXT_SEPARATOR"
 
 print_text "💻 Installing all dotfiles..."
-print_text "$TEXT_SEPARATOR\n"
+print_text "$TEXT_SEPARATOR"
 
-# Load installation scripts
-. installation/preinstall.sh
-. installation/macos.sh
-. installation/brew.sh
-. installation/symlinks.sh
-. installation/zsh.sh
-. installation/node.sh
-. installation/python.sh
-. installation/ruby.sh
-. installation/rust.sh
-. installation/go.sh
-. installation/bin.sh
-. installation/postinstall.sh
+scripts=(
+  preinstall
+  macos
+  brew
+  symlinks
+  zsh
+  node
+  python
+  ruby
+  rust
+  postinstall
+)
+for s in "${scripts[@]}"; do
+  # shellcheck disable=SC1090
+  . "installation/${s}.sh"
+done
 
 print_green "🎉 Dotfiles installed and configured!"
 print_green "✅ Reloading shell! 😊"
-print_green "$TEXT_SEPARATOR\n"
+print_green "$TEXT_SEPARATOR"
 
-exec $SHELL -l
+exec "$SHELL" -l

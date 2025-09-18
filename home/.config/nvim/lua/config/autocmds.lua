@@ -1,5 +1,7 @@
+--- Autocommands
 local numbertoggle = vim.api.nvim_create_augroup("numbertoggle", {})
 
+--- Set relative numbers when in insert mode
 vim.api.nvim_create_autocmd({ "BufEnter", "FocusGained", "InsertLeave", "WinEnter", "CmdlineLeave" }, {
   group = numbertoggle,
   callback = function()
@@ -9,6 +11,7 @@ vim.api.nvim_create_autocmd({ "BufEnter", "FocusGained", "InsertLeave", "WinEnte
   end,
 })
 
+--- Remove relative numbers when in insert mode
 vim.api.nvim_create_autocmd({ "BufLeave", "FocusLost", "InsertEnter", "WinLeave", "CmdlineEnter" }, {
   group = numbertoggle,
   callback = function()

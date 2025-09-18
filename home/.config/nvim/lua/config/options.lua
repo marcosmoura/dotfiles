@@ -1,15 +1,17 @@
 -- Vim options
 vim.o.cmdheight = 0
-vim.o.completeopt = "menu,menuone,noselect,noinsert"
 vim.opt.backup = false
 vim.opt.colorcolumn = "120"
 vim.opt.guicursor = "i-ci:ver100,a:blinkon50"
 vim.opt.hlsearch = false
 vim.opt.incsearch = true
+vim.opt.linebreak = true
 vim.opt.relativenumber = false
 vim.opt.softtabstop = 2
 vim.opt.swapfile = false
+vim.opt.termguicolors = true
 vim.opt.undodir = os.getenv("HOME") .. "/.vim/nvim-undodir"
+vim.opt.wrap = true
 
 -- Globals
 vim.g.autoformat_enabled = true
@@ -62,7 +64,7 @@ if vim.g.neovide then
   vim.g.neovide_scroll_animation_length = 0.2
 
   vim.g.neovide_floating_shadow = false
-  vim.g.neovide_transparency = 0.9
+  vim.g.neovide_transparency = 0.8
   vim.g.neovide_window_blurred = true
 
   vim.g.neovide_refresh_rate = 240
