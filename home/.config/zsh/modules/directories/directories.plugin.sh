@@ -1,9 +1,11 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 setopt auto_pushd
 setopt pushd_ignore_dups
 setopt pushdminus
 setopt autocd
+
+export EZA_ICON_SPACING=2
 
 # So these commands can be executed with sudo
 alias sudo="sudo "
@@ -18,7 +20,7 @@ alias .......='cd ../../../../../..'
 alias ~="cd ~"
 
 # Always use color output for `ls`
-alias ls="eza -a -s=type --group-directories-first --icons=always --color=always --hyperlink --space-between-columns=3"
+alias ls="eza -a -s=type --group-directories-first --icons=always --color=always --hyperlink --spacing=3"
 
 # List all files colorized in long format
 alias la="ls -l -a -h -F=always --git"

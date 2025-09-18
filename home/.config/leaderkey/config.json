@@ -1,0 +1,38 @@
+{
+  "actions": [
+    {
+      "actions": [
+        {
+          "key": "e",
+          "type": "url",
+          "value": "raycast://extensions/raycast/emoji-symbols/search-emoji-symbols"
+        },
+        {
+          "key": "p",
+          "type": "url",
+          "value": "raycast://confetti"
+        },
+        {
+          "key": "c",
+          "type": "url",
+          "value": "raycast://extensions/raycast/system/open-camera"
+        },
+        {
+          "key": "k",
+          "type": "url",
+          "value": "raycast://extensions/rolandleth/kill-process/index"
+        }
+      ],
+      "key": "r",
+      "type": "group"
+    },
+    {
+      "iconPath": "/Applications/Ghostty.app",
+      "key": "t",
+      "label": "Ghostty",
+      "type": "application",
+      "value": "/Applications/Ghostty.app"
+    }
+  ],
+  "type": "group"
+}

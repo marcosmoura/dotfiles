@@ -1,14 +1,16 @@
 return {
   {
-    "williamboman/mason.nvim",
+    "mason-org/mason.nvim",
     opts = {
+      ui = {
+        border = "rounded",
+      },
       ensure_installed = {
         "bash-language-server",
-        "codespell",
         "cspell",
         "css-lsp",
         "emmet-ls",
-        "eslint_d",
+        "eslint-lsp",
         "html-lsp",
         "json-lsp",
         "lua-language-server",
@@ -19,6 +21,7 @@ return {
         "prettier",
         "prettierd",
         "rust-analyzer",
+        "selene",
         "shellcheck",
         "shfmt",
         "stylua",

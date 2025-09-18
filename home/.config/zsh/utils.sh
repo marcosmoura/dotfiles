@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 TEXT_YELLOW=$(tput setaf 3)
 TEXT_GREEN=$(tput setaf 2)
@@ -70,13 +70,46 @@ function join_by_char {
 
 function authenticateBeforeUpdate {
   print_text "🔑 Authenticating"
-  sudo -v
+  sudo -v || {
+    print_error "Failed to acquire sudo credentials"
+    exit 1
+  }
 
-  # Keep-alive: update existing `sudo` time stamp until `.osx` has finished
   print_text ""
-  while true; do
-    sudo -n true
-    sleep 60
-    kill -0 "$$" || exit
-  done 2>/dev/null &
+  # Avoid spawning multiple keep-alive loops if already running in this shell.
+  if [ -n "${SUDO_KEEPALIVE_PID:-}" ] && kill -0 "${SUDO_KEEPALIVE_PID}" 2>/dev/null; then
+    return 0
+  fi
+
+  local parent_pid=$$
+
+  # Define a cleanup function (idempotent) so we can reuse in traps or manual calls.
+  stop_sudo_keepalive() {
+    if [ -n "${SUDO_KEEPALIVE_PID:-}" ] && kill -0 "${SUDO_KEEPALIVE_PID}" 2>/dev/null; then
+      kill "${SUDO_KEEPALIVE_PID}" 2>/dev/null || true
+    fi
+    unset SUDO_KEEPALIVE_PID
+  }
+
+  # Background keep-alive loop: refresh sudo timestamp every 60s while parent shell lives.
+  (
+    while true; do
+      # Exit if parent shell died (prevents orphan after sourced subshell exits).
+      if ! kill -0 "$parent_pid" 2>/dev/null; then
+        exit 0
+      fi
+      sudo -n true 2>/dev/null || exit 0
+      sleep 60
+    done
+  ) &
+  SUDO_KEEPALIVE_PID=$!
+
+  # Detach from job control if possible to suppress shell job messages.
+  if command -v disown >/dev/null 2>&1; then
+    disown "$SUDO_KEEPALIVE_PID" 2>/dev/null || true
+  fi
+
+  # Ensure cleanup on common termination signals. Use a single trap preserving existing ones is complex;
+  # here we overwrite (acceptable in this context). If integration with other traps needed, merge logic.
+  trap 'stop_sudo_keepalive' EXIT INT TERM HUP QUIT
 }

@@ -6,7 +6,7 @@ module.setup = function()
   require("config.defaults").start()
 
   -- Load IPC communication
-  require("config.ipc").start()
+  -- require("config.ipc").start()
 
   -- Load all spoons
   require("config.spoons").start()
@@ -16,18 +16,17 @@ module.setup = function()
   require("config.caps-lock").start()
 
   -- Load modules that create a watcher
-  require("config.audio").start()
   require("config.hold-to-quit").start()
   require("config.wifi").start()
 
-  -- Load canvas modules
+  -- Load slower modules
+  require("config.audio").start()
   require("config.window-manager").start()
-  require("config.weather").start()
 
-  local assets = require("config.utils.assets")
   local alert = require("config.utils.alert")
+  local assets = require("config.utils.assets")
 
-  alert.custom("Configuration Reloaded!", assets.settings, nil, 1)
+  alert.custom("Reloading Configuration!", assets.settings, nil, 1)
 end
 
 return module

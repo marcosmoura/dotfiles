@@ -1,6 +1,9 @@
 return {
   {
     "lewis6991/satellite.nvim",
+    cond = function()
+      return not vim.g.vscode
+    end,
     event = {
       "BufRead",
       "BufWinEnter",

@@ -1,0 +1,1 @@
+/Users/marcosmoura/.config/sketchybar-top/glass/init.lua

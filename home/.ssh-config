@@ -1,16 +1,13 @@
+# Added by OrbStack: 'orb' SSH host for Linux machines
+# This only works if it's at the top of ssh_config (before any Host blocks).
+# This won't be added again if you remove it.
+Include ~/.orbstack/ssh/config
+
 # Work GitHub
 Host github.com
 AddKeysToAgent yes
 IdentityFile ~/.ssh/microsoft
 PreferredAuthentications publickey
-
-# EMU GitHub
-Host github-emu
-AddKeysToAgent yes
-Hostname github.com
-IdentityFile ~/.ssh/microsoft_enterprise
-PreferredAuthentications publickey
-User git
 
 Host *
 AddKeysToAgent yes

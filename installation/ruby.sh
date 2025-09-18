@@ -1,9 +1,13 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 print_start "Installing Ruby"
 
-brew install rbenv
-RBENV_VERSION=$(rbenv install -l -s | grep -v - | tail -1)
+if ! command -v rbenv >/dev/null 2>&1; then
+  brew install rbenv
+fi
+
+# Pick latest stable semantic version
+RBENV_VERSION=$(rbenv install -l 2>/dev/null | awk '/^  [0-9]+\.[0-9]+\.[0-9]+$/ {print $1}' | tail -1)
 export RBENV_VERSION
 
 eval "$(rbenv init - zsh)"
@@ -12,11 +16,19 @@ rbenv global "$RBENV_VERSION"
 
 print_progress "Installing gems"
 
-gem install bundler
-gem install openssl
-gem install rake
-gem install rdoc
-gem install rubygems-update
-gem install sqlite3
+gems=(
+  bundler
+  openssl
+  rake
+  rdoc
+  rubygems-update
+  sqlite3
+)
 
-print_success "Ruby installed! \n"
+for g in "${gems[@]}"; do
+  if ! gem list -i "$g" >/dev/null 2>&1; then
+    gem install "$g"
+  fi
+done
+
+print_success "Ruby installed!"

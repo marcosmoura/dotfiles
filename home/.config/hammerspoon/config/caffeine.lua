@@ -68,7 +68,6 @@ module.start = function()
 
   caffeinate(false)
   hs.caffeinate.watcher.new(onCaffeinate):start()
-  hs.ipc.localPort("yabai:onSystemWoke", caffeinate)
 end
 
 return module

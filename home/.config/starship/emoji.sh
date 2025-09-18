@@ -1,40 +1,50 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-function emoji {
-  function random_emoji {
-    printf "%s\0" "$@" | shuf -z -n1 | tr -d '\0'
+# Print a context / date aware emoji for the Starship prompt.
+
+emoji() {
+  # Helper: pick a random element from arguments using $RANDOM
+  random_emoji() {
+    local items=("$@")
+    local count=${#items[@]}
+    ((count == 0)) && return 1
+    local idx=$((RANDOM % count))
+    printf '%s' "${items[$idx]}"
   }
 
-  day=$(date +%d)
-  month=$(date +%m)
-  day_of_week=$(date +%u)
+  local day=$(date +%d)
+  local month=$(date +%m)
+  local dow=$(date +%u) # 1=Mon .. 7=Sun
 
   day=${day#0}
   month=${month#0}
 
-  # birthday
-  if [[ $month -eq 10 && $day -eq 15 ]]; then
-    echo "🎂"
-  # halloween
+  # ---- Date based picks ----
+  if [[ $month -eq 1 && $day -eq 1 ]]; then
+    random_emoji "🥳" "🎆" "🎇" "🍾" "🎉"
+  elif [[ $month -eq 2 && $day -eq 14 ]]; then
+    random_emoji "❤️" "💘" "💝" "🌹" "🥰"
+  elif [[ $month -eq 10 && $day -eq 15 ]]; then
+    printf '%s' "🎂" # Birthday
   elif [[ $month -eq 10 && $day -eq 31 ]]; then
-    random_emoji "👹" "👺" "👻" "💀" "🎃" "🧛🏻‍♂️" "🧟‍♂️" "🕷" "🕸"
-  # Friday the 13th
-  elif [[ $day_of_week -eq 2 && $day -eq 13 ]]; then
-    random_emoji "👻" "💀"
-  # Christmas
+    random_emoji "👹" "👺" "👻" "💀" "🎃" "🧛🏻‍♂️" "🧟‍♂️" "🕷" "🕸" # Halloween
+  elif [[ $day -eq 13 && $dow -eq 5 ]]; then
+    random_emoji "👻" "💀" # Friday the 13th
   elif [[ $month -eq 12 && $day -le 25 ]]; then
-    random_emoji "🎅🏻" "🎄" "🎁" "☃️" "⛄️"
-  # new years eve
+    random_emoji "🎅🏻" "🎄" "🎁" "☃️" "⛄️" # Advent / Christmas season
   elif [[ $month -eq 12 && $day -eq 31 ]]; then
-    random_emoji "🍾" "🥂" "🎊" "🎉"
-  # Fluent UI directory
-  elif [[ $PWD =~ "fluent" ]]; then
-    echo " 󰍲  "
-  # Dotfiles
-  elif [[ $PWD =~ "dotfiles" ]]; then
-    echo "   "
+    random_emoji "🍾" "🥂" "🎊" "🎉" # New Year's Eve
+  # Weekend flair (Sat=6, Sun=7) — low precedence after major holidays.
+  elif [[ $dow -ge 6 ]]; then
+    random_emoji "😎" "🛌" "🏖" "🚴" "📚"
+  # ---- Directory context picks ----
+  elif [[ $PWD == *"/fluent"* || $PWD == *"fluent-ui"* || $PWD == *"fluent"* ]]; then
+    printf '%s' " 󰍲  "
+  elif [[ $PWD == *"dotfiles"* ]]; then
+    printf '%s' "   "
   else
-    echo " 󰉋  "
+    # General default icon (folder glyph variant)
+    printf '%s' " 󰉋  "
   fi
 }
 

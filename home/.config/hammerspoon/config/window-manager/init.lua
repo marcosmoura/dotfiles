@@ -1,4 +1,5 @@
 local os = require("config.utils.os")
+local windows = require("config.utils.windows")
 
 local module = {}
 local brewPath = "/opt/homebrew/bin/brew"
@@ -19,15 +20,20 @@ local enableBordersIfNeeded = function()
 end
 
 module.start = function()
-  if os.aerospace.isRunning() then
-    require("config.window-manager.aerospace").start()
-    enableBordersIfNeeded()
-  else
-    require("config.window-manager.yabai").start()
-    enableBordersIfNeeded()
+  local externalBarWidth = 0
+
+  if os.sketchybar.isRunning() then
+    externalBarWidth = windows.getMenuBarHeight() or 25
   end
 
-  -- require("config.window-manager.stack-indicator").start()
+  if not os.yabai.isRunning() then
+    os.yabai.execute("--start-service", { silent = true })
+  end
+
+  os.yabai.execute("-m config external_bar all:" .. externalBarWidth .. ":0", { silent = true })
+  require("config.window-manager.wallpaper").start()
+  require("config.window-manager.bindings")
+  enableBordersIfNeeded()
 end
 
 return module

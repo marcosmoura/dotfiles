@@ -67,9 +67,6 @@ require("lazy").setup({
     { import = "lazyvim.plugins.extras.test.core" },
     { import = "lazyvim.plugins.extras.util.dot" },
 
-    --- [[ UI ]]
-    { import = "lazyvim.plugins.extras.ui.mini-animate" },
-
     --- [[ Util ]]
     { import = "lazyvim.plugins.extras.vscode" },
 

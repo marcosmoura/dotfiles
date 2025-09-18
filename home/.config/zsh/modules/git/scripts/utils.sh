@@ -1,10 +1,10 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 source ~/.config/zsh/utils.sh
 
 LOG_SEPARATOR="^"
 HASH="%C(yellow bold)%h"
-AUTHOR="%C(green bold)%aN"
+AUTHOR="%<(20,trunc)%C(green bold)%aN"
 DATE="%>>(18,trunc)%C(blue bold)%ad"
 MESSAGE="%<(70,trunc)%C(reset)%s"
 export GIT_LOG_FORMAT=$(join_by_char $LOG_SEPARATOR $HASH $AUTHOR $DATE $MESSAGE)

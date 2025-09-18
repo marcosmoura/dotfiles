@@ -1,6 +1,9 @@
 return {
   {
     "sQVe/sort.nvim",
+    cond = function()
+      return not vim.g.vscode
+    end,
     event = { "BufReadPre", "BufNewFile" },
     config = function()
       require("sort").setup()
@@ -13,6 +16,9 @@ return {
 
   {
     "2nthony/sortjson.nvim",
+    cond = function()
+      return not vim.g.vscode
+    end,
     cmd = {
       "SortJSONByAlphaNum",
       "SortJSONByAlphaNumReverse",

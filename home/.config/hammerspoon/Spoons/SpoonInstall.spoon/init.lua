@@ -1,5 +1,3 @@
---- cSpell:disable
-
 --- === SpoonInstall ===
 ---
 --- Install and manage Spoons and Spoon repositories

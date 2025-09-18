@@ -1,8 +1,9 @@
 shell = "zsh"
 
-
-# defer
-# ----------------------
+# ==============================================================================
+# DEFER SETUP
+# ==============================================================================
+# Template for deferred loading to improve shell startup time
 
 [plugins.zsh-defer]
 github = "romkatv/zsh-defer"
@@ -10,28 +11,40 @@ github = "romkatv/zsh-defer"
 [templates]
 defer = "{{ hooks?.pre | nl }}{% for file in files %}zsh-defer source \"{{ file }}\"\n{% endfor %}{{ hooks?.post | nl }}"
 
+# ==============================================================================
+# CORE SYSTEM MODULES
+# ==============================================================================
+# Essential functionality that needs to load early
 
-# core modules
-# ----------------------
-
-[plugins.colors]
+[plugins.core-system]
 local = "~/.config/zsh/modules"
 use = ["{colors,compinit,macOS}/*.plugin.sh"]
 
+# ==============================================================================
+# OH-MY-ZSH FOUNDATION
+# ==============================================================================
+# Core zsh functionality from oh-my-zsh
 
-# Syntax highlighting
-# ----------------------
+[plugins.ohmyzsh-lib]
+github = "ohmyzsh/ohmyzsh"
+dir = "lib"
+use = ["{compfix,completion,git,grep,history,key-bindings}.zsh"]
+
+[plugins.ohmyzsh-plugins]
+github = "ohmyzsh/ohmyzsh"
+dir = "plugins"
+use = ["{aliases,cp,dircycle,github,zoxide}/*.plugin.zsh"]
+
+# ==============================================================================
+# SHELL ENHANCEMENTS
+# ==============================================================================
+# Visual and interactive improvements
+
+[plugins.256color]
+github = "chrissicool/zsh-256color"
 
 [plugins.syntax-highlight]
 github = "marcosmoura/fast-syntax-highlighting"
-apply = ["defer"]
-
-
-# Completions
-# ----------------------
-
-[plugins.zsh-completions]
-github = "zsh-users/zsh-completions"
 apply = ["defer"]
 
 [plugins.zsh-autosuggestions]
@@ -39,10 +52,25 @@ github = "zsh-users/zsh-autosuggestions"
 use = ["{{ name }}.zsh"]
 apply = ["defer"]
 
+[plugins.zsh-you-should-use]
+github = "MichaelAquilina/zsh-you-should-use"
+apply = ["defer"]
+
+# ==============================================================================
+# COMPLETION SYSTEM
+# ==============================================================================
+# Tab completion for various tools and commands
+
+[plugins.zsh-completions]
+github = "zsh-users/zsh-completions"
+apply = ["defer"]
+
+# Custom completions from dotfiles
 [plugins.dotfiles-completions]
 local = "~/.config/zsh/modules/completions"
 use = ["*.plugin.sh"]
 
+# Node.js ecosystem completions
 [plugins.yarn-completion]
 github = "chrisands/zsh-yarn-completions"
 apply = ["defer"]
@@ -55,38 +83,19 @@ apply = ["defer"]
 github = "g-plane/pnpm-shell-completion"
 apply = ["defer"]
 
-
-# omz plugins
-# ----------------------
-
-[plugins.ohmyzsh-lib]
-github = "ohmyzsh/ohmyzsh"
-dir = "lib"
-use = ["{compfix,completion,git,grep,history,key-bindings}.zsh"]
-
-[plugins.ohmyzsh-plugins]
-github = "ohmyzsh/ohmyzsh"
-dir = "plugins"
-use = ["{aliases,cp,dircycle,github,zoxide}/*.plugin.zsh"]
-
-
-# Other plugins
-# ----------------------
-
-[plugins.256color]
-github = "chrissicool/zsh-256color"
+# ==============================================================================
+# NAVIGATION & UTILITIES
+# ==============================================================================
+# Tools for better directory navigation and file management
 
 [plugins.zoxide]
 github = "ajeetdsouza/zoxide"
 
-[plugins.zsh-you-should-use]
-github = "MichaelAquilina/zsh-you-should-use"
-apply = ["defer"]
+# ==============================================================================
+# CUSTOM DOTFILES MODULES
+# ==============================================================================
+# Personal shell configuration modules
 
-
-# Dotfiles
-# ----------------------
-
-[plugins.dotfiles]
+[plugins.dotfiles-modules]
 local = "~/.config/zsh/modules"
 use = ["*.plugin.sh", "!{colors,completions,compinit,macOS}/*.plugin.sh"]

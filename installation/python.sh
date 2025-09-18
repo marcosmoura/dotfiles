@@ -1,23 +1,35 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 print_start "Installing Python"
 
-if ! brew ls --versions python >/dev/null; then
-  brew install python
-  brew install pipx
-  brew install python@2
-  brew install python-tk
-fi
+tools=(
+  python
+  pipx
+)
+
+for t in "${tools[@]}"; do
+  if ! command -v "$t" >/dev/null 2>&1; then
+    brew install "$t" || true
+  fi
+done
 
 print_progress "Installing pip packages"
 
-python -m venv ~/.local/share/venv
-source "$HOME/.local/share/venv/bin/activate"
-python -m pip install codespell
-python -m pip install psutil
-python -m pip install pynvim
-python -m pip install setuptools
-python -m pip install six
-python -m pip install wheel
+VENV_DIR="$HOME/.local/share/venv"
+if [ ! -d "$VENV_DIR" ]; then
+  python3 -m venv "$VENV_DIR"
+fi
+source "$VENV_DIR/bin/activate"
 
-print_success "Python installed! \n"
+packages=(
+  psutil
+  pynvim
+  setuptools
+  six
+  wheel
+)
+for p in "${packages[@]}"; do
+  python -m pip install --upgrade "$p"
+done
+
+print_success "Python installed!"
