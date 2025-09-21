@@ -26,7 +26,6 @@ yabai -m space 3 --label browser
 yabai -m space 4 --label music
 yabai -m space 5 --label figma
 yabai -m space 6 --label communication
-yabai -m space 7 --label misc
 
 ## Spaces layouts
 yabai -m config --space code layout stack
@@ -69,9 +68,9 @@ yabai -m rule --add label="Archetype Apps" app="^Archetype" space="misc"
 #### Screen 2
 ####################################################################################################
 
-yabai -m space 8 --label finder
-yabai -m space 9 --label outlook
-yabai -m space 10 --label productivity
+yabai -m space 7 --label finder
+yabai -m space 8 --label outlook
+yabai -m space 9 --label productivity
 
 ## Space - Finder
 yabai -m rule --add label="Finder" app="^Finder$" space="finder"
@@ -107,9 +106,3 @@ yabai -m rule --add manage=off title="(Settings|Preferences)"
 yabai -m rule --add manage=off title="^(General|(Tab|Password|Website|Extension)s|AutoFill|Se(arch|curity)|Privacy|Advanced)$"
 yabai -m rule --add manage=off title="^Exports"
 yabai -m rule --add manage=off title="^Opening"
-
-#### Events
-####################################################################################################
-
-yabai -m signal --add event="space_changed" action="sketchybar-bottom --trigger space_changed"
-yabai -m signal --add event="application_front_switched" action="sketchybar-bottom --trigger space_changed"
