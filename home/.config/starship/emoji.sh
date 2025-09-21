@@ -36,7 +36,7 @@ emoji() {
     random_emoji "🍾" "🥂" "🎊" "🎉" # New Year's Eve
   # Weekend flair (Sat=6, Sun=7) — low precedence after major holidays.
   elif [[ $dow -ge 6 ]]; then
-    random_emoji "😎" "🛌" "🏖" "🚴" "📚"
+    random_emoji "😎" "🛌" "🏖" "📚"
   # ---- Directory context picks ----
   elif [[ $PWD == *"/fluent"* || $PWD == *"fluent-ui"* || $PWD == *"fluent"* ]]; then
     printf '%s' " 󰍲  "
