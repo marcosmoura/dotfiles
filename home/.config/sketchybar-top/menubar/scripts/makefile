@@ -10,7 +10,7 @@ bin/menubar-watcher: | bin
 	cargo build --release
 	cp target/release/menubar-watcher $@
 
-bin:
+bin: | clean
 	mkdir bin
 
 clean:

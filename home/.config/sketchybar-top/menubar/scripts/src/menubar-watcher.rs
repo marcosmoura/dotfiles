@@ -25,7 +25,8 @@ fn is_menu_bar_visible() -> bool {
         let mouse_loc = NSEvent::mouseLocation(nil);
         let main_frame = cocoa::appkit::NSWindow::frame(screen);
         let relative_y = mouse_loc.y;
-        relative_y >= (main_frame.size.height - 3.0)
+
+        relative_y >= (main_frame.size.height - 25.0)
     }
 }
 
@@ -36,7 +37,10 @@ fn trigger_sketchybar_event(is_visible: bool) {
         "menubar_is_hidden"
     };
     let command = format!("sketchybar-top --trigger {}", event_name);
-    let output = Command::new("/bin/sh").arg("-c").arg(&command).output();
+    let output = Command::new("sketchybar-bottom")
+        .arg("--trigger")
+        .arg(event_name)
+        .output();
 
     match output {
         Ok(o) => {
