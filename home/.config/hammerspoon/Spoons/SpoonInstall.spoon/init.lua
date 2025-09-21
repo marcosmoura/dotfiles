@@ -273,7 +273,7 @@ function obj:_installSpoonFromZipURLgetCallback(urlparts, callback, status, body
       f:close()
 
       -- Check its contents - only one *.spoon directory should be in there
-      output = _x(
+      local output = _x(
         string.format(
           "/usr/bin/unzip -l %s '*.spoon/' | /usr/bin/awk '$NF ~ /\\.spoon\\/$/ { print $NF }' | /usr/bin/wc -l",
           outfile
@@ -286,11 +286,11 @@ function obj:_installSpoonFromZipURLgetCallback(urlparts, callback, status, body
           -- Uncompress the zip file
           local outdir = string.format("%s/Spoons", hs.configdir)
           if
-            _x(
-              string.format("/usr/bin/unzip -o %s -d %s 2>&1", outfile, outdir),
-              "Error uncompressing file %s, leaving it in place for your examination.",
-              outfile
-            )
+              _x(
+                string.format("/usr/bin/unzip -o %s -d %s 2>&1", outfile, outdir),
+                "Error uncompressing file %s, leaving it in place for your examination.",
+                outfile
+              )
           then
             -- And finally, install it using Hammerspoon itself
             self.logger.f("Downloaded and installed %s", urlparts.absoluteString)
