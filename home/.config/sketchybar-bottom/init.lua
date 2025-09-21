@@ -19,6 +19,7 @@ sketchybar.bar({
 })
 
 require("spaces")
+require("weather")
 
 sketchybar.hotload(true)
 sketchybar.end_config()

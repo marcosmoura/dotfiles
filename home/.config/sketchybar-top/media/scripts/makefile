@@ -6,15 +6,18 @@ TARGET_DIR = ./bin
 
 all: build install install_agent
 
-build:
+build: | bin
 	cargo build --$(PROFILE)
 
 install: build
 	mkdir -p $(TARGET_DIR)
 	cp target/$(PROFILE)/media-watcher $(TARGET_DIR)/media-watcher
 
+bin: | clean
+	mkdir bin
+
 clean:
-	cargo clean
+	rm -f bin/media-watcher
 
 HOME_DIR := $(shell eval echo ~)
 AGENTS_DIR := $(HOME_DIR)/Library/LaunchAgents
