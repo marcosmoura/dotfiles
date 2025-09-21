@@ -20,17 +20,10 @@ local enableBordersIfNeeded = function()
 end
 
 module.start = function()
-  local externalBarWidth = 0
-
-  if os.sketchybar.isRunning() then
-    externalBarWidth = windows.getMenuBarHeight() or 25
-  end
-
   if not os.yabai.isRunning() then
     os.yabai.execute("--start-service", { silent = true })
   end
 
-  os.yabai.execute("-m config external_bar all:" .. externalBarWidth .. ":0", { silent = true })
   require("config.window-manager.wallpaper").start()
   require("config.window-manager.bindings")
   enableBordersIfNeeded()
