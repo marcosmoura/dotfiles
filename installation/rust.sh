@@ -13,6 +13,7 @@ print_progress "Installing Rust packages"
 rust_bins=(
   binocular-cli
   cargo-cache
+  cargo-machete
   cargo-update
   just
   powertest
