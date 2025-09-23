@@ -1,7 +1,7 @@
 use objc2::rc::Retained;
 use objc2::runtime::NSObjectProtocol;
 use objc2::runtime::ProtocolObject;
-use objc2::{define_class, msg_send, AnyThread};
+use objc2::{AnyThread, define_class, msg_send};
 use objc2_core_location::{
     CLAuthorizationStatus, CLLocation, CLLocationManager, CLLocationManagerDelegate,
 };
@@ -124,15 +124,12 @@ impl LocationInfo {
     }
 
     fn is_fresh(&self) -> bool {
-        match self.timestamp {
-            Some(time) => {
-                SystemTime::now()
-                    .duration_since(time)
-                    .map(|duration| duration < Duration::from_secs(3600)) // Cache for 1 hour
-                    .unwrap_or(false)
-            }
-            None => false,
-        }
+        self.timestamp.is_some_and(|time| {
+            SystemTime::now()
+                .duration_since(time)
+                .map(|duration| duration < Duration::from_secs(3600)) // Cache for 1 hour
+                .unwrap_or(false)
+        })
     }
 }
 
@@ -141,13 +138,12 @@ static CACHED_LOCATION: LazyLock<Mutex<Option<LocationInfo>>> = LazyLock::new(||
 
 async fn get_location() -> Option<LocationInfo> {
     // Check if we have a cached location that's still fresh
-    if let Ok(cached) = CACHED_LOCATION.lock() {
-        if let Some(location) = cached.as_ref() {
-            if location.is_fresh() {
-                eprintln!("Using cached location: {}", location.query);
-                return Some(location.clone());
-            }
-        }
+    if let Ok(cached) = CACHED_LOCATION.lock()
+        && let Some(location) = cached.as_ref()
+        && location.is_fresh()
+    {
+        eprintln!("Using cached location: {}", location.query);
+        return Some(location.clone());
     }
 
     // Try to get location from multiple sources in parallel
@@ -175,10 +171,10 @@ async fn get_location() -> Option<LocationInfo> {
     };
 
     // Cache the result if successful
-    if let Some(loc) = &location {
-        if let Ok(mut cached) = CACHED_LOCATION.lock() {
-            *cached = Some(loc.clone());
-        }
+    if let Some(loc) = &location
+        && let Ok(mut cached) = CACHED_LOCATION.lock()
+    {
+        *cached = Some(loc.clone());
     }
 
     location
@@ -284,13 +280,13 @@ fn macos_core_location_once() -> Option<LocationInfo> {
         // Run the run loop until we have a coordinate or timeout
         while start.elapsed() < timeout {
             // Check if we have location data yet
-            if let Ok(st) = LOCATION_STATE.lock() {
-                if st.finished {
-                    if let Some((lat, lon)) = st.coord {
-                        return Some(LocationInfo::new(format!("{lat},{lon}"), None));
-                    }
-                    return None;
+            if let Ok(st) = LOCATION_STATE.lock()
+                && st.finished
+            {
+                if let Some((lat, lon)) = st.coord {
+                    return Some(LocationInfo::new(format!("{lat},{lon}"), None));
                 }
+                return None;
             }
 
             // Process events for a short time

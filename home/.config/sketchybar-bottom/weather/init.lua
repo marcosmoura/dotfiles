@@ -66,7 +66,6 @@ sketchybar.add("item", "weather.padding.right", {
 })
 
 local weather_item = glass.create_hoverable_item('weather', {
-  update_freq = 900,
   position = "right",
   label = {
     string = "Loading weather...",

@@ -64,11 +64,11 @@ fn is_menu_bar_visible(is_visible: bool) -> bool {
 struct SketchybarCommands {}
 
 impl SketchybarCommands {
-    fn new() -> Self {
+    const fn new() -> Self {
         Self {}
     }
 
-    fn trigger(&mut self, is_visible: bool) {
+    fn trigger(&self, is_visible: bool) {
         let menubar_arg = format!("MENUBAR={is_visible}");
 
         // Use spawn and ignore output for faster execution
@@ -90,7 +90,7 @@ fn main() {
     println!("Starting MenuBar Watcher...");
 
     // Initialize the command cache
-    let mut commands = SketchybarCommands::new();
+    let commands = SketchybarCommands::new();
     let mut last_state = is_menu_bar_visible(false);
 
     // Notify initial state

@@ -12,11 +12,17 @@ pushd $HOME/.config/sketchybar/apps
 cargo build --release
 
 # Kill existing watchers if any
+killall clock-watcher
+killall cpu-watcher
+killall battery-watcher
 killall media-watcher
 killall menubar-watcher
 killall weather-watcher
 
 # Start watchers
+./bin/release/clock-watcher &
+./bin/release/cpu-watcher --stream &
+./bin/release/battery-watcher --stream &
 ./bin/release/media-watcher --stream &
 ./bin/release/menubar-watcher &
 ./bin/release/weather-watcher &

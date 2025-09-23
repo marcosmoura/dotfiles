@@ -125,13 +125,13 @@ impl DockReader {
         // Using a single pass through the content
         let bundle_id_marker = "bundle-identifier";
         for line in plist_content.lines() {
-            if line.contains(bundle_id_marker) {
-                if let Some(bundle_id) = self.extract_bundle_identifier(line) {
-                    let mut dock_app = self.create_dock_app_from_bundle(&bundle_id);
-                    dock_app.dock_position = Some(position);
-                    apps.push(dock_app);
-                    position += 1;
-                }
+            if line.contains(bundle_id_marker)
+                && let Some(bundle_id) = self.extract_bundle_identifier(line)
+            {
+                let mut dock_app = self.create_dock_app_from_bundle(&bundle_id);
+                dock_app.dock_position = Some(position);
+                apps.push(dock_app);
+                position += 1;
             }
         }
 
@@ -218,18 +218,21 @@ impl DockReader {
             let icon_path = {
                 let cache = ICON_CACHE.get().unwrap();
 
-                if let Ok(mut cache_lock) = cache.try_lock() {
-                    if let Some(cached_path) = cache_lock.get(&bundle_identifier) {
-                        cached_path.clone()
-                    } else {
-                        let path = self.get_app_path_from_bundle(&bundle_identifier);
-                        cache_lock.insert(bundle_identifier.clone(), path.clone());
-                        path
-                    }
-                } else {
-                    // If we can't lock the cache (rare), just get the path directly
-                    self.get_app_path_from_bundle(&bundle_identifier)
-                }
+                // We need to use #[allow(clippy::option_if_let_else)] here because
+                // the alternative with map_or_else causes borrow checker issues
+                #[allow(clippy::option_if_let_else)]
+                cache.try_lock().map_or_else(
+                    |_| self.get_app_path_from_bundle(&bundle_identifier),
+                    |mut cache_lock| {
+                        if let Some(cached_path) = cache_lock.get(&bundle_identifier) {
+                            cached_path.clone()
+                        } else {
+                            let path = self.get_app_path_from_bundle(&bundle_identifier);
+                            cache_lock.insert(bundle_identifier.clone(), path.clone());
+                            path
+                        }
+                    },
+                )
             };
 
             Some(DockApp {
@@ -260,12 +263,11 @@ impl DockReader {
 
     fn get_app_path_from_bundle(&self, bundle_identifier: &str) -> Option<String> {
         // First check if we have this path cached globally
-        if let Some(cache) = ICON_CACHE.get() {
-            if let Ok(cache_lock) = cache.try_lock() {
-                if let Some(cached_path) = cache_lock.get(bundle_identifier) {
-                    return cached_path.clone();
-                }
-            }
+        if let Some(cache) = ICON_CACHE.get()
+            && let Ok(cache_lock) = cache.try_lock()
+            && let Some(cached_path) = cache_lock.get(bundle_identifier)
+        {
+            return cached_path.clone();
         }
 
         unsafe {
@@ -299,7 +301,7 @@ impl DockReader {
         // Create a static set of common icon paths to check
         static ICON_PATHS_CHECKED: OnceLock<HashSet<PathBuf>> = OnceLock::new();
         // Use underscore prefix to avoid the unused variable warning
-        let _icon_paths_checked = ICON_PATHS_CHECKED.get_or_init(|| HashSet::new());
+        let _icon_paths_checked = ICON_PATHS_CHECKED.get_or_init(HashSet::new);
 
         // Early return if this resources path doesn't exist
         if !resources_path.exists() {
@@ -307,24 +309,24 @@ impl DockReader {
         }
 
         // Try to read the Info.plist to get the icon file name
-        if info_plist_path.exists() {
-            if let Ok(plist_content) = fs::read_to_string(&info_plist_path) {
-                // Look for CFBundleIconFile in the plist
-                if let Some(icon_name) = self.extract_icon_name_from_plist(&plist_content) {
-                    // Try different extensions using cached common extensions
-                    for &ext in &self.common_extensions {
-                        let icon_file = if icon_name.ends_with(&format!(".{ext}")) {
-                            icon_name.clone()
-                        } else {
-                            format!("{icon_name}.{ext}")
-                        };
+        if info_plist_path.exists()
+            && let Ok(plist_content) = fs::read_to_string(&info_plist_path)
+        {
+            // Look for CFBundleIconFile in the plist
+            if let Some(icon_name) = self.extract_icon_name_from_plist(&plist_content) {
+                // Try different extensions using cached common extensions
+                for &ext in &self.common_extensions {
+                    let icon_file = if icon_name.ends_with(&format!(".{ext}")) {
+                        icon_name.clone()
+                    } else {
+                        format!("{icon_name}.{ext}")
+                    };
 
-                        let icon_path = resources_path.join(&icon_file);
+                    let icon_path = resources_path.join(&icon_file);
 
-                        // Use exists() which is more efficient than metadata() or similar
-                        if icon_path.exists() {
-                            return Some(icon_path.to_string_lossy().to_string());
-                        }
+                    // Use exists() which is more efficient than metadata() or similar
+                    if icon_path.exists() {
+                        return Some(icon_path.to_string_lossy().to_string());
                     }
                 }
             }
@@ -344,10 +346,10 @@ impl DockReader {
             // Find first .icns file
             while let Some(Ok(entry)) = entries.next() {
                 let path = entry.path();
-                if let Some(ext) = path.extension() {
-                    if ext == "icns" {
-                        return Some(path.to_string_lossy().to_string());
-                    }
+                if let Some(ext) = path.extension()
+                    && ext == "icns"
+                {
+                    return Some(path.to_string_lossy().to_string());
                 }
             }
         }

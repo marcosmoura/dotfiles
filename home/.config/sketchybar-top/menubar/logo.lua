@@ -3,7 +3,7 @@ local sketchybar = require("sketchybar")
 
 local menu_script_path = "$HOME/.config/sketchybar/apps/bin/release/app-menu"
 
-sketchybar.add("item", "menu.logo_padding", {
+sketchybar.add("item", "menubar.logo_padding", {
   label = {
     padding_left = 2,
   },
@@ -17,7 +17,7 @@ local apple_logo = glass.create_hoverable_item("menubar.logo", {
     color = 0xFFFFFFFF,
     align = "center",
     font = {
-      family = "SF Pro Display",
+      family = "SF Pro",
       style = "Black",
       size = 22.0,
     },

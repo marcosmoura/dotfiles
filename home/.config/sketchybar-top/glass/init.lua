@@ -177,7 +177,7 @@ end
 sketchybar.default({
   icon = {
     font = {
-      family = "SF Pro Text",
+      family = "SF Pro",
       style = "Medium",
       size = 13,
     },
@@ -185,7 +185,7 @@ sketchybar.default({
   },
   label = {
     font = {
-      family = "SF Pro Text",
+      family = "SF Pro",
       style = "Medium",
       size = 13,
     },
