@@ -22,7 +22,6 @@ brew tap githubutilities/tap
 formulas=(
   bash
   bat
-  eth-p/software/bat-extras
   btop
   chafa
   cmake
@@ -34,6 +33,7 @@ formulas=(
   docker-compose
   dust
   efm-langserver
+  eth-p/software/bat-extras
   fastfetch
   fd
   findutils
@@ -56,6 +56,7 @@ formulas=(
   mas
   mise
   moreutils
+  narugit/tap/smctemp
   ncdu
   ncurses
   neovim
