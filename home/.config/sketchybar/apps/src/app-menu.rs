@@ -135,9 +135,8 @@ impl MenuList {
             }
 
             let cf_string = CFString::wrap_under_create_rule(title as CFStringRef);
-            let result = Some(cf_string.to_string());
             // No need to manually release cf_string as wrap_under_create_rule handles ownership transfer
-            result
+            Some(cf_string.to_string())
         }
     }
 
@@ -236,11 +235,10 @@ impl MenuList {
             for i in 1..count {
                 let item = CFArrayGetValueAtIndex(children_ref as CFArrayRef, i as isize)
                     as AXUIElementRef;
-                if !item.is_null() {
-                    if let Some(title) = self.ax_get_title(item) {
+                if !item.is_null()
+                    && let Some(title) = self.ax_get_title(item) {
                         println!("{title}");
                     }
-                }
             }
 
             CFRelease(children_ref);
@@ -500,7 +498,7 @@ fn main() {
 
     // Simple test first
     if args.len() == 1 {
-        let program = args.get(0).map_or("app-menu", |s| s);
+        let program = args.first().map_or("app-menu", |s| s);
         println!("Usage: {program} [--list | --show id/alias]");
         println!("  --list          List menu options for frontmost app");
         println!("  --show id       Select menu option by ID for frontmost app");

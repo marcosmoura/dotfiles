@@ -1,4 +1,5 @@
 local glass = require("glass")
+local inspect = require("inspect")
 local sketchybar = require("sketchybar")
 
 local artwork_size = 30
