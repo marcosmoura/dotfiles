@@ -1,7 +1,7 @@
 local glass = require("glass")
 local sketchybar = require("sketchybar")
 
-local menu_script_path = "$CONFIG_DIR/menubar/scripts/bin/menu-list"
+local menu_script_path = "$HOME/.config/sketchybar/apps/bin/release/app-menu"
 
 local menu_watcher = sketchybar.add("item", {
   drawing = false,
@@ -20,8 +20,8 @@ for i = 1, max_items, 1 do
   })
 
   menu:subscribe("mouse.clicked", function()
-    sketchybar.trigger("menubar_is_visible")
-    sketchybar.exec(menu_script_path .. " -s " .. i)
+    sketchybar.trigger("menubar_visibility_changed", { ['MENUBAR'] = 'true' })
+    sketchybar.exec(menu_script_path .. " --show " .. i)
   end)
 
   menu_items[i] = menu
@@ -35,18 +35,25 @@ local menu_padding = sketchybar.add("item", "menu.padding", {
 })
 
 menu_watcher:subscribe("front_app_switched", function()
-  sketchybar.exec(menu_script_path .. " -l", function(menus)
+  sketchybar.exec(menu_script_path .. " --list", function(menus)
     id = 1
 
     menu_padding:set({ drawing = true })
 
     for menu in string.gmatch(menus, "[^\r\n]+") do
       if id < max_items then
-        menu_items[id]:set({ label = menu, drawing = true })
+        menu_items[id]:set({
+          label = menu,
+          drawing = true
+        })
       else
         break
       end
       id = id + 1
+    end
+
+    for i = id, max_items, 1 do
+      menu_items[i]:set({ drawing = false })
     end
   end)
 end)

@@ -149,11 +149,14 @@ local create_hoverable_item = function(id, config, type)
     })
   end
 
-  local reset = set_default_styles
-
   local set_active = function()
     is_active = true
     set_active_styles()
+  end
+
+  local reset = function()
+    is_active = false
+    set_default_styles()
   end
 
   item:subscribe("mouse.entered", function()

@@ -54,7 +54,7 @@ local apps = {
   },
 }
 
-local spaces = { "", "", "󰇩", "󰓇", "", "󰊻", "", "", "󰴢", "" }
+local spaces = { "", "", "󰇩", "󰓇", "", "󰊻", "", "󰴢", "" }
 local space_items = {}
 local total_spaces = #spaces
 
@@ -124,7 +124,7 @@ local on_front_app_changed = function(env)
 
   -- Wait a bit for the space change to be effective.
   -- Without this, the query might return the previous space.
-  sketchybar.exec("sleep 0.35", function()
+  sketchybar.exec("sleep 0.3", function()
     inactivate_space()
 
     query_space(function(space_id)

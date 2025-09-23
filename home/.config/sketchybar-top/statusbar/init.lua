@@ -22,6 +22,9 @@ sketchybar.add("item", "Control Center.padding.right", {
 for _, item in ipairs(status_bar_items) do
   glass.create_hoverable_item(item, {
     position = "right",
+    alias = {
+      color = "0xaaffffff",
+    }
   }, "alias")
 end
 

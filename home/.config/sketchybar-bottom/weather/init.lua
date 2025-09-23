@@ -1,6 +1,5 @@
 local glass = require("glass")
 local sketchybar = require("sketchybar")
-local inspect = require("inspect")
 
 local icon_map = {
   ["snow"] = "❄️",
@@ -59,21 +58,22 @@ local get_moon_phase_name = function(phase)
   return "unknown"
 end
 
-local weather_padding_right = sketchybar.add("item", "weather.padding.right", {
+sketchybar.add("item", "weather.padding.right", {
   position = "right",
-  drawing = false,
   label = {
     padding_right = 1,
   },
 })
 
 local weather_item = glass.create_hoverable_item('weather', {
-  drawing = false,
+  update_freq = 900,
   position = "right",
   label = {
+    string = "Loading weather...",
     padding_right = 12,
   },
   icon = {
+    string = "☀️",
     padding_left = 12,
     padding_right = 12,
     font = {
@@ -81,11 +81,10 @@ local weather_item = glass.create_hoverable_item('weather', {
       family = "Maple Mono NF",
     },
   },
-}, "alias")
+})
 
-local weather_padding_left = sketchybar.add("item", "weather.padding.left", {
+sketchybar.add("item", "weather.padding.left", {
   position = "right",
-  drawing = false,
   label = {
     padding_left = 1,
   },
@@ -97,9 +96,6 @@ local weather_watcher = sketchybar.add("item", "weather.watcher", {
 
 local function on_weather_changed(env)
   local weather = env["WEATHER"]
-  local drawing = {
-    drawing = true,
-  }
 
   if not weather then
     return
@@ -107,7 +103,7 @@ local function on_weather_changed(env)
 
   local feels_like = math.ceil(weather.feels_like)
   local moon_phase = get_moon_phase_name(weather.moon_phase)
-  local description = weather.description:gsub("^%l", string.upper):gsub("%.$", "")
+  local conditions = weather.conditions:gsub("^%l", string.upper):gsub("%.$", "")
   local city = weather.city
   local icon = icon_map[weather.icon]
 
@@ -116,13 +112,13 @@ local function on_weather_changed(env)
   end
 
   weather_item:set({
-    icon = icon,
-    label = string.format("%s - %d°C (%s)", city, feels_like, description),
-    drawing = true,
+    icon = {
+      string = icon
+    },
+    label = {
+      string = string.format("%s - %d°C (%s)", city, feels_like, conditions),
+    },
   })
-
-  weather_padding_left:set(drawing)
-  weather_padding_right:set(drawing)
 end
 
 weather_watcher:subscribe("weather_changed", on_weather_changed)
