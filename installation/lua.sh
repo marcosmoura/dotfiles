@@ -20,6 +20,7 @@ lua_rocks_packages=(
   inspect
   lua-import
   lunajson
+  luv
 )
 
 for pkg in "${lua_rocks_packages[@]}"; do
