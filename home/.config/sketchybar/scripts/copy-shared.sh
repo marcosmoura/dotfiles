@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+
 # Build script for glass (sketchybar-top) - converted from Makefile
 
 set -euo pipefail

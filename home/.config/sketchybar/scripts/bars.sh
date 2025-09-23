@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 SKETCHYBAR_EXECUTABLE=$(which sketchybar)
 
 # Link sketchybar to sketchybar-top and sketchybar-bottom if not already linked
