@@ -1,6 +1,8 @@
 local glass = require("glass")
 local sketchybar = require("sketchybar")
 
+local menu_script_path = "$HOME/.config/sketchybar/apps/bin/release/app-menu"
+
 sketchybar.add("item", "menu.logo_padding", {
   label = {
     padding_left = 2,
@@ -15,6 +17,7 @@ local apple_logo = glass.create_hoverable_item("menubar.logo", {
     color = 0xFFFFFFFF,
     align = "center",
     font = {
+      family = "SF Pro Display",
       style = "Black",
       size = 22.0,
     },
@@ -22,6 +25,6 @@ local apple_logo = glass.create_hoverable_item("menubar.logo", {
 })
 
 apple_logo:subscribe("mouse.clicked", function()
-  sketchybar.trigger("menubar_is_visible")
-  sketchybar.exec("$CONFIG_DIR/menubar/scripts/bin/menu-list -a")
+  sketchybar.trigger("menubar_visibility_changed", { ['MENUBAR'] = 'true' })
+  sketchybar.exec(menu_script_path .. " --show " .. 0)
 end)

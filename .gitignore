@@ -59,7 +59,6 @@ yarn-error.log*
 *.sw?
 
 # Hammerspoon
-home/.config/hammerspoon/api_keys.json
 home/.config/hammerspoon/Spoons/*
 !home/.config/hammerspoon/Spoons/SpoonInstall.spoon
 
