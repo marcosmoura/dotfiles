@@ -15,7 +15,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
         let time_str = now.format("%a  %b %d  %H:%M:%S").to_string();
 
         // Format the argument for sketchybar-top
-        let time_arg = format!("TIME={}", time_str);
+        let time_arg = format!("TIME={time_str}");
 
         // Use tokio::process for the external command
         let status = tokio::process::Command::new("sketchybar-top")
@@ -25,16 +25,16 @@ async fn main() -> Result<(), Box<dyn Error>> {
             .status()
             .await;
 
-        println!("Dispatched time update: {}", time_str);
+        println!("Dispatched time update: {time_str}");
 
         match status {
             Ok(exit_status) => {
                 if !exit_status.success() {
-                    eprintln!("sketchybar-top command failed with exit code: {:?}", exit_status);
+                    eprintln!("sketchybar-top command failed with exit code: {exit_status:?}");
                 }
-            },
+            }
             Err(e) => {
-                eprintln!("Failed to execute sketchybar-top: {}", e);
+                eprintln!("Failed to execute sketchybar-top: {e}");
             }
         }
 

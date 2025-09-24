@@ -40,9 +40,9 @@ enum BatteryError {
 impl fmt::Display for BatteryError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            Self::CommandFailed(e) => write!(f, "Command failed: {}", e),
+            Self::CommandFailed(e) => write!(f, "Command failed: {e}"),
             Self::InvalidUtf8 => write!(f, "Invalid UTF-8 in command output"),
-            Self::ParseError(msg) => write!(f, "Parse error: {}", msg),
+            Self::ParseError(msg) => write!(f, "Parse error: {msg}"),
             Self::SketchybarFailed => write!(f, "Failed to trigger sketchybar"),
         }
     }
@@ -252,7 +252,7 @@ enum Mode {
 }
 
 fn print_usage(prog: &str) {
-    println!("Usage: {} [--stream | --get]", prog);
+    println!("Usage: {prog} [--stream | --get]");
     println!("  --stream    Start streaming battery info to sketchybar");
     println!("  --get       Get current battery info once and send to sketchybar");
 }
@@ -274,17 +274,17 @@ fn run_stream_mode() -> Result<(), BatteryError> {
                 if info != last_info {
                     let battery_data = format_battery_data(&info);
 
-                    println!("Battery change detected: {}", battery_data);
+                    println!("Battery change detected: {battery_data}");
 
                     if let Err(e) = trigger_sketchybar(&battery_data) {
-                        eprintln!("Error triggering sketchybar: {}", e);
+                        eprintln!("Error triggering sketchybar: {e}");
                     }
 
                     last_info = info;
                 }
             }
             Err(e) => {
-                eprintln!("Error getting battery info: {}", e);
+                eprintln!("Error getting battery info: {e}");
             }
         }
     }
@@ -294,7 +294,7 @@ fn run_get_mode() -> Result<(), BatteryError> {
     let info = get_battery_info()?;
     let battery_data = format_battery_data(&info);
 
-    println!("Current battery info: {}", battery_data);
+    println!("Current battery info: {battery_data}");
     trigger_sketchybar(&battery_data)?;
 
     Ok(())

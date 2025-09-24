@@ -68,7 +68,7 @@ impl SketchybarCommands {
         Self {}
     }
 
-    fn trigger(&self, is_visible: bool) {
+    fn trigger(is_visible: bool) {
         let menubar_arg = format!("MENUBAR={is_visible}");
 
         // Use spawn and ignore output for faster execution
@@ -87,19 +87,19 @@ impl SketchybarCommands {
 }
 
 fn main() {
-    println!("Starting MenuBar Watcher...");
-
-    // Initialize the command cache
-    let commands = SketchybarCommands::new();
-    let mut last_state = is_menu_bar_visible(false);
-
-    // Notify initial state
-    commands.trigger(last_state);
-
     // Define sleep durations
     const ACTIVE_SLEEP: Duration = Duration::from_millis(16); // ~60fps for active state changes
     const IDLE_SLEEP: Duration = Duration::from_millis(200); // Maximum sleep during idle
     const NORMAL_SLEEP: Duration = Duration::from_millis(50); // Default sleep
+
+    println!("Starting MenuBar Watcher...");
+
+    // Initialize the command cache
+    let _commands = SketchybarCommands::new();
+    let mut last_state = is_menu_bar_visible(false);
+
+    // Notify initial state
+    SketchybarCommands::trigger(last_state);
 
     let mut sleep_duration = NORMAL_SLEEP;
     let mut unchanged_count = 0;
@@ -109,17 +109,7 @@ fn main() {
         // Get current state - use last state as hint
         let current = is_menu_bar_visible(last_state);
 
-        if current != last_state {
-            // State changed - use faster refresh rate
-            if unchanged_count > 0 {
-                println!("MenuBar visibility changed: {last_state} -> {current}");
-            }
-
-            commands.trigger(current);
-            last_state = current;
-            sleep_duration = ACTIVE_SLEEP;
-            unchanged_count = 0;
-        } else {
+        if current == last_state {
             // State unchanged - gradually increase sleep time for efficiency
             unchanged_count += 1;
 
@@ -130,6 +120,16 @@ fn main() {
                 // After longer stability, use idle rate
                 sleep_duration = IDLE_SLEEP;
             }
+        } else {
+            // State changed - use faster refresh rate
+            if unchanged_count > 0 {
+                println!("MenuBar visibility changed: {last_state} -> {current}");
+            }
+
+            SketchybarCommands::trigger(current);
+            last_state = current;
+            sleep_duration = ACTIVE_SLEEP;
+            unchanged_count = 0;
         }
 
         thread::sleep(sleep_duration);

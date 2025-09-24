@@ -18,8 +18,8 @@ enum CpuError {
 impl fmt::Display for CpuError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            Self::CommandFailed(e) => write!(f, "Command failed: {}", e),
-            Self::ParseError(msg) => write!(f, "Parse error: {}", msg),
+            Self::CommandFailed(e) => write!(f, "Command failed: {e}"),
+            Self::ParseError(msg) => write!(f, "Parse error: {msg}"),
             Self::SketchybarFailed => write!(f, "Failed to trigger sketchybar"),
         }
     }
@@ -65,16 +65,13 @@ fn get_cpu_usage() -> Result<f32, CpuError> {
     )))
 }
 
-use lazy_static::lazy_static;
-use std::sync::Mutex;
+use std::sync::{LazyLock, Mutex};
 use std::time::{Duration, Instant};
 
 // Global temperature cache
-lazy_static! {
-    static ref TEMP_CACHE: Mutex<Option<(f32, Instant)>> = Mutex::new(None);
-}
+static TEMP_CACHE: LazyLock<Mutex<Option<(f32, Instant)>>> = LazyLock::new(|| Mutex::new(None));
 
-fn get_cpu_temperature() -> Result<f32, CpuError> {
+fn get_cpu_temperature() -> f32 {
     // Check cache first - CPU temp doesn't change that rapidly
     // Only fetch new value every 10 seconds
     const CACHE_DURATION: Duration = Duration::from_secs(10);
@@ -84,7 +81,7 @@ fn get_cpu_temperature() -> Result<f32, CpuError> {
         if let Some((temp, timestamp)) = *cache
             && timestamp.elapsed() < CACHE_DURATION
         {
-            return Ok(temp);
+            return temp;
         }
     }
 
@@ -101,20 +98,18 @@ fn get_cpu_temperature() -> Result<f32, CpuError> {
         if let Ok(temp) = output_str.trim().parse::<f32>() {
             // Update cache with proper drop handling
             *TEMP_CACHE.lock().unwrap() = Some((temp, Instant::now()));
-            return Ok(temp);
+            return temp;
         }
     }
 
     // If nothing works, use a reasonable default
-    Ok(50.0)
+    50.0
 }
 
 async fn get_cpu_info() -> Result<CpuInfo, CpuError> {
     // Create a thread pool for CPU-bound operations to avoid spawning new threads each time
     // This is more efficient for repeated operations
-    lazy_static! {
-        static ref CPU_POOL: tokio::runtime::Handle = tokio::runtime::Handle::current();
-    }
+    static CPU_POOL: LazyLock<tokio::runtime::Handle> = LazyLock::new(tokio::runtime::Handle::current);
 
     // Get CPU usage and temperature concurrently using the shared thread pool
     let usage_fut = CPU_POOL.spawn_blocking(get_cpu_usage);
@@ -122,7 +117,7 @@ async fn get_cpu_info() -> Result<CpuInfo, CpuError> {
 
     // More efficient error handling with fast path resolution
     match tokio::try_join!(usage_fut, temp_fut) {
-        Ok((Ok(percentage), Ok(temperature))) => {
+        Ok((Ok(percentage), temperature)) => {
             // Fast path - both succeeded, construct directly
             Ok(CpuInfo {
                 percentage,
@@ -130,8 +125,7 @@ async fn get_cpu_info() -> Result<CpuInfo, CpuError> {
             })
         }
         Ok((Err(e), _)) => Err(e),
-        Ok((_, Err(e))) => Err(e),
-        Err(e) => Err(CpuError::ParseError(format!("Task join error: {}", e))),
+        Err(e) => Err(CpuError::ParseError(format!("Task join error: {e}"))),
     }
 }
 
@@ -140,7 +134,9 @@ async fn get_cpu_info() -> Result<CpuInfo, CpuError> {
 fn format_cpu_data(info: &CpuInfo) -> String {
     // Pre-calculate integer values to avoid float formatting
     // Use as u8 to reduce memory footprint
+    #[allow(clippy::cast_possible_truncation, clippy::cast_sign_loss)]
     let percentage = info.percentage.ceil() as u8;
+    #[allow(clippy::cast_possible_truncation, clippy::cast_sign_loss)]
     let temperature = info.temperature.ceil() as u8;
 
     // Pre-allocate exactly the right size - calculate exact size to avoid any reallocations
@@ -178,7 +174,7 @@ async fn trigger_sketchybar(cpu_data: &str) -> Result<(), CpuError> {
     static BASE_ARGS: [&str; 2] = ["--trigger", "cpu_changed"];
 
     // Pre-allocate with the right capacity to avoid reallocation
-    let cpu_arg = format!("CPU={}", cpu_data);
+    let cpu_arg = format!("CPU={cpu_data}");
 
     // Use tokio spawn to run the command in a separate task - this allows
     // the main task to continue processing if sketchybar is slow to respond
@@ -236,14 +232,12 @@ enum Mode {
 }
 
 fn print_usage(prog: &str) {
-    println!("Usage: {} [--stream | --get]", prog);
+    println!("Usage: {prog} [--stream | --get]");
     println!("  --stream    Start streaming CPU info to sketchybar every 2 seconds");
     println!("  --get       Get current CPU info once and send to sketchybar");
 }
 
 async fn run_stream_mode() -> Result<(), Box<dyn Error>> {
-    println!("CPU watcher started in stream mode");
-
     // Increased threshold to reduce unnecessary updates
     // Only update if CPU usage changed by more than 1.0 percentage point
     // or temperature by more than 0.5 degrees
@@ -253,6 +247,8 @@ async fn run_stream_mode() -> Result<(), Box<dyn Error>> {
     // Longer interval for better performance - 3.5 seconds is still responsive
     // but reduces CPU usage of the watcher itself
     const UPDATE_INTERVAL: std::time::Duration = std::time::Duration::from_millis(3500);
+
+    println!("CPU watcher started in stream mode");
 
     // Create a fixed interval ticker with immediate start
     let mut interval = tokio::time::interval(UPDATE_INTERVAL);
@@ -269,7 +265,7 @@ async fn run_stream_mode() -> Result<(), Box<dyn Error>> {
 
     // Only print in debug mode
     #[cfg(debug_assertions)]
-    println!("Initial CPU info: {}", cpu_data);
+    println!("Initial CPU info: {cpu_data}");
 
     // Use error counter to exponentially back off on repeated errors
     let mut consecutive_errors = 0;
@@ -294,12 +290,12 @@ async fn run_stream_mode() -> Result<(), Box<dyn Error>> {
 
                     // Only print output in debug/development environments
                     #[cfg(debug_assertions)]
-                    println!("CPU info updated: {}", cpu_data);
+                    println!("CPU info updated: {cpu_data}");
 
                     // Fire and forget - don't wait for sketchybar to respond
                     tokio::spawn(async move {
                         if let Err(e) = trigger_sketchybar(&cpu_data).await {
-                            eprintln!("Error triggering sketchybar: {}", e);
+                            eprintln!("Error triggering sketchybar: {e}");
                         }
                     });
 
@@ -309,7 +305,7 @@ async fn run_stream_mode() -> Result<(), Box<dyn Error>> {
                 }
             }
             Err(e) => {
-                eprintln!("Error getting CPU info: {}", e);
+                eprintln!("Error getting CPU info: {e}");
 
                 // Exponential backoff on repeated errors
                 consecutive_errors += 1;
@@ -324,7 +320,7 @@ async fn run_get_mode() -> Result<(), Box<dyn Error>> {
     let info = get_cpu_info().await?;
     let cpu_data = format_cpu_data(&info);
 
-    println!("Current CPU info: {}", cpu_data);
+    println!("Current CPU info: {cpu_data}");
     trigger_sketchybar(&cpu_data).await?;
 
     Ok(())

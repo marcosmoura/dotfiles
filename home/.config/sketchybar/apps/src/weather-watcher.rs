@@ -60,31 +60,25 @@ async fn main() {
         .unwrap_or(15);
     let update_interval = Duration::from_secs(update_interval_mins * 60);
 
-    eprintln!("Update interval set to {} minutes", update_interval_mins);
+    eprintln!("Update interval set to {update_interval_mins} minutes");
 
     // Run the update loop forever
     loop {
         // Get location - will use cache if available and fresh
-        let location = match get_location().await {
-            Some(loc) => loc,
-            None => {
-                eprintln!("Failed to infer location. Will retry in 60 seconds.");
-                tokio::time::sleep(Duration::from_secs(60)).await;
-                continue;
-            }
+        let Some(location) = get_location().await else {
+            eprintln!("Failed to infer location. Will retry in 60 seconds.");
+            tokio::time::sleep(Duration::from_secs(60)).await;
+            continue;
         };
 
         // Update the weather data
         match update(&key, &location).await {
-            Ok(_) => eprintln!("Weather update successful"),
+            Ok(()) => eprintln!("Weather update successful"),
             Err(e) => eprintln!("Weather update failed: {e}"),
         }
 
         // Sleep until next update
-        eprintln!(
-            "Sleeping for {} minutes until next update",
-            update_interval_mins
-        );
+        eprintln!("Sleeping for {update_interval_mins} minutes until next update");
         tokio::time::sleep(update_interval).await;
     }
 }
@@ -321,16 +315,10 @@ async fn get_location_from_ipapi() -> Option<LocationInfo> {
     .await;
 
     // First handle the timeout Result
-    let send_result = match timeout_result {
-        Ok(result) => result,
-        Err(_) => return None,
-    };
+    let Ok(send_result) = timeout_result else { return None };
 
     // Then handle the request Result
-    let resp = match send_result {
-        Ok(resp) => resp,
-        Err(_) => return None,
-    };
+    let Ok(resp) = send_result else { return None };
 
     let api_data: IpApiResponse = resp.json().await.ok()?;
     let loc = api_data.loc?;
@@ -354,16 +342,10 @@ async fn get_location_from_ipinfo() -> Option<LocationInfo> {
     .await;
 
     // First handle the timeout Result
-    let send_result = match timeout_result {
-        Ok(result) => result,
-        Err(_) => return None,
-    };
+    let Ok(send_result) = timeout_result else { return None };
 
     // Then handle the request Result
-    let resp = match send_result {
-        Ok(resp) => resp,
-        Err(_) => return None,
-    };
+    let Ok(resp) = send_result else { return None };
 
     let api_data: IpInfoResponse = resp.json().await.ok()?;
     let loc = api_data.loc?;

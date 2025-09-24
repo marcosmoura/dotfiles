@@ -85,7 +85,7 @@ impl DockReader {
 
             let frontmost_bundle = frontmost_app
                 .as_ref()
-                .and_then(|app| self.get_bundle_identifier(app))
+                .and_then(|app| Self::get_bundle_identifier(app))
                 .unwrap_or_default();
 
             for i in 0..count {
@@ -126,7 +126,7 @@ impl DockReader {
         let bundle_id_marker = "bundle-identifier";
         for line in plist_content.lines() {
             if line.contains(bundle_id_marker)
-                && let Some(bundle_id) = self.extract_bundle_identifier(line)
+                && let Some(bundle_id) = Self::extract_bundle_identifier(line)
             {
                 let mut dock_app = self.create_dock_app_from_bundle(&bundle_id);
                 dock_app.dock_position = Some(position);
@@ -209,8 +209,8 @@ impl DockReader {
                 return None;
             }
 
-            let bundle_identifier = self.get_bundle_identifier(app)?;
-            let localized_name = self.get_localized_name(app)?;
+            let bundle_identifier = Self::get_bundle_identifier(app)?;
+            let localized_name = Self::get_localized_name(app)?;
             let process_id: i32 = msg_send![app, processIdentifier];
             let is_frontmost = bundle_identifier == frontmost_bundle;
 
@@ -247,14 +247,14 @@ impl DockReader {
         }
     }
 
-    fn get_bundle_identifier(&self, app: &NSRunningApplication) -> Option<String> {
+    fn get_bundle_identifier(app: &NSRunningApplication) -> Option<String> {
         unsafe {
             let bundle_id: Option<Retained<NSString>> = msg_send![app, bundleIdentifier];
             bundle_id.map(|id| id.to_string())
         }
     }
 
-    fn get_localized_name(&self, app: &NSRunningApplication) -> Option<String> {
+    fn get_localized_name(app: &NSRunningApplication) -> Option<String> {
         unsafe {
             let name: Option<Retained<NSString>> = msg_send![app, localizedName];
             name.map(|n| n.to_string())
@@ -293,15 +293,15 @@ impl DockReader {
     fn find_icon_in_bundle(&self, app_bundle_path: &str) -> Option<String> {
         use std::fs;
 
-        // Use Path for efficient path operations
-        let bundle_path = Path::new(app_bundle_path);
-        let info_plist_path = bundle_path.join("Contents/Info.plist");
-        let resources_path = bundle_path.join("Contents/Resources");
-
         // Create a static set of common icon paths to check
         static ICON_PATHS_CHECKED: OnceLock<HashSet<PathBuf>> = OnceLock::new();
         // Use underscore prefix to avoid the unused variable warning
         let _icon_paths_checked = ICON_PATHS_CHECKED.get_or_init(HashSet::new);
+
+        // Use Path for efficient path operations
+        let bundle_path = Path::new(app_bundle_path);
+        let info_plist_path = bundle_path.join("Contents/Info.plist");
+        let resources_path = bundle_path.join("Contents/Resources");
 
         // Early return if this resources path doesn't exist
         if !resources_path.exists() {
@@ -313,7 +313,7 @@ impl DockReader {
             && let Ok(plist_content) = fs::read_to_string(&info_plist_path)
         {
             // Look for CFBundleIconFile in the plist
-            if let Some(icon_name) = self.extract_icon_name_from_plist(&plist_content) {
+            if let Some(icon_name) = Self::extract_icon_name_from_plist(&plist_content) {
                 // Try different extensions using cached common extensions
                 for &ext in &self.common_extensions {
                     let icon_file = if icon_name.ends_with(&format!(".{ext}")) {
@@ -357,7 +357,7 @@ impl DockReader {
         None
     }
 
-    fn extract_icon_name_from_plist(&self, plist_content: &str) -> Option<String> {
+    fn extract_icon_name_from_plist(plist_content: &str) -> Option<String> {
         // Define these constants once
         static KEY_TAG: &str = "<key>CFBundleIconFile</key>";
         static STRING_OPEN_TAG: &str = "<string>";
@@ -382,14 +382,14 @@ impl DockReader {
         let icon_name = &plist_content[string_content_start..string_content_start + string_end];
 
         // Only allocate if non-empty
-        if !icon_name.is_empty() {
-            Some(icon_name.to_string())
-        } else {
+        if icon_name.is_empty() {
             None
+        } else {
+            Some(icon_name.to_string())
         }
     }
 
-    fn extract_bundle_identifier(&self, line: &str) -> Option<String> {
+    fn extract_bundle_identifier(line: &str) -> Option<String> {
         // Quick check to avoid unnecessary parsing
         if !line.contains("bundle-identifier") {
             return None;
