@@ -1,4 +1,10 @@
 //! App menu interaction utilities for `SketchyBar`
+
+#![allow(clippy::cast_sign_loss)]
+#![allow(clippy::cast_possible_wrap)]
+#![allow(clippy::ptr_as_ptr)]
+#![allow(clippy::borrow_as_ptr)]
+
 use std::os::raw::{c_int, c_uint, c_void};
 use std::process;
 use std::ptr;
@@ -99,7 +105,7 @@ impl MenuList {
         }
     }
 
-    fn ax_perform_click(&self, element: AXUIElementRef) -> Result<(), String> {
+    fn ax_perform_click(element: AXUIElementRef) -> Result<(), String> {
         if element.is_null() {
             return Err("Element is null".to_string());
         }
@@ -116,7 +122,7 @@ impl MenuList {
         Ok(())
     }
 
-    fn ax_get_title(&self, element: AXUIElementRef) -> Option<String> {
+    fn ax_get_title(element: AXUIElementRef) -> Option<String> {
         if element.is_null() {
             return None;
         }
@@ -127,7 +133,7 @@ impl MenuList {
             let error = AXUIElementCopyAttributeValue(
                 element,
                 title_attr.as_concrete_TypeRef(),
-                &mut title,
+                &raw mut title,
             );
 
             if error != AX_ERROR_SUCCESS || title.is_null() {
@@ -140,7 +146,7 @@ impl MenuList {
         }
     }
 
-    fn ax_select_menu_option(&self, app: AXUIElementRef, id: usize) -> Result<(), String> {
+    fn ax_select_menu_option(app: AXUIElementRef, id: usize) -> Result<(), String> {
         if app.is_null() {
             return Err("App element is null".to_string());
         }
@@ -153,7 +159,7 @@ impl MenuList {
             let error = AXUIElementCopyAttributeValue(
                 app,
                 menubar_attr.as_concrete_TypeRef(),
-                &mut menubars_ref,
+                &raw mut menubars_ref,
             );
 
             if error != AX_ERROR_SUCCESS || menubars_ref.is_null() {
@@ -178,10 +184,10 @@ impl MenuList {
             let result = if id < count {
                 let item = CFArrayGetValueAtIndex(children_ref as CFArrayRef, id as isize)
                     as AXUIElementRef;
-                if !item.is_null() {
-                    self.ax_perform_click(item)
-                } else {
+                if item.is_null() {
                     Err(format!("Failed to get menu item {id}"))
+                } else {
+                    Self::ax_perform_click(item)
                 }
             } else {
                 Err(format!("Menu item {} out of range (0-{})", id, count - 1))
@@ -192,7 +198,7 @@ impl MenuList {
         }
     }
 
-    fn ax_print_menu_options(&self, app: AXUIElementRef) -> Result<(), String> {
+    fn ax_print_menu_options(app: AXUIElementRef) -> Result<(), String> {
         if app.is_null() {
             return Err("App element is null".to_string());
         }
@@ -205,7 +211,7 @@ impl MenuList {
             let error = AXUIElementCopyAttributeValue(
                 app,
                 menubar_attr.as_concrete_TypeRef(),
-                &mut menubars_ref,
+                &raw mut menubars_ref,
             );
 
             if error != AX_ERROR_SUCCESS || menubars_ref.is_null() {
@@ -236,7 +242,7 @@ impl MenuList {
                 let item = CFArrayGetValueAtIndex(children_ref as CFArrayRef, i as isize)
                     as AXUIElementRef;
                 if !item.is_null()
-                    && let Some(title) = self.ax_get_title(item) {
+                    && let Some(title) = Self::ax_get_title(item) {
                         println!("{title}");
                     }
             }
@@ -246,7 +252,8 @@ impl MenuList {
         }
     }
 
-    fn ax_get_extra_menu_item(&self, alias: &str) -> Option<AXUIElementRef> {
+    #[allow(clippy::too_many_lines)]
+    fn ax_get_extra_menu_item(alias: &str) -> Option<AXUIElementRef> {
         unsafe {
             let window_list = CGWindowListCopyWindowInfo(kCGWindowListOptionAll, kCGNullWindowID);
             if window_list.is_null() {
@@ -413,9 +420,8 @@ impl MenuList {
         }
     }
 
-    fn ax_select_menu_extra(&self, alias: &str) -> Result<(), String> {
-        let item = self
-            .ax_get_extra_menu_item(alias)
+    fn ax_select_menu_extra(alias: &str) -> Result<(), String> {
+        let item = Self::ax_get_extra_menu_item(alias)
             .ok_or_else(|| format!("Menu extra '{alias}' not found"))?;
 
         unsafe {
@@ -426,7 +432,7 @@ impl MenuList {
             SLSSetMenuBarVisibilityOverrideOnDisplay(connection_id, 0, true);
             SLSSetMenuBarInsetAndAlpha(connection_id, 0.0, 1.0, 0.0);
 
-            self.ax_perform_click(item)?;
+            Self::ax_perform_click(item)?;
 
             // Restore menu bar
             SLSSetMenuBarVisibilityOverrideOnDisplay(connection_id, 0, false);
@@ -438,7 +444,7 @@ impl MenuList {
         Ok(())
     }
 
-    fn ax_get_front_app(&self) -> Result<AXUIElementRef, String> {
+    fn ax_get_front_app() -> Result<AXUIElementRef, String> {
         unsafe {
             let mut psn = ProcessSerialNumber { high: 0, low: 0 };
             _SLPSGetFrontProcess(&mut psn);
@@ -458,12 +464,12 @@ impl MenuList {
         }
     }
 
-    fn run(&self, args: &[String]) -> Result<(), String> {
+    fn run(args: &[String]) -> Result<(), String> {
         // We've already validated args.len() in main()
         match args[1].as_str() {
             "--list" => {
-                let app = self.ax_get_front_app()?;
-                let result = self.ax_print_menu_options(app);
+                let app = Self::ax_get_front_app()?;
+                let result = Self::ax_print_menu_options(app);
                 unsafe { CFRelease(app as CFTypeRef) };
                 result?;
             }
@@ -473,14 +479,14 @@ impl MenuList {
                 // Try to parse as number first - this is more efficient than a regex match
                 match args[2].parse::<usize>() {
                     Ok(id) => {
-                        let app = self.ax_get_front_app()?;
-                        let result = self.ax_select_menu_option(app, id);
+                        let app = Self::ax_get_front_app()?;
+                        let result = Self::ax_select_menu_option(app, id);
                         unsafe { CFRelease(app as CFTypeRef) };
                         result?;
                     }
                     Err(_) => {
                         // Treat as alias for menu extra
-                        self.ax_select_menu_extra(&args[2])?;
+                        Self::ax_select_menu_extra(&args[2])?;
                     }
                 }
             }
@@ -518,7 +524,7 @@ fn main() {
         process::exit(1);
     }
 
-    let menu_list = match MenuList::new() {
+    let _menu_list = match MenuList::new() {
         Ok(ml) => ml,
         Err(e) => {
             eprintln!("Error initializing menu-list: {e}");
@@ -526,7 +532,7 @@ fn main() {
         }
     };
 
-    if let Err(e) = menu_list.run(&args) {
+    if let Err(e) = MenuList::run(&args) {
         eprintln!("Error: {e}");
         process::exit(1);
     }

@@ -477,11 +477,13 @@ fn start_streaming() {
                     }
 
                     // For each line call process_stream_output()
-                    if let Err(_e) = process_stream_output(&line_content, &mut state) {
+                    #[cfg(debug_assertions)]
+                    if let Err(e) = process_stream_output(&line_content, &mut state) {
                         // Only print errors in debug mode to avoid cluttering logs
-                        #[cfg(debug_assertions)]
-                        eprintln!("Error processing media control output: {_e}");
+                        eprintln!("Error processing media control output: {e}");
                     }
+                    #[cfg(not(debug_assertions))]
+                    let _ = process_stream_output(&line_content, &mut state);
                 }
                 Err(_e) => {
                     #[cfg(debug_assertions)]
@@ -522,18 +524,22 @@ fn get_media_once() {
             match line {
                 Ok(line_content) => {
                     // Skip empty lines
-                    if !line_content.trim().is_empty()
-                        && let Err(_e) = process_get_output(&line_content)
-                    {
-                        // Only print errors in debug mode
+                    if !line_content.trim().is_empty() {
                         #[cfg(debug_assertions)]
-                        eprintln!("Error processing media control output: {_e}");
+                        if let Err(e) = process_get_output(&line_content) {
+                            // Only print errors in debug mode
+                            eprintln!("Error processing media control output: {e}");
+                        }
+                        #[cfg(not(debug_assertions))]
+                        let _ = process_get_output(&line_content);
                     }
                 }
-                Err(_e) => {
-                    #[cfg(debug_assertions)]
-                    eprintln!("Error reading line from media-control: {_e}");
+                #[cfg(debug_assertions)]
+                Err(e) => {
+                    eprintln!("Error reading line from media-control: {e}");
                 }
+                #[cfg(not(debug_assertions))]
+                Err(_) => {}
             }
         }
     }
