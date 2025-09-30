@@ -33,11 +33,11 @@ local setFloatingWindowPosition = function(arrowKey)
     local windowHeight = height * ratio
 
     focusedWindow
-      :setSize({
-        w = windowWidth,
-        h = windowHeight,
-      })
-      :centerOnScreen()
+        :setSize({
+          w = windowWidth,
+          h = windowHeight,
+        })
+        :centerOnScreen()
 
     return
   end
@@ -121,6 +121,21 @@ for arrowKey, direction in pairs(yabaiDirectionMap) do
     os.yabai.execute({ "-m window --swap", direction }, { silent = true })
   end)
 end
+
+--------------------
+--- Split ratio
+--------------------
+hs.hotkey.bind({ "cmd", "ctrl", "alt" }, "=", function()
+  os.yabai.execute("-m config split_ratio 0.75", { silent = true })
+  os.yabai.execute("-m config auto_balance off", { silent = true })
+  os.yabai.execute("-m space --layout bsp", { silent = true })
+end)
+
+hs.hotkey.bind({ "cmd", "ctrl", "alt" }, "-", function()
+  os.yabai.execute("-m config split_ratio 0.5", { silent = true })
+  os.yabai.execute("-m config auto_balance on", { silent = true })
+  os.yabai.execute("-m space --layout bsp", { silent = true })
+end)
 
 --------------------
 --- Move windows between displays
