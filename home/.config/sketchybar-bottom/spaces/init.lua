@@ -163,9 +163,16 @@ for i = 1, total_spaces do
         family = "Maple Mono NF",
       },
     },
-    padding_right = 1,
-    padding_left = 1,
   }, "space")
+
+  if i ~= total_spaces then
+    sketchybar.add("item", "space." .. i .. ".padding.right", {
+      position = "left",
+      label = {
+        padding_right = 1,
+      },
+    })
+  end
 
   space:subscribe("mouse.clicked", function(env)
     -- Focus space using AppleScript to send Control+Number keypress.

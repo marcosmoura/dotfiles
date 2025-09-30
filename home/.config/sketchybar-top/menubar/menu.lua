@@ -14,8 +14,8 @@ for i = 1, max_items, 1 do
     drawing = false,
     icon = { drawing = false },
     label = {
-      padding_left = 9,
-      padding_right = 9,
+      padding_left = 10,
+      padding_right = 10,
     },
   })
 

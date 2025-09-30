@@ -18,11 +18,12 @@ sketchybar.bar({
   y_offset = 12,
   blur_radius = 8.0,
   topmost = "window",
+  display = "main",
   font_smoothing = true,
   position = "top",
 })
 
-sketchybar.exec("yabai -m config external_bar all:" .. total_space .. ":0")
+sketchybar.exec("yabai -m config external_bar main:" .. total_space .. ":0")
 
 require("menubar")
 require("media")
