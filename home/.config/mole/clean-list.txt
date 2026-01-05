@@ -1,0 +1,93 @@
+# Mole Cleanup Preview - 2025-12-29 00:04:04
+#
+# How to protect files:
+# 1. Copy any path below to ~/.config/mole/whitelist
+# 2. Run: mo clean --whitelist
+#
+# Example:
+#   /Users/*/Library/Caches/com.example.app
+#
+
+
+=== User essentials ===
+/Users/marcosmoura/Library/Caches  # 37.84GB (84 items)
+/Users/marcosmoura/Library/Logs  # 35.4MB (18 items)
+/Users/marcosmoura/.Trash/fresh  # 24KB
+
+=== Finder metadata ===
+
+=== macOS system caches ===
+/Users/marcosmoura/Library/Saved Application State  # 128KB (7 items)
+/Users/marcosmoura/Library/Caches/CloudKit  # 9.7MB (7 items)
+/Users/marcosmoura/Library/Suggestions  # 10.8MB (16 items)
+
+=== Sandboxed app caches ===
+
+=== Browsers ===
+/Users/marcosmoura/Library/Caches/com.apple.Safari  # 232KB (2 items)
+/Users/marcosmoura/Library/Caches/company.thebrowser.Browser  # 1.0MB (4 items)
+/Users/marcosmoura/Library/Caches/company.thebrowser.dia  # 139.1MB (4 items)
+/Users/marcosmoura/Library/Caches/Firefox/Profiles  # 61.7MB
+
+=== Cloud storage ===
+
+=== Office applications ===
+
+=== Developer tools ===
+/Users/marcosmoura/Library/pnpm/store  # 11.53GB (2 items)
+/Users/marcosmoura/.cargo/registry/cache/index.crates.io-1949cf8c6b5b557f  # 188.8MB
+/Users/marcosmoura/.cargo/git  # 9.4MB (2 items)
+/Users/marcosmoura/Library/Caches/com.figma.Desktop  # 3.0MB (3 items)
+/Users/marcosmoura/Library/Caches/SentryCrash  # 40KB (10 items)
+/Users/marcosmoura/Library/Caches/Homebrew  # 23.82GB (9 items)
+
+=== Development applications ===
+/Users/marcosmoura/Library/Caches/com.apple.dt.Xcode  # 740KB (4 items)
+/Users/marcosmoura/Library/Developer/Xcode/DerivedData  # 3.30GB (2 items)
+/Users/marcosmoura/Library/Application Support/Code/logs  # 152.0MB (10 items)
+/Users/marcosmoura/Library/Application Support/Code/Cache  # 627.9MB (2 items)
+/Users/marcosmoura/Library/Application Support/Code/CachedData  # 244.5MB (9 items)
+/Users/marcosmoura/Library/Application Support/discord/Cache/Cache_Data  # 320.0MB
+/Users/marcosmoura/Library/Caches/us.zoom.xos  # 21.2MB (3 items)
+/Users/marcosmoura/Library/Caches/com.figma.Desktop  # 3.0MB (3 items)
+/Users/marcosmoura/Library/Caches/com.apple.TV  # 7.0MB (5 items)
+/Users/marcosmoura  # 192KB (2 items)
+/Users/marcosmoura/.lesshst  # 4KB
+/Users/marcosmoura/.wget-hsts  # 4KB
+
+=== Virtual machine tools ===
+
+=== Application Support ===
+
+=== Uninstalled app data ===
+/Users/marcosmoura/Library/Caches/org.hammerspoon.Hammerspoon  # 24.2MB
+/Users/marcosmoura/Library/Caches/org.swift.swiftpm  # 10.3MB
+/Users/marcosmoura/Library/Caches/io.branch.network.cache  # 308KB
+/Users/marcosmoura/Library/WebKit/com.desktop-bar.dev  # 2.6MB
+/Users/marcosmoura/Library/WebKit/com.marcosmoura.desktop-bar  # 488KB
+/Users/marcosmoura/Library/WebKit/org.hammerspoon.Hammerspoon  # 488KB
+/Users/marcosmoura/Library/WebKit/org.webkit.Playwright  # 4KB
+/Users/marcosmoura/Library/HTTPStorages/com.brnbw.Leader-Key  # 96KB
+/Users/marcosmoura/Library/HTTPStorages/com.google.GoogleUpdater  # 936KB
+/Users/marcosmoura/Library/HTTPStorages/com.microsoft.EdgeUpdater  # 4.0MB
+/Users/marcosmoura/Library/HTTPStorages/com.microsoft.autoupdate2  # 72KB
+/Users/marcosmoura/Library/HTTPStorages/com.microsoft.wdav.mainux  # 56KB
+/Users/marcosmoura/Library/HTTPStorages/com.microsoft.wdav.tray  # 60KB
+/Users/marcosmoura/Library/HTTPStorages/com.spotify.client.helper  # 64KB
+/Users/marcosmoura/Library/HTTPStorages/org.hammerspoon.Hammerspoon  # 2.0MB
+/Users/marcosmoura/Library/HTTPStorages/org.hammerspoon.Hammerspoon.binarycookies  # 4KB
+/Users/marcosmoura/Library/HTTPStorages/org.sparkle-project.DownloaderService  # 168KB
+/Users/marcosmoura/Library/HTTPStorages/org.sparkle-project.DownloaderService.binarycookies  # 4KB
+
+=== Apple Silicon updates ===
+
+=== iOS device backups ===
+
+=== Time Machine incomplete backups ===
+
+# ============================================
+# Summary
+# ============================================
+# Potential cleanup: 79.83GB
+# Items: 256
+# Categories: 48

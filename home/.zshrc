@@ -1,35 +1,38 @@
-# Homebrew
-eval "$(/opt/homebrew/bin/brew shellenv)"
-if type brew &>/dev/null; then
-  FPATH="$(brew --prefix)/share/zsh/site-functions:${FPATH}"
-fi
+# Homebrew - static setup to avoid slow brew shellenv calls
+export HOMEBREW_PREFIX="/opt/homebrew"
+export HOMEBREW_CELLAR="/opt/homebrew/Cellar"
+export HOMEBREW_REPOSITORY="/opt/homebrew"
+export PATH="/opt/homebrew/bin:/opt/homebrew/sbin${PATH+:$PATH}"
+export MANPATH="/opt/homebrew/share/man${MANPATH+:$MANPATH}:"
+export INFOPATH="/opt/homebrew/share/info:${INFOPATH:-}"
+FPATH="/opt/homebrew/share/zsh/site-functions:${FPATH}"
 
 # Paths
 export XDG_CONFIG_HOME=${XDG_CONFIG_HOME:-$HOME/.config}
 
 # Path helper to avoid duplicate entries
 path_prepend() {
-  [ -d "$1" ] || return 0
-  case ":$PATH:" in
-  *":$1:"*) ;; # already present
-  *) PATH="$1:$PATH" ;;
-  esac
+	[ -d "$1" ] || return 0
+	case ":$PATH:" in
+	*":$1:"*) ;; # already present
+	*) PATH="$1:$PATH" ;;
+	esac
 }
 
 local paths=(
-  /usr/local/bin
-  /usr/local/opt
-  "$HOME/.local/bin"
-  "$HOME/.rbenv/shims"
-  "$HOME/.yarn/bin"
-  "$HOME/.config/yarn/global/node_modules/.bin"
-  "$HOME/go/bin"
-  "$HOME/.cargo/bin"
-  "$HOME/.local/share/venv/bin"
+	/usr/local/bin
+	/usr/local/opt
+	"$HOME/.local/bin"
+	"$HOME/.rbenv/shims"
+	"$HOME/.yarn/bin"
+	"$HOME/.config/yarn/global/node_modules/.bin"
+	"$HOME/go/bin"
+	"$HOME/.cargo/bin"
+	"$HOME/.local/share/venv/bin"
 )
 
 for p in $paths; do
-  path_prepend $p
+	path_prepend $p
 done
 
 # Avoid duplicate entries in PATH
@@ -64,19 +67,14 @@ export SAVESIZE=25000
 # You Should Use
 export YSU_MODE=ALL
 
-# Load starship
-export STARSHIP_CONFIG=$XDG_CONFIG_HOME/starship/starship.toml
-eval "$(starship init zsh)"
-
-# SSH Agent
-SSH_AGENT_INSTANCES=$(pgrep ssh-agent)
-if [ -z "${SSH_AGENT_INSTANCES}" ]; then
-  eval "$(ssh-agent -s)"
-  trap "ssh-agent -k" exit
-fi
-
 # Load sheldon
 eval "$(sheldon source)"
+
+# Load starship
+export STARSHIP_CONFIG=$XDG_CONFIG_HOME/starship/starship.toml
+export STARSHIP_EMOJI=$($XDG_CONFIG_HOME/starship/scripts/emoji.sh)
+export STARSHIP_CLOCK=$($XDG_CONFIG_HOME/starship/scripts/clock.sh)
+eval "$(starship init zsh)"
 
 # Clear screen
 clear

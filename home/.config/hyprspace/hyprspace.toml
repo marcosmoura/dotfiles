@@ -1,0 +1,332 @@
+# ╔═══════════════════════════════════════════════════════════════════════════════╗
+# ║                              STARTUP & LIFECYCLE                              ║
+# ╚═══════════════════════════════════════════════════════════════════════════════╝
+
+config-version = 2
+start-at-login = true
+
+after-startup-command = [
+  # Restart Barba to ensure it's running
+  'exec-and-forget killall barba',
+  'exec-and-forget sleep 1',
+  'exec-and-forget open -na "/Applications/Barba.app"',
+
+  # Disable Caps Lock key
+  "exec-and-forget hidutil property --set '{\"UserKeyMapping\":[{\"HIDKeyboardModifierMappingSrc\": 0x700000039, \"HIDKeyboardModifierMappingDst\": 0x7000000E3}]}'",
+
+  # Setup workspaces layouts
+  'workspace terminal',
+  'layout accordion',
+
+  'workspace coding',
+  'layout master',
+
+  'workspace browser',
+  'layout accordion',
+
+  'workspace music',
+  'layout dwindle',
+
+  'workspace design',
+  'layout dwindle',
+
+  'workspace communication',
+  'layout dwindle',
+
+  'workspace misc',
+  'layout dwindle',
+
+  'workspace files',
+  'layout dwindle',
+
+  'workspace mail',
+  'layout v_tiles',
+
+  'workspace tasks',
+  'layout v_tiles',
+
+  'workspace coding'
+]
+
+persistent-workspaces = [
+  "terminal",
+  "coding",
+  "browser",
+  "music",
+  "design",
+  "communication",
+  "misc",
+  "files",
+  "mail",
+  "tasks"
+]
+
+
+# ╔═══════════════════════════════════════════════════════════════════════════════╗
+# ║                             BAR INTEGRATION                                   ║
+# ╚═══════════════════════════════════════════════════════════════════════════════╝
+
+exec-on-workspace-change = ['/bin/bash', '-c',
+  'barba workspace-changed $AEROSPACE_FOCUSED_WORKSPACE'
+]
+on-focus-changed = 'exec-and-forget barba focus-changed'
+
+# ╔═══════════════════════════════════════════════════════════════════════════════╗
+# ║                                LAYOUT SETTINGS                                ║
+# ╚═══════════════════════════════════════════════════════════════════════════════╝
+
+default-root-container-layout = 'dwindle'
+default-root-container-orientation = 'auto'
+
+dwindle-default-split-ratio = 1.0
+dwindle-single-window-aspect-ratio = [0, 0]
+dwindle-single-window-aspect-ratio-tolerance = 0.1
+
+accordion-padding = 0
+
+niri-focused-width-ratio = 0.95
+
+master-default-percent = 0.7
+
+# ╔═══════════════════════════════════════════════════════════════════════════════╗
+# ║                      MOUSE INTERACTION (HYPRSPACE EXCLUSIVE)                  ║
+# ╚═══════════════════════════════════════════════════════════════════════════════╝
+
+mouse-sensitivity = 1.0
+
+# ╔═══════════════════════════════════════════════════════════════════════════════╗
+# ║                         NORMALIZATION SETTINGS                                ║
+# ╚═══════════════════════════════════════════════════════════════════════════════╝
+
+enable-normalization-flatten-containers = true
+enable-normalization-opposite-orientation-for-nested-containers = true
+
+# ╔═══════════════════════════════════════════════════════════════════════════════╗
+# ║                           MACOS INTEGRATION                                   ║
+# ╚═══════════════════════════════════════════════════════════════════════════════╝
+
+automatically-unhide-macos-hidden-apps = true
+
+# ╔═══════════════════════════════════════════════════════════════════════════════╗
+# ║                            GAPS CONFIGURATION                                 ║
+# ╚═══════════════════════════════════════════════════════════════════════════════╝
+
+[gaps]
+inner.horizontal = 12
+inner.vertical = 12
+
+outer.top = [
+  { monitor.main = 52 },
+  12
+]
+outer.right = 12
+outer.bottom = 12
+outer.left = 12
+
+# ╔═══════════════════════════════════════════════════════════════════════════════╗
+# ║                     WORKSPACE TO MONITOR ASSIGNMENT                           ║
+# ╚═══════════════════════════════════════════════════════════════════════════════╝
+
+[workspace-to-monitor-force-assignment]
+  terminal = 'main'
+  coding = 'main'
+  browser = 'main'
+  music = 'main'
+  design = 'main'
+  communication = 'main'
+  misc = 'main'
+
+  files = 'secondary'
+  mail = 'secondary'
+  tasks = 'secondary'
+
+# ╔═══════════════════════════════════════════════════════════════════════════════╗
+# ║                            KEY MAPPING                                        ║
+# ╚═══════════════════════════════════════════════════════════════════════════════╝
+
+[key-mapping]
+preset = 'qwerty'
+
+# ╔═══════════════════════════════════════════════════════════════════════════════╗
+# ║                       EXEC ENVIRONMENT CONFIGURATION                          ║
+# ╚═══════════════════════════════════════════════════════════════════════════════╝
+
+[exec]
+inherit-env-vars = true
+
+[exec.env-vars]
+PATH = '~/.cargo/bin:/opt/homebrew/bin:/opt/homebrew/sbin:${PATH}'
+
+# ╔═══════════════════════════════════════════════════════════════════════════════╗
+# ║                        WINDOW DETECTION RULES                                 ║
+# ╚═══════════════════════════════════════════════════════════════════════════════╝
+
+# ═══════  Monitor 1 Assignments
+
+[[on-window-detected]]
+if.app-id = 'com.mitchellh.ghostty'
+run = 'move-node-to-workspace terminal'
+
+[[on-window-detected]]
+if.app-id = 'dev.zed.Zed-Preview'
+run = 'move-node-to-workspace coding'
+
+[[on-window-detected]]
+if.app-id = 'com.microsoft.VSCode'
+run = 'move-node-to-workspace coding'
+
+[[on-window-detected]]
+if.app-id = 'com.microsoft.edgemac.Dev'
+run = 'move-node-to-workspace browser'
+
+[[on-window-detected]]
+if.app-id = 'company.thebrowser.dia'
+run = 'move-node-to-workspace browser'
+
+[[on-window-detected]]
+if.app-id = 'com.spotify.client'
+run = 'move-node-to-workspace music'
+
+[[on-window-detected]]
+if.app-id = 'com.tidal.desktop'
+run = 'move-node-to-workspace music'
+
+[[on-window-detected]]
+if.app-id = 'dev.zed.Zed-Preview'
+run = 'move-node-to-workspace music'
+
+[[on-window-detected]]
+if.app-id = 'com.figma.Desktop'
+run = 'move-node-to-workspace design'
+
+[[on-window-detected]]
+if.app-id = 'com.microsoft.teams2'
+run = 'move-node-to-workspace communication'
+
+[[on-window-detected]]
+if.app-id = 'net.whatsapp.WhatsApp'
+run = 'move-node-to-workspace communication'
+
+[[on-window-detected]]
+if.app-id = 'com.hnc.Discord'
+run = 'move-node-to-workspace communication'
+
+[[on-window-detected]]
+if.app-id = 'com.NeuralDSP.ArchetypeNollyX'
+run = 'move-node-to-workspace misc'
+
+[[on-window-detected]]
+if.app-id = 'com.NeuralDSP.ArchetypeGojiraX'
+run = 'move-node-to-workspace misc'
+
+[[on-window-detected]]
+if.app-id = 'com.NeuralDSP.ArchetypeJohnMayerX'
+run = 'move-node-to-workspace misc'
+
+[[on-window-detected]]
+if.app-id = 'com.NeuralDSP.FortinNamelessSuiteX'
+run = 'move-node-to-workspace misc'
+
+# ═══════  Monitor 2 Assignments
+
+[[on-window-detected]]
+if.app-id = 'com.apple.finder'
+run = 'move-node-to-workspace files'
+
+[[on-window-detected]]
+if.app-id = 'com.microsoft.Outlook'
+run = 'move-node-to-workspace mail'
+
+[[on-window-detected]]
+if.app-id = 'com.apple.reminders'
+run = 'move-node-to-workspace tasks'
+
+[[on-window-detected]]
+if.app-id = 'com.microsoft.AzureVpnMac'
+run = 'move-node-to-workspace tasks'
+
+[[on-window-detected]]
+if.app-id = 'me.proton.pass.electron'
+run = 'move-node-to-workspace tasks'
+
+# ═══════  Floating Layouts
+
+[[on-window-detected]]
+if.app-id = 'com.apple.systempreferences'
+run = 'layout floating'
+
+# ╔═══════════════════════════════════════════════════════════════════════════════╗
+# ║                          MAIN MODE KEYBINDINGS                                ║
+# ╚═══════════════════════════════════════════════════════════════════════════════╝
+
+[mode.main.binding]
+
+# ═══════  WORKSPACE SWITCHING
+
+alt-1 = 'workspace terminal'
+alt-2 = 'workspace coding'
+alt-3 = 'workspace browser'
+alt-4 = 'workspace music'
+alt-5 = 'workspace design'
+alt-6 = 'workspace communication'
+alt-7 = 'workspace misc'
+alt-8 = 'workspace files'
+alt-9 = 'workspace mail'
+alt-0 = 'workspace tasks'
+
+alt-shift-1 = 'move-node-to-workspace terminal --focus-follows-window'
+alt-shift-2 = 'move-node-to-workspace coding --focus-follows-window'
+alt-shift-3 = 'move-node-to-workspace browser --focus-follows-window'
+alt-shift-4 = 'move-node-to-workspace music --focus-follows-window'
+alt-shift-5 = 'move-node-to-workspace design --focus-follows-window'
+alt-shift-6 = 'move-node-to-workspace communication --focus-follows-window'
+alt-shift-7 = 'move-node-to-workspace misc --focus-follows-window'
+alt-shift-8 = 'move-node-to-workspace files --focus-follows-window'
+alt-shift-9 = 'move-node-to-workspace mail --focus-follows-window'
+alt-shift-0 = 'move-node-to-workspace tasks --focus-follows-window'
+
+# ═══════  Disable built-in useless hotkeys
+cmd-h = []
+cmd-alt-h = []
+
+# ═══════  Reload all configs
+cmd-ctrl-r = ['exec-and-forget barba reload', 'reload-config']
+
+# ═══════  Change wallpaper
+cmd-ctrl-shift-w = 'exec-and-forget barba wallpaper set --random'
+
+# ═══════  Resize and balance workspace
+cmd-ctrl-equal = ['resize width +50', 'resize height +50']
+cmd-ctrl-minus = ['resize width -50', 'resize height -50']
+cmd-ctrl-e = ['flatten-workspace-tree', 'balance-sizes']
+
+# ═══════  Layout shortcuts
+cmd-ctrl-b = 'layout dwindle'
+cmd-ctrl-f = 'layout floating tiling'
+cmd-ctrl-a = 'layout accordion'
+cmd-ctrl-n = 'layout scroll'
+cmd-ctrl-m = 'layout master'
+cmd-ctrl-v = ['layout v_tiles', 'balance-sizes']
+cmd-ctrl-c = ['layout h_tiles', 'balance-sizes']
+
+# ═══════  Move windows between displays
+cmd-alt-ctrl-left = 'move-node-to-monitor left'
+cmd-alt-ctrl-right = 'move-node-to-monitor right'
+cmd-alt-ctrl-up = 'move-node-to-monitor up'
+cmd-alt-ctrl-down = 'move-node-to-monitor down'
+
+# ═══════  Focus windows
+cmd-ctrl-shift-left = 'focus left'
+cmd-ctrl-shift-right = 'focus right'
+cmd-ctrl-shift-up = 'focus up'
+cmd-ctrl-shift-down = 'focus down'
+
+# ═══════  Cycle windows
+cmd-backtick = 'focus dfs-next --boundaries-action wrap-around-the-workspace'
+cmd-shift-backtick = 'focus dfs-prev --boundaries-action wrap-around-the-workspace'
+
+# ═══════  Move windows
+cmd-ctrl-left = 'move left'
+cmd-ctrl-right = 'move right'
+cmd-ctrl-up = 'move up'
+cmd-ctrl-down = 'move down'

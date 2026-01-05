@@ -15,11 +15,11 @@ brew upgrade
 
 print_progress "Installing command-line tools (formulas)"
 
-brew tap dteoh/sqa
 brew tap FelixKratz/formulae
 brew tap githubutilities/tap
 
 formulas=(
+  atuin
   bash
   bat
   btop
@@ -61,16 +61,15 @@ formulas=(
   ncurses
   neovim
   nextdns/tap/nextdns
+  ninja
   openssl
-  osx-cpu-temp
   pandoc
   perl
   pre-commit
   ripgrep
   rust-analyzer
   shellcheck
-  sketchybar
-  speedtest-cli
+  speedtest
   starship
   taplo
   tealdeer
@@ -85,7 +84,6 @@ formulas=(
   watchman
   webp
   wget
-  yabai
   yaml-language-server
   yazi
   yq
@@ -96,7 +94,6 @@ formulas=(
 install_from_head=(
   borders
   media-control
-  yabai
 )
 
 # Install formulas idempotently
@@ -116,6 +113,7 @@ print_progress "Installing applications (casks)"
 
 casks=(
   adguard
+  BarutSRB/tap/hyprspace
   displaylink
   figma
   firefox-nightly
@@ -129,7 +127,6 @@ casks=(
   font-symbols-only-nerd-font
   ghostty
   git-credential-manager
-  hammerspoon
   intune-company-portal
   jordanbaird-ice
   kap
@@ -150,18 +147,12 @@ casks=(
   proton-pass
   protonvpn
   proxy-audio-device
-  qlcolorcode
-  qlstephen
-  qlvideo
-  quicklook-json
-  quicklookase
   raycast
   sf-symbols
   shottr
   spotify
   stats
   visual-studio-code
-  webpquicklook
   whatsapp
   zoom
 )
@@ -174,7 +165,5 @@ done
 if command -v mas >/dev/null 2>&1 && ! mas list | grep -q "497799835"; then
   mas install 497799835 # Xcode
 fi
-
-defaults write org.hammerspoon.Hammerspoon MJConfigFile "$HOME/.config/hammerspoon/init.lua"
 
 print_success "Homebrew installed!"

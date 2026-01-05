@@ -1,0 +1,199 @@
+{
+  "agent": {
+    "always_allow_tool_actions": true,
+    "default_model": {
+      "model": "claude-opus-4.5",
+      "provider": "copilot_chat"
+    },
+    "dock": "left",
+    "inline_assistant_model": {
+      "model": "claude-opus-4.5",
+      "provider": "copilot_chat"
+    },
+    "message_editor_min_lines": 5,
+    "play_sound_when_agent_done": true
+  },
+  "auto_indent_on_paste": true,
+  "base_keymap": "SublimeText",
+  "buffer_font_fallbacks": [
+    "JetBrains Mono",
+    "Symbols Nerd Font Mono",
+    "Apple Color Emoji",
+    "Monaco"
+  ],
+  "buffer_font_family": "Maple Mono NF",
+  "buffer_font_size": 17,
+  "buffer_font_weight": 475,
+  "buffer_line_height": {
+    "custom": 1.6
+  },
+  "centered_layout": {
+    "left_padding": 0.1,
+    "right_padding": 0.1
+  },
+  "collaboration_panel": {
+    "button": false
+  },
+  "completions": {
+    "words": "disabled"
+  },
+  "current_line_highlight": "all",
+  "cursor_blink": true,
+  "cursor_shape": "bar",
+  "diagnostics": {
+    "button": true
+  },
+  "edit_predictions": {
+    "disabled_globs": ["**/node_modules/**", "**/dist/**", "**/.git/**"]
+  },
+  "ensure_final_newline_on_save": true,
+  "experimental.theme_overrides": {
+    "accents": [
+      "#cbb0f766",
+      "#b9c3fc66",
+      "#86caee66",
+      "#aee1b266",
+      "#f0e0bd66",
+      "#f1ba9d66",
+      "#eb9ab766"
+    ],
+    "background": "#11111be7",
+    "border": "#bac2de35",
+    "drop_target.background": "#31324466",
+    "editor.active_line_number": "#bac2de",
+    "editor.active_line.background": "#cdd6f410",
+    "editor.active_wrap_guide": "#bac2de35",
+    "editor.document_highlight.bracket_background": "#89b4fa17",
+    "editor.document_highlight.read_background": "#a6adc829",
+    "editor.document_highlight.write_background": "#a6adc829",
+    "editor.indent_guide": "#bac2de35",
+    "editor.indent_guide_active": "#89b4faaa",
+    "editor.line_number": "#bac2de40",
+    "editor.wrap_guide": "#bac2de35",
+    "element.active": "#585b704d",
+    "element.background": "#89b4fa50",
+    "element.disabled": "#6c7086",
+    "element.hover": "#89b4fa33",
+    "element.selected": "#3132444d",
+    "ghost_element.active": "#89b4fa",
+    "ghost_element.background": "#ffffff25",
+    "ghost_element.disabled": "#6c7086",
+    "ghost_element.hover": "#ffffff20",
+    "ghost_element.selected": "#6f728d66",
+    "icon.accent": "#89b4fa",
+    "icon.muted": "#7f849c",
+    "panel.indent_guide": "#bac2de35",
+    "panel.indent_guide_hover": "#89b4faaa",
+    "scrollbar.thumb.background": "#31324490",
+    "scrollbar.thumb.hover_background": "#313244cc",
+    "scrollbar.track.border": "#cdd6f412",
+    "status_bar.background": "#11111be3",
+    "tab.active_background": "#ffffff15",
+    "text.accent": "#89b4fa",
+    "text.muted": "#bac2de",
+    "text.placeholder": "#585b70",
+    "title_bar.background": "#11111be3"
+  },
+  "features": {
+    "edit_prediction_provider": "copilot"
+  },
+  "file_types": {
+    "json": [".prettierrc"],
+    "shellscript": [".ssh-config"]
+  },
+  "git": {
+    "inline_blame": {
+      "show_commit_summary": true
+    }
+  },
+  "git_panel": {
+    "sort_by_path": false,
+    "status_style": "icon"
+  },
+  "icon_theme": "Catppuccin Mocha",
+  "indent_guides": {
+    "enabled": true
+  },
+  "linked_edits": true,
+  "minimap": {
+    "show": "never"
+  },
+  "multi_cursor_modifier": "cmd_or_ctrl",
+  "node": {
+    "npm_path": "pnpm"
+  },
+  "outline_panel": {
+    "button": false,
+    "dock": "left"
+  },
+  "preview_tabs": {
+    "enable_keep_preview_on_code_navigation": true,
+    "enable_preview_from_file_finder": true
+  },
+  "project_panel": {
+    "auto_fold_dirs": false,
+    "button": true,
+    "dock": "right",
+    "entry_spacing": "standard",
+    "hide_gitignore": false,
+    "hide_hidden": false,
+    "hide_root": true,
+    "indent_size": 24.0,
+    "show_diagnostics": "all",
+    "sticky_scroll": false
+  },
+  "remove_trailing_whitespace_on_save": true,
+  "scroll_sensitivity": 1.5,
+  "search": {
+    "button": true
+  },
+  "show_edit_predictions": true,
+  "show_whitespaces": "trailing",
+  "soft_wrap": "none",
+  "status_bar": {
+    "active_language_button": true,
+    "cursor_position_button": true
+  },
+  "tab_bar": {
+    "show_nav_history_buttons": false
+  },
+  "tab_size": 2,
+  "tabs": {
+    "file_icons": true,
+    "git_status": true,
+    "show_diagnostics": "errors"
+  },
+  "telemetry": {
+    "diagnostics": false,
+    "metrics": false
+  },
+  "terminal": {
+    "blinking": "on",
+    "button": true,
+    "copy_on_select": true,
+    "cursor_shape": "bar",
+    "font_weight": 500,
+    "line_height": {
+      "custom": 1.6
+    },
+    "max_scroll_history_lines": 9999999
+  },
+  "theme": "Catppuccin Mocha (Blur) [Heavy]",
+  "title_bar": {
+    "show_branch_icon": true,
+    "show_menus": false,
+    "show_onboarding_banner": false,
+    "show_project_items": true
+  },
+  "toolbar": {
+    "breadcrumbs": false,
+    "quick_actions": false
+  },
+  "ui_font_family": "Maple Mono NF",
+  "ui_font_size": 16.5,
+  "ui_font_weight": 500,
+  "use_smartcase_search": true,
+  "use_system_window_tabs": false,
+  "when_closing_with_no_tabs": "platform_default",
+  "wrap_guides": [100]
+}

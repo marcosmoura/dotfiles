@@ -1,0 +1,16 @@
+auto_sync = true
+dialect = "us"
+enter_accept = false
+inline_height = 20
+search_mode = "fuzzy"
+sync_frequency = "10m"
+timezone = "local"
+update_check = true
+workspaces = true
+filter_mode_shell_up_key_binding = "workspace"
+
+[sync]
+records = true
+
+[theme]
+name = "catppuccin"

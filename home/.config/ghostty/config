@@ -14,7 +14,7 @@ font-variation-bold = wght=650
 # Theme & Colors
 ########################################
 theme = catppuccin
-split-divider-color = #3b3d4e
+split-divider-color = #313244
 
 ########################################
 # Cursor
