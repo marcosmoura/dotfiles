@@ -1,5 +1,3 @@
-local none_color = "NONE"
-
 local function parse_hex(int_color)
   return string.format("#%x", int_color)
 end
@@ -9,7 +7,7 @@ local function get_hlgroup(name, fallback)
     local group = vim.api.nvim_get_hl(0, { name = name })
 
     local hl = {
-      fg = group.fg == nil and none_color or parse_hex(group.fg),
+      fg = group.fg == nil and "NONE" or parse_hex(group.fg),
     }
 
     return hl
@@ -26,32 +24,30 @@ return {
       local lazy_status = require("lazy.status")
       local colors = require("catppuccin.palettes.mocha")
 
-      colors.bg = none_color
-
       return {
         options = {
           component_separators = { left = " ", right = "" },
           section_separators = { left = "", right = "" },
           theme = {
             normal = {
-              a = { fg = colors.blue, bg = colors.bg },
-              b = { fg = colors.cyan, bg = colors.bg },
-              c = { fg = colors.text, bg = colors.bg },
-              x = { fg = colors.text, bg = colors.bg },
-              y = { fg = colors.magenta, bg = colors.bg },
-              z = { fg = colors.grey, bg = colors.bg },
+              a = { fg = colors.blue, bg = "NONE" },
+              b = { fg = colors.cyan, bg = "NONE" },
+              c = { fg = colors.text, bg = "NONE" },
+              x = { fg = colors.text, bg = "NONE" },
+              y = { fg = colors.magenta, bg = "NONE" },
+              z = { fg = colors.grey, bg = "NONE" },
             },
             insert = {
-              a = { fg = colors.green, bg = colors.bg },
-              z = { fg = colors.grey, bg = colors.bg },
+              a = { fg = colors.green, bg = "NONE" },
+              z = { fg = colors.grey, bg = "NONE" },
             },
             visual = {
-              a = { fg = colors.magenta, bg = colors.bg },
-              z = { fg = colors.grey, bg = colors.bg },
+              a = { fg = colors.magenta, bg = "NONE" },
+              z = { fg = colors.grey, bg = "NONE" },
             },
             terminal = {
-              a = { fg = colors.orange, bg = colors.bg },
-              z = { fg = colors.grey, bg = colors.bg },
+              a = { fg = colors.orange, bg = "NONE" },
+              z = { fg = colors.grey, bg = "NONE" },
             },
           },
           globalstatus = vim.o.laststatus == 3,

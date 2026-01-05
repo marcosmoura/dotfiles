@@ -6,8 +6,7 @@ options=(
   style=round
   width=8
   active_color=0xFFFFFFFF
-  inactive_color=0x50FFFFFF
-  blacklist="Electron"
+  inactive_color=0x00FFFFFF
 )
 
 borders "${options[@]}"

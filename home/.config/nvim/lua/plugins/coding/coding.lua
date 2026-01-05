@@ -12,9 +12,8 @@ return {
     opts = {
       library = {
         { path = "${3rd}/luv/library", words = { "vim%.uv" } },
-        { path = "snacks.nvim", words = { "Snacks" } },
-        { path = "LazyVim", words = { "LazyVim" } },
-        { path = "~/.config/hammerspoon/Spoons/EmmyLua.spoon/annotations", words = { "hs%." } },
+        { path = "snacks.nvim",        words = { "Snacks" } },
+        { path = "LazyVim",            words = { "LazyVim" } },
       },
     },
   },
@@ -35,19 +34,6 @@ return {
   },
 
   {
-    "catppuccin",
-    opts = {
-      custom_highlights = function(colors)
-        return {
-          PackageInfoUpToDateVersion = { fg = colors.green },
-          PackageInfoOutdatedVersion = { fg = colors.yellow },
-          PackageInfoInErrorVersion = { fg = colors.red },
-        }
-      end,
-    },
-  },
-
-  {
     "vuki656/package-info.nvim",
     cond = function()
       return not vim.g.vscode
@@ -60,7 +46,7 @@ return {
 
       require("package-info").setup({
         autostart = true,
-        package_manager = "yarn",
+        package_manager = "pnpm",
         hide_up_to_date = false,
         icons = {
           style = {

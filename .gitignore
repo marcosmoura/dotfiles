@@ -58,10 +58,6 @@ yarn-error.log*
 *.sln
 *.sw?
 
-# Hammerspoon
-home/.config/hammerspoon/Spoons/*
-!home/.config/hammerspoon/Spoons/SpoonInstall.spoon
-
 # Rust
 **/target/
 **/target/*

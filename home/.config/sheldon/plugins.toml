@@ -9,7 +9,7 @@ shell = "zsh"
 github = "romkatv/zsh-defer"
 
 [templates]
-defer = "{{ hooks?.pre | nl }}{% for file in files %}zsh-defer source \"{{ file }}\"\n{% endfor %}{{ hooks?.post | nl }}"
+defer = "{{ hooks?.pre | nl }}{% for file in files %}zsh-defer -p source \"{{ file }}\"\n{% endfor %}{{ hooks?.post | nl }}"
 
 # ==============================================================================
 # CORE SYSTEM MODULES
@@ -17,8 +17,8 @@ defer = "{{ hooks?.pre | nl }}{% for file in files %}zsh-defer source \"{{ file 
 # Essential functionality that needs to load early
 
 [plugins.core-system]
-local = "~/.config/zsh/modules"
-use = ["{colors,compinit,macOS}/*.plugin.sh"]
+local = "~/.config/zsh/plugins"
+use = ["{compinit,macOS}.plugin.sh"]
 
 # ==============================================================================
 # OH-MY-ZSH FOUNDATION
@@ -34,6 +34,7 @@ use = ["{compfix,completion,git,grep,history,key-bindings}.zsh"]
 github = "ohmyzsh/ohmyzsh"
 dir = "plugins"
 use = ["{aliases,cp,dircycle,github,zoxide}/*.plugin.zsh"]
+apply = ["defer"]
 
 # ==============================================================================
 # SHELL ENHANCEMENTS
@@ -42,6 +43,7 @@ use = ["{aliases,cp,dircycle,github,zoxide}/*.plugin.zsh"]
 
 [plugins.256color]
 github = "chrissicool/zsh-256color"
+apply = ["defer"]
 
 [plugins.syntax-highlight]
 github = "marcosmoura/fast-syntax-highlighting"
@@ -65,10 +67,16 @@ apply = ["defer"]
 github = "zsh-users/zsh-completions"
 apply = ["defer"]
 
-# Custom completions from dotfiles
+# Custom env from dotfiles
+[plugins.dotfiles-env]
+local = "~/.config/zsh/plugins"
+use = ["env.plugin.sh"]
+apply = ["defer"]
+
+# Custom completion from dotfiles
 [plugins.dotfiles-completions]
-local = "~/.config/zsh/modules/completions"
-use = ["*.plugin.sh"]
+local = "~/.config/zsh/plugins"
+use = ["completions.plugin.sh"]
 
 # Node.js ecosystem completions
 [plugins.yarn-completion]
@@ -90,12 +98,14 @@ apply = ["defer"]
 
 [plugins.zoxide]
 github = "ajeetdsouza/zoxide"
+apply = ["defer"]
 
 # ==============================================================================
 # CUSTOM DOTFILES MODULES
 # ==============================================================================
 # Personal shell configuration modules
 
-[plugins.dotfiles-modules]
-local = "~/.config/zsh/modules"
-use = ["*.plugin.sh", "!{colors,completions,compinit,macOS}/*.plugin.sh"]
+[plugins.dotfiles-plugins]
+local = "~/.config/zsh/plugins"
+use = ["*.plugin.sh", "!{compinit,completions,env,macOS}/*.plugin.sh"]
+apply = ["defer"]

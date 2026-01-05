@@ -6,4 +6,4 @@ sort_by = "natural"
 sort_dir_first = true
 
 [preview]
-syntect_theme = "~/.config/bat/themes/Catppuccin.tmTheme"
+syntect_theme = "~/.config/yazi/Catppuccin-mocha.tmTheme"
