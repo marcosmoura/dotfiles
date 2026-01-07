@@ -7,12 +7,42 @@
     "radius": 20,
     "blur": 0
   },
+
   "bar": {
     "weather": {
       "visualCrossingApiKey": "B3TT8UMXUZGYNUNKQBFCRVAD8",
       "defaultLocation": "Prague"
     }
   },
+
+  "proxyAudio": {
+    "enabled": true,
+    "input": {
+      "name": "Virtual Input Device",
+      "priority": [
+        { "name": "AirPods Pro 3", "strategy": "contains" },
+        { "name": "AT2020USB", "strategy": "startsWith" },
+        { "name": "MacBook Pro", "strategy": "startsWith" }
+      ]
+    },
+    "output": {
+      "name": "Virtual Output Device",
+      "bufferSize": 128,
+      "priority": [
+        { "name": "AirPods Pro 3", "strategy": "contains" },
+        { "name": "External Speakers" },
+        // { "name": "MiniFuse 2" },
+        { "name": "MacBook Pro", "strategy": "startsWith" }
+      ]
+    }
+  },
+
+  "menuAnywhere": {
+    "enabled": true,
+    "modifiers": ["control", "command"],
+    "mouseButton": "rightClick"
+  },
+
   "tiling": {
     "enabled": false,
     "animations": {
@@ -171,6 +201,7 @@
       { "app-id": "com.raycast.macos" }
     ]
   },
+
   "keybindings": {
     // // Disable macOS default keybindings
     // "Command+h": [],
