@@ -6,7 +6,7 @@ adjust-cell-width = -1
 font-family = Maple Mono
 font-family = Symbols Nerd Font Mono
 font-family = Apple Color Emoji
-font-size = 18
+font-size = 17
 font-variation = wght=500
 font-variation-bold = wght=650
 
@@ -25,9 +25,9 @@ cursor-style = bar
 ########################################
 # Background & Transparency
 ########################################
-background-blur-radius = 48
+background-blur-radius = 32
 background-opacity = 0.9
-unfocused-split-opacity = 0.5
+unfocused-split-opacity = 0.45
 
 ########################################
 # Window & Layout
