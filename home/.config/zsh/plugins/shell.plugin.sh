@@ -11,11 +11,11 @@ alias dotfiles="code ~/Projects/dotfiles"
 # Open zsh config
 alias zshconfig="code ~/.zshrc"
 
-# Always enable colored `grep` output
+# Always enable colored `grep` output with sensible excludes
 # Note: `GREP_OPTIONS="--color=auto"` is deprecated, hence the alias usage.
-alias grep='grep --color=auto'
-alias fgrep='fgrep --color=auto'
-alias egrep='egrep --color=auto'
+alias grep='grep --color=auto --exclude-dir={.bzr,CVS,.git,.hg,.svn,.idea,.tox,.venv,venv,node_modules}'
+alias egrep='grep -E'
+alias fgrep='grep -F'
 
 # sudo editors
 alias vim='nvim'
@@ -44,7 +44,7 @@ export FZF_DEFAULT_OPTS=" \
 
 # FZF with unique list filtering
 function fzfu() {
-	awk '!x[$0]++' | fzf
+  awk '!x[$0]++' | fzf
 }
 
 # Better tree
@@ -52,33 +52,33 @@ alias tree="tree --gitignore --dirsfirst --sort name -C"
 
 # Create a .tar.gz archive, using `zopfli`, `pigz` or `gzip` for compression
 function targz() {
-	local tmpFile="${@%/}.tar"
-	tar -cvf "${tmpFile}" --exclude=".DS_Store" "${@}" || return 1
+  local tmpFile="${@%/}.tar"
+  tar -cvf "${tmpFile}" --exclude=".DS_Store" "${@}" || return 1
 
-	size=$(
-		stat -f"%z" "${tmpFile}" 2>/dev/null # OS X `stat`
-		stat -c"%s" "${tmpFile}" 2>/dev/null # GNU `stat`
-	)
+  size=$(
+    stat -f"%z" "${tmpFile}" 2>/dev/null # OS X `stat`
+    stat -c"%s" "${tmpFile}" 2>/dev/null # GNU `stat`
+  )
 
-	local cmd=""
-	if ((size < 52428800)) && hash zopfli 2>/dev/null; then
-		# the .tar file is smaller than 50 MB and Zopfli is available; use it
-		cmd="zopfli"
-	else
-		if hash pigz 2>/dev/null; then
-			cmd="pigz"
-		else
-			cmd="gzip"
-		fi
-	fi
+  local cmd=""
+  if ((size < 52428800)) && hash zopfli 2>/dev/null; then
+    # the .tar file is smaller than 50 MB and Zopfli is available; use it
+    cmd="zopfli"
+  else
+    if hash pigz 2>/dev/null; then
+      cmd="pigz"
+    else
+      cmd="gzip"
+    fi
+  fi
 
-	echo "Compressing .tar using \`${cmd}\`…"
-	"${cmd}" -v "${tmpFile}" || return 1
-	[ -f "${tmpFile}" ] && rm "${tmpFile}"
-	echo "${tmpFile}.gz created successfully."
+  echo "Compressing .tar using \`${cmd}\`…"
+  "${cmd}" -v "${tmpFile}" || return 1
+  [ -f "${tmpFile}" ] && rm "${tmpFile}"
+  echo "${tmpFile}.gz created successfully."
 }
 
 # Reload shell
 function reload() {
-	exec $SHELL -l
+  exec $SHELL -l
 }
