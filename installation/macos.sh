@@ -9,9 +9,9 @@ print_start "Configuring macOS"
 # Capture macOS version early for conditional tweaks
 MACOS_VERSION="$(sw_vers -productVersion 2>/dev/null | awk -F '.' '{print $1"."$2}')"
 
-# Close any open System Preferences panes, to prevent them from overriding
-# settings we’re about to change
-osascript -e 'tell application "System Preferences" to quit'
+# Close any open System Settings/Preferences panes, to prevent them from overriding
+# settings we're about to change (System Preferences renamed to System Settings in macOS Ventura)
+osascript -e 'tell application "System Settings" to quit' 2>/dev/null || osascript -e 'tell application "System Preferences" to quit' 2>/dev/null || true
 
 ###############################################################################
 # General UI/UX
@@ -176,9 +176,6 @@ defaults write NSGlobalDomain AppleShowAllExtensions -bool true
 
 # Finder: hide path bar
 defaults write com.apple.finder ShowPathbar -bool false
-
-# Finder: allow text selection in Quick Look
-defaults write com.apple.finder QLEnableTextSelection -bool true
 
 # Display full POSIX path as Finder window title
 defaults write com.apple.finder _FXShowPosixPathInTitle -bool true
@@ -359,12 +356,6 @@ defaults write com.apple.TextEdit RichText -int 0
 # Open and save files as UTF-8 in TextEdit
 defaults write com.apple.TextEdit PlainTextEncoding -int 4
 defaults write com.apple.TextEdit PlainTextEncodingForWrite -int 4
-
-###############################################################################
-# WezTerm
-###############################################################################
-# Set the default appearance to light
-defaults write com.github.wez.wezterm NSRequiresAquaSystemAppearance -bool YES
 
 ###############################################################################
 # Mac App Store
