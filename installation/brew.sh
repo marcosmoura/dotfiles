@@ -57,7 +57,7 @@ formulas=(
   mise
   moreutils
   narugit/tap/smctemp
-  ncdu
+  gdu
   ncurses
   neovim
   nextdns/tap/nextdns
