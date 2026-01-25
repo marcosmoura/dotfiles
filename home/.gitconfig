@@ -101,7 +101,7 @@
   conflictstyle = diff3
 
 [help]
-  autocorrect = 1
+  autocorrect = prompt
 
 [diff]
   colorMoved = default
@@ -189,11 +189,3 @@
 
 [interactive]
   diffFilter = delta --color-only
-[credential]
-	helper = osxkeychain
-	helper =
-	helper = /usr/local/share/gcm-core/git-credential-manager
-[credential "https://dev.azure.com"]
-	useHttpPath = true
-[credential "azrepos:org/office"]
-	username = marcosmoura@microsoft.com
