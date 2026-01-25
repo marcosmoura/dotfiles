@@ -191,10 +191,6 @@ if.app-id = 'com.tidal.desktop'
 run = 'move-node-to-workspace music'
 
 [[on-window-detected]]
-if.app-id = 'dev.zed.Zed-Preview'
-run = 'move-node-to-workspace music'
-
-[[on-window-detected]]
 if.app-id = 'com.figma.Desktop'
 run = 'move-node-to-workspace design'
 
