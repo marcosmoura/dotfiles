@@ -12,3 +12,5 @@ PreferredAuthentications publickey
 Host *
 AddKeysToAgent yes
 IdentityFile ~/.ssh/personal
+IdentitiesOnly yes
+HashKnownHosts yes
