@@ -65,8 +65,3 @@ quit-after-last-window-closed = true
 ########################################
 shell-integration = zsh
 shell-integration-features = no-title
-
-########################################
-# Default Working Directory
-########################################
-working-directory = "~/Projects/fluent/fluentui"
