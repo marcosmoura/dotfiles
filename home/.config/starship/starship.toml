@@ -44,5 +44,5 @@ ignore_timeout = true
 [custom.special-emoji]
 when = true
 command = 'echo -n "$STARSHIP_EMOJI"'
-format = "[$output](bold cyan)  "
+format = "[$output](bold cyan) "
 ignore_timeout = true

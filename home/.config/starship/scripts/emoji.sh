@@ -18,7 +18,7 @@ random_emoji() {
 	local count=${#items[@]}
 	[[ $count -eq 0 ]] && return 1
 	local index=$((RANDOM % count))
-	echo -n "${items[$index]}"
+	echo -n "${items[$index]}  "
 }
 
 day=$(date +%d)
