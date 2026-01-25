@@ -190,7 +190,7 @@
     "quick_actions": false
   },
   "ui_font_family": "Maple Mono NF",
-  "ui_font_size": 16.5,
+  "ui_font_size": 16,
   "ui_font_weight": 500,
   "use_smartcase_search": true,
   "use_system_window_tabs": false,
