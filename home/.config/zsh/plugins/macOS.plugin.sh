@@ -88,7 +88,7 @@ function systeminfo {
 
 	desc="Apple $model_name / $chip_name / $memory RAM / $disk_size"
 
-	print_yellow "\n  💻  $desc\n"
+	print_yellow "\n  💻 $desc\n"
 
 	fastfetch
 }
