@@ -14,5 +14,5 @@ greedy_cask = false
 
 [commands]
 "Catppuccin Colors" = "export CATPPUCCIN_COLORS=$(vivid generate catppuccin-mocha); export LS_COLORS=$CATPPUCCIN_COLORS; echo $CATPPUCCIN_COLORS > ~/.config/zsh/static/catppuccin-colors.txt && echo 'Catppuccin colors updated!'"
-"Ruby Installation" = "export RBENV_VERSION=$(rbenv install -l 2>/dev/null | awk '/^[0-9]+\\.[0-9]+\\.[0-9]+$/ {print $1}' | tail -1); echo \"Installing Ruby $RBENV_VERSION\"; rbenv install -s \"$RBENV_VERSION\" && rbenv global \"$RBENV_VERSION\"; gem update --system"
+"Ruby Update" = "mise upgrade ruby && gem update --system && gem update"
 "Python Packages" = "VENV_DIR=\"$HOME/.local/share/venv\"; if [ ! -d \"$VENV_DIR\" ] || [ ! -f \"$VENV_DIR/bin/python\" ]; then echo \"Creating/Recreating Python virtual environment\"; rm -rf \"$VENV_DIR\"; python3 -m venv \"$VENV_DIR\"; fi; source \"$VENV_DIR/bin/activate\" && pip install --upgrade pip && pip list --outdated | awk '{if(NR>2)print $1}' | xargs -n1 pip install -U || true"
