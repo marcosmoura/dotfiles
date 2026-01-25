@@ -44,8 +44,8 @@ export EDITOR=$(which nvim)
 export LANG="en_US.UTF-8"
 export LC_ALL="en_US.UTF-8"
 
-# Highlight section titles in manual pages.
-export LESS_TERMCAP_md="${yellow}"
+# Highlight section titles in manual pages (bold yellow).
+export LESS_TERMCAP_md=$'\e[1;33m'
 
 # Don’t clear the screen after quitting a manual page.
 export MANPAGER="less -X"
@@ -61,7 +61,7 @@ export ENABLE_CORRECTION="false"
 export COMPLETION_WAITING_DOTS="false"
 export HIST_STAMPS="dd/mm/yyyy"
 export HISTSIZE=250000
-export SAVESIZE=25000
+export SAVEHIST=25000
 
 # You Should Use
 export YSU_MODE=ALL
