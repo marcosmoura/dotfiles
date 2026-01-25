@@ -37,7 +37,6 @@ vim.g.loaded_netrw = 1
 vim.g.loaded_netrwPlugin = 1
 
 -- LazyVim settings
-vim.g.lazyvim_cmp = "blink"
 vim.g.lazyvim_cmp = "blink.cmp"
 vim.g.lazyvim_picker = "snacks"
 vim.g.root_spec = { ".git", "lsp", "cwd" }
