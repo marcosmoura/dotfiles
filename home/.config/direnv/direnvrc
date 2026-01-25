@@ -1,0 +1,48 @@
+# direnv stdlib extensions
+# https://direnv.net/man/direnv-stdlib.1.html
+
+# Use a specific Node.js version via mise
+use_mise() {
+  direnv_load mise direnv exec
+}
+
+# Use a specific Node.js version via fnm
+use_node() {
+  local version=${1:-}
+  if [[ -z "$version" ]] && [[ -f .node-version ]]; then
+    version=$(cat .node-version)
+  elif [[ -z "$version" ]] && [[ -f .nvmrc ]]; then
+    version=$(cat .nvmrc)
+  fi
+
+  if [[ -n "$version" ]]; then
+    log_status "Using Node.js $version"
+    mise use node@"$version"
+  fi
+}
+
+# Automatically load .env files (with security warning)
+dotenv_if_exists() {
+  local envfile="${1:-.env}"
+  if [[ -f "$envfile" ]]; then
+    log_status "Loading $envfile"
+    dotenv "$envfile"
+  fi
+}
+
+# Layout for Rust projects with cargo
+layout_rust() {
+  PATH_add "$(pwd)/target/debug"
+  PATH_add "$(pwd)/target/release"
+  export CARGO_HOME="${CARGO_HOME:-$HOME/.cargo}"
+  export RUSTUP_HOME="${RUSTUP_HOME:-$HOME/.rustup}"
+}
+
+# Source local environment overrides
+source_env_if_exists() {
+  local envfile="${1:-.envrc.local}"
+  if [[ -f "$envfile" ]]; then
+    log_status "Loading $envfile"
+    source_env "$envfile"
+  fi
+}
