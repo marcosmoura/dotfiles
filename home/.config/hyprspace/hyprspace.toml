@@ -162,10 +162,12 @@ PATH = '~/.cargo/bin:/opt/homebrew/bin:/opt/homebrew/sbin:${PATH}'
 
 # ═══════  Monitor 1 Assignments
 
+# Terminal
 [[on-window-detected]]
 if.app-id = 'com.mitchellh.ghostty'
 run = 'move-node-to-workspace terminal'
 
+# Coding
 [[on-window-detected]]
 if.app-id = 'dev.zed.Zed-Preview'
 run = 'move-node-to-workspace coding'
@@ -174,6 +176,7 @@ run = 'move-node-to-workspace coding'
 if.app-id = 'com.microsoft.VSCode'
 run = 'move-node-to-workspace coding'
 
+# Browser
 [[on-window-detected]]
 if.app-id = 'com.microsoft.edgemac.Dev'
 run = 'move-node-to-workspace browser'
@@ -182,6 +185,7 @@ run = 'move-node-to-workspace browser'
 if.app-id = 'company.thebrowser.dia'
 run = 'move-node-to-workspace browser'
 
+# Music
 [[on-window-detected]]
 if.app-id = 'com.spotify.client'
 run = 'move-node-to-workspace music'
@@ -190,10 +194,12 @@ run = 'move-node-to-workspace music'
 if.app-id = 'com.tidal.desktop'
 run = 'move-node-to-workspace music'
 
+# Design
 [[on-window-detected]]
 if.app-id = 'com.figma.Desktop'
 run = 'move-node-to-workspace design'
 
+# Communication
 [[on-window-detected]]
 if.app-id = 'com.microsoft.teams2'
 run = 'move-node-to-workspace communication'
@@ -206,6 +212,7 @@ run = 'move-node-to-workspace communication'
 if.app-id = 'com.hnc.Discord'
 run = 'move-node-to-workspace communication'
 
+# Misc
 [[on-window-detected]]
 if.app-id = 'com.NeuralDSP.ArchetypeNollyX'
 run = 'move-node-to-workspace misc'
@@ -224,14 +231,17 @@ run = 'move-node-to-workspace misc'
 
 # ═══════  Monitor 2 Assignments
 
+# Files
 [[on-window-detected]]
 if.app-id = 'com.apple.finder'
 run = 'move-node-to-workspace files'
 
+# Mail
 [[on-window-detected]]
 if.app-id = 'com.microsoft.Outlook'
 run = 'move-node-to-workspace mail'
 
+# Tasks
 [[on-window-detected]]
 if.app-id = 'com.apple.reminders'
 run = 'move-node-to-workspace tasks'
