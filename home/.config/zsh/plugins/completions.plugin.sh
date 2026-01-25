@@ -11,5 +11,5 @@ eval "$(atuin init zsh)" >/dev/null 2>&1
 bindkey '^r' atuin-up-search
 bindkey '^R' atuin-search
 
-# Barba completions
-eval "$(barba completions --shell zsh)" >/dev/null 2>&1
+# Stache completions
+eval "$(stache completions --shell zsh)" >/dev/null 2>&1

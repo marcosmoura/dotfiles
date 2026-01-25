@@ -6,10 +6,10 @@ config-version = 2
 start-at-login = true
 
 after-startup-command = [
-  # Restart Barba to ensure it's running
-  'exec-and-forget killall barba',
+  # Restart Stache to ensure it's running
+  'exec-and-forget killall stache',
   'exec-and-forget sleep 1',
-  'exec-and-forget open -na "/Applications/Barba.app"',
+  'exec-and-forget open -na "/Applications/Stache.app"',
 
   # Disable Caps Lock key
   "exec-and-forget hidutil property --set '{\"UserKeyMapping\":[{\"HIDKeyboardModifierMappingSrc\": 0x700000039, \"HIDKeyboardModifierMappingDst\": 0x7000000E3}]}'",
@@ -19,7 +19,7 @@ after-startup-command = [
   'layout accordion',
 
   'workspace coding',
-  'layout master',
+  'layout accordion',
 
   'workspace browser',
   'layout accordion',
@@ -45,7 +45,7 @@ after-startup-command = [
   'workspace tasks',
   'layout v_tiles',
 
-  'workspace coding'
+  'workspace coding',
 ]
 
 persistent-workspaces = [
@@ -58,7 +58,7 @@ persistent-workspaces = [
   "misc",
   "files",
   "mail",
-  "tasks"
+  "tasks",
 ]
 
 
@@ -66,10 +66,12 @@ persistent-workspaces = [
 # ║                             BAR INTEGRATION                                   ║
 # ╚═══════════════════════════════════════════════════════════════════════════════╝
 
-exec-on-workspace-change = ['/bin/bash', '-c',
-  'barba workspace-changed $AEROSPACE_FOCUSED_WORKSPACE'
+exec-on-workspace-change = [
+  '/bin/bash',
+  '-c',
+  'stache event workspace-changed $AEROSPACE_FOCUSED_WORKSPACE',
 ]
-on-focus-changed = 'exec-and-forget barba focus-changed'
+on-focus-changed = 'exec-and-forget stache event window-focus-changed'
 
 # ╔═══════════════════════════════════════════════════════════════════════════════╗
 # ║                                LAYOUT SETTINGS                                ║
@@ -115,10 +117,7 @@ automatically-unhide-macos-hidden-apps = true
 inner.horizontal = 12
 inner.vertical = 12
 
-outer.top = [
-  { monitor.main = 52 },
-  12
-]
+outer.top = [{ monitor.main = 52 }, 12]
 outer.right = 12
 outer.bottom = 12
 outer.left = 12
@@ -128,17 +127,17 @@ outer.left = 12
 # ╚═══════════════════════════════════════════════════════════════════════════════╝
 
 [workspace-to-monitor-force-assignment]
-  terminal = 'main'
-  coding = 'main'
-  browser = 'main'
-  music = 'main'
-  design = 'main'
-  communication = 'main'
-  misc = 'main'
+terminal = 'main'
+coding = 'main'
+browser = 'main'
+music = 'main'
+design = 'main'
+communication = 'main'
+misc = 'main'
 
-  files = 'secondary'
-  mail = 'secondary'
-  tasks = 'secondary'
+files = 'secondary'
+mail = 'secondary'
+tasks = 'secondary'
 
 # ╔═══════════════════════════════════════════════════════════════════════════════╗
 # ║                            KEY MAPPING                                        ║
@@ -290,10 +289,10 @@ cmd-h = []
 cmd-alt-h = []
 
 # ═══════  Reload all configs
-cmd-ctrl-r = ['exec-and-forget barba reload', 'reload-config']
+cmd-ctrl-r = ['exec-and-forget stache reload', 'reload-config']
 
 # ═══════  Change wallpaper
-cmd-ctrl-shift-w = 'exec-and-forget barba wallpaper set --random'
+cmd-ctrl-shift-w = 'exec-and-forget stache wallpaper set --random'
 
 # ═══════  Resize and balance workspace
 cmd-ctrl-equal = ['resize width +50', 'resize height +50']
