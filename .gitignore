@@ -1,15 +1,14 @@
 # Local files
 /dist
-home/.config/crossnote
 home/.config/gh/hosts.yml
 home/.config/github-copilot
-home/.config/mume
+home/.config/mole
 home/.config/raycast
 home/.config/sheldon/plugins.lock
 home/.config/sheldon/repos
+home/.config/stache/.env
 home/.config/yarn
 home/.config/yazi/plugins
-home/.config/helix/runtime
 node_modules
 
 # General
