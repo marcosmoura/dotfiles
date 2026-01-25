@@ -1,0 +1,295 @@
+{
+  "$schema": "https://raw.githubusercontent.com/marcosmoura/stache/refs/heads/main/stache.schema.json",
+
+  "bar": {
+    "enabled": true,
+    "height": 28,
+    "padding": 12,
+    "weather": {
+      "apiKeys": ".env",
+      "defaultLocation": "Prague"
+    }
+  },
+
+  "wallpapers": {
+    "enabled": true,
+    "path": "~/Projects/personal/dotfiles/home/.config/wallpapers",
+    "interval": 0,
+    "mode": "random",
+    "radius": 20,
+    "blur": 0
+  },
+
+  "commandQuit": {
+    "enabled": true,
+    "holdDuration": 1500
+  },
+
+  "notunes": {
+    "enabled": true,
+    "targetApp": "tidal"
+  },
+
+  "proxyAudio": {
+    "enabled": true,
+    "input": [
+      { "name": "AirPods Pro 3", "strategy": "contains" },
+      { "name": "AT2020USB", "strategy": "startsWith" },
+      { "name": "MacBook Pro", "strategy": "startsWith" }
+    ],
+    "output": [
+      { "name": "AirPods Pro 3", "strategy": "contains" },
+      {
+        "name": "External Speakers",
+        "dependsOn": { "name": "MiniFuse", "strategy": "startsWith" }
+      },
+      { "name": "MacBook Pro", "strategy": "startsWith" }
+    ]
+  },
+
+  "menuAnywhere": {
+    "enabled": true,
+    "modifiers": ["control", "command"],
+    "mouseButton": "rightClick"
+  },
+
+  "tiling": {
+    "enabled": true,
+    "animations": {
+      "enabled": false,
+      "duration": 350,
+      "easing": "ease-out-expo"
+    },
+    "borders": {
+      "enabled": true,
+      "style": "round",
+      "hidpi": true,
+      "unfocused": false,
+      "focused": {
+        "width": 6,
+        "gradient": { "from": "#cba6f7", "to": "#a6e3a1", "angle": 180 }
+      },
+      "monocle": { "width": 6, "color": "#89b4fa" }
+    },
+    "gaps": [
+      {
+        "screen": "main",
+        "inner": 12,
+        "outer": 12
+      },
+      {
+        "screen": "secondary",
+        "inner": 12,
+        "outer": 12
+      }
+    ],
+    "master": {
+      "ratio": 70
+    },
+    "floating": {
+      "defaultPosition": "center",
+      "presets": [
+        {
+          "name": "centered",
+          "width": 1920,
+          "height": 1080,
+          "center": true
+        },
+        {
+          "name": "full",
+          "width": "100%",
+          "height": "100%",
+          "center": true
+        },
+        {
+          "name": "aligned-left",
+          "width": "50%",
+          "height": "100%",
+          "x": 0,
+          "y": 0
+        },
+        {
+          "name": "aligned-right",
+          "width": "50%",
+          "height": "100%",
+          "x": "50%",
+          "y": 0
+        }
+      ]
+    },
+    "workspaces": [
+      // Main screen workspaces
+      {
+        "name": "terminal",
+        "layout": "monocle",
+        "screen": "main",
+        "rules": [{ "appId": "com.mitchellh.ghostty" }]
+      },
+      {
+        "name": "coding",
+        "layout": "monocle",
+        "screen": "main",
+        "rules": [
+          { "appId": "dev.zed.Zed-Preview" },
+          { "appId": "com.microsoft.VSCode" }
+        ]
+      },
+      {
+        "name": "browser",
+        "layout": "monocle",
+        "screen": "main",
+        "rules": [
+          { "appId": "com.microsoft.edgemac.Dev" },
+          { "appId": "company.thebrowser.dia" }
+        ]
+      },
+      {
+        "name": "music",
+        "layout": "monocle",
+        "screen": "main",
+        "rules": [
+          { "appId": "com.spotify.client" },
+          { "appId": "com.tidal.desktop" }
+        ]
+      },
+      {
+        "name": "design",
+        "layout": "monocle",
+        "screen": "main",
+        "rules": [{ "appId": "com.figma.Desktop" }]
+      },
+      {
+        "name": "communication",
+        "layout": "floating",
+        "screen": "main",
+        "rules": [
+          { "appId": "com.microsoft.teams2" },
+          { "appId": "net.whatsapp.WhatsApp" },
+          { "appId": "com.hnc.Discord" }
+        ]
+      },
+      {
+        "name": "misc",
+        "layout": "floating",
+        "screen": "main",
+        "rules": [
+          { "appId": "com.NeuralDSP.ArchetypeNollyX" },
+          { "appId": "com.NeuralDSP.ArchetypeGojiraX" },
+          { "appId": "com.NeuralDSP.ArchetypeJohnMayerX" },
+          { "appId": "com.NeuralDSP.SoldanoSLO100X" },
+          { "appId": "com.NeuralDSP.FortinNamelessSuiteX" }
+        ]
+      },
+
+      // Secondary screen workspaces
+      {
+        "name": "files",
+        "layout": "split",
+        "screen": "secondary",
+        "rules": [
+          { "appId": "com.apple.finder" },
+          { "appId": "com.asiafu.Bloom" }
+        ]
+      },
+      {
+        "name": "mail",
+        "layout": "split",
+        "screen": "secondary",
+        "rules": [{ "appId": "com.microsoft.Outlook" }]
+      },
+      {
+        "name": "tasks",
+        "layout": "split",
+        "screen": "secondary",
+        "rules": [
+          { "appId": "com.apple.reminders" },
+          { "appId": "me.proton.pass.electron" },
+          { "appId": "com.microsoft.AzureVpnMac" }
+        ]
+      }
+    ],
+    "ignore": [
+      // Default macOS apps to ignore
+      { "appId": "com.apple.Spotlight" },
+      { "appId": "com.apple.dock" },
+      { "appId": "com.apple.notificationcenterui" },
+      { "appId": "com.apple.systempreferences" },
+      { "appId": "com.apple.loginwindow" },
+      { "appId": "com.apple.weather.menu" },
+
+      // Third-party apps
+      { "appId": "cc.ffitch.shottr" },
+      { "appId": "com.wulkano.kap" },
+      { "appId": "com.raycast.macos" }
+    ]
+  },
+
+  "keybindings": {
+    // Reload configs
+    "Command+Control+R": "stache reload",
+
+    // Change wallpaper
+    "Command+Control+Shift+W": "stache wallpaper set --random",
+
+    // Switch to workspace
+    "Option+1": "stache tiling workspace --focus terminal",
+    "Option+2": "stache tiling workspace --focus coding",
+    "Option+3": "stache tiling workspace --focus browser",
+    "Option+4": "stache tiling workspace --focus music",
+    "Option+5": "stache tiling workspace --focus design",
+    "Option+6": "stache tiling workspace --focus communication",
+    "Option+7": "stache tiling workspace --focus misc",
+    "Option+8": "stache tiling workspace --focus files",
+    "Option+9": "stache tiling workspace --focus mail",
+    "Option+0": "stache tiling workspace --focus tasks",
+
+    // Move focused window to workspace
+    "Option+Shift+1": "stache tiling window --send-to-workspace terminal",
+    "Option+Shift+2": "stache tiling window --send-to-workspace coding",
+    "Option+Shift+3": "stache tiling window --send-to-workspace browser",
+    "Option+Shift+4": "stache tiling window --send-to-workspace music",
+    "Option+Shift+5": "stache tiling window --send-to-workspace design",
+    "Option+Shift+6": "stache tiling window --send-to-workspace communication",
+    "Option+Shift+7": "stache tiling window --send-to-workspace misc",
+    "Option+Shift+8": "stache tiling window --send-to-workspace files",
+    "Option+Shift+9": "stache tiling window --send-to-workspace mail",
+    "Option+Shift+0": "stache tiling window --send-to-workspace tasks",
+
+    // Change workspace layout
+    "Control+Command+A": "stache tiling workspace --layout monocle",
+    "Control+Command+M": "stache tiling workspace --layout master",
+    "Control+Command+F": "stache tiling workspace --layout floating",
+    "Control+Command+G": "stache tiling workspace --layout grid",
+    "Control+Command+S": "stache tiling workspace --layout split",
+    "Control+Command+B": "stache tiling workspace --layout dwindle",
+    "Control+Command+H": "stache tiling workspace --layout split-horizontal",
+    "Control+Command+V": "stache tiling workspace --layout split-vertical",
+
+    // Cycle, focus and move windows between screens
+    "Command+`": "stache tiling window --focus next",
+    "Command+Shift+`": "stache tiling window --focus previous",
+    "Control+Command+Shift+Up": "stache tiling window --focus up",
+    "Control+Command+Shift+Right": "stache tiling window --focus right",
+    "Control+Command+Shift+Left": "stache tiling window --focus left",
+    "Control+Command+Shift+Down": "stache tiling window --focus down",
+    "Control+Command+Up": "stache tiling window --swap up",
+    "Control+Command+Right": "stache tiling window --swap right",
+    "Control+Command+Down": "stache tiling window --swap down",
+    "Control+Command+Left": "stache tiling window --swap left",
+
+    // Resize windows
+    "Control+Command+=": "stache tiling window --resize width 50 --resize height 50",
+    "Control+Command+-": "stache tiling window --resize width -50 --resize height -50",
+    "Control+Option+Command+up": "stache tiling window --resize height 50",
+    "Control+Option+Command+down": "stache tiling window --resize height -50",
+    "Control+Option+Command+right": "stache tiling window --resize width 50",
+    "Control+Option+Command+left": "stache tiling window --resize width -50",
+    "Control+Command+E": "stache tiling workspace --balance",
+
+    // Floating window presets
+    "Control+Option+up": "stache tiling window --preset full",
+    "Control+Option+right": "stache tiling window --preset aligned-right",
+    "Control+Option+down": "stache tiling window --preset centered",
+    "Control+Option+left": "stache tiling window --preset aligned-left"
+  }
+}
