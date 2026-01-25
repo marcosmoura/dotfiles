@@ -1,18 +1,17 @@
 #!/usr/bin/env bash
 
-print_start "Installing Ruby"
+print_start "Installing Ruby (via mise)"
 
-if ! command -v rbenv >/dev/null 2>&1; then
-  brew install rbenv
+# Ensure mise is available
+if ! command -v mise >/dev/null 2>&1; then
+  print_error "mise is required but not installed. Please run brew.sh first."
+  exit 1
 fi
 
-# Pick latest stable semantic version
-RBENV_VERSION=$(rbenv install -l 2>/dev/null | awk '/^  [0-9]+\.[0-9]+\.[0-9]+$/ {print $1}' | tail -1)
-export RBENV_VERSION
-
-eval "$(rbenv init - zsh)"
-rbenv install -s "$RBENV_VERSION"
-rbenv global "$RBENV_VERSION"
+# Install Ruby via mise
+print_progress "Installing latest Ruby via mise"
+mise install ruby@latest
+mise use --global ruby@latest
 
 print_progress "Installing gems"
 

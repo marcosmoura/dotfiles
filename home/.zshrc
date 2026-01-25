@@ -23,7 +23,6 @@ local paths=(
 	/usr/local/bin
 	/usr/local/opt
 	"$HOME/.local/bin"
-	"$HOME/.rbenv/shims"
 	"$HOME/.yarn/bin"
 	"$HOME/.config/yarn/global/node_modules/.bin"
 	"$HOME/go/bin"
