@@ -31,3 +31,6 @@ indent_size = 4
 
 [*.lua]
 indent_size = 2
+
+[*.sh]
+indent_size = 2
