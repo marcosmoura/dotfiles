@@ -2,17 +2,25 @@
 
 print_start "Installing Node"
 
-tools=(
-  bun
-  node
-  pnpm
-  yarn
-)
-for t in "${tools[@]}"; do
-  if ! command -v "$t" >/dev/null 2>&1; then
-    brew install "$t" || true
-  fi
-done
+if ! command -v mise >/dev/null 2>&1; then
+  print_error "mise is required but not installed. Please run brew.sh first."
+  exit 1
+fi
+
+eval "$(mise activate bash)"
+
+print_progress "Installing Node via mise"
+mise install node@lts
+mise use --global node@lts
+
+print_progress "Enabling corepack"
+corepack enable
+corepack prepare pnpm@latest --activate
+corepack prepare yarn@stable --activate
+
+print_progress "Installing Bun via mise"
+mise install bun@latest
+mise use --global bun@latest
 
 print_progress "Installing global packages"
 global_packages=(
