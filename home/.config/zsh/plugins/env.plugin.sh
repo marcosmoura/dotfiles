@@ -6,13 +6,15 @@ if [[ ! "$PATH" == *".cargo/bin"* ]]; then
 fi
 
 # Luarocks - cache paths to avoid slow startup
-if [[ -z "$LUA_PATH" ]]; then
+if [[ -z "$LUA_PATH" ]] && command -v luarocks >/dev/null 2>&1; then
   eval "$(luarocks path)"
 fi
 
 # SSH Agent - only start if not already running
-if [[ -z "$(pgrep -u $USER ssh-agent)" ]]; then
-  eval "$(ssh-agent -s)"
+if [[ -z "${SSH_AUTH_SOCK:-}" ]] && command -v ssh-agent >/dev/null 2>&1; then
+  if ! pgrep -u "$USER" ssh-agent >/dev/null 2>&1; then
+    eval "$(ssh-agent -s)"
+  fi
 fi
 
 # direnv - load project-specific environment variables
