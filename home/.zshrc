@@ -80,6 +80,8 @@ export STARSHIP_EMOJI=$($XDG_CONFIG_HOME/starship/scripts/emoji.sh)
 export STARSHIP_CLOCK=$($XDG_CONFIG_HOME/starship/scripts/clock.sh)
 eval "$(starship init zsh)"
 
-# Clear screen
-clear
-systeminfo
+# Clear screen on login shells only
+if [[ -o login ]]; then
+  clear
+  command -v systeminfo >/dev/null 2>&1 && systeminfo
+fi
