@@ -56,12 +56,17 @@ export BAT_CONFIG_PATH="$XDG_CONFIG_HOME/bat/batconfig"
 # Setup zsh
 export ZSH_CACHE_DIR=$HOME/.config/zsh
 export ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=#888"
-export ZSH_THEME=""
-export ENABLE_CORRECTION="false"
-export COMPLETION_WAITING_DOTS="false"
-export HIST_STAMPS="dd/mm/yyyy"
 export HISTSIZE=250000
 export SAVEHIST=25000
+
+# History options for better experience
+setopt HIST_EXPIRE_DUPS_FIRST  # Expire duplicates first
+setopt HIST_IGNORE_DUPS        # Don't record duplicates
+setopt HIST_IGNORE_ALL_DUPS    # Delete old duplicate
+setopt HIST_FIND_NO_DUPS       # Don't show duplicates in search
+setopt HIST_IGNORE_SPACE       # Don't record commands starting with space
+setopt HIST_SAVE_NO_DUPS       # Don't write duplicates
+setopt SHARE_HISTORY           # Share history between sessions
 
 # You Should Use
 export YSU_MODE=ALL
