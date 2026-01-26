@@ -1,0 +1,60 @@
+gui:
+  theme:
+    lightTheme: false
+    activeBorderColor:
+      - "#cba6f7"
+      - bold
+    inactiveBorderColor:
+      - "#6c7086"
+    optionsTextColor:
+      - "#89b4fa"
+    selectedLineBgColor:
+      - "#313244"
+    selectedRangeBgColor:
+      - "#313244"
+    cherryPickedCommitBgColor:
+      - "#45475a"
+    cherryPickedCommitFgColor:
+      - "#cba6f7"
+    unstagedChangesColor:
+      - "#f38ba8"
+    defaultFgColor:
+      - "#cdd6f4"
+    searchingActiveBorderColor:
+      - "#f9e2af"
+  showFileTree: true
+  showListFooter: false
+  showRandomTip: false
+  showCommandLog: true
+  showBottomLine: true
+  nerdFontsVersion: "3"
+  border: rounded
+  mouseEvents: true
+  skipDiscardChangeWarning: false
+  skipStashWarning: false
+git:
+  pagers:
+    - colorArg: always
+      pager: delta --dark --paging=never
+  commit:
+    signOff: false
+  merging:
+    manualCommit: false
+    args: ""
+  log:
+    showGraph: always
+    showWholeGraph: false
+os:
+  editPreset: nvim
+keybinding:
+  universal:
+    quit: q
+    togglePanel: <tab>
+    prevItem: <up>
+    nextItem: <down>
+    prevPage: ","
+    nextPage: "."
+    scrollLeft: H
+    scrollRight: L
+notARepository: skip
+promptToReturnFromSubprocess: false
