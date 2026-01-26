@@ -42,7 +42,7 @@ vim.g.lazyvim_picker = "snacks"
 vim.g.root_spec = { ".git", "lsp", "cwd" }
 
 -- Underscore as word character
-vim.cmd("set iskeyword-=_", false)
+vim.opt.iskeyword:remove("_")
 
 -- Neovide
 if vim.g.neovide then
