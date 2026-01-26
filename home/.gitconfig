@@ -90,6 +90,24 @@
 [pull]
   rebase = true
 
+[fetch]
+  prune = true
+  pruneTags = true
+
+[rebase]
+  autoStash = true
+  autoSquash = true
+
+[rerere]
+  enabled = true
+  autoUpdate = true
+
+[branch]
+  sort = -committerdate
+
+[commit]
+  verbose = true
+
 [mergetool]
   keepTemporaries = false
   prompt = false
@@ -106,7 +124,8 @@
 [diff]
   colorMoved = default
   renames = copies
-  renameLimit = 1644
+  renameLimit = 999999
+  algorithm = histogram
 
 [diff "bin"]
   textconv = hexdump -v -C
@@ -143,7 +162,7 @@
 [core]
   pager = delta
   attributesfile = ~/.gitattributes
-  editor = vim
+  editor = nvim
   excludesfile = ~/.gitignore
   precomposeunicode = false
   trustctime = false
@@ -161,22 +180,14 @@
 [advice]
   statusHints = false
 
-# URL shorthands
+# URL shorthands (using SSH instead of deprecated git:// protocol)
 
 [url "git@github.com:"]
   insteadOf = "gh:"
-  pushInsteadOf = "github:"
-  pushInsteadOf = "git://github.com/"
-
-[url "git://github.com/"]
   insteadOf = "github:"
 
 [url "git@gist.github.com:"]
   insteadOf = "gst:"
-  pushInsteadOf = "gist:"
-  pushInsteadOf = "git://gist.github.com/"
-
-[url "git://gist.github.com/"]
   insteadOf = "gist:"
 
 [init]
