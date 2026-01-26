@@ -30,7 +30,6 @@ formulas=(
   curl
   deno
   direnv
-  docker-compose
   dust
   efm-langserver
   eth-p/software/bat-extras
@@ -68,6 +67,7 @@ formulas=(
   perl
   pre-commit
   ripgrep
+  rustup
   rust-analyzer
   shellcheck
   speedtest
@@ -85,6 +85,7 @@ formulas=(
   watchman
   webp
   wget
+  uv
   yaml-language-server
   yazi
   yq
@@ -159,7 +160,7 @@ casks=(
 )
 for c in "${casks[@]}"; do
   if ! brew list --cask --versions "$c" >/dev/null 2>&1; then
-    brew install --cask --no-quarantine "$c"
+    brew install --cask "$c"
   fi
 done
 
