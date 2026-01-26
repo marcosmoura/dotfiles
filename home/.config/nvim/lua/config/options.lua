@@ -10,7 +10,9 @@ vim.opt.relativenumber = false
 vim.opt.softtabstop = 2
 vim.opt.swapfile = false
 vim.opt.termguicolors = true
-vim.opt.undodir = os.getenv("HOME") .. "/.vim/nvim-undodir"
+local undodir = vim.fn.stdpath("state") .. "/undo"
+vim.fn.mkdir(undodir, "p")
+vim.opt.undodir = undodir
 vim.opt.wrap = true
 
 -- Globals
