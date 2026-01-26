@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 
-# Set 256 color terminal
-export TERM=xterm-256color
+# Catppuccin colors for LS
 export CATPPUCCIN_COLORS=$(cat ~/.config/zsh/static/catppuccin-colors.txt)
 export LS_COLORS=$CATPPUCCIN_COLORS
 
@@ -35,12 +34,19 @@ alias chmox='chmod -x'
 # Trim trailing newline and copy to clipboard
 alias copy="tr -d '\n' | pbcopy"
 
-# Better FZF
+# Better FZF with Catppuccin colors and preview enhancements
+export FZF_DEFAULT_COMMAND='fd --type f --hidden --follow --exclude .git'
 export FZF_DEFAULT_OPTS=" \
---color=fg:#cdd6f4,header:#f38ba8,info:#cba6f7,pointer:#f5e0dc,gutter:-1 \
---color=marker:#b4befe,fg+:#cdd6f4,prompt:#cba6f7,hl+:#f38ba8 \
---color=selected-bg:#45475a \
+--color=fg:#cdd6f4,bg:#1e1e2e,hl:#f38ba8 \
+--color=fg+:#cdd6f4,bg+:#313244,hl+:#f38ba8 \
+--color=info:#cba6f7,prompt:#cba6f7,pointer:#f5e0dc \
+--color=marker:#b4befe,spinner:#f5e0dc,header:#f38ba8 \
+--color=gutter:#1e1e2e,border:#89b4fa \
+--height=40% --layout=reverse --border=rounded \
+--bind='ctrl-/:toggle-preview' \
 --multi"
+export FZF_CTRL_T_OPTS="--preview 'bat --style=numbers --color=always {} 2>/dev/null || cat {}'"
+export FZF_ALT_C_OPTS="--preview 'eza --tree --color=always {} 2>/dev/null | head -100'"
 
 # FZF with unique list filtering
 function fzfu() {
