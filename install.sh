@@ -22,6 +22,7 @@ scripts=(
   symlinks
   zsh
   node
+  lua
   python
   ruby
   rust
