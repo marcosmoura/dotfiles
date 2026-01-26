@@ -2,24 +2,28 @@
 
 print_start "Installing Python"
 
-tools=(
-  python
-  pipx
-)
+if ! command -v mise >/dev/null 2>&1; then
+  print_error "mise is required but not installed. Please run brew.sh first."
+  exit 1
+fi
 
-for t in "${tools[@]}"; do
-  if ! command -v "$t" >/dev/null 2>&1; then
-    brew install "$t" || true
-  fi
-done
+eval "$(mise activate bash)"
+
+print_progress "Installing latest Python via mise"
+mise install python@latest
+mise use --global python@latest
+
+print_progress "Installing uv"
+if ! command -v uv >/dev/null 2>&1; then
+  brew install uv || true
+fi
 
 print_progress "Installing pip packages"
 
 VENV_DIR="$HOME/.local/share/venv"
 if [ ! -d "$VENV_DIR" ]; then
-  python3 -m venv "$VENV_DIR"
+  uv venv "$VENV_DIR"
 fi
-source "$VENV_DIR/bin/activate"
 
 packages=(
   psutil
@@ -29,7 +33,7 @@ packages=(
   wheel
 )
 for p in "${packages[@]}"; do
-  python -m pip install --upgrade "$p"
+  uv pip install --python "$VENV_DIR/bin/python" --upgrade "$p"
 done
 
 print_success "Python installed!"
