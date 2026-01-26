@@ -1,0 +1,39 @@
+# Auto detect text files and normalize line endings
+* text=auto eol=lf
+
+# Binary files
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.webp binary
+*.avif binary
+*.pdf binary
+*.zip binary
+*.tar binary
+*.gz binary
+*.7z binary
+*.ttf binary
+*.otf binary
+*.woff binary
+*.woff2 binary
+*.eot binary
+
+# Diff settings for better readability
+*.md diff=markdown
+*.json diff=json
+*.yaml diff=yaml
+*.yml diff=yaml
+*.css diff=css
+*.html diff=html
+
+# Lock files - don't diff
+package-lock.json binary
+pnpm-lock.yaml binary
+yarn.lock binary
+Cargo.lock binary
+
+# Ignore generated files in diffs
+*.min.js -diff
+*.min.css -diff
