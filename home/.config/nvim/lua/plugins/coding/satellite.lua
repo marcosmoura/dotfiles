@@ -14,8 +14,13 @@ return {
         winblend = 0,
         excluded_filetypes = {
           "prompt",
-          "TelescopePrompt",
+          "snacks_picker",
+          "snacks_notif",
+          "snacks_dashboard",
+          "yazi",
           "neo-tree",
+          "lazy",
+          "mason",
         },
       })
     end,
