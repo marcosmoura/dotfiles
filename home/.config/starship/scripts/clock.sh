@@ -17,8 +17,11 @@ idx=$((10#$hour % 12))
 
 # Check if cache is valid (same hour)
 if [[ -f "$CACHE_FILE" ]]; then
-  cached_hour=$(cat "$CACHE_FILE" 2>/dev/null | head -1)
-  cached_glyph=$(cat "$CACHE_FILE" 2>/dev/null | tail -1)
+  # Read both values in a single file read
+  {
+    read -r cached_hour
+    read -r cached_glyph
+  } <"$CACHE_FILE" 2>/dev/null
   if [[ "$cached_hour" == "$hour" ]]; then
     printf '%s' "$cached_glyph"
     exit 0
