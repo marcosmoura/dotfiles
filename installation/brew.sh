@@ -34,6 +34,7 @@ formulas=(
   dust
   efm-langserver
   eth-p/software/bat-extras
+  eza
   fastfetch
   fd
   findutils
