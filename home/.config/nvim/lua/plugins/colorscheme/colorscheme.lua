@@ -15,11 +15,11 @@ return {
       transparent_background = true,
       no_italic = true,
       integrations = {
-        cmp = true,
+        blink_cmp = true,
         gitsigns = true,
-        nvimtree = true,
         treesitter = true,
         notify = true,
+        snacks = true,
         mini = {
           enabled = true,
           indentscope_color = "blue",
