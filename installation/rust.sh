@@ -23,9 +23,13 @@ print_progress "Installing Rust packages"
 rust_bins=(
   binocular-cli
   cargo-audit
+  cargo-auditable
   cargo-binstall
   cargo-cache
+  cargo-clean-all
   cargo-machete
+  cargo-nextest
+  cargo-shear
   cargo-sort
   cargo-update
   just
