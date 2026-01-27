@@ -1,0 +1,62 @@
+{
+  "version": 3,
+  "skills": {
+    "react-native-best-practices": {
+      "source": "callstackincubator/agent-skills",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/callstackincubator/agent-skills.git",
+      "skillPath": "skills/react-native-best-practices/SKILL.md",
+      "skillFolderHash": "8449934e63e4b2c9ea5e42796f7b9243f20eaee0",
+      "installedAt": "2026-01-27T15:49:40.013Z",
+      "updatedAt": "2026-01-27T15:52:37.116Z"
+    },
+    "find-skills": {
+      "source": "vercel-labs/skills",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/vercel-labs/skills.git",
+      "skillPath": "skills/find-skills/SKILL.md",
+      "skillFolderHash": "c2f31172b6f256272305a5e6e7228b258446899f",
+      "installedAt": "2026-01-27T15:49:46.676Z",
+      "updatedAt": "2026-01-27T15:49:46.676Z"
+    },
+    "brainstorming": {
+      "source": "obra/superpowers",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/obra/superpowers.git",
+      "skillPath": "skills/brainstorming/SKILL.md",
+      "skillFolderHash": "761c2f359474328f40d73db9cb4cc1f5721917e5",
+      "installedAt": "2026-01-27T15:50:04.131Z",
+      "updatedAt": "2026-01-27T15:53:42.316Z"
+    },
+    "vercel-react-best-practices": {
+      "source": "vercel-labs/agent-skills",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/vercel-labs/agent-skills.git",
+      "skillPath": "skills/react-best-practices/SKILL.md",
+      "skillFolderHash": "079b06a135401704ea94ab74c7c9d86c92ba259f",
+      "installedAt": "2026-01-27T15:50:18.280Z",
+      "updatedAt": "2026-01-27T15:53:17.103Z"
+    },
+    "copywriting": {
+      "source": "coreyhaines31/marketingskills",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/coreyhaines31/marketingskills.git",
+      "skillPath": "skills/copywriting/SKILL.md",
+      "skillFolderHash": "9a630c6194721e4d06b72318a3d0ddb1dc11263c",
+      "installedAt": "2026-01-27T15:50:30.566Z",
+      "updatedAt": "2026-01-27T15:53:07.193Z"
+    },
+    "building-native-ui": {
+      "source": "expo/skills",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/expo/skills.git",
+      "skillPath": "plugins/expo-app-design/skills/building-native-ui/SKILL.md",
+      "skillFolderHash": "9e899e3ea35aecf476bbd1b1f440025b66712d46",
+      "installedAt": "2026-01-27T15:50:41.291Z",
+      "updatedAt": "2026-01-27T15:52:52.853Z"
+    }
+  },
+  "dismissed": {
+    "findSkillsPrompt": true
+  }
+}
