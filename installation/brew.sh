@@ -24,15 +24,18 @@ formulas=(
   bat
   btop
   chafa
+  cloc
   cmake
   cocoapods
   coreutils
   curl
   deno
   direnv
+  docker-compose
   dust
   efm-langserver
   eth-p/software/bat-extras
+  exiftool
   eza
   fastfetch
   fd
@@ -41,36 +44,47 @@ formulas=(
   fzf
   gawk
   gcc
+  gdu
   gh
   git
   git-delete-merged-branches
   git-delta
   git-lfs
   gnu-sed
+  gnuplot
   gnutls
   go
   grep
+  hyperfine
+  imageoptim-cli
   jq
   lazygit
   lolcat
   mas
   mise
+  mole
   moreutils
   narugit/tap/smctemp
-  gdu
   ncurses
   neovim
   nextdns/tap/nextdns
   ninja
+  ollama
+  opencode
   openssl
+  osx-cpu-temp
   pandoc
   perl
+  pipx
   pre-commit
   ripgrep
-  rustup
   rust-analyzer
+  rustup
+  sheldon
   shellcheck
+  shfmt
   speedtest
+  speedtest-cli
   starship
   taplo
   tealdeer
@@ -80,12 +94,12 @@ formulas=(
   tree-sitter
   tsv-utils
   unar
+  uv
   vivid
   wallpaper
   watchman
   webp
   wget
-  uv
   yaml-language-server
   yazi
   yq
@@ -115,12 +129,14 @@ print_progress "Installing applications (casks)"
 
 casks=(
   adguard
-  BarutSRB/tap/hyprspace
+  betterdisplay
+  claude-code
+  discord
   displaylink
   figma
   firefox-nightly
+  font-commit-mono
   font-fira-code
-  font-hack-nerd-font
   font-hanken-grotesk
   font-inter
   font-jetbrains-mono
@@ -129,22 +145,20 @@ casks=(
   font-symbols-only-nerd-font
   ghostty
   git-credential-manager
+  imageoptim
   intune-company-portal
-  jordanbaird-ice
   kap
   keka
   kekaexternalhelper
-  leader-key
   linearmouse
   logitech-camera-settings
   microsoft-auto-update
   microsoft-edge@dev
   microsoft-outlook
   microsoft-teams
-  obs
+  ollama-app
   orbstack
   pearcleaner
-  powershell
   proton-drive
   proton-pass
   protonvpn
@@ -153,7 +167,7 @@ casks=(
   sf-symbols
   shottr
   spotify
-  stats
+  tidal
   visual-studio-code
   whatsapp
   zoom
