@@ -2,29 +2,14 @@
   "$schema": "https://opencode.ai/config.json",
   "autoupdate": true,
   "theme": "catppuccin",
-  "model": "anthropic/claude-opus-4-5",
-  "small_model": "anthropic/claude-haiku-4-5",
-
-  "provider": {
-    "ollama": {
-      "models": {
-        "glm-4.7-flash:latest": {
-          "name": "glm-4.7-flash:latest"
-        }
-      },
-      "name": "Ollama (local)",
-      "npm": "@ai-sdk/openai-compatible",
-      "options": {
-        "baseURL": "http://localhost:11434/v1"
-      }
-    }
-  },
+  "model": "github-copilot/claude-opus-4.5",
+  "small_model": "github-copilot/claude-haiku-4.5",
 
   "tui": {
     "scroll_speed": 5,
     "scroll_acceleration": {
-      "enabled": true
-    }
+      "enabled": true,
+    },
   },
 
   "mcp": {
@@ -32,29 +17,29 @@
       "type": "remote",
       "url": "https://mcp.context7.com/mcp",
       "headers": {
-        "CONTEXT7_API_KEY": "{file:~/.secrets/context7-key}"
+        "CONTEXT7_API_KEY": "{file:~/.secrets/context7-key}",
       },
-      "enabled": true
+      "enabled": true,
     },
 
     "gh_grep": {
       "type": "remote",
       "url": "https://mcp.grep.app",
-      "enabled": true
+      "enabled": true,
     },
 
     "github": {
       "type": "remote",
       "headers": {
-        "Authorization": "{file:~/.secrets/gh-pat-key}"
+        "Authorization": "{file:~/.secrets/gh-pat-key}",
       },
       "url": "https://api.githubcopilot.com/mcp/",
-      "enabled": true
-    }
+      "enabled": true,
+    },
   },
 
   "plugin": [
     "@mohak34/opencode-notifier@latest",
-    "@franlol/opencode-md-table-formatter@latest"
-  ]
+    "@franlol/opencode-md-table-formatter@latest",
+  ],
 }
