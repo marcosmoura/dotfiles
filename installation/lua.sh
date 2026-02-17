@@ -9,9 +9,7 @@ lua_packages=(
   luarocks
 )
 
-if ! command -v lua >/dev/null 2>&1; then
-  brew install "${lua_packages[@]}"
-fi
+brew install "${lua_packages[@]}"
 
 print_progress "Installing Lua packages"
 
