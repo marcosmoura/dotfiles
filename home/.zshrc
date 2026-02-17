@@ -28,6 +28,7 @@ local paths=(
 	"$HOME/go/bin"
 	"$HOME/.cargo/bin"
 	"$HOME/.local/share/venv/bin"
+	/opt/homebrew/opt/rustup/bin
 )
 
 for p in $paths; do
