@@ -2,14 +2,10 @@
 
 print_start "Installing Rust"
 
-if ! command -v rustup >/dev/null 2>&1; then
-  brew install rustup || true
-fi
+brew install rust rustup || true
 
-if ! rustup show active-toolchain >/dev/null 2>&1; then
-  rustup toolchain install stable
-  rustup default stable
-fi
+rustup toolchain install stable
+rustup default stable
 
 if [ -f "$HOME/.cargo/env" ]; then
   # shellcheck disable=SC1091
