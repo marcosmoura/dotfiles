@@ -129,50 +129,39 @@
         "name": "coding",
         "layout": "monocle",
         "screen": "main",
-        "rules": [
-          { "appId": "dev.zed.Zed-Preview" },
-          { "appId": "com.microsoft.VSCode" }
-        ]
+        "rules": [{ "appId": "dev.zed.Zed-Preview" }, { "appId": "com.microsoft.VSCode" }]
       },
       {
         "name": "browser",
         "layout": "monocle",
         "screen": "main",
-        "rules": [
-          { "appId": "com.microsoft.edgemac.Dev" },
-          { "appId": "company.thebrowser.dia" }
-        ]
+        "rules": [{ "appId": "com.microsoft.edgemac.Dev" }, { "appId": "company.thebrowser.dia" }]
       },
       {
         "name": "music",
         "layout": "monocle",
         "screen": "main",
-        "rules": [
-          { "appId": "com.spotify.client" },
-          { "appId": "com.tidal.desktop" }
-        ]
-      },
-      {
-        "name": "design",
-        "layout": "monocle",
-        "screen": "main",
-        "rules": [{ "appId": "com.figma.Desktop" }]
+        "rules": [{ "appId": "org.jeffvli.feishin" }]
       },
       {
         "name": "communication",
         "layout": "floating",
         "screen": "main",
-        "rules": [
-          { "appId": "com.microsoft.teams2" },
-          { "appId": "net.whatsapp.WhatsApp" },
-          { "appId": "com.hnc.Discord" }
-        ]
+        "rules": [{ "appId": "net.whatsapp.WhatsApp" }, { "appId": "com.hnc.Discord" }]
       },
       {
         "name": "misc",
         "layout": "floating",
         "screen": "main",
+        "rules": [{ "appId": "org.m0k.transmission" }, { "appId": "com.figma.Desktop" }]
+      },
+      {
+        "name": "guitar",
+        "layout": "floating",
+        "screen": "main",
         "rules": [
+          { "appId": "com.apple.audio.AudioMIDISetup" },
+          { "appId": "com.ableton.live" },
           { "appId": "com.NeuralDSP.ArchetypeNollyX" },
           { "appId": "com.NeuralDSP.ArchetypeGojiraX" },
           { "appId": "com.NeuralDSP.ArchetypeJohnMayerX" },
@@ -184,27 +173,18 @@
       // Secondary screen workspaces
       {
         "name": "files",
-        "layout": "split",
+        "layout": "grid",
         "screen": "secondary",
-        "rules": [
-          { "appId": "com.apple.finder" },
-          { "appId": "com.asiafu.Bloom" }
-        ]
-      },
-      {
-        "name": "mail",
-        "layout": "split",
-        "screen": "secondary",
-        "rules": [{ "appId": "com.microsoft.Outlook" }]
+        "rules": [{ "appId": "com.apple.finder" }, { "appId": "com.asiafu.Bloom" }]
       },
       {
         "name": "tasks",
-        "layout": "split",
+        "layout": "grid",
         "screen": "secondary",
         "rules": [
           { "appId": "com.apple.reminders" },
           { "appId": "me.proton.pass.electron" },
-          { "appId": "com.microsoft.AzureVpnMac" }
+          { "appId": "ch.protonvpn.mac" }
         ]
       }
     ],
