@@ -10,13 +10,9 @@ fi
 eval "$(mise activate bash)"
 
 print_progress "Installing Node via mise"
-mise install node@lts
-mise use --global node@lts
-
-print_progress "Enabling corepack"
-corepack enable
-corepack prepare pnpm@latest --activate
-corepack prepare yarn@stable --activate
+mise install node@latest
+mise use --global node@latest
+mise use --global pnpm@latest
 
 print_progress "Installing Bun via mise"
 mise install bun@latest
@@ -27,6 +23,7 @@ global_packages=(
   @fsouza/prettierd
   @johnnymorganz/stylua-bin
   @vscode/codicons
+  corepack
   nx
   prettier
   stylelint
@@ -72,5 +69,9 @@ for dict in "${cspell_dictionaries[@]}"; do
     cspell link add "$dict" || true
   fi
 done
+
+print_progress "Enabling corepack"
+corepack enable
+corepack prepare pnpm@latest --activate
 
 print_success "Node installed!"
