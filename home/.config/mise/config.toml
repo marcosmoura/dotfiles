@@ -1,7 +1,9 @@
 [tools]
 ruby = "latest"
-node = "lts"
+node = "latest"
 python = "latest"
+bun = "latest"
+pnpm = "latest"
 
 [settings]
 experimental = true
