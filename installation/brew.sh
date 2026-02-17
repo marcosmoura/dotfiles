@@ -12,11 +12,14 @@ print_progress "Updating brew"
 
 brew update
 brew upgrade
+sudo softwareupdate --install-rosetta
 
 print_progress "Installing command-line tools (formulas)"
 
 brew tap FelixKratz/formulae
 brew tap githubutilities/tap
+brew tap kgarner7/homebrew-feishin
+brew tap marcosmoura/homebrew-tap
 
 formulas=(
   atuin
@@ -83,8 +86,6 @@ formulas=(
   sheldon
   shellcheck
   shfmt
-  speedtest
-  speedtest-cli
   starship
   taplo
   tealdeer
@@ -132,7 +133,6 @@ casks=(
   betterdisplay
   claude-code
   discord
-  displaylink
   figma
   firefox-nightly
   font-commit-mono
@@ -144,18 +144,14 @@ casks=(
   font-sf-mono
   font-symbols-only-nerd-font
   ghostty
-  git-credential-manager
+  ilok-license-manager
   imageoptim
-  intune-company-portal
   kap
   keka
   kekaexternalhelper
   linearmouse
   logitech-camera-settings
-  microsoft-auto-update
   microsoft-edge@dev
-  microsoft-outlook
-  microsoft-teams
   ollama-app
   orbstack
   pearcleaner
@@ -167,6 +163,7 @@ casks=(
   sf-symbols
   shottr
   spotify
+  thebrowsercompany-dia
   tidal
   visual-studio-code
   whatsapp
