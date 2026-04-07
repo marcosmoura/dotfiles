@@ -9,6 +9,7 @@ home/.config/sheldon/repos
 home/.config/stache/.env
 home/.config/yarn
 home/.config/yazi/plugins
+home/.config/opencode/opencode-notifier-state.json
 node_modules
 
 # General
