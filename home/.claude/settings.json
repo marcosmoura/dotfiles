@@ -1,0 +1,88 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "env": {
+    "CLAUDE_CODE_DISABLE_1M_CONTEXT": "1",
+    "CLAUDE_CODE_ENABLE_TELEMETRY": "0",
+    "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1",
+    "CLAUDE_CODE_ATTRIBUTION_HEADER": "0",
+    "CLAUDE_CODE_NO_FLICKER": "1"
+  },
+  "permissions": {
+    "allow": [
+      "Bash(cat *)",
+      "Bash(chmod *)",
+      "Bash(chown *)",
+      "Bash(cp *)",
+      "Bash(echo *)",
+      "Bash(fd *)",
+      "Bash(find *)",
+      "Bash(git branch *)",
+      "Bash(git diff *)",
+      "Bash(git log *)",
+      "Bash(git show *)",
+      "Bash(git status *)",
+      "Bash(grep *)",
+      "Bash(head *)",
+      "Bash(ls *)",
+      "Bash(mkdir *)",
+      "Bash(mv *)",
+      "Bash(node *)",
+      "Bash(pwd)",
+      "Bash(python *)",
+      "Bash(rg *)",
+      "Bash(tail *)",
+      "Bash(type *)",
+      "Bash(wc *)",
+      "Bash(which *)",
+      "Edit",
+      "Glob",
+      "Grep",
+      "Read",
+      "TodoWrite",
+      "WebFetch",
+      "WebSearch",
+      "Write"
+    ],
+    "deny": ["Bash(dd *)", "Bash(mkfs *)", "Bash(> /dev/sda*)"],
+    "ask": ["Bash(sudo *)", "Bash(rm -rf *)", "Bash(chmod)", "Bash(chown)"]
+  },
+  "model": "sonnet",
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/rtk-rewrite.sh"
+          }
+        ]
+      }
+    ]
+  },
+  "statusLine": {
+    "type": "command",
+    "command": "~/.claude/plugins/cache/claude-lens-marketplace/claude-lens/0.6.0/claude-lens.sh"
+  },
+  "enabledPlugins": {
+    "rust-analyzer-lsp@claude-plugins-official": true,
+    "frontend-design@claude-plugins-official": true,
+    "superpowers@claude-plugins-official": true,
+    "code-review@claude-plugins-official": true,
+    "code-simplifier@claude-plugins-official": true,
+    "typescript-lsp@claude-plugins-official": true,
+    "security-guidance@claude-plugins-official": true,
+    "github@claude-plugins-official": true,
+    "claude-lens@claude-lens-marketplace": true
+  },
+  "extraKnownMarketplaces": {
+    "claude-lens-marketplace": {
+      "source": {
+        "source": "github",
+        "repo": "Astro-Han/claude-lens"
+      }
+    }
+  },
+  "effortLevel": "high",
+  "promptSuggestionEnabled": false
+}

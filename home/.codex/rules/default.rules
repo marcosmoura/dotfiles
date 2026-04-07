@@ -1,0 +1,31 @@
+prefix_rule(pattern = ["cat"], decision = "allow", justification = "Allow read command")
+prefix_rule(pattern = ["cp"], decision = "allow", justification = "Allow safe copy command")
+prefix_rule(pattern = ["echo"], decision = "allow", justification = "Allow echo command")
+prefix_rule(pattern = ["fd"], decision = "allow", justification = "Allow file discovery")
+prefix_rule(pattern = ["find"], decision = "allow", justification = "Allow file discovery")
+prefix_rule(pattern = ["grep"], decision = "allow", justification = "Allow content search")
+prefix_rule(pattern = ["head"], decision = "allow", justification = "Allow file preview")
+prefix_rule(pattern = ["ls"], decision = "allow", justification = "Allow directory listing")
+prefix_rule(pattern = ["mkdir"], decision = "allow", justification = "Allow directory creation")
+prefix_rule(pattern = ["mv"], decision = "allow", justification = "Allow file move")
+prefix_rule(pattern = ["node"], decision = "allow", justification = "Allow local node execution")
+prefix_rule(pattern = ["pwd"], decision = "allow", justification = "Allow working directory inspection")
+prefix_rule(pattern = ["python"], decision = "allow", justification = "Allow local python execution")
+prefix_rule(pattern = ["rg"], decision = "allow", justification = "Allow ripgrep search")
+prefix_rule(pattern = ["tail"], decision = "allow", justification = "Allow file preview")
+prefix_rule(pattern = ["type"], decision = "allow", justification = "Allow type inspection")
+prefix_rule(pattern = ["wc"], decision = "allow", justification = "Allow word count")
+prefix_rule(pattern = ["which"], decision = "allow", justification = "Allow binary discovery")
+prefix_rule(
+    pattern = ["git", ["branch", "diff", "log", "show", "status"]],
+    decision = "allow",
+    justification = "Allow safe git inspection commands",
+)
+
+prefix_rule(pattern = ["chmod"], decision = "prompt", justification = "Permission changes require review")
+prefix_rule(pattern = ["chown"], decision = "prompt", justification = "Ownership changes require review")
+
+prefix_rule(pattern = ["sudo"], decision = "forbidden", justification = "Privilege escalation is not allowed")
+prefix_rule(pattern = ["rm", "-rf"], decision = "forbidden", justification = "Recursive force delete is not allowed")
+prefix_rule(pattern = ["dd"], decision = "forbidden", justification = "Raw disk write tools are not allowed")
+prefix_rule(pattern = ["mkfs"], decision = "forbidden", justification = "Filesystem formatting tools are not allowed")
