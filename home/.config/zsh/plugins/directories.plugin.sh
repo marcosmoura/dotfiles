@@ -20,7 +20,7 @@ alias .......='cd ../../../../../..'
 alias ~="cd ~"
 
 # Always use color output for `ls`
-alias ls="eza -a -s=type --group-directories-first --icons=always --color=always --hyperlink --spacing=3"
+alias ls="eza -a -s=type --group-directories-first --icons=always --color=always --hyperlink"
 
 # List all files colorized in long format
 alias la="ls -l -a -h -F=always --git"

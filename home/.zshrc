@@ -81,6 +81,10 @@ export STARSHIP_EMOJI=$($XDG_CONFIG_HOME/starship/scripts/emoji.sh)
 export STARSHIP_CLOCK=$($XDG_CONFIG_HOME/starship/scripts/clock.sh)
 eval "$(starship init zsh)"
 
+# Secrets
+export CONTEXT7_API_KEY=$(cat ~/.secrets/context7-key)
+export GH_PAT=$(cat ~/.secrets/gh-pat-key)
+
 # Clear screen on login shells only
 if [[ -o login ]]; then
   clear
