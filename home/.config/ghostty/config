@@ -34,8 +34,8 @@ unfocused-split-opacity = 0.45
 ########################################
 window-colorspace = display-p3
 window-inherit-font-size = true
-window-padding-x = 16,16
-window-padding-y = 16,16
+window-padding-x = 14,14
+window-padding-y = 14,14
 window-title-font-family = Maple Mono
 window-vsync = true
 macos-titlebar-style = tabs
