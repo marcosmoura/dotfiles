@@ -61,3 +61,18 @@ yarn-error.log*
 **/target/
 **/target/*
 **/*.rs.bk
+
+# Claude Code
+.claude.json
+home/.claude/*
+!home/.claude/CLAUDE.md
+!home/.claude/RTK.md
+!home/.claude/settings.json
+!home/.claude/statusline.json
+
+# Codex
+home/.codex/*
+!home/.codex/AGENTS.md
+!home/.codex/config.toml
+!home/.codex/RTK.md
+!home/.codex/rules/
