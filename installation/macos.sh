@@ -17,8 +17,10 @@ osascript -e 'tell application "System Settings" to quit' 2>/dev/null || osascri
 # General UI/UX
 ###############################################################################
 
-# Disable the sound effects on boot (ignore failure on Apple Silicon if restricted)
-sudo nvram SystemAudioVolume=" " 2>/dev/null || print_info "Skipping SystemAudioVolume (not supported)"
+# Mute the startup chime.
+# Apple Silicon (all Macs supported by Tahoe 26) uses StartupMute; the legacy
+# Intel key (SystemAudioVolume) is ignored on AS hardware.
+sudo nvram StartupMute=%01 2>/dev/null || print_info "Skipping StartupMute (not supported)"
 
 # Finder: show hidden files by default
 defaults write com.apple.finder AppleShowAllFiles -bool true
@@ -78,6 +80,10 @@ defaults write NSGlobalDomain NSAutomaticQuoteSubstitutionEnabled -bool false
 # Disable auto-correct
 defaults write NSGlobalDomain NSAutomaticSpellingCorrectionEnabled -bool false
 
+# Disable icons in menu items (new default in macOS Tahoe 26 — adds visual clutter).
+# Quit and relaunch individual apps for the change to take effect per-app.
+defaults write -g NSMenuEnableActionImages -bool false
+
 ###############################################################################
 # SSD-specific tweaks
 ###############################################################################
@@ -111,14 +117,27 @@ defaults write NSGlobalDomain KeyRepeat -int 1
 defaults write NSGlobalDomain InitialKeyRepeat -int 10
 
 # Set the timezone (overridable). See `systemsetup -listtimezones` for values.
+# systemsetup was deprecated in Ventura and may fail silently on Apple Silicon /
+# Tahoe 26. We try it first and fall back to a direct /etc/localtime symlink.
 TIMEZONE="${DOTFILES_TIMEZONE:-Europe/Prague}"
-if command -v systemsetup >/dev/null 2>&1; then
-  CURRENT_TZ=$(sudo systemsetup -gettimezone 2>/dev/null | awk -F': ' '{print $2}')
-  if [ "$CURRENT_TZ" != "$TIMEZONE" ] && [ -n "$TIMEZONE" ]; then
-    sudo systemsetup -settimezone "$TIMEZONE" >/dev/null || print_info "Could not set timezone to $TIMEZONE"
+_set_timezone_fallback() {
+  sudo ln -sf "/usr/share/zoneinfo/$TIMEZONE" /etc/localtime 2>/dev/null ||
+    print_info "Could not set timezone to $TIMEZONE"
+}
+if [ -n "$TIMEZONE" ]; then
+  if command -v systemsetup >/dev/null 2>&1; then
+    CURRENT_TZ=$(sudo systemsetup -gettimezone 2>/dev/null | awk -F': ' '{print $2}')
+    if [ "$CURRENT_TZ" != "$TIMEZONE" ]; then
+      sudo systemsetup -settimezone "$TIMEZONE" >/dev/null 2>&1 ||
+        {
+          print_info "systemsetup failed; falling back to /etc/localtime symlink"
+          _set_timezone_fallback
+        }
+    fi
+  else
+    # systemsetup unavailable (removed in a future macOS) – use symlink directly.
+    _set_timezone_fallback
   fi
-else
-  print_info "systemsetup not available; skipping timezone configuration"
 fi
 
 # Disable text replacement
@@ -179,7 +198,10 @@ defaults write NSGlobalDomain com.apple.springing.delay -float 0
 defaults write com.apple.desktopservices DSDontWriteNetworkStores -bool true
 defaults write com.apple.desktopservices DSDontWriteUSBStores -bool true
 
-# Disable disk image verification
+# Disable disk image verification.
+# NOTE: These keys may be silently ignored on macOS Tahoe 26+ due to
+# Gatekeeper / SIP security hardening. They write without error but the
+# verification bypass is not guaranteed.
 defaults write com.apple.frameworks.diskimages skip-verify -bool true
 defaults write com.apple.frameworks.diskimages skip-verify-locked -bool true
 defaults write com.apple.frameworks.diskimages skip-verify-remote -bool true
@@ -273,7 +295,10 @@ defaults write com.apple.dock expose-group-by-app -bool true
 # Don’t automatically rearrange Spaces based on most recent use
 defaults write com.apple.dock mru-spaces -bool false
 
-# Monitors don't have separate spaces
+# Monitors don't have separate spaces.
+# NOTE: The spans-displays key was only confirmed functional through macOS Ventura.
+# In Tahoe 26 the Spaces architecture changed; verify manually in
+# System Settings › Desktop & Dock › "Displays have separate Spaces".
 defaults write com.apple.spaces spans-displays -bool true
 
 # Remove the auto-hiding Dock delay
@@ -341,24 +366,17 @@ defaults write com.apple.TextEdit PlainTextEncodingForWrite -int 4
 # Mac App Store
 ###############################################################################
 
-# Enable the WebKit Developer Tools in the Mac App Store
-defaults write com.apple.appstore WebKitDeveloperExtras -bool true
-
-# Enable Debug Menu in the Mac App Store
-defaults write com.apple.appstore ShowDebugMenu -bool true
+# NOTE: WebKitDeveloperExtras and ShowDebugMenu no longer work in the rebuilt
+# Mac App Store shipped with macOS Tahoe 26. Both keys are silently ignored.
 
 ###############################################################################
 # Messages
 ###############################################################################
 
-# Disable automatic emoji substitution (i.e. use plain text smileys)
-defaults write com.apple.messageshelper.MessageController SOInputLineSettings -dict-add "automaticEmojiSubstitutionEnablediMessage" -bool false
-
-# Disable smart quotes as it’s annoying for messages that contain code
-defaults write com.apple.messageshelper.MessageController SOInputLineSettings -dict-add "automaticQuoteSubstitutionEnabled" -bool false
-
-# Disable continuous spell checking
-defaults write com.apple.messageshelper.MessageController SOInputLineSettings -dict-add "continuousSpellCheckingEnabled" -bool false
+# NOTE: com.apple.messageshelper.MessageController no longer exists in
+# macOS Tahoe 26 — Messages was architecturally rewritten and the
+# SOInputLineSettings domain is not read. Configure emoji substitution,
+# smart quotes, and spell-check manually in Messages › Settings if needed.
 
 ###############################################################################
 # Kill affected applications
