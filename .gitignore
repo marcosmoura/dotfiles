@@ -1,5 +1,6 @@
 # Local files
 /dist
+.worktrees
 home/.config/gh/hosts.yml
 home/.config/github-copilot
 home/.config/mole
