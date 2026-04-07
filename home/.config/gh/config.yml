@@ -2,6 +2,6 @@ git_protocol: https
 editor: vim
 prompt: enabled
 aliases:
-  co: pr checkout
-  go: pr checkout
+    co: pr checkout
+    go: pr checkout
 version: "1"

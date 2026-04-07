@@ -4,7 +4,7 @@
   "bar": {
     "enabled": true,
     "height": 28,
-    "padding": 12,
+    "padding": 14,
     "weather": {
       "apiKeys": ".env",
       "defaultLocation": "Prague"
@@ -13,7 +13,7 @@
 
   "wallpapers": {
     "enabled": true,
-    "path": "~/Projects/personal/dotfiles/home/.config/wallpapers",
+    "path": "~/Projects/dotfiles/home/.config/wallpapers",
     "interval": 0,
     "mode": "random",
     "radius": 20,
@@ -27,7 +27,7 @@
 
   "notunes": {
     "enabled": true,
-    "targetApp": "tidal"
+    "targetApp": "feishin"
   },
 
   "proxyAudio": {
@@ -74,17 +74,18 @@
     "gaps": [
       {
         "screen": "main",
-        "inner": 12,
-        "outer": 12
+        "inner": 14,
+        "outer": 14
       },
       {
         "screen": "secondary",
-        "inner": 12,
-        "outer": 12
+        "inner": 14,
+        "outer": 14
       }
     ],
     "master": {
-      "ratio": 70
+      "ratio": 60,
+      "position": "right"
     },
     "floating": {
       "defaultPosition": "center",
@@ -127,9 +128,9 @@
       },
       {
         "name": "coding",
-        "layout": "monocle",
+        "layout": "master",
         "screen": "main",
-        "rules": [{ "appId": "dev.zed.Zed-Preview" }, { "appId": "com.microsoft.VSCode" }]
+        "rules": [{ "appId": "com.microsoft.VSCode" }, { "appId": "com.cmuxterm.app" }]
       },
       {
         "name": "browser",
@@ -153,7 +154,13 @@
         "name": "misc",
         "layout": "floating",
         "screen": "main",
-        "rules": [{ "appId": "org.m0k.transmission" }, { "appId": "com.figma.Desktop" }]
+        "rules": [
+          { "appId": "com.figma.Desktop" },
+          { "appId": "com.nuvio.hub" },
+          { "appId": "com.westbridge.stremio5-mac" },
+          { "appId": "org.m0k.transmission" },
+          { "appId": "win.stkc.omni" }
+        ]
       },
       {
         "name": "guitar",
