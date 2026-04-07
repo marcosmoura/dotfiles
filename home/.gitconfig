@@ -1,6 +1,6 @@
 [user]
   name = Marcos Moura
-  email = github@p.marcosmoura.com
+  email = contact@marcosmoura.com
 
 [filter "lfs"]
 	clean = git-lfs clean -- %f
