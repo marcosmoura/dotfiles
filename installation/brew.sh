@@ -73,7 +73,6 @@ formulas=(
   nextdns/tap/nextdns
   ninja
   ollama
-  opencode
   openssl
   osx-cpu-temp
   pandoc
@@ -83,6 +82,7 @@ formulas=(
   ripgrep
   rust-analyzer
   rustup
+  sccache
   sheldon
   shellcheck
   shfmt
