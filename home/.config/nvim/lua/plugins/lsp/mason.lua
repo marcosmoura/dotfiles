@@ -7,25 +7,22 @@ return {
       },
       ensure_installed = {
         "bash-language-server",
-        "cspell",
+        -- [work] cspell not available
+        -- "cspell",
         "css-lsp",
         "emmet-ls",
         "eslint-lsp",
         "html-lsp",
         "json-lsp",
-        "lua-language-server",
-        "luacheck",
+        -- [work] lua not available: lua-language-server, luacheck, selene, stylua
         "markdown-toc",
         "marksman",
         "oxlint",
         "prettier",
-        "prettierd",
-        "rust-analyzer",
-        "selene",
+        -- [work] rust not available: rust-analyzer
         "shellcheck",
         "shfmt",
-        "stylua",
-        "yaml-language-server",
+        -- [work] yaml not available: yaml-language-server
       },
     },
   },

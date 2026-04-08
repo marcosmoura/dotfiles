@@ -26,6 +26,6 @@ if [ -z "${LOG_OUTPUT}" ]; then
   return 1
 fi
 
-format_log $LOG_OUTPUT
+format_log "$LOG_OUTPUT"
 
 print_success "Done!"

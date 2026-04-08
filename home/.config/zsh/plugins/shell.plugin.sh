@@ -21,13 +21,6 @@ alias vim='nvim'
 alias svim='sudo nvim'
 alias snano='sudo nano'
 
-# Better du
-alias du='dust -x -X .git -X node_modules'
-
-# Better man
-alias help='tldr'
-alias man='batman'
-
 # Chmod -x
 alias chmox='chmod -x'
 
@@ -45,7 +38,6 @@ export FZF_DEFAULT_OPTS=" \
 --height=40% --layout=reverse --border=rounded \
 --bind='ctrl-/:toggle-preview' \
 --multi"
-export FZF_CTRL_T_OPTS="--preview 'bat --style=numbers --color=always {} 2>/dev/null || cat {}'"
 export FZF_ALT_C_OPTS="--preview 'eza --tree --color=always {} 2>/dev/null | head -100'"
 
 # FZF with unique list filtering

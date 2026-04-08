@@ -16,12 +16,14 @@ source "$SCRIPT_DIR/installation/lib/utils.sh"
 RUN_CORE=false
 RUN_ALL=false
 RUN_MODULES=()
+AVAILABLE_MODULES=(zsh node)
 
 # Dry-run is CLI-only. Do not inherit it from the parent shell environment.
 DOTFILES_DRY_RUN=0
 export DOTFILES_DRY_RUN
 
 function show_usage {
+  local modules_list="${AVAILABLE_MODULES[*]}"
   cat <<EOF
 Usage: $0 [OPTIONS]
 
@@ -32,7 +34,7 @@ Options:
   --dry-run          Enable dry-run mode (simulate changes)
   --help             Show this help message
 
-Available modules: zsh, node, lua, python, ruby, rust
+Available modules: $modules_list
 
 Examples:
   $0 --all                    # Run everything
@@ -162,8 +164,6 @@ EOF
 # -----------------------------------------------------------------------------
 # Module Scripts
 # -----------------------------------------------------------------------------
-AVAILABLE_MODULES=(zsh node lua python ruby rust)
-
 function run_module {
   local module="$1"
   local script_path="$DOTFILES_DIR/installation/modules/${module}.sh"

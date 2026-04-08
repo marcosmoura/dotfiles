@@ -7,42 +7,23 @@ fi
 
 log_step "Installing Node.js ecosystem"
 
-dry_run_guard "Node.js" "Would install Node (mise), Bun, pnpm, global packages, cspell dictionaries" && return 0
+dry_run_guard "Node.js" "Would install global packages via pnpm" && return 0
 
-require_command mise || return 1
-eval "$(mise activate bash)"
+require_command node || return 1
+require_command pnpm || return 1
 
-log_progress "Installing Node via mise"
-mise install node@latest
-mise use --global node@latest
-mise use --global pnpm@latest
+packages_file="$DOTFILES_DIR/packages/node-globals.txt"
 
-log_progress "Installing Bun via mise"
-mise install bun@latest
-mise use --global bun@latest
+if [[ ! -f "$packages_file" ]]; then
+  log_error "Node globals file not found: $packages_file"
+  summary_fail "Node.js ecosystem"
+  return 1
+fi
 
 log_progress "Installing global packages"
 while IFS= read -r pkg || [[ -n "$pkg" ]]; do
   [[ -z "$pkg" || "$pkg" == \#* ]] && continue
-  pnpm add -g "$pkg" --dangerously-allow-all-builds || log_warn "Failed to install: $pkg"
-done <"$DOTFILES_DIR/packages/node-globals.txt"
-
-log_progress "Installing cspell + dictionaries"
-if ! command -v cspell &>/dev/null; then
-  pnpm add -g cspell --dangerously-allow-all-builds
-fi
-
-existing_links=$(cspell link list 2>/dev/null || true)
-while IFS= read -r dict || [[ -n "$dict" ]]; do
-  [[ -z "$dict" || "$dict" == \#* ]] && continue
-  pnpm add -g "$dict" --dangerously-allow-all-builds || true
-  if ! echo "$existing_links" | grep -q "$dict"; then
-    cspell link add "$dict" || true
-  fi
-done <"$DOTFILES_DIR/packages/cspell-dictionaries.txt"
-
-log_progress "Enabling corepack"
-corepack enable
-corepack prepare pnpm@latest --activate
+  pnpm add -g "$pkg" || log_warn "Failed to install: $pkg"
+done <"$packages_file"
 
 summary_success "Node.js ecosystem installed"

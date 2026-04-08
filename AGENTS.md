@@ -7,7 +7,7 @@ Independent branches per machine — no shared `main`. Each branch is self-conta
 - `personal` — full personal dev setup
 - `work` — limited work machine (separate scope, separate configs)
 
-Deploy by cloning the branch: `git clone -b personal <url>`. Worktrees (`.worktrees/`) are for local development only.
+Deploy by cloning the branch: `git clone -b work <url>`. Worktrees (`.worktrees/`) are for local development only.
 
 ## Repository structure
 
@@ -15,11 +15,11 @@ Deploy by cloning the branch: `git clone -b personal <url>`. Worktrees (`.worktr
 install.sh                  # Entry point: --all, --core, --module <name>, --dry-run
 packages/                   # Declarative package lists
   Brewfile                  # Homebrew (brew bundle)
-  *.txt                     # Language-specific (one package per line, # for comments)
+  node-globals.txt          # Node.js global packages
 installation/
   lib/utils.sh              # Shared utilities — ALL scripts source this
   core/                     # Sequential: preinstall → brew → symlinks → macos → postinstall
-  modules/                  # Opt-in: zsh, node, lua, python, ruby, rust
+  modules/                  # Opt-in: zsh, node
 home/                       # Symlinked to ~/ (entire .config/ is one symlink)
 ```
 
@@ -41,8 +41,8 @@ Every `.sh` file must:
 ## Validation
 
 ```bash
-shellcheck -S error install.sh installation/lib/utils.sh installation/core/*.sh installation/modules/*.sh
-bash -n install.sh installation/lib/utils.sh installation/core/*.sh installation/modules/*.sh
+shellcheck -S error install.sh installation/lib/utils.sh installation/core/*.sh installation/modules/zsh.sh installation/modules/node.sh
+bash -n install.sh installation/lib/utils.sh installation/core/*.sh installation/modules/zsh.sh installation/modules/node.sh
 ```
 
 Avoid emoji/unicode in bash scripts — multi-byte characters cause bash parse errors (e.g., variation selectors contain bytes bash misinterprets as quotes).
@@ -61,7 +61,7 @@ Since `~/.config` is a symlink to `home/.config/`, files gitignored under `home/
 
 - API keys live in `~/.secrets/` (outside repo, created by install.sh)
 - `home/.config/git/identity` holds git name/email — **gitignored**, created interactively by install.sh
-- Check `.gitignore` before adding any file under `home/.config/` — several paths are excluded (gh/hosts.yml, github-copilot/, mole/, raycast/, etc.)
+- Check `.gitignore` before adding any file under `home/.config/` — several paths are excluded (gh/hosts.yml, github-copilot/, etc.)
 
 ## Zsh architecture
 
@@ -76,10 +76,12 @@ Since `~/.config` is a symlink to `home/.config/`, files gitignored under `home/
 
 There are **two separate utils.sh files** — `installation/lib/utils.sh` (install scripts) and `home/.config/zsh/utils.sh` (runtime shell plugins). Don't confuse them.
 
+**Note:** This is the work branch. Some zsh plugins have commented-out integrations for tools not available on the work machine (e.g., atuin, bat, btop, direnv, lazygit, yazi, etc.).
+
 ## Adding packages
 
 - Homebrew: add to `packages/Brewfile` using `brew "name"` or `cask "name"` syntax
-- Language packages: add to the relevant `packages/*.txt` file (one per line)
+- Node.js globals: add to `packages/node-globals.txt` (one per line)
 - If a tool can be installed via Homebrew, prefer the Brewfile over module scripts
 
 ## macOS settings

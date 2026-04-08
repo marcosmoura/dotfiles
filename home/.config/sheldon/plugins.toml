@@ -78,14 +78,6 @@ apply = ["defer"]
 local = "~/.config/zsh/plugins"
 use = ["completions.plugin.sh"]
 
-# Node.js ecosystem completions
-[plugins.yarn-completion]
-github = "chrisands/zsh-yarn-completions"
-apply = ["defer"]
-
-[plugins.nx-completion]
-github = "jscutlery/nx-completion"
-
 [plugins.pnpm-completion]
 github = "g-plane/pnpm-shell-completion"
 apply = ["defer"]
@@ -106,5 +98,5 @@ apply = ["defer"]
 
 [plugins.dotfiles-plugins]
 local = "~/.config/zsh/plugins"
-use = ["*.plugin.sh", "!{compinit,completions,env,macOS}/*.plugin.sh"]
+use = ["*.plugin.sh", "!{compinit,completions,env,macOS,python}.plugin.sh"]
 apply = ["defer"]

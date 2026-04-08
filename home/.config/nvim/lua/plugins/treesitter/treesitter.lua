@@ -16,12 +16,11 @@ return {
         "markdown",
         "query",
         "regex",
-        "rust",
+        -- [work] not available: rust, yaml
         "tsx",
         "typescript",
         "vim",
         "vimdoc",
-        "yaml",
       },
     },
   },

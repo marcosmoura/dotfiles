@@ -1,7 +1,7 @@
-local default = { "cspell" }
-local css = { "cspell", "stylelint" }
+local default = {}
+local css = { "stylelint" }
 local js = default
-local shell = { "cspell", "shellcheck" }
+local shell = { "shellcheck" }
 
 return {
   {
@@ -19,15 +19,18 @@ return {
         html = css,
         javascript = js,
         javascriptreact = js,
-        json = { "cspell", "jsonlint" },
+        json = { "jsonlint" },
         kdl = default,
-        lua = { "cspell", "selene" },
-        markdown = { "cspell", "markdownlint" },
-        rust = default,
+        -- [work] lua not available
+        -- lua = { "selene" },
+        markdown = { "markdownlint" },
+        -- [work] rust not available
+        -- rust = default,
         sh = shell,
         typescript = js,
         typescriptreact = js,
-        yaml = default,
+        -- [work] yaml not available
+        -- yaml = default,
         zsh = shell,
       },
     },

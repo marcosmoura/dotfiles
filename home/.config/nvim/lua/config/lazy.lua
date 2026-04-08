@@ -27,11 +27,6 @@ require("lazy").setup({
       import = "lazyvim.plugins"
     },
 
-    --- [[ AI ]]
-    { import = "lazyvim.plugins.extras.ai.copilot-native" },
-    { import = "lazyvim.plugins.extras.ai.copilot-chat" },
-    { import = "lazyvim.plugins.extras.ai.sidekick" },
-
     --- [[ Coding ]]
     { import = "lazyvim.plugins.extras.coding.blink" },
     { import = "lazyvim.plugins.extras.coding.luasnip" },
@@ -52,14 +47,11 @@ require("lazy").setup({
     { import = "lazyvim.plugins.extras.formatting.prettier" },
 
     --- [[ Lang ]]
-    { import = "lazyvim.plugins.extras.lang.astro" },
     { import = "lazyvim.plugins.extras.lang.git" },
     { import = "lazyvim.plugins.extras.lang.json" },
     { import = "lazyvim.plugins.extras.lang.markdown" },
-    { import = "lazyvim.plugins.extras.lang.rust" },
     { import = "lazyvim.plugins.extras.lang.toml" },
     { import = "lazyvim.plugins.extras.lang.typescript" },
-    { import = "lazyvim.plugins.extras.lang.yaml" },
 
     --- [[ Linting ]]
     { import = "lazyvim.plugins.extras.linting.eslint" },
@@ -67,7 +59,6 @@ require("lazy").setup({
 
     --- [[ LSP ]]
     { import = "lazyvim.plugins.extras.dap.core" },
-    { import = "lazyvim.plugins.extras.dap.nlua" },
     { import = "lazyvim.plugins.extras.lsp.neoconf" },
     { import = "lazyvim.plugins.extras.test.core" },
     { import = "lazyvim.plugins.extras.util.dot" },

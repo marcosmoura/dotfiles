@@ -1,2 +1,3 @@
-@RTK.md
-@context7.md
+# Work machine Claude Code config
+
+# See settings.json for permissions and plugins

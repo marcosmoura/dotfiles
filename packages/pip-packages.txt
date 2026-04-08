@@ -1,5 +1,0 @@
-psutil
-pynvim
-setuptools
-six
-wheel

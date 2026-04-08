@@ -1,5 +1,0 @@
-catppuccin
-inspect
-lua-import
-lunajson
-luv

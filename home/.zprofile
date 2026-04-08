@@ -28,15 +28,12 @@ export LESS_TERMCAP_md=$'\e[1;33m'
 export MANPAGER="less -X"
 export PAGER="less"
 
-# Bat
-export BAT_CONFIG_PATH="$XDG_CONFIG_HOME/bat/batconfig"
-
 # PATH additions — deduplicated via path_prepend
 path_prepend() {
   [ -d "$1" ] || return 0
   case ":$PATH:" in
-    *":$1:"*) ;;
-    *) PATH="$1:$PATH" ;;
+  *":$1:"*) ;;
+  *) PATH="$1:$PATH" ;;
   esac
 }
 
@@ -45,10 +42,14 @@ path_prepend /usr/local/opt
 path_prepend "$HOME/.local/bin"
 path_prepend "$HOME/.yarn/bin"
 path_prepend "$HOME/.config/yarn/global/node_modules/.bin"
-path_prepend "$HOME/go/bin"
-path_prepend "$HOME/.cargo/bin"
-path_prepend "$HOME/.local/share/venv/bin"
-path_prepend /opt/homebrew/opt/rustup/bin
+# [work] go not available
+# path_prepend "$HOME/go/bin"
+# [work] rust not available
+# path_prepend "$HOME/.cargo/bin"
+# [work] python not available
+# path_prepend "$HOME/.local/share/venv/bin"
+# [work] rust not available
+# path_prepend /opt/homebrew/opt/rustup/bin
 
 unfunction path_prepend
 

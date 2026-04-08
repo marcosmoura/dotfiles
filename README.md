@@ -1,12 +1,12 @@
-# Dotfiles
+# Dotfiles (Work)
 
-Personal macOS dotfiles managed with modular install scripts.
+Work machine dotfiles — limited scope setup with zsh and Node.js only.
 
 ## Quick Start
 
 ```bash
-# Clone for your machine
-git clone -b personal git@github.com:marcosmoura/dotfiles.git ./dotfiles
+# Clone for work machine
+git clone -b work git@github.com:marcosmoura/dotfiles.git ./dotfiles
 
 # Run full installation
 cd ./dotfiles
@@ -20,12 +20,7 @@ dotfiles/
 ├── install.sh              # Entry point (--all, --core, --module, --dry-run)
 ├── packages/               # Declarative package lists
 │   ├── Brewfile            # Declarative Homebrew packages (brew bundle)
-│   ├── node-globals.txt
-│   ├── cspell-dictionaries.txt
-│   ├── cargo-binaries.txt
-│   ├── pip-packages.txt
-│   ├── gems.txt
-│   └── luarocks.txt
+│   └── node-globals.txt    # Node.js global packages
 ├── installation/
 │   ├── core/               # Always runs (in order)
 │   │   ├── preinstall.sh   # Sudo auth, Xcode CLI tools
@@ -35,17 +30,13 @@ dotfiles/
 │   │   └── postinstall.sh  # Cleanup + summary
 │   ├── modules/            # Opt-in, runnable after core
 │   │   ├── zsh.sh          # Shell setup + sheldon plugins
-│   │   ├── node.sh         # Node.js, Bun, pnpm, globals
-│   │   ├── lua.sh          # Luarocks packages
-│   │   ├── python.sh       # Python, uv, pip packages
-│   │   ├── ruby.sh         # Ruby, gems
-│   │   └── rust.sh         # Rust toolchain, cargo binaries
+│   │   └── node.sh         # Node.js global packages via pnpm
 │   └── lib/
 │       └── utils.sh        # Shared utilities (logging, retry, etc.)
 ├── home/                   # Symlinked to ~/
 │   ├── .zprofile           # Login shell: PATH, env vars
 │   ├── .zshrc              # Interactive shell: plugins, prompt
-│   └── .config/            # XDG configs (git, nvim, zsh, etc.)
+│   └── .config/            # XDG configs (git, zsh, etc.)
 └── static/                 # Assets (keyboard layouts)
 ```
 
@@ -58,8 +49,8 @@ dotfiles/
 # Core only (brew, symlinks, macOS settings)
 ./install.sh --core
 
-# Specific modules
-./install.sh --module node rust
+# Specific modules (zsh, node)
+./install.sh --module node
 
 # Dry run (symlinks go to .cache/ for inspection)
 ./install.sh --dry-run
@@ -72,7 +63,7 @@ dotfiles/
 This repository uses **separate branches per machine**:
 
 - **`personal`** — Full personal development setup
-- **`work`** — Work machine (limited scope)
+- **`work`** — Work machine (limited scope: zsh and node only)
 
 Each machine clones its own branch directly:
 
