@@ -20,10 +20,6 @@ export GIT_LOG_FORMAT=$(join_by_char $LOG_SEPARATOR $HASH $AUTHOR $DATE $MESSAGE
 function format_log() {
   local pretty_print="$1"
 
-  if command -v tsv-pretty >/dev/null 2>&1; then
-    pretty_print="$(tsv-pretty -x -l=25 -e -f -d="$LOG_SEPARATOR" <<<"$1")"
-  fi
-
   if command -v bat >/dev/null 2>&1; then
     bat -p --color=always -l="gitlog" --pager="less -RFnXJ" <<<"$pretty_print"
   else

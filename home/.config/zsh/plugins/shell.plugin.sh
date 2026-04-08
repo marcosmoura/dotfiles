@@ -21,6 +21,12 @@ alias vim='nvim'
 alias svim='sudo nvim'
 alias snano='sudo nano'
 
+# Better du
+alias du='dust -x -X .git -X node_modules'
+
+# Better man
+alias man='batman'
+
 # Chmod -x
 alias chmox='chmod -x'
 
@@ -38,6 +44,7 @@ export FZF_DEFAULT_OPTS=" \
 --height=40% --layout=reverse --border=rounded \
 --bind='ctrl-/:toggle-preview' \
 --multi"
+export FZF_CTRL_T_OPTS="--preview 'bat --style=numbers --color=always {} 2>/dev/null || cat {}'"
 export FZF_ALT_C_OPTS="--preview 'eza --tree --color=always {} 2>/dev/null | head -100'"
 
 # FZF with unique list filtering
@@ -48,30 +55,13 @@ function fzfu() {
 # Better tree
 alias tree="tree --gitignore --dirsfirst --sort name -C"
 
-# Create a .tar.gz archive, using `zopfli`, `pigz` or `gzip` for compression
+# Create a .tar.gz archive using gzip for compression
 function targz() {
   local tmpFile="${@%/}.tar"
   tar -cvf "${tmpFile}" --exclude=".DS_Store" "${@}" || return 1
 
-  size=$(
-    stat -f"%z" "${tmpFile}" 2>/dev/null # OS X `stat`
-    stat -c"%s" "${tmpFile}" 2>/dev/null # GNU `stat`
-  )
-
-  local cmd=""
-  if ((size < 52428800)) && hash zopfli 2>/dev/null; then
-    # the .tar file is smaller than 50 MB and Zopfli is available; use it
-    cmd="zopfli"
-  else
-    if hash pigz 2>/dev/null; then
-      cmd="pigz"
-    else
-      cmd="gzip"
-    fi
-  fi
-
-  echo "Compressing .tar using \`${cmd}\`…"
-  "${cmd}" -v "${tmpFile}" || return 1
+  echo "Compressing .tar using gzip…"
+  gzip -v "${tmpFile}" || return 1
   [ -f "${tmpFile}" ] && rm "${tmpFile}"
   echo "${tmpFile}.gz created successfully."
 }
