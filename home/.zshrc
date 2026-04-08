@@ -17,8 +17,8 @@ export ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=#888"
 # You Should Use
 export YSU_MODE=ALL
 
-# Plugin manager (sheldon)
-eval "$(sheldon source)"
+# Plugin manager (zplug)
+source "$ZSH_DIR/zplug.zsh"
 
 # Prompt (starship)
 export STARSHIP_CONFIG="${XDG_CONFIG_HOME:-$HOME/.config}/starship/starship.toml"
