@@ -4,6 +4,7 @@
 
 # Initialize zplug
 export ZPLUG_HOME="$(brew --prefix)/opt/zplug"
+echo "DEBUG: commands[git]=$+commands[git] path_has_brew=$(echo $PATH | grep -c homebrew)" >&2
 source "$ZPLUG_HOME/init.zsh"
 
 # ==============================================================================
