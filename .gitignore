@@ -16,10 +16,7 @@ home/.config/gh/hosts.yml
 home/.config/github-copilot/
 home/.config/mole/
 home/.config/raycast/
-home/.config/stache/.env
 home/.config/yarn/
-home/.config/yazi/plugins/
-home/.config/opencode/opencode-notifier-state.json
 home/.config/sheldon/plugins.lock
 home/.config/sheldon/repos/
 
@@ -70,13 +67,5 @@ yarn-error.log*
 .claude.json
 home/.claude/*
 !home/.claude/CLAUDE.md
-!home/.claude/RTK.md
 !home/.claude/settings.json
 !home/.claude/statusline.json
-
-# Codex (allow specific config files)
-home/.codex/*
-!home/.codex/AGENTS.md
-!home/.codex/config.toml
-!home/.codex/RTK.md
-!home/.codex/rules/

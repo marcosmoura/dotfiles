@@ -4,13 +4,9 @@
 
 config-version = 2
 start-at-login = true
+auto-reload-config = true
 
 after-startup-command = [
-  # Restart Stache to ensure it's running
-  'exec-and-forget killall stache',
-  'exec-and-forget sleep 1',
-  'exec-and-forget open -na "/Applications/Stache.app"',
-
   # Disable Caps Lock key
   "exec-and-forget hidutil property --set '{\"UserKeyMapping\":[{\"HIDKeyboardModifierMappingSrc\": 0x700000039, \"HIDKeyboardModifierMappingDst\": 0x7000000E3}]}'",
 
@@ -25,19 +21,19 @@ after-startup-command = [
   'layout accordion',
 
   'workspace music',
-  'layout dwindle',
+  'layout tiles',
 
   'workspace design',
-  'layout dwindle',
+  'layout tiles',
 
   'workspace communication',
-  'layout dwindle',
+  'layout tiles',
 
   'workspace misc',
-  'layout dwindle',
+  'layout tiles',
 
   'workspace files',
-  'layout dwindle',
+  'layout tiles',
 
   'workspace mail',
   'layout v_tiles',
@@ -63,38 +59,13 @@ persistent-workspaces = [
 
 
 # ╔═══════════════════════════════════════════════════════════════════════════════╗
-# ║                             BAR INTEGRATION                                   ║
-# ╚═══════════════════════════════════════════════════════════════════════════════╝
-
-exec-on-workspace-change = [
-  '/bin/bash',
-  '-c',
-  'stache event workspace-changed $AEROSPACE_FOCUSED_WORKSPACE',
-]
-on-focus-changed = 'exec-and-forget stache event window-focus-changed'
-
-# ╔═══════════════════════════════════════════════════════════════════════════════╗
 # ║                                LAYOUT SETTINGS                                ║
 # ╚═══════════════════════════════════════════════════════════════════════════════╝
 
-default-root-container-layout = 'dwindle'
+default-root-container-layout = 'tiles'
 default-root-container-orientation = 'auto'
 
-dwindle-default-split-ratio = 1.0
-dwindle-single-window-aspect-ratio = [0, 0]
-dwindle-single-window-aspect-ratio-tolerance = 0.1
-
 accordion-padding = 0
-
-niri-focused-width-ratio = 0.95
-
-master-default-percent = 0.7
-
-# ╔═══════════════════════════════════════════════════════════════════════════════╗
-# ║                      MOUSE INTERACTION (HYPRSPACE EXCLUSIVE)                  ║
-# ╚═══════════════════════════════════════════════════════════════════════════════╝
-
-mouse-sensitivity = 1.0
 
 # ╔═══════════════════════════════════════════════════════════════════════════════╗
 # ║                         NORMALIZATION SETTINGS                                ║
@@ -169,20 +140,12 @@ run = 'move-node-to-workspace terminal'
 
 # Coding
 [[on-window-detected]]
-if.app-id = 'dev.zed.Zed-Preview'
-run = 'move-node-to-workspace coding'
-
-[[on-window-detected]]
 if.app-id = 'com.microsoft.VSCode'
 run = 'move-node-to-workspace coding'
 
 # Browser
 [[on-window-detected]]
-if.app-id = 'com.microsoft.edgemac.Dev'
-run = 'move-node-to-workspace browser'
-
-[[on-window-detected]]
-if.app-id = 'company.thebrowser.dia'
+if.app-id = 'com.google.Chrome'
 run = 'move-node-to-workspace browser'
 
 # Music
@@ -197,33 +160,8 @@ run = 'move-node-to-workspace design'
 
 # Communication
 [[on-window-detected]]
-if.app-id = 'com.microsoft.teams2'
+if.app-id = 'com.tinyspeck.slackmacgap'
 run = 'move-node-to-workspace communication'
-
-[[on-window-detected]]
-if.app-id = 'net.whatsapp.WhatsApp'
-run = 'move-node-to-workspace communication'
-
-[[on-window-detected]]
-if.app-id = 'com.hnc.Discord'
-run = 'move-node-to-workspace communication'
-
-# Misc
-[[on-window-detected]]
-if.app-id = 'com.NeuralDSP.ArchetypeNollyX'
-run = 'move-node-to-workspace misc'
-
-[[on-window-detected]]
-if.app-id = 'com.NeuralDSP.ArchetypeGojiraX'
-run = 'move-node-to-workspace misc'
-
-[[on-window-detected]]
-if.app-id = 'com.NeuralDSP.ArchetypeJohnMayerX'
-run = 'move-node-to-workspace misc'
-
-[[on-window-detected]]
-if.app-id = 'com.NeuralDSP.FortinNamelessSuiteX'
-run = 'move-node-to-workspace misc'
 
 # ═══════  Monitor 2 Assignments
 
@@ -234,20 +172,12 @@ run = 'move-node-to-workspace files'
 
 # Mail
 [[on-window-detected]]
-if.app-id = 'com.microsoft.Outlook'
+if.app-id = 'com.apple.mail'
 run = 'move-node-to-workspace mail'
 
 # Tasks
 [[on-window-detected]]
 if.app-id = 'com.apple.reminders'
-run = 'move-node-to-workspace tasks'
-
-[[on-window-detected]]
-if.app-id = 'com.microsoft.AzureVpnMac'
-run = 'move-node-to-workspace tasks'
-
-[[on-window-detected]]
-if.app-id = 'me.proton.pass.electron'
 run = 'move-node-to-workspace tasks'
 
 # ═══════  Floating Layouts
@@ -291,10 +221,7 @@ cmd-h = []
 cmd-alt-h = []
 
 # ═══════  Reload all configs
-cmd-ctrl-r = ['exec-and-forget stache reload', 'reload-config']
-
-# ═══════  Change wallpaper
-cmd-ctrl-shift-w = 'exec-and-forget stache wallpaper set --random'
+cmd-ctrl-r = 'reload-config'
 
 # ═══════  Resize and balance workspace
 cmd-ctrl-equal = ['resize width +50', 'resize height +50']
@@ -302,11 +229,9 @@ cmd-ctrl-minus = ['resize width -50', 'resize height -50']
 cmd-ctrl-e = ['flatten-workspace-tree', 'balance-sizes']
 
 # ═══════  Layout shortcuts
-cmd-ctrl-b = 'layout dwindle'
+cmd-ctrl-b = 'layout tiles'
 cmd-ctrl-f = 'layout floating tiling'
 cmd-ctrl-a = 'layout accordion'
-cmd-ctrl-n = 'layout scroll'
-cmd-ctrl-m = 'layout master'
 cmd-ctrl-v = ['layout v_tiles', 'balance-sizes']
 cmd-ctrl-c = ['layout h_tiles', 'balance-sizes']
 
