@@ -1,92 +1,33 @@
-# Homebrew - static setup to avoid slow brew shellenv calls
-export HOMEBREW_PREFIX="/opt/homebrew"
-export HOMEBREW_CELLAR="/opt/homebrew/Cellar"
-export HOMEBREW_REPOSITORY="/opt/homebrew"
-export PATH="/opt/homebrew/bin:/opt/homebrew/sbin${PATH+:$PATH}"
-export MANPATH="/opt/homebrew/share/man${MANPATH+:$MANPATH}:"
-export INFOPATH="/opt/homebrew/share/info:${INFOPATH:-}"
-FPATH="/opt/homebrew/share/zsh/site-functions:${FPATH}"
+# ╔══════════════════════════════════════════════════════════════╗
+# ║  .zshrc — Interactive shell configuration                   ║
+# ║  Loaded for every interactive session (after .zprofile)     ║
+# ╚══════════════════════════════════════════════════════════════╝
 
-# Paths
-export XDG_CONFIG_HOME=${XDG_CONFIG_HOME:-$HOME/.config}
+ZSH_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/zsh"
 
-# Path helper to avoid duplicate entries
-path_prepend() {
-  [ -d "$1" ] || return 0
-  case ":$PATH:" in
-  *":$1:"*) ;; # already present
-  *) PATH="$1:$PATH" ;;
-  esac
-}
+# History
+source "$ZSH_DIR/history.zsh"
 
-local paths=(
-  /usr/local/bin
-  /usr/local/opt
-  "$HOME/.local/bin"
-  "$HOME/.yarn/bin"
-  "$HOME/.config/yarn/global/node_modules/.bin"
-  "$HOME/go/bin"
-  "$HOME/.cargo/bin"
-  "$HOME/.local/share/venv/bin"
-  /opt/homebrew/opt/rustup/bin
-)
+# Secrets (API keys from ~/.secrets/)
+source "$ZSH_DIR/secrets.zsh"
 
-for p in $paths; do
-  path_prepend $p
-done
-
-# Avoid duplicate entries in PATH
-typeset -U path PATH
-
-# Preferred editor
-export EDITOR=$(which nvim)
-
-# Prefer US English and use UTF-8.
-export LANG="en_US.UTF-8"
-export LC_ALL="en_US.UTF-8"
-
-# Highlight section titles in manual pages (bold yellow).
-export LESS_TERMCAP_md=$'\e[1;33m'
-
-# Don’t clear the screen after quitting a manual page.
-export MANPAGER="less -X"
-
-# Define bat config
-export BAT_CONFIG_PATH="$XDG_CONFIG_HOME/bat/batconfig"
-
-# Setup zsh
-export ZSH_CACHE_DIR=$HOME/.config/zsh
+# Zsh autosuggestions style
 export ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=#888"
-export HISTSIZE=250000
-export SAVEHIST=25000
-
-# History options for better experience
-setopt HIST_EXPIRE_DUPS_FIRST # Expire duplicates first
-setopt HIST_IGNORE_DUPS       # Don't record duplicates
-setopt HIST_IGNORE_ALL_DUPS   # Delete old duplicate
-setopt HIST_FIND_NO_DUPS      # Don't show duplicates in search
-setopt HIST_IGNORE_SPACE      # Don't record commands starting with space
-setopt HIST_SAVE_NO_DUPS      # Don't write duplicates
-setopt SHARE_HISTORY          # Share history between sessions
 
 # You Should Use
 export YSU_MODE=ALL
 
-# Load sheldon
+# Plugin manager (sheldon)
 eval "$(sheldon source)"
 
-# Load starship
-export STARSHIP_CONFIG=$XDG_CONFIG_HOME/starship/starship.toml
-export STARSHIP_EMOJI=$($XDG_CONFIG_HOME/starship/scripts/emoji.sh)
-export STARSHIP_CLOCK=$($XDG_CONFIG_HOME/starship/scripts/clock.sh)
+# Prompt (starship)
+export STARSHIP_CONFIG="${XDG_CONFIG_HOME:-$HOME/.config}/starship/starship.toml"
+export STARSHIP_EMOJI=$("${XDG_CONFIG_HOME:-$HOME/.config}/starship/scripts/emoji.sh")
+export STARSHIP_CLOCK=$("${XDG_CONFIG_HOME:-$HOME/.config}/starship/scripts/clock.sh")
 eval "$(starship init zsh)"
 
-# Secrets
-export CONTEXT7_API_KEY=$(cat ~/.secrets/context7-key)
-export GH_PAT=$(cat ~/.secrets/gh-pat-key)
-
-# Clear screen on login shells only
+# Welcome screen on login shells
 if [[ -o login ]]; then
   clear
-  command -v systeminfo >/dev/null 2>&1 && systeminfo
+  command -v systeminfo &>/dev/null && systeminfo
 fi

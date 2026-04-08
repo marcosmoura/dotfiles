@@ -1,0 +1,6 @@
+bundler
+openssl
+rake
+rdoc
+rubygems-update
+sqlite3
