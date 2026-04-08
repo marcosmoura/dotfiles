@@ -40,6 +40,7 @@ path_prepend() {
 path_prepend /usr/local/bin
 path_prepend /usr/local/opt
 path_prepend "$HOME/.local/bin"
+path_prepend "$HOME/.opencode/bin"
 path_prepend "$HOME/.yarn/bin"
 path_prepend "$HOME/.config/yarn/global/node_modules/.bin"
 # [work] go not available
