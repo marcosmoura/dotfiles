@@ -35,7 +35,7 @@
       "skillPath": "skills/simplify/SKILL.md",
       "skillFolderHash": "83566973442dc05bcf5abbe83053e8a8e5f50b6b",
       "installedAt": "2026-04-04T15:34:12.000Z",
-      "updatedAt": "2026-04-04T15:34:12.000Z"
+      "updatedAt": "2026-04-08T02:48:00.127Z"
     },
     "agent-browser": {
       "source": "vercel-labs/agent-browser",
@@ -44,7 +44,7 @@
       "skillPath": "skills/agent-browser/SKILL.md",
       "skillFolderHash": "b6f762bf402cdfaf6a06514e9ce4142ce3e4fb4c",
       "installedAt": "2026-04-04T15:34:14.474Z",
-      "updatedAt": "2026-04-07T16:25:12.801Z"
+      "updatedAt": "2026-04-08T02:48:03.358Z"
     }
   },
   "dismissed": {
