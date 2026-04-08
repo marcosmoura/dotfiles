@@ -36,7 +36,7 @@ fi
 
 # Update and upgrade
 log_progress "Updating Homebrew..."
-brew update
+brew update || log_warn "brew update failed, continuing anyway"
 brew upgrade || true
 
 # Install Rosetta (for Apple Silicon Macs)
