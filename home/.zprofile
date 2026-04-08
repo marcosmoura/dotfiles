@@ -35,14 +35,15 @@ export BAT_CONFIG_PATH="$XDG_CONFIG_HOME/bat/batconfig"
 path_prepend() {
   [ -d "$1" ] || return 0
   case ":$PATH:" in
-    *":$1:"*) ;;
-    *) PATH="$1:$PATH" ;;
+  *":$1:"*) ;;
+  *) PATH="$1:$PATH" ;;
   esac
 }
 
 path_prepend /usr/local/bin
 path_prepend /usr/local/opt
 path_prepend "$HOME/.local/bin"
+path_prepend "$HOME/.opencode/bin"
 path_prepend "$HOME/.yarn/bin"
 path_prepend "$HOME/.config/yarn/global/node_modules/.bin"
 path_prepend "$HOME/go/bin"
