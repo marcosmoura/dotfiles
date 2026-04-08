@@ -8,6 +8,9 @@
 /dist
 node_modules/
 
+# SSH config (contains server IPs — managed outside repo)
+home/.ssh-config
+
 # Sensitive app data (never commit)
 home/.config/gh/hosts.yml
 home/.config/github-copilot/

@@ -1,16 +1,26 @@
+# =============================================================================
+# Global gitignore — applied to ALL repositories on this machine
+# =============================================================================
+
 # macOS
 .DS_Store
 .AppleDouble
 .LSOverride
+Icon
 ._*
-.Spotlight-V100
-.Trashes
+*.icloud
 .DocumentRevisions-V100
 .fseventsd
+.Spotlight-V100
 .TemporaryItems
-.com.apple.timemachine.donotpresent
+.Trashes
 .VolumeIcon.icns
-Icon
+.com.apple.timemachine.donotpresent
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
 
 # Editors
 *.sw?
@@ -19,22 +29,52 @@ Icon
 .idea/
 .vscode/settings.json
 .vscode/launch.json
+.session.vim
 
 # Environment
 .env.local
 .env.*.local
 .envrc
-
-# Compiled
-*.o
-*.pyc
-__pycache__/
+mise.local.toml
 
 # Logs
 *.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+lerna-debug.log*
+.pnpm-debug.log*
+
+# Node
+node_modules/
+jspm_packages/
+web_modules/
+*.tsbuildinfo
+.npm
+.eslintcache
+.stylelintcache
+.node_repl_history
+.yarn/cache
+.yarn/unplugged
+.yarn/build-state.yml
+.yarn/install-state.gz
+.pnp.*
+.webpack/
+
+# Lua
+luac.out
+*.src.rock
+
+# Rust
+debug/
+target/
+**/*.rs.bk
+*.pdb
+
+# Compiled
+*.o
+*.pyc
+__pycache__/
 
 # Claude Code
 **/.claude/settings.local.json

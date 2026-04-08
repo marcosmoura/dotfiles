@@ -246,21 +246,8 @@ function create_all_symlinks {
     # Skip special entries
     [[ "$basename_entry" == "." || "$basename_entry" == ".." ]] && continue
 
-    # Special case: .ssh-config goes to ~/.ssh/config
-    if [[ "$basename_entry" == ".ssh-config" ]]; then
-      if [[ "$DOTFILES_DRY_RUN" != "1" ]]; then
-        mkdir -p "$HOME_DIR/.ssh"
-      fi
-      create_symlink "$entry" "$HOME_DIR/.ssh/config"
-
-      # Remove accidental ~/.ssh-config if it exists
-      if [[ -L "$HOME_DIR/.ssh-config" ]]; then
-        log_warn "Removing accidental ~/.ssh-config symlink"
-        safe_remove "$HOME_DIR/.ssh-config"
-        _REMOVED_SYMLINKS+=("$HOME_DIR/.ssh-config")
-      fi
-      continue
-    fi
+    # SSH config is managed outside the repo (~/.ssh/config) — skip if present
+    [[ "$basename_entry" == ".ssh-config" ]] && continue
 
     # Regular symlink: ~/entry -> DOTFILES_DIR/home/entry
     create_symlink "$entry" "$HOME_DIR/$basename_entry"

@@ -123,7 +123,8 @@ function run_core_scripts {
 # Git Identity Setup
 # -----------------------------------------------------------------------------
 function setup_git_identity {
-  local identity_file="$HOME/.config/git/identity"
+  # Write into the repo so it lands at ~/.config/git/identity after symlinks
+  local identity_file="$DOTFILES_DIR/home/.config/git/identity"
 
   if [[ -f "$identity_file" ]]; then
     log_info "Git identity already configured, skipping."
