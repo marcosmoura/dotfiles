@@ -116,7 +116,10 @@ function run_core_scripts {
     if [[ -f "$script_path" ]]; then
       log_progress "Loading: $script"
       # shellcheck source=/dev/null
-      source "$script_path"
+      if ! source "$script_path"; then
+        log_error "Core script failed: $script"
+        summary_fail "Core script: $script"
+      fi
     else
       log_error "Core script not found: $script_path"
       summary_fail "Core script: $script"
@@ -176,7 +179,10 @@ function run_module {
 
   log_progress "Loading module: $module"
   # shellcheck source=/dev/null
-  source "$script_path"
+  if ! source "$script_path"; then
+    log_error "Module failed: $module"
+    summary_fail "Module: $module"
+  fi
 }
 
 function run_all_modules {
