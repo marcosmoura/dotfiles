@@ -1,6 +1,4 @@
-local default = {}
 local css = { "stylelint" }
-local js = default
 local shell = { "shellcheck" }
 
 return {
@@ -17,20 +15,10 @@ return {
         bash = shell,
         css = css,
         html = css,
-        javascript = js,
-        javascriptreact = js,
         json = { "jsonlint" },
-        kdl = default,
-        -- [work] lua not available
-        -- lua = { "selene" },
+        lua = { "selene" },
         markdown = { "markdownlint" },
-        -- [work] rust not available
-        -- rust = default,
         sh = shell,
-        typescript = js,
-        typescriptreact = js,
-        -- [work] yaml not available
-        -- yaml = default,
         zsh = shell,
       },
     },

@@ -17,7 +17,6 @@ return {
           "snacks_picker",
           "snacks_notif",
           "snacks_dashboard",
-          "yazi",
           "neo-tree",
           "lazy",
           "mason",

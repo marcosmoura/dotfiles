@@ -10,12 +10,11 @@ return {
       explorer = {
         enabled = false,
       },
-      -- [work] lazygit not available
-      -- styles = {
-      --   lazygit = {
-      --     border = "rounded",
-      --   },
-      -- },
+      styles = {
+        lazygit = {
+          border = "rounded",
+        },
+      },
     },
   },
 }
