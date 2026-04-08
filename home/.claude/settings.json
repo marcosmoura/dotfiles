@@ -8,10 +8,12 @@
     "CLAUDE_CODE_ATTRIBUTION_HEADER": "0",
     "CLAUDE_CODE_NO_FLICKER": "1"
   },
+
   "attribution": {
     "commit": "",
     "pr": ""
   },
+
   "permissions": {
     "allow": [
       "Bash(cat *)",
@@ -48,21 +50,14 @@
       "WebSearch",
       "Write"
     ],
-    "deny": [
-      "Bash(dd *)",
-      "Bash(mkfs *)",
-      "Bash(> /dev/sda*)"
-    ],
-    "ask": [
-      "Bash(sudo *)",
-      "Bash(rm -rf *)",
-      "Bash(chmod)",
-      "Bash(chown)"
-    ]
+    "deny": ["Bash(dd *)", "Bash(mkfs *)", "Bash(> /dev/sda*)"],
+    "ask": ["Bash(sudo *)", "Bash(rm -rf *)", "Bash(chmod)", "Bash(chown)"]
   },
+
   "model": "sonnet",
   "effortLevel": "high",
   "promptSuggestionEnabled": false,
+
   "hooks": {
     "PreToolUse": [
       {
@@ -74,9 +69,9 @@
           }
         ]
       }
-  },
     ]
   },
+
   "statusLine": {
     "type": "command",
     "command": "~/.claude/statusline.sh"
