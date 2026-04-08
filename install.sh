@@ -16,17 +16,20 @@ source "$SCRIPT_DIR/installation/lib/utils.sh"
 RUN_CORE=false
 RUN_ALL=false
 RUN_MODULES=()
-DOTFILES_DRY_RUN="${DOTFILES_DRY_RUN:-0}"
+
+# Dry-run is CLI-only. Do not inherit it from the parent shell environment.
+DOTFILES_DRY_RUN=0
+export DOTFILES_DRY_RUN
 
 function show_usage {
   cat <<EOF
 Usage: $0 [OPTIONS]
 
 Options:
-  --all              Run core + all modules (default if no flags)
+  --all              Run core + all modules
   --core             Run core scripts only
   --module <name>    Run specific module(s) (can be used multiple times)
-  --dry-run          Set DOTFILES_DRY_RUN=1 (simulate changes)
+  --dry-run          Enable dry-run mode (simulate changes)
   --help             Show this help message
 
 Available modules: zsh, node, lua, python, ruby, rust

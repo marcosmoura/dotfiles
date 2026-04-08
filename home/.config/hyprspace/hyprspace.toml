@@ -187,10 +187,6 @@ run = 'move-node-to-workspace browser'
 
 # Music
 [[on-window-detected]]
-if.app-id = 'com.spotify.client'
-run = 'move-node-to-workspace music'
-
-[[on-window-detected]]
 if.app-id = 'com.tidal.desktop'
 run = 'move-node-to-workspace music'
 

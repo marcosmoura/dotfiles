@@ -60,6 +60,7 @@ function resolve_path {
 
 function safe_remove {
   local target="$1"
+  local force_recursive="${2:-0}"
 
   if [[ "$DOTFILES_DRY_RUN" == "1" ]]; then
     log_info "[DRY RUN] Would remove: $target"
@@ -71,8 +72,11 @@ function safe_remove {
   elif [[ -f "$target" ]]; then
     rm -f "$target"
   elif [[ -d "$target" ]]; then
+    if [[ "$force_recursive" == "1" ]]; then
+      log_warn "Removing existing directory: $target"
+      rm -rf "$target"
     # Only remove empty directories to avoid nuking user data
-    if [[ -z "$(ls -A "$target" 2>/dev/null)" ]]; then
+    elif [[ -z "$(ls -A "$target" 2>/dev/null)" ]]; then
       rmdir "$target" 2>/dev/null || true
     else
       log_warn "Skipping non-empty directory: $target"
@@ -108,6 +112,11 @@ function backup_existing {
 function create_symlink {
   local source="$1"
   local target="$2"
+  local force_recursive_remove=0
+
+  if [[ "$(basename "$target")" == ".config" ]]; then
+    force_recursive_remove=1
+  fi
 
   # Determine actual target based on dry-run mode
   local actual_target
@@ -125,7 +134,7 @@ function create_symlink {
     if [[ "$DOTFILES_SYMLINK_BACKUP" == "1" ]]; then
       backup_existing "$actual_target"
     else
-      if ! safe_remove "$actual_target"; then
+      if ! safe_remove "$actual_target" "$force_recursive_remove"; then
         log_error "Cannot create symlink — target exists and could not be removed: $actual_target"
         summary_fail "Symlink: $(basename "$target")"
         return 0
