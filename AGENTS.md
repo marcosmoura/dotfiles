@@ -51,7 +51,6 @@ Emoji characters in `utils.sh` cause shellcheck parse false positives — suppre
 
 `home/` contents are symlinked to `~/`. The symlink script also:
 
-- Maps `home/.ssh-config` → `~/.ssh/config`
 - Cleans stale symlinks pointing into the repo whose targets no longer exist
 - In dry-run mode, symlinks into `.cache/dry-run/` for inspection
 

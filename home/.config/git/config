@@ -160,9 +160,7 @@
 
 [core]
   pager = delta
-  attributesfile = ~/.config/git/attributes
   editor = nvim
-  excludesfile = ~/.config/git/ignore
   fsmonitor = true
   precomposeunicode = false
   trustctime = false
