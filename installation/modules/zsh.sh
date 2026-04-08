@@ -8,7 +8,7 @@ fi
 
 log_step "Configuring zsh"
 
-dry_run_guard "Zsh" "Would add zsh to /etc/shells, set as default shell, refresh sheldon plugins" && return 0
+dry_run_guard "Zsh" "Would add zsh to /etc/shells, set as default shell, install zplug plugins" && return 0
 
 ZSH_PATH="$(command -v zsh)"
 
@@ -22,9 +22,13 @@ if [ "$SHELL" != "$ZSH_PATH" ]; then
   chsh -s "$ZSH_PATH"
 fi
 
-if command -v sheldon &>/dev/null; then
-  log_progress "Refreshing sheldon plugins"
-  sheldon lock --reinstall || true
+if command -v zplug &>/dev/null; then
+  log_progress "Installing zplug plugins"
+  # zplug install is handled automatically on first shell start
+  # but we can force it here if needed
+  export ZPLUG_HOME="$(brew --prefix)/opt/zplug"
+  source "$ZPLUG_HOME/init.zsh"
+  zplug check || zplug install
 fi
 
 summary_success "Zsh configured"

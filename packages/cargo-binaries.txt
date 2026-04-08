@@ -1,0 +1,6 @@
+cargo-cache
+cargo-clean-all
+cargo-machete
+cargo-nextest
+cargo-sort
+cargo-update

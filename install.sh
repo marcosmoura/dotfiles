@@ -16,7 +16,7 @@ source "$SCRIPT_DIR/installation/lib/utils.sh"
 RUN_CORE=false
 RUN_ALL=false
 RUN_MODULES=()
-AVAILABLE_MODULES=(zsh node)
+AVAILABLE_MODULES=(zsh node lua python ruby rust)
 
 # Dry-run is CLI-only. Do not inherit it from the parent shell environment.
 DOTFILES_DRY_RUN=0
