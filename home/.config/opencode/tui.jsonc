@@ -4,5 +4,8 @@
   "scroll_speed": 8,
   "scroll_acceleration": {
     "enabled": true
-  }
+  },
+  "plugin": [
+    "oc-tps@latest"
+  ]
 }
