@@ -5,7 +5,5 @@
   "scroll_acceleration": {
     "enabled": true
   },
-  "plugin": [
-    "oc-tps@latest"
-  ]
+  "plugin": ["oc-tps@latest"]
 }
