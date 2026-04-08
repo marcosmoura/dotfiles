@@ -45,7 +45,7 @@ shellcheck -S error install.sh installation/lib/utils.sh installation/core/*.sh 
 bash -n install.sh installation/lib/utils.sh installation/core/*.sh installation/modules/*.sh
 ```
 
-Emoji characters in `utils.sh` cause shellcheck parse false positives — suppressed via `SC1072,SC1073,SC1078`.
+Avoid emoji/unicode in bash scripts — multi-byte characters cause bash parse errors (e.g., variation selectors contain bytes bash misinterprets as quotes).
 
 ## Symlinks
 
