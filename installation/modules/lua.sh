@@ -12,11 +12,11 @@ dry_run_guard "Lua" "Would install luarocks packages from packages/luarocks.txt"
 require_command luarocks || return 1
 
 log_progress "Installing luarocks packages"
-while IFS= read -r pkg || [[ -n "$pkg" ]]; do
+while IFS= read -r pkg <&3 || [[ -n "$pkg" ]]; do
   [[ -z "$pkg" || "$pkg" == \#* ]] && continue
   if ! luarocks list --porcelain | grep -q "$pkg"; then
     luarocks install "$pkg" || log_warn "Failed to install: $pkg"
   fi
-done <"$DOTFILES_DIR/packages/luarocks.txt"
+done 3<"$DOTFILES_DIR/packages/luarocks.txt"
 
 summary_success "Lua packages installed"

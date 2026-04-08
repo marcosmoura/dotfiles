@@ -14,20 +14,18 @@ require_command rustup || return 1
 rustup toolchain install stable
 rustup default stable
 
-if [ -f "$HOME/.cargo/env" ]; then
-  # shellcheck disable=SC1091
-  source "$HOME/.cargo/env" 2>/dev/null || true
-else
-  export PATH="$HOME/.cargo/bin:$PATH"
-fi
+# Add cargo to PATH — brew-installed rustup doesn't create ~/.cargo/env,
+# so resolve the toolchain bin directory via rustup itself.
+CARGO_BIN_DIR="$(dirname "$(rustup which cargo)")"
+export PATH="$CARGO_BIN_DIR:$HOME/.cargo/bin:$PATH"
 
 log_progress "Installing cargo binaries"
-while IFS= read -r bin || [[ -n "$bin" ]]; do
+while IFS= read -r bin <&3 || [[ -n "$bin" ]]; do
   [[ -z "$bin" || "$bin" == \#* ]] && continue
   if ! cargo install --list 2>/dev/null | grep -q "^$bin "; then
     log_progress "Installing $bin"
     retry 2 5 cargo install "$bin" || log_warn "Failed to install: $bin"
   fi
-done <"$DOTFILES_DIR/packages/cargo-binaries.txt"
+done 3<"$DOTFILES_DIR/packages/cargo-binaries.txt"
 
 summary_success "Rust ecosystem installed"
