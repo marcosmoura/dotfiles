@@ -1,6 +1,5 @@
 {
   "$schema": "https://json.schemastore.org/claude-code-settings.json",
-
   "env": {
     "CLAUDE_CODE_DISABLE_1M_CONTEXT": "1",
     "CLAUDE_CODE_ENABLE_TELEMETRY": "0",
@@ -8,12 +7,10 @@
     "CLAUDE_CODE_ATTRIBUTION_HEADER": "0",
     "CLAUDE_CODE_NO_FLICKER": "1"
   },
-
   "attribution": {
     "commit": "",
     "pr": ""
   },
-
   "permissions": {
     "allow": [
       "Bash(cat *)",
@@ -50,14 +47,19 @@
       "WebSearch",
       "Write"
     ],
-    "deny": ["Bash(dd *)", "Bash(mkfs *)", "Bash(> /dev/sda*)"],
-    "ask": ["Bash(sudo *)", "Bash(rm -rf *)", "Bash(chmod)", "Bash(chown)"]
+    "deny": [
+      "Bash(dd *)",
+      "Bash(mkfs *)",
+      "Bash(> /dev/sda*)"
+    ],
+    "ask": [
+      "Bash(sudo *)",
+      "Bash(rm -rf *)",
+      "Bash(chmod)",
+      "Bash(chown)"
+    ]
   },
-
-  "model": "sonnet",
-  "effortLevel": "high",
-  "promptSuggestionEnabled": false,
-
+  "model": "haiku",
   "hooks": {
     "PreToolUse": [
       {
@@ -71,12 +73,10 @@
       }
     ]
   },
-
   "statusLine": {
     "type": "command",
     "command": "~/.claude/statusline.sh"
   },
-
   "enabledPlugins": {
     "claude-lens@claude-lens-marketplace": true,
     "code-review@claude-plugins-official": true,
@@ -90,13 +90,20 @@
     "superpowers@claude-plugins-official": true,
     "typescript-lsp@claude-plugins-official": true
   },
-
   "extraKnownMarketplaces": {
     "claude-pace-marketplace": {
       "source": {
         "source": "github",
         "repo": "Astro-Han/claude-pace"
       }
+    },
+    "stripe-internal-marketplace": {
+      "source": {
+        "source": "git",
+        "url": "http://gitmirror-git-http--northwest.corp.stripe.com.certproxy.localhost:7891/repos/stripe-internal/claude-marketplace.git"
+      }
     }
-  }
+  },
+  "effortLevel": "medium",
+  "promptSuggestionEnabled": false
 }
