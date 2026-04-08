@@ -1,6 +1,5 @@
 {
   "$schema": "https://json.schemastore.org/claude-code-settings.json",
-
   "env": {
     "CLAUDE_CODE_DISABLE_1M_CONTEXT": "1",
     "CLAUDE_CODE_ENABLE_TELEMETRY": "0",
@@ -8,7 +7,10 @@
     "CLAUDE_CODE_ATTRIBUTION_HEADER": "0",
     "CLAUDE_CODE_NO_FLICKER": "1"
   },
-
+  "attribution": {
+    "commit": "",
+    "pr": ""
+  },
   "permissions": {
     "allow": [
       "Bash(cat *)",
@@ -45,10 +47,18 @@
       "WebSearch",
       "Write"
     ],
-    "deny": ["Bash(dd *)", "Bash(mkfs *)", "Bash(> /dev/sda*)"],
-    "ask": ["Bash(sudo *)", "Bash(rm -rf *)", "Bash(chmod)", "Bash(chown)"]
+    "deny": [
+      "Bash(dd *)",
+      "Bash(mkfs *)",
+      "Bash(> /dev/sda*)"
+    ],
+    "ask": [
+      "Bash(sudo *)",
+      "Bash(rm -rf *)",
+      "Bash(chmod)",
+      "Bash(chown)"
+    ]
   },
-
   "hooks": {
     "PreToolUse": [
       {
@@ -62,12 +72,10 @@
       }
     ]
   },
-
   "statusLine": {
     "type": "command",
     "command": "~/.claude/statusline.sh"
   },
-
   "enabledPlugins": {
     "rust-analyzer-lsp@claude-plugins-official": true,
     "frontend-design@claude-plugins-official": true,
@@ -81,7 +89,6 @@
     "feature-dev@claude-plugins-official": true,
     "playwright@claude-plugins-official": true
   },
-
   "extraKnownMarketplaces": {
     "claude-pace-marketplace": {
       "source": {
@@ -90,13 +97,6 @@
       }
     }
   },
-
-  "model": "sonnet",
   "effortLevel": "high",
-  "promptSuggestionEnabled": false,
-
-  "attribution": {
-    "commit": "",
-    "pr": ""
-  }
+  "promptSuggestionEnabled": false
 }
