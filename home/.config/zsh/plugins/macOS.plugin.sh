@@ -3,22 +3,76 @@
 source ~/.config/zsh/utils.sh
 
 function updateSystem {
-  print_start "Updating system tools"
+  clear
+
+  print_green "💻 Updating system tools\n"
 
   authenticateBeforeUpdate
+  clear
 
+  print_green "💻 Updating system tools\n"
+
+  # --- macOS software updates ---
+  print_start "Checking macOS software updates"
+  softwareupdate --install --all 2>/dev/null || true
+  print_success "macOS updates done"
+
+  # --- Homebrew ---
   if command -v brew >/dev/null 2>&1; then
-    print_progress "Updating Homebrew formulae"
-    brew update && brew upgrade && brew upgrade --cask
+    print_start "Updating Homebrew"
+    brew update && brew upgrade && brew upgrade --cask --greedy-auto-updates
+    brew autoremove
+    brew cleanup -s
+    print_success "Homebrew updated"
   fi
 
+  # --- mise runtimes ---
+  if command -v mise >/dev/null 2>&1; then
+    print_start "Updating mise runtimes"
+    mise upgrade
+    print_success "mise runtimes updated"
+  fi
+
+  # --- Global Node packages ---
   if command -v pnpm >/dev/null 2>&1; then
-    print_progress "Updating global pnpm packages"
-    pnpm update -g || print_error "Failed to update global pnpm packages"
+    print_start "Updating global pnpm packages"
+    pnpm update -g || true
+    print_success "pnpm globals updated"
   fi
 
-  command -v fsh-alias >/dev/null 2>&1 && fsh-alias "$XDG_CONFIG_HOME/syntax-theme/syntax-theme.ini" >/dev/null 2>&1
+  # --- Ruby ---
+  if command -v gem >/dev/null 2>&1; then
+    print_start "Updating Ruby gems"
+    gem update --system 2>/dev/null || true
+    gem update || true
+    print_success "Ruby gems updated"
+  fi
+
+  # --- Python venv ---
+  local venv_dir="$HOME/.local/share/venv"
+  if [[ -f "$venv_dir/bin/python" ]]; then
+    print_start "Updating Python venv packages"
+    "$venv_dir/bin/pip" install --upgrade pip 2>/dev/null || true
+    "$venv_dir/bin/pip" list --outdated 2>/dev/null | awk '{if(NR>2)print $1}' | xargs -n1 "$venv_dir/bin/pip" install -U 2>/dev/null || true
+    print_success "Python packages updated"
+  fi
+
+  # --- Rust ---
+  if command -v rustup >/dev/null 2>&1; then
+    print_start "Updating Rust toolchain"
+    rustup update || true
+    print_success "Rust updated"
+  fi
+
+  # --- Lua ---
+  if command -v luarocks >/dev/null 2>&1; then
+    print_start "Updating Luarocks packages"
+    luarocks install --only-deps 2>/dev/null || true
+    print_success "Luarocks updated"
+  fi
+
   print_success "💻 Updated! \n"
+
 }
 
 # Cache file for system info (refreshed daily or on demand)
@@ -28,15 +82,16 @@ _SYSINFO_CACHE_AGE=86400 # 24 hours in seconds
 function _refresh_sysinfo_cache {
   mkdir -p "$(dirname "$_SYSINFO_CACHE")"
 
-  local all_info=$(system_profiler SPHardwareDataType SPDisplaysDataType 2>/dev/null)
-  local model_name=$(echo "$all_info" | awk -F': ' '/^ *Model Name:/ {print $2; exit}')
-  local chip_name=$(echo "$all_info" | awk -F': ' '/^ *Chip:/ {print $2; exit}')
-  local memory=$(echo "$all_info" | awk -F': ' '/^ *Memory:/ {print $2; exit}')
+  local hardware_info=$(system_profiler SPHardwareDataType 2>/dev/null)
+  local model_name=$(echo "$hardware_info" | awk -F': ' '/^ *Model Name:/ {print $2; exit}')
+  local chip_name=$(echo "$hardware_info" | awk -F': ' '/^ *Chip:/ {print $2; exit}')
+  local memory=$(echo "$hardware_info" | awk -F': ' '/^ *Memory:/ {print $2; exit}')
 
   # Determine built-in display size heuristically via resolution width.
   local display_size=""
+  local display_info=$(system_profiler SPDisplaysDataType 2>/dev/null)
   # Look specifically for the built-in display resolution, not external monitors
-  local resolution_line=$(echo "$all_info" | awk '/Built-in/,/Resolution:/' | awk -F': ' '/Resolution:/ {print $2; exit}')
+  local resolution_line=$(echo "$display_info" | awk '/Built-in/,/Resolution:/' | awk -F': ' '/Resolution:/ {print $2; exit}')
   local width=$(echo "$resolution_line" | awk '{print $1}')
 
   case "$width" in
@@ -91,6 +146,8 @@ function systeminfo {
   desc="Apple $model_name / $chip_name / $memory RAM / $disk_size"
 
   print_yellow "\n  💻 $desc\n"
+
+  neofetch
 }
 
 # Force refresh system info cache
