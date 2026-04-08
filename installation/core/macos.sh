@@ -1,10 +1,25 @@
 #!/usr/bin/env bash
+set -euo pipefail
+
+# =============================================================================
+# macOS Configuration Script
+# Applies macOS system defaults
+# =============================================================================
+
+# Source utils if not already loaded
+if ! command -v log_step &>/dev/null; then
+  # shellcheck source=/dev/null
+  source "$(cd "$(dirname "${BASH_SOURCE[0]}")/../lib" && pwd)/utils.sh"
+fi
+
+log_step "Configuring macOS settings..."
 
 # Environment variables supported:
 #   DOTFILES_TIMEZONE                 Override timezone (default Europe/Prague)
 #   DOTFILES_ENABLE_LEGACY_DEBUG=1    Enable legacy debug / dashboard settings
 
-print_start "Configuring macOS"
+# Skip entirely in dry-run mode — defaults write has no undo
+dry_run_guard "macOS settings" "Would apply macOS system defaults (not reversible)" && { return 0 2>/dev/null || exit 0; }
 
 # Capture macOS version early for conditional tweaks
 MACOS_VERSION="$(sw_vers -productVersion 2>/dev/null | awk -F '.' '{print $1"."$2}')"
@@ -20,7 +35,7 @@ osascript -e 'tell application "System Settings" to quit' 2>/dev/null || osascri
 # Mute the startup chime.
 # Apple Silicon (all Macs supported by Tahoe 26) uses StartupMute; the legacy
 # Intel key (SystemAudioVolume) is ignored on AS hardware.
-sudo nvram StartupMute=%01 2>/dev/null || print_info "Skipping StartupMute (not supported)"
+sudo nvram StartupMute=%01 2>/dev/null || log_info "Skipping StartupMute (not supported)"
 
 # Finder: show hidden files by default
 defaults write com.apple.finder AppleShowAllFiles -bool true
@@ -28,7 +43,7 @@ defaults write com.apple.finder AppleShowAllFiles -bool true
 # Make Dock icons of hidden applications translucent
 defaults write com.apple.dock showhidden -bool true
 
-# Don’t show recent applications in Dock
+# Don't show recent applications in Dock
 defaults write com.apple.dock show-recents -bool false
 
 # Set sidebar icon size to small
@@ -51,8 +66,12 @@ defaults write NSGlobalDomain NSDocumentSaveNewDocumentsToCloud -bool false
 # Automatically quit printer app once the print jobs complete
 defaults write com.apple.print.PrintingPrefs "Quit When Finished" -bool true
 
-# Remove duplicates in the “Open With” menu (also see `lscleanup` alias)
-/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister -r -domain local -domain system -domain user
+# Remove duplicates in the "Open With" menu (also see `lscleanup` alias)
+# NOTE: This rebuilds the Launch Services database and can take 30-60s.
+# Set DOTFILES_REBUILD_LSDB=1 to run it (skipped by default).
+if [[ "${DOTFILES_REBUILD_LSDB:-0}" == "1" ]]; then
+  /System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister -r -domain local -domain system -domain user
+fi
 
 # Display ASCII control characters using caret notation in standard text views
 # Try e.g. `cd /tmp; unidecode "\x{0000}" > cc.txt; open -e cc.txt`
@@ -65,16 +84,16 @@ defaults write com.apple.systempreferences NSQuitAlwaysKeepsWindows -bool false
 # in the login window
 sudo defaults write /Library/Preferences/com.apple.loginwindow AdminHostInfo HostName
 
-# Disable automatic capitalization as it’s annoying when typing code
+# Disable automatic capitalization as it's annoying when typing code
 defaults write NSGlobalDomain NSAutomaticCapitalizationEnabled -bool false
 
-# Disable smart dashes as they’re annoying when typing code
+# Disable smart dashes as they're annoying when typing code
 defaults write NSGlobalDomain NSAutomaticDashSubstitutionEnabled -bool false
 
-# Disable automatic period substitution as it’s annoying when typing code
+# Disable automatic period substitution as it's annoying when typing code
 defaults write NSGlobalDomain NSAutomaticPeriodSubstitutionEnabled -bool false
 
-# Disable smart quotes as they’re annoying when typing code
+# Disable smart quotes as they're annoying when typing code
 defaults write NSGlobalDomain NSAutomaticQuoteSubstitutionEnabled -bool false
 
 # Disable auto-correct
@@ -122,7 +141,7 @@ defaults write NSGlobalDomain InitialKeyRepeat -int 10
 TIMEZONE="${DOTFILES_TIMEZONE:-Europe/Prague}"
 _set_timezone_fallback() {
   sudo ln -sf "/usr/share/zoneinfo/$TIMEZONE" /etc/localtime 2>/dev/null ||
-    print_info "Could not set timezone to $TIMEZONE"
+    log_info "Could not set timezone to $TIMEZONE"
 }
 if [ -n "$TIMEZONE" ]; then
   if command -v systemsetup >/dev/null 2>&1; then
@@ -130,7 +149,7 @@ if [ -n "$TIMEZONE" ]; then
     if [ "$CURRENT_TZ" != "$TIMEZONE" ]; then
       sudo systemsetup -settimezone "$TIMEZONE" >/dev/null 2>&1 ||
         {
-          print_info "systemsetup failed; falling back to /etc/localtime symlink"
+          log_info "systemsetup failed; falling back to /etc/localtime symlink"
           _set_timezone_fallback
         }
     fi
@@ -245,7 +264,7 @@ defaults write com.apple.finder WarnOnEmptyTrash -bool false
 chflags nohidden ~/Library
 
 # Expand the following File Info panes:
-# “General”, “Open with”, and “Sharing & Permissions”
+# "General", "Open with", and "Sharing & Permissions"
 defaults write com.apple.finder FXInfoPanesExpanded -dict \
   General -bool true \
   OpenWith -bool true \
@@ -268,7 +287,7 @@ defaults write com.apple.dock tilesize -int 38
 # Change minimize/maximize window effect
 defaults write com.apple.dock mineffect -string "scale"
 
-# Minimize windows into their application’s icon
+# Minimize windows into their application's icon
 defaults write com.apple.dock minimize-to-application -bool true
 
 # Enable spring loading for all Dock items
@@ -278,11 +297,11 @@ defaults write com.apple.dock enable-spring-load-actions-on-all-items -bool true
 defaults write com.apple.dock show-process-indicators -bool true
 
 # Wipe all (default) app icons from the Dock
-# This is only really useful when setting up a new Mac, or if you don’t use
+# This is only really useful when setting up a new Mac, or if you don't use
 # the Dock to launch apps.
 defaults write com.apple.dock persistent-apps -array ""
 
-# Don’t animate opening applications from the Dock
+# Don't animate opening applications from the Dock
 defaults write com.apple.dock launchanim -bool false
 
 # Speed up Mission Control animations
@@ -292,7 +311,7 @@ defaults write com.apple.dock expose-animation-duration -float 0.1
 # (i.e. use the old Exposé behavior instead)
 defaults write com.apple.dock expose-group-by-app -bool true
 
-# Don’t automatically rearrange Spaces based on most recent use
+# Don't automatically rearrange Spaces based on most recent use
 defaults write com.apple.dock mru-spaces -bool false
 
 # Monitors don't have separate spaces.
@@ -388,4 +407,5 @@ for app in "Activity Monitor" "Address Book" "Calendar" "Contacts" "cfprefsd" \
   killall "${app}" >/dev/null 2>&1
 done
 
-print_success "macOS configured! \n"
+log_success "macOS configured!"
+summary_success "macOS configured"

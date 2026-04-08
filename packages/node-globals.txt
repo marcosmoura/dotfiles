@@ -1,0 +1,8 @@
+@fsouza/prettierd
+@johnnymorganz/stylua-bin
+@vscode/codicons
+corepack
+nx
+prettier
+stylelint
+typescript

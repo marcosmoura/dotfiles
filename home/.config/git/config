@@ -1,12 +1,11 @@
-[user]
-  name = Marcos Moura
-  email = contact@marcosmoura.com
+[include]
+  path = identity
 
 [filter "lfs"]
-	clean = git-lfs clean -- %f
-	smudge = git-lfs smudge -- %f
+  clean = git-lfs clean -- %f
+  smudge = git-lfs smudge -- %f
   required = true
-	process = git-lfs filter-process
+  process = git-lfs filter-process
 
 [alias]
   # List aliases
@@ -161,9 +160,9 @@
 
 [core]
   pager = delta
-  attributesfile = ~/.gitattributes
+  attributesfile = ~/.config/git/attributes
   editor = nvim
-  excludesfile = ~/.gitignore
+  excludesfile = ~/.config/git/ignore
   fsmonitor = true
   precomposeunicode = false
   trustctime = false
