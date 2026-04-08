@@ -43,8 +43,17 @@
       "WebSearch",
       "Write"
     ],
-    "deny": ["Bash(dd *)", "Bash(mkfs *)", "Bash(> /dev/sda*)"],
-    "ask": ["Bash(sudo *)", "Bash(rm -rf *)", "Bash(chmod)", "Bash(chown)"]
+    "deny": [
+      "Bash(dd *)",
+      "Bash(mkfs *)",
+      "Bash(> /dev/sda*)"
+    ],
+    "ask": [
+      "Bash(sudo *)",
+      "Bash(rm -rf *)",
+      "Bash(chmod)",
+      "Bash(chown)"
+    ]
   },
   "model": "sonnet",
   "hooks": {
@@ -62,7 +71,7 @@
   },
   "statusLine": {
     "type": "command",
-    "command": "~/.claude/plugins/cache/claude-lens-marketplace/claude-lens/0.6.0/claude-lens.sh"
+    "command": "~/.claude/statusline.sh"
   },
   "enabledPlugins": {
     "rust-analyzer-lsp@claude-plugins-official": true,
@@ -73,13 +82,15 @@
     "typescript-lsp@claude-plugins-official": true,
     "security-guidance@claude-plugins-official": true,
     "github@claude-plugins-official": true,
-    "claude-lens@claude-lens-marketplace": true
+    "context7@claude-plugins-official": true,
+    "feature-dev@claude-plugins-official": true,
+    "playwright@claude-plugins-official": true
   },
   "extraKnownMarketplaces": {
-    "claude-lens-marketplace": {
+    "claude-pace-marketplace": {
       "source": {
         "source": "github",
-        "repo": "Astro-Han/claude-lens"
+        "repo": "Astro-Han/claude-pace"
       }
     }
   },
