@@ -24,24 +24,11 @@ function print_version {
 }
 
 function nodeVersions {
-  # [work] nx not available
-  # local NX_GLOBAL_VERSION="$(nx --version | grep Global | sed 's/- Global: v//')"
-  # local NX_LOCAL_VERSION="$(nx --version | grep Local | sed 's/- Local: v//')"
-
   print_info "Node ENV versions:\n"
 
   print_version "node" "$(node -v)"
   print_version "npm" "$(npm -v)"
   print_version "yarn" "$(yarn -v)"
   print_version "pnpm" "$(pnpm -v)"
-  print_version "bun" "$(bun -v)"
   print_version "tsc" "$(tsc -v | sed 's/Version //')"
-
-  # [work] nx not available
-  # In case nx global is "Not found", print the local version
-  # if [[ $NX_GLOBAL_VERSION == *"Not found"* ]]; then
-  #   print_version "nx" "$NX_LOCAL_VERSION (using local version)"
-  # else
-  #   print_version "nx" "$NX_GLOBAL_VERSION (using global version)"
-  # fi
 }
