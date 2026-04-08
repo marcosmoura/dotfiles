@@ -15,6 +15,8 @@ eval "$(mise activate bash)"
 log_progress "Installing Python via mise"
 mise install python@latest
 mise use --global python@latest
+# Refresh PATH so python/pip resolve to the mise-managed version
+eval "$(mise env)"
 
 require_command uv || return 1
 

@@ -15,13 +15,15 @@ eval "$(mise activate bash)"
 log_progress "Installing Ruby via mise"
 mise install ruby@latest
 mise use --global ruby@latest
+# Refresh PATH so gem/ruby resolve to the mise-managed version
+eval "$(mise env)"
 
 log_progress "Installing gems"
-while IFS= read -r gem || [[ -n "$gem" ]]; do
+while IFS= read -r gem <&3 || [[ -n "$gem" ]]; do
   [[ -z "$gem" || "$gem" == \#* ]] && continue
   if ! gem list -i "$gem" &>/dev/null; then
     gem install "$gem" || log_warn "Failed to install: $gem"
   fi
-done <"$DOTFILES_DIR/packages/gems.txt"
+done 3<"$DOTFILES_DIR/packages/gems.txt"
 
 summary_success "Ruby ecosystem installed"

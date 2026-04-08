@@ -7,7 +7,7 @@ fi
 
 log_step "Installing Node.js ecosystem"
 
-dry_run_guard "Node.js" "Would install Node (mise), Bun, pnpm, global packages" && return 0
+dry_run_guard "Node.js" "Would install Node (mise), pnpm, global packages" && return 0
 
 require_command mise || return 1
 eval "$(mise activate bash)"
@@ -17,15 +17,20 @@ mise install node@latest
 mise use --global node@latest
 mise use --global pnpm@latest
 
-log_progress "Installing Bun via mise"
-mise install bun@latest
-mise use --global bun@latest
+# Refresh PATH so node/pnpm resolve to the mise-managed versions
+eval "$(mise env)"
+
+# Ensure pnpm global bin directory exists
+export PNPM_HOME="${PNPM_HOME:-$HOME/.local/share/pnpm}"
+mkdir -p "$PNPM_HOME"
+export PATH="$PNPM_HOME:$PATH"
+pnpm setup || true
 
 log_progress "Installing global packages"
-while IFS= read -r pkg || [[ -n "$pkg" ]]; do
+while IFS= read -r pkg <&3 || [[ -n "$pkg" ]]; do
   [[ -z "$pkg" || "$pkg" == \#* ]] && continue
   pnpm add -g "$pkg" --dangerously-allow-all-builds || log_warn "Failed to install: $pkg"
-done <"$DOTFILES_DIR/packages/node-globals.txt"
+done 3<"$DOTFILES_DIR/packages/node-globals.txt"
 
 log_progress "Enabling corepack"
 corepack enable
