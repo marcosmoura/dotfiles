@@ -10,7 +10,7 @@ git clone -b personal git@github.com:marcosmoura/dotfiles.git ./dotfiles
 
 # Run full installation
 cd ./dotfiles
-./install.sh
+./install.sh --all
 ```
 
 ## Architecture
@@ -64,6 +64,8 @@ dotfiles/
 # Dry run (symlinks go to .cache/ for inspection)
 ./install.sh --dry-run
 ```
+
+> Note: the installer replaces an existing `~/.config` directory with the repo symlink. Set `DOTFILES_SYMLINK_BACKUP=1` if you want the existing directory renamed instead of removed.
 
 ## Branch Strategy
 

@@ -53,6 +53,7 @@ Avoid emoji/unicode in bash scripts — multi-byte characters cause bash parse e
 
 - Cleans stale symlinks pointing into the repo whose targets no longer exist
 - In dry-run mode, symlinks into `.cache/dry-run/` for inspection
+- If `~/.config` already exists as a real directory, the installer removes it and replaces it with the repo symlink (unless `DOTFILES_SYMLINK_BACKUP=1` is set)
 
 Since `~/.config` is a symlink to `home/.config/`, files gitignored under `home/.config/` (like `git/identity`) still live in the repo directory on disk.
 
