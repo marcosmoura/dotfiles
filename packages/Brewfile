@@ -96,7 +96,6 @@ brew "wget"
 brew "yq"
 brew "zig"
 brew "zoxide"
-brew "zplug"
 
 # Applications
 cask "betterdisplay"
