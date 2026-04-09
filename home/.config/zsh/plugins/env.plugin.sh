@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Rust - already loaded in .zshenv, skip if PATH already contains cargo
-if [[ ! "$PATH" == *".cargo/bin"* ]]; then
+if [[ ! "$PATH" == *".cargo/bin"* ]] && [[ -f "$HOME/.cargo/env" ]]; then
   source $HOME/.cargo/env
 fi
 

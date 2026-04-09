@@ -16,10 +16,13 @@ install.sh                  # Entry point: --all, --core, --module <name>, --dry
 packages/                   # Declarative package lists
   Brewfile                  # Homebrew (brew bundle)
   node-globals.txt          # Node.js global packages
+  luarocks.txt              # Lua packages installed via luarocks
+  gems.txt                  # Ruby gems
+  cargo-binaries.txt        # Rust cargo-installed binaries
 installation/
   lib/utils.sh              # Shared utilities — ALL scripts source this
   core/                     # Sequential: preinstall → brew → symlinks → macos → postinstall
-  modules/                  # Opt-in: zsh, node
+  modules/                  # Opt-in: zsh, node, lua, python, ruby, rust
 home/                       # Symlinked to ~/ (entire .config/ is one symlink)
 ```
 
@@ -37,15 +40,6 @@ Every `.sh` file must:
 - `--dry-run` redirects symlinks to `.cache/dry-run/` and makes brew, all modules, and macOS settings log-only. Everything else (sudo, xcode, git identity, postinstall) runs normally.
 
 `DOTFILES_DIR` is resolved automatically by `utils.sh`. Don't hardcode paths.
-
-## Validation
-
-```bash
-shellcheck -S error install.sh installation/lib/utils.sh installation/core/*.sh installation/modules/zsh.sh installation/modules/node.sh
-bash -n install.sh installation/lib/utils.sh installation/core/*.sh installation/modules/zsh.sh installation/modules/node.sh
-```
-
-Avoid emoji/unicode in bash scripts — multi-byte characters cause bash parse errors (e.g., variation selectors contain bytes bash misinterprets as quotes).
 
 ## Symlinks
 
@@ -68,20 +62,23 @@ Since `~/.config` is a symlink to `home/.config/`, files gitignored under `home/
 | File                              | Purpose                                          | When loaded         |
 | --------------------------------- | ------------------------------------------------ | ------------------- |
 | `.zprofile`                       | PATH, Homebrew, XDG, EDITOR, LANG                | Login shells (once) |
-| `.zshrc`                          | Thin loader: history, secrets, sheldon, starship | Interactive shells  |
+| `.zshrc`                          | Thin loader: history, secrets, zplug, starship   | Interactive shells  |
 | `.config/zsh/history.zsh`         | HISTSIZE, setopt history options                 | Sourced by .zshrc   |
 | `.config/zsh/secrets.zsh`         | Loads `~/.secrets/*` into env                    | Sourced by .zshrc   |
-| `.config/zsh/plugins/*.plugin.sh` | Aliases, functions, completions                  | Loaded by sheldon   |
+| `.config/zsh/plugins/*.plugin.sh` | Aliases, functions, completions                  | Loaded by zplug     |
 | `.config/zsh/utils.sh`            | Runtime color printing (NOT the install utils)   | Sourced by plugins  |
 
 There are **two separate utils.sh files** — `installation/lib/utils.sh` (install scripts) and `home/.config/zsh/utils.sh` (runtime shell plugins). Don't confuse them.
 
-**Note:** This is the work branch. Some zsh plugins have commented-out integrations for tools not available on the work machine (e.g., atuin, bat, btop, direnv, lazygit, yazi, etc.).
+**Note:** This is the work branch. It stays slimmer than `personal`, but still includes Neovim, bat/btop/direnv/lazygit, and managed Lua/Python/Ruby/Rust runtimes.
 
 ## Adding packages
 
 - Homebrew: add to `packages/Brewfile` using `brew "name"` or `cask "name"` syntax
 - Node.js globals: add to `packages/node-globals.txt` (one per line)
+- Lua packages: add to `packages/luarocks.txt` (one per line)
+- Ruby gems: add to `packages/gems.txt` (one per line)
+- Cargo binaries: add to `packages/cargo-binaries.txt` (one per line)
 - If a tool can be installed via Homebrew, prefer the Brewfile over module scripts
 
 ## macOS settings

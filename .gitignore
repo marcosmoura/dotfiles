@@ -13,12 +13,8 @@ home/.ssh-config
 
 # Sensitive app data (never commit)
 home/.config/gh/hosts.yml
-home/.config/github-copilot/
-home/.config/mole/
 home/.config/raycast/
 home/.config/yarn/
-home/.config/sheldon/plugins.lock
-home/.config/sheldon/repos/
 
 # Git identity (machine-specific, created by install.sh)
 home/.config/git/identity

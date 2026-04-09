@@ -15,10 +15,14 @@ join_by_char() {
   fi
 }
 
-export GIT_LOG_FORMAT=$(join_by_char $LOG_SEPARATOR $HASH $AUTHOR $DATE $MESSAGE)
+export GIT_LOG_FORMAT="$(join_by_char "$LOG_SEPARATOR" "$HASH" "$AUTHOR" "$DATE" "$MESSAGE")"
 
 function format_log() {
   local pretty_print="$1"
+
+  if command -v column >/dev/null 2>&1; then
+    pretty_print="$(column -t -s "$LOG_SEPARATOR" <<<"$pretty_print")"
+  fi
 
   if command -v bat >/dev/null 2>&1; then
     bat -p --color=always -l="gitlog" --pager="less -RFnXJ" <<<"$pretty_print"

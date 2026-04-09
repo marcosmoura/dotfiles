@@ -1,1 +1,4 @@
+jsonlint
+markdownlint-cli
 prettier
+stylelint

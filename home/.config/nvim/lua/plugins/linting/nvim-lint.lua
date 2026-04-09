@@ -1,4 +1,6 @@
 local css = { "stylelint" }
+local docs = { "markdownlint" }
+local json = { "jsonlint" }
 local shell = { "shellcheck" }
 
 return {
@@ -15,9 +17,9 @@ return {
         bash = shell,
         css = css,
         html = css,
-        json = { "jsonlint" },
+        json = json,
         lua = { "selene" },
-        markdown = { "markdownlint" },
+        markdown = docs,
         sh = shell,
         zsh = shell,
       },

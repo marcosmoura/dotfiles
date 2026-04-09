@@ -2,7 +2,57 @@
 
 source ~/.config/zsh/utils.sh
 
+function run_update_step {
+  local label="$1"
+  shift
+
+  print_start "$label"
+  if "$@"; then
+    print_success "$label done"
+  else
+    print_error "$label failed"
+    return 1
+  fi
+}
+
+function update_homebrew {
+  brew update && brew upgrade && brew upgrade --cask --greedy-auto-updates && brew autoremove && brew cleanup -s
+}
+
+function update_ruby_gems {
+  gem update --system && gem update
+}
+
+function update_python_venv {
+  local venv_dir="$1"
+  local outdated
+
+  "$venv_dir/bin/pip" install --upgrade pip || return 1
+  outdated=$("$venv_dir/bin/pip" list --outdated --format=json 2>/dev/null | "$venv_dir/bin/python" -c 'import json, sys; print("\n".join(package["name"] for package in json.load(sys.stdin)))')
+
+  [[ -z "$outdated" ]] && return 0
+
+  while IFS= read -r package; do
+    [[ -z "$package" ]] && continue
+    "$venv_dir/bin/pip" install -U "$package" || return 1
+  done <<<"$outdated"
+}
+
+function update_luarocks_packages {
+  local outdated_rocks
+
+  outdated_rocks="$(luarocks list --outdated --porcelain 2>/dev/null | awk '{print $1}' | uniq)"
+  [[ -z "$outdated_rocks" ]] && return 0
+
+  while IFS= read -r rock; do
+    [[ -z "$rock" ]] && continue
+    luarocks install "$rock" || return 1
+  done <<<"$outdated_rocks"
+}
+
 function updateSystem {
+  local had_failures=0
+
   clear
 
   print_green "💻 Updating system tools\n"
@@ -13,65 +63,49 @@ function updateSystem {
   print_green "💻 Updating system tools\n"
 
   # --- macOS software updates ---
-  print_start "Checking macOS software updates"
-  softwareupdate --install --all 2>/dev/null || true
-  print_success "macOS updates done"
+  run_update_step "Checking macOS software updates" softwareupdate --install --all || had_failures=1
 
   # --- Homebrew ---
   if command -v brew >/dev/null 2>&1; then
-    print_start "Updating Homebrew"
-    brew update && brew upgrade && brew upgrade --cask --greedy-auto-updates
-    brew autoremove
-    brew cleanup -s
-    print_success "Homebrew updated"
+    run_update_step "Updating Homebrew" update_homebrew || had_failures=1
   fi
 
   # --- mise runtimes ---
   if command -v mise >/dev/null 2>&1; then
-    print_start "Updating mise runtimes"
-    mise upgrade
-    print_success "mise runtimes updated"
+    run_update_step "Updating mise runtimes" mise upgrade || had_failures=1
   fi
 
   # --- Global Node packages ---
   if command -v pnpm >/dev/null 2>&1; then
-    print_start "Updating global pnpm packages"
-    pnpm update -g || true
-    print_success "pnpm globals updated"
+    run_update_step "Updating global pnpm packages" pnpm update -g || had_failures=1
   fi
 
   # --- Ruby ---
   if command -v gem >/dev/null 2>&1; then
-    print_start "Updating Ruby gems"
-    gem update --system 2>/dev/null || true
-    gem update || true
-    print_success "Ruby gems updated"
+    run_update_step "Updating Ruby gems" update_ruby_gems || had_failures=1
   fi
 
   # --- Python venv ---
   local venv_dir="$HOME/.local/share/venv"
   if [[ -f "$venv_dir/bin/python" ]]; then
-    print_start "Updating Python venv packages"
-    "$venv_dir/bin/pip" install --upgrade pip 2>/dev/null || true
-    "$venv_dir/bin/pip" list --outdated 2>/dev/null | awk '{if(NR>2)print $1}' | xargs -n1 "$venv_dir/bin/pip" install -U 2>/dev/null || true
-    print_success "Python packages updated"
+    run_update_step "Updating Python venv packages" update_python_venv "$venv_dir" || had_failures=1
   fi
 
   # --- Rust ---
   if command -v rustup >/dev/null 2>&1; then
-    print_start "Updating Rust toolchain"
-    rustup update || true
-    print_success "Rust updated"
+    run_update_step "Updating Rust toolchain" rustup update || had_failures=1
   fi
 
   # --- Lua ---
   if command -v luarocks >/dev/null 2>&1; then
-    print_start "Updating Luarocks packages"
-    luarocks install --only-deps 2>/dev/null || true
-    print_success "Luarocks updated"
+    run_update_step "Updating LuaRocks packages" update_luarocks_packages || had_failures=1
   fi
 
-  print_success "💻 Updated! \n"
+  if [[ "$had_failures" -eq 0 ]]; then
+    print_success "💻 Updated! \n"
+  else
+    print_error "💻 Update completed with failures.\n"
+  fi
 
 }
 
@@ -147,7 +181,9 @@ function systeminfo {
 
   print_yellow "\n  💻 $desc\n"
 
-  neofetch
+  if command -v neofetch >/dev/null 2>&1; then
+    neofetch
+  fi
 }
 
 # Force refresh system info cache
