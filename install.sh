@@ -16,7 +16,7 @@ source "$SCRIPT_DIR/installation/lib/utils.sh"
 RUN_CORE=false
 RUN_ALL=false
 RUN_MODULES=()
-AVAILABLE_MODULES=(zsh node lua python ruby rust)
+AVAILABLE_MODULES=(brew zsh node lua python ruby rust)
 
 function show_usage {
   local modules_list="${AVAILABLE_MODULES[*]}"
@@ -91,7 +91,7 @@ echo ""
 # -----------------------------------------------------------------------------
 # Core Scripts (always run in order)
 # -----------------------------------------------------------------------------
-CORE_SCRIPTS=(preinstall brew symlinks macos)
+CORE_SCRIPTS=(preinstall symlinks macos)
 
 function run_core_scripts {
   log_step "Running core installation scripts..."
