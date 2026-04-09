@@ -32,7 +32,7 @@ dotfiles/
 │   │   ├── macos.sh        # macOS system defaults
 │   │   └── postinstall.sh  # Cleanup + summary
 │   ├── modules/            # Opt-in, runnable after core
-│   │   ├── zsh.sh          # Shell setup + zplug bootstrap
+│   │   ├── zsh.sh          # Shell setup
 │   │   ├── node.sh         # Node.js, Bun, pnpm, globals via mise
 │   │   ├── lua.sh          # Lua packages via luarocks
 │   │   ├── python.sh       # Python + shared virtualenv via uv
