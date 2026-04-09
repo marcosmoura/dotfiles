@@ -4,7 +4,6 @@
 
 config-version = 2
 start-at-login = true
-auto-reload-config = true
 
 after-startup-command = [
   # Disable Caps Lock key
