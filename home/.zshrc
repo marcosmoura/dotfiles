@@ -28,6 +28,6 @@ eval "$(starship init zsh)"
 
 # Welcome screen on login shells
 if [[ -o login ]]; then
-  # clear
+  clear
   command -v systeminfo &>/dev/null && systeminfo
 fi
