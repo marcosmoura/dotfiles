@@ -8,7 +8,7 @@ fi
 
 log_step "Configuring zsh"
 
-dry_run_guard "Zsh" "Would add zsh to /etc/shells, set as default shell, install zplug plugins" && return 0
+dry_run_guard "Zsh" "Would add zsh to /etc/shells, set as default shell, install zap plugins" && return 0
 
 ZSH_PATH="$(command -v zsh)"
 
@@ -22,13 +22,10 @@ if [ "$SHELL" != "$ZSH_PATH" ]; then
   chsh -s "$ZSH_PATH"
 fi
 
-if command -v zplug &>/dev/null; then
-  log_progress "Installing zplug plugins"
-  # zplug install is handled automatically on first shell start
-  # but we can force it here if needed
-  export ZPLUG_HOME="$(brew --prefix)/opt/zplug"
-  source "$ZPLUG_HOME/init.zsh"
-  zplug check || zplug install
+ZAP_DIR="${XDG_DATA_HOME:-$HOME/.local/share}/zap"
+if [ ! -d "$ZAP_DIR" ]; then
+  log_progress "Installing zap plugin manager"
+  zsh <(curl -s https://raw.githubusercontent.com/zap-zsh/zap/master/install.zsh) --branch release-v1 --keep
 fi
 
 summary_success "Zsh configured"
