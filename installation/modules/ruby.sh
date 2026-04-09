@@ -7,7 +7,7 @@ fi
 
 log_step "Installing Ruby ecosystem"
 
-dry_run_guard "Ruby" "Would install Ruby (mise), install gems from packages/gems.txt" && return 0
+if dry_run_guard "Ruby" "Would install Ruby (mise), install gems from packages/gems.txt"; then return 0; fi
 
 require_command mise || return 1
 eval "$(mise activate bash)"

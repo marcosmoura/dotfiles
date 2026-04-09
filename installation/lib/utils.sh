@@ -87,7 +87,7 @@ function require_command {
 # Dry-Run Helpers
 # -----------------------------------------------------------------------------
 
-# Script/module-level guard. Usage: dry_run_guard "Label" "description" && return 0
+# Script/module-level guard. Usage: if dry_run_guard "Label" "description"; then return 0; fi
 function dry_run_guard {
   local label="$1"
   local description="${2:-Would run $label}"
