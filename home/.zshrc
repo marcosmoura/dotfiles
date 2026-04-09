@@ -14,7 +14,6 @@ if [[ -z "$HOMEBREW_PREFIX" ]]; then
   export MANPATH="/opt/homebrew/share/man${MANPATH+:$MANPATH}:"
   export INFOPATH="/opt/homebrew/share/info:${INFOPATH:-}"
   FPATH="/opt/homebrew/share/zsh/site-functions:${FPATH}"
-  rehash
 fi
 
 # History
@@ -29,8 +28,8 @@ export ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=#888"
 # You Should Use
 export YSU_MODE=ALL
 
-# Plugin manager (zplug)
-source "$ZSH_DIR/zplug.zsh"
+# Plugin manager (zap)
+source "$ZSH_DIR/zap.zsh"
 
 # Prompt (starship)
 export STARSHIP_CONFIG="${XDG_CONFIG_HOME:-$HOME/.config}/starship/starship.toml"
@@ -43,3 +42,11 @@ if [[ -o login ]]; then
   clear
   command -v systeminfo &>/dev/null && systeminfo
 fi
+
+# pnpm
+export PNPM_HOME="/Users/marcosmoura/.local/share/pnpm"
+case ":$PATH:" in
+  *":$PNPM_HOME:"*) ;;
+  *) export PATH="$PNPM_HOME:$PATH" ;;
+esac
+# pnpm end
