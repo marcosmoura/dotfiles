@@ -78,7 +78,6 @@
     "command": "~/.claude/statusline.sh"
   },
   "enabledPlugins": {
-    "claude-lens@claude-lens-marketplace": true,
     "code-review@claude-plugins-official": true,
     "code-simplifier@claude-plugins-official": true,
     "context7@claude-plugins-official": true,
@@ -88,19 +87,32 @@
     "playwright@claude-plugins-official": true,
     "security-guidance@claude-plugins-official": true,
     "superpowers@claude-plugins-official": true,
-    "typescript-lsp@claude-plugins-official": true
+    "typescript-lsp@claude-plugins-official": true,
+    "claude-pace@claude-pace-marketplace": true,
+    "anthropic-commit-commands@stripe-internal-marketplace": true,
+    "anthropic-claude-code-setup@stripe-internal-marketplace": true,
+    "commit-commands@claude-plugins-official": true,
+    "figma@claude-plugins-official": true,
+    "slack@claude-plugins-official": true,
+    "stripe@claude-plugins-official": true
   },
   "extraKnownMarketplaces": {
+    "stripe-internal-marketplace": {
+      "source": {
+        "source": "git",
+        "url": "http://gitmirror-git-http--northwest.corp.stripe.com.certproxy.localhost:7891/repos/stripe-internal/claude-marketplace.git"
+      }
+    },
     "claude-pace-marketplace": {
       "source": {
         "source": "github",
         "repo": "Astro-Han/claude-pace"
       }
     },
-    "stripe-internal-marketplace": {
+    "claude-plugins-official": {
       "source": {
-        "source": "git",
-        "url": "http://gitmirror-git-http--northwest.corp.stripe.com.certproxy.localhost:7891/repos/stripe-internal/claude-marketplace.git"
+        "source": "github",
+        "repo": "anthropics/claude-plugins-official"
       }
     }
   },
