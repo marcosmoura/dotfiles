@@ -4,7 +4,7 @@
 _load_secret() {
   local var_name="$1" file_path="$2"
   if [[ -r "$file_path" ]]; then
-    export "$var_name"="${(<$file_path)}"
+    export "$var_name"="$(<$file_path)"
   fi
 }
 
