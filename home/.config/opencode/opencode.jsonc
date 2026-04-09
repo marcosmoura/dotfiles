@@ -96,6 +96,6 @@
     "@mohak34/opencode-notifier@latest",
     "@franlol/opencode-md-table-formatter@latest",
     "@ex-machina/opencode-anthropic-auth@latest",
-    "file:///private/var/folders/__/2mbmhrk92q75446h4ln2lymr0000gn/T/bunx-501-oh-my-opencode-slim@latest/node_modules/oh-my-opencode-slim/dist/index.js"
+    "oh-my-opencode-slim@latest"
   ]
 }
