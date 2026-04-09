@@ -13,8 +13,7 @@ Deploy by cloning the branch: `git clone -b work <url>`. Worktrees (`.worktrees/
 
 ```text
 install.sh                  # Entry point: --all, --core, --module <name>, --dry-run
-packages/                   # Declarative package lists
-  Brewfile                  # Homebrew (brew bundle)
+packages/                   # Declarative package lists (*.txt files)
   node-globals.txt          # Node.js global packages
   luarocks.txt              # Lua packages installed via luarocks
   gems.txt                  # Ruby gems
@@ -24,6 +23,7 @@ installation/
   core/                     # Sequential: preinstall → brew → symlinks → macos → postinstall
   modules/                  # Opt-in: zsh, node, lua, python, ruby, rust
 home/                       # Symlinked to ~/ (entire .config/ is one symlink)
+  Brewfile                  # Homebrew (brew bundle)
 ```
 
 ## Shell script conventions
@@ -62,10 +62,10 @@ Since `~/.config` is a symlink to `home/.config/`, files gitignored under `home/
 | File                              | Purpose                                          | When loaded         |
 | --------------------------------- | ------------------------------------------------ | ------------------- |
 | `.zprofile`                       | PATH, Homebrew, XDG, EDITOR, LANG                | Login shells (once) |
-| `.zshrc`                          | Thin loader: history, secrets, zplug, starship   | Interactive shells  |
+| `.zshrc`                          | Thin loader: history, secrets, zap, starship     | Interactive shells  |
 | `.config/zsh/history.zsh`         | HISTSIZE, setopt history options                 | Sourced by .zshrc   |
 | `.config/zsh/secrets.zsh`         | Loads `~/.secrets/*` into env                    | Sourced by .zshrc   |
-| `.config/zsh/plugins/*.plugin.sh` | Aliases, functions, completions                  | Loaded by zplug     |
+| `.config/zsh/plugins/*.plugin.sh` | Aliases, functions, completions                  | Loaded by zap       |
 | `.config/zsh/utils.sh`            | Runtime color printing (NOT the install utils)   | Sourced by plugins  |
 
 There are **two separate utils.sh files** — `installation/lib/utils.sh` (install scripts) and `home/.config/zsh/utils.sh` (runtime shell plugins). Don't confuse them.
@@ -74,7 +74,7 @@ There are **two separate utils.sh files** — `installation/lib/utils.sh` (insta
 
 ## Adding packages
 
-- Homebrew: add to `packages/Brewfile` using `brew "name"` or `cask "name"` syntax
+- Homebrew: add to `home/Brewfile` using `brew "name"` or `cask "name"` syntax
 - Node.js globals: add to `packages/node-globals.txt` (one per line)
 - Lua packages: add to `packages/luarocks.txt` (one per line)
 - Ruby gems: add to `packages/gems.txt` (one per line)
