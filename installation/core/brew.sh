@@ -46,7 +46,7 @@ if [[ "$(uname -m)" == "arm64" ]]; then
 fi
 
 # Brew Bundle
-BREWFILE="$DOTFILES_DIR/packages/Brewfile"
+BREWFILE="$DOTFILES_DIR/home/Brewfile"
 if [[ -f "$BREWFILE" ]]; then
   log_progress "Installing packages from Brewfile..."
   retry 2 5 brew bundle --file="$BREWFILE"

@@ -13,14 +13,13 @@ Deploy by cloning the branch: `git clone -b personal <url>`. Worktrees (`.worktr
 
 ```text
 install.sh                  # Entry point: --all, --core, --module <name>, --dry-run
-packages/                   # Declarative package lists
-  Brewfile                  # Homebrew (brew bundle)
-  *.txt                     # Language-specific (one package per line, # for comments)
+packages/                   # Declarative package lists (*.txt files)
 installation/
   lib/utils.sh              # Shared utilities — ALL scripts source this
   core/                     # Sequential: preinstall → brew → symlinks → macos → postinstall
   modules/                  # Opt-in: zsh, node, lua, python, ruby, rust
 home/                       # Symlinked to ~/ (entire .config/ is one symlink)
+  Brewfile                  # Homebrew (brew bundle)
 ```
 
 ## Shell script conventions
@@ -78,7 +77,7 @@ There are **two separate utils.sh files** — `installation/lib/utils.sh` (insta
 
 ## Adding packages
 
-- Homebrew: add to `packages/Brewfile` using `brew "name"` or `cask "name"` syntax
+- Homebrew: add to `home/Brewfile` using `brew "name"` or `cask "name"` syntax
 - Language packages: add to the relevant `packages/*.txt` file (one per line)
 - If a tool can be installed via Homebrew, prefer the Brewfile over module scripts
 
