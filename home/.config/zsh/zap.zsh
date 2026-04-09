@@ -13,10 +13,26 @@ plug "$HOME/.config/zsh/plugins/compinit.plugin.sh"
 plug "$HOME/.config/zsh/plugins/macOS.plugin.sh"
 
 # ==============================================================================
-# OH-MY-ZSH FOUNDATION
+# OH-MY-ZSH LIBRARIES & PLUGINS
 # ==============================================================================
+# Clone ohmyzsh repo (noop if already present), then source individual pieces
 
-plug "ohmyzsh/ohmyzsh" # Base lib (completion, git, history, key-bindings, etc.)
+plug "ohmyzsh/ohmyzsh"
+
+OMZ_DIR="${XDG_DATA_HOME:-$HOME/.local/share}/zap/plugins/ohmyzsh"
+
+# Core libs
+for _omz_lib in compfix completion git grep history key-bindings; do
+  [[ -f "$OMZ_DIR/lib/${_omz_lib}.zsh" ]] && source "$OMZ_DIR/lib/${_omz_lib}.zsh"
+done
+unset _omz_lib
+
+# Plugins
+for _omz_plug in aliases cp dircycle github zoxide; do
+  [[ -f "$OMZ_DIR/plugins/${_omz_plug}/${_omz_plug}.plugin.zsh" ]] && \
+    source "$OMZ_DIR/plugins/${_omz_plug}/${_omz_plug}.plugin.zsh"
+done
+unset _omz_plug OMZ_DIR
 
 # ==============================================================================
 # SHELL ENHANCEMENTS
