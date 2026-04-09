@@ -7,7 +7,7 @@ fi
 
 log_step "Installing Python ecosystem"
 
-dry_run_guard "Python" "Would install Python (mise), create venv, install pip packages" && return 0
+if dry_run_guard "Python" "Would install Python (mise), create venv, install pip packages"; then return 0; fi
 
 require_command mise || return 1
 eval "$(mise activate bash)"

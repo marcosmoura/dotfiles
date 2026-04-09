@@ -23,7 +23,7 @@ elif [[ -f /usr/local/bin/brew ]]; then
   eval "$(/usr/local/bin/brew shellenv)"
 fi
 
-dry_run_guard "Homebrew" "Would install/update Homebrew, run brew bundle, cleanup" && return 0
+if dry_run_guard "Homebrew" "Would install/update Homebrew, run brew bundle, cleanup"; then return 0; fi
 
 # Install Homebrew if not present
 if ! command -v brew &>/dev/null; then

@@ -7,7 +7,7 @@ fi
 
 log_step "Installing Rust ecosystem"
 
-dry_run_guard "Rust" "Would install Rust toolchain (rustup), install cargo binaries" && return 0
+if dry_run_guard "Rust" "Would install Rust toolchain (rustup), install cargo binaries"; then return 0; fi
 
 require_command rustup || return 1
 

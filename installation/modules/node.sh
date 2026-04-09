@@ -7,7 +7,7 @@ fi
 
 log_step "Installing Node.js ecosystem"
 
-dry_run_guard "Node.js" "Would install Node (mise), Bun, pnpm, global packages, cspell dictionaries" && return 0
+if dry_run_guard "Node.js" "Would install Node (mise), Bun, pnpm, global packages, cspell dictionaries"; then return 0; fi
 
 require_command mise || return 1
 eval "$(mise activate bash)"
