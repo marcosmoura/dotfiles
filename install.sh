@@ -25,9 +25,8 @@ Options:
   --all              Run core + all modules
   --core             Run core scripts only
   --module <name>    Run specific module(s) (can be used multiple times)
-  --help             Show this help message
 
-Available modules: zsh, node, lua, python, ruby, rust
+Available modules: brew, zsh, node, lua, python, ruby, rust
 
 Examples:
   $0 --all                    # Run everything
@@ -89,7 +88,7 @@ echo ""
 # -----------------------------------------------------------------------------
 # Core Scripts (always run in order)
 # -----------------------------------------------------------------------------
-CORE_SCRIPTS=(preinstall brew symlinks macos)
+CORE_SCRIPTS=(preinstall symlinks macos)
 
 function run_core_scripts {
   log_step "Running core installation scripts..."
@@ -146,7 +145,7 @@ EOF
 # -----------------------------------------------------------------------------
 # Module Scripts
 # -----------------------------------------------------------------------------
-AVAILABLE_MODULES=(zsh node lua python ruby rust)
+AVAILABLE_MODULES=(brew zsh node lua python ruby rust)
 
 function run_module {
   local module="$1"

@@ -29,11 +29,11 @@ dotfiles/
 ├── installation/
 │   ├── core/               # Always runs (in order)
 │   │   ├── preinstall.sh   # Sudo auth, Xcode CLI tools
-│   │   ├── brew.sh         # Homebrew + brew bundle
 │   │   ├── symlinks.sh     # Symlinks + stale link cleanup
 │   │   ├── macos.sh        # macOS system defaults
 │   │   └── postinstall.sh  # Cleanup + summary
-│   ├── modules/            # Opt-in, runnable after core
+│   ├── modules/            # Opt-in, runnable individually
+│   │   ├── brew.sh         # Homebrew + brew bundle
 │   │   ├── zsh.sh          # Shell setup + sheldon plugins
 │   │   ├── node.sh         # Node.js, Bun, pnpm, globals
 │   │   ├── lua.sh          # Luarocks packages
@@ -55,7 +55,7 @@ dotfiles/
 # Full installation (core + all modules)
 ./install.sh --all
 
-# Core only (brew, symlinks, macOS settings)
+# Core only (symlinks, macOS settings)
 ./install.sh --core
 
 # Specific modules
