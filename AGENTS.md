@@ -12,7 +12,7 @@ Deploy by cloning the branch: `git clone -b work <url>`. Worktrees (`.worktrees/
 ## Repository structure
 
 ```text
-install.sh                  # Entry point: --all, --core, --module <name>, --dry-run
+install.sh                  # Entry point: --all, --core, --module <name>
 packages/                   # Declarative package lists (*.txt files)
   node-globals.txt          # Node.js global packages
   luarocks.txt              # Lua packages installed via luarocks
@@ -37,7 +37,6 @@ Every `.sh` file must:
 - Use `require_command <cmd>` before depending on external tools
 - Use `retry <attempts> <delay> <cmd>` for network operations
 - Call `summary_success` / `summary_fail` to register with the install summary
-- `--dry-run` redirects symlinks to `.cache/dry-run/` and makes brew, all modules, and macOS settings log-only. Everything else (sudo, xcode, git identity, postinstall) runs normally.
 
 `DOTFILES_DIR` is resolved automatically by `utils.sh`. Don't hardcode paths.
 
@@ -46,8 +45,7 @@ Every `.sh` file must:
 `home/` contents are symlinked to `~/`. The symlink script also:
 
 - Cleans stale symlinks pointing into the repo whose targets no longer exist
-- In dry-run mode, symlinks into `.cache/dry-run/` for inspection
-- If `~/.config` already exists as a real directory, the installer removes it and replaces it with the repo symlink (unless `DOTFILES_SYMLINK_BACKUP=1` is set)
+- If `~/.config` already exists as a real directory, the installer removes it and replaces it with the repo symlink
 
 Since `~/.config` is a symlink to `home/.config/`, files gitignored under `home/.config/` (like `git/identity`) still live in the repo directory on disk.
 
@@ -83,4 +81,4 @@ There are **two separate utils.sh files** — `installation/lib/utils.sh` (insta
 
 ## macOS settings
 
-`installation/core/macos.sh` applies `defaults write` commands. These are **not reversible** and are skipped entirely in `--dry-run` mode. The `lsregister` rebuild is gated behind `DOTFILES_REBUILD_LSDB=1`.
+`installation/core/macos.sh` applies `defaults write` commands. These are **not reversible**. The `lsregister` rebuild is gated behind `DOTFILES_REBUILD_LSDB=1`.

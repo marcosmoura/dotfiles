@@ -29,11 +29,6 @@ fi
 
 export TEXT_SEPARATOR="-----------------------------------------"
 
-# Default env vars (prevents set -u failures in standalone scripts)
-DOTFILES_DRY_RUN="${DOTFILES_DRY_RUN:-0}"
-DOTFILES_SYMLINK_BACKUP="${DOTFILES_SYMLINK_BACKUP:-0}"
-export DOTFILES_DRY_RUN DOTFILES_SYMLINK_BACKUP
-
 # -----------------------------------------------------------------------------
 # Directory Resolution
 # -----------------------------------------------------------------------------
@@ -84,31 +79,7 @@ function require_command {
 }
 
 # -----------------------------------------------------------------------------
-# Dry-Run Helpers
-# -----------------------------------------------------------------------------
 
-# Script/module-level guard. Usage: if dry_run_guard "Label" "description"; then return 0; fi
-function dry_run_guard {
-  local label="$1"
-  local description="${2:-Would run $label}"
-  if [[ "$DOTFILES_DRY_RUN" == "1" ]]; then
-    log_info "[DRY RUN] $description"
-    summary_skip "$label (dry-run)"
-    return 0
-  fi
-  return 1
-}
-
-# Command-level guard. Usage: run_or_log brew cleanup || true
-function run_or_log {
-  if [[ "$DOTFILES_DRY_RUN" == "1" ]]; then
-    log_info "[DRY RUN] Would run: $*"
-    return 0
-  fi
-  "$@"
-}
-
-# -----------------------------------------------------------------------------
 # Retry Logic
 # -----------------------------------------------------------------------------
 function retry {

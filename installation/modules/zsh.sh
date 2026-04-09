@@ -8,8 +8,6 @@ fi
 
 log_step "Configuring zsh"
 
-if dry_run_guard "Zsh" "Would add zsh to /etc/shells, set as default shell, install zap plugins"; then return 0; fi
-
 ZSH_PATH="$(command -v zsh)"
 
 if ! grep -Fxq "$ZSH_PATH" /etc/shells; then

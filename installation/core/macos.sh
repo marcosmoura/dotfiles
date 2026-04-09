@@ -18,9 +18,6 @@ log_step "Configuring macOS settings..."
 #   DOTFILES_TIMEZONE                 Override timezone (default Europe/Prague)
 #   DOTFILES_ENABLE_LEGACY_DEBUG=1    Enable legacy debug / dashboard settings
 
-# Skip entirely in dry-run mode — defaults write has no undo
-if dry_run_guard "macOS settings" "Would apply macOS system defaults (not reversible)"; then return 0 2>/dev/null || exit 0; fi
-
 # Capture macOS version early for conditional tweaks
 MACOS_VERSION="$(sw_vers -productVersion 2>/dev/null | awk -F '.' '{print $1"."$2}')"
 
