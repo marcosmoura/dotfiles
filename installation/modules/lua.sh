@@ -7,8 +7,6 @@ fi
 
 log_step "Installing Lua packages"
 
-if dry_run_guard "Lua" "Would install luarocks packages from packages/luarocks.txt"; then return 0; fi
-
 require_command luarocks || return 1
 
 log_progress "Installing luarocks packages"

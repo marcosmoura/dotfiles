@@ -3,7 +3,7 @@ set -euo pipefail
 
 # =============================================================================
 # Symlinks Management Script
-# Creates symlinks from home/ to $HOME, with dry-run and backup support
+# Creates symlinks from home/ to $HOME
 # =============================================================================
 
 # Source utils if not already loaded
@@ -17,12 +17,8 @@ log_step "Setting up symlinks..."
 # -----------------------------------------------------------------------------
 # Configuration
 # -----------------------------------------------------------------------------
-DOTFILES_DRY_RUN="${DOTFILES_DRY_RUN:-0}"
-DOTFILES_SYMLINK_BACKUP="${DOTFILES_SYMLINK_BACKUP:-0}"
-
 HOME_DIR="$HOME"
 SOURCE_DIR="$DOTFILES_DIR/home"
-DRY_RUN_DIR="$DOTFILES_DIR/.cache/dry-run"
 
 # Tracking arrays
 _CREATED_SYMLINKS=()
@@ -62,11 +58,6 @@ function safe_remove {
   local target="$1"
   local force_recursive="${2:-0}"
 
-  if [[ "$DOTFILES_DRY_RUN" == "1" ]]; then
-    log_info "[DRY RUN] Would remove: $target"
-    return 0
-  fi
-
   if [[ -L "$target" ]]; then
     rm -f "$target"
   elif [[ -f "$target" ]]; then
@@ -92,17 +83,8 @@ function backup_existing {
     return 0
   fi
 
-  if [[ "$DOTFILES_SYMLINK_BACKUP" != "1" ]]; then
-    return 0
-  fi
-
   local backup_suffix=".backup.$(date +%Y%m%d_%H%M%S)"
   local backup_path="${target}${backup_suffix}"
-
-  if [[ "$DOTFILES_DRY_RUN" == "1" ]]; then
-    log_info "[DRY RUN] Would backup: $target -> $backup_path"
-    return 0
-  fi
 
   mv "$target" "$backup_path"
   _BACKED_UP+=("$target -> $backup_path")
@@ -118,38 +100,19 @@ function create_symlink {
     force_recursive_remove=1
   fi
 
-  # Determine actual target based on dry-run mode
-  local actual_target
-  if [[ "$DOTFILES_DRY_RUN" == "1" ]]; then
-    # Create relative path from home inside dry-run dir
-    local rel_path="${target#$HOME/}"
-    actual_target="$DRY_RUN_DIR/$rel_path"
-    mkdir -p "$(dirname "$actual_target")"
-  else
-    actual_target="$target"
-  fi
-
-  # Backup or remove existing target
-  if [[ -e "$actual_target" || -L "$actual_target" ]]; then
-    if [[ "$DOTFILES_SYMLINK_BACKUP" == "1" ]]; then
-      backup_existing "$actual_target"
-    else
-      if ! safe_remove "$actual_target" "$force_recursive_remove"; then
-        log_error "Cannot create symlink — target exists and could not be removed: $actual_target"
-        summary_fail "Symlink: $(basename "$target")"
-        return 0
-      fi
+  # Remove existing target
+  if [[ -e "$target" || -L "$target" ]]; then
+    if ! safe_remove "$target" "$force_recursive_remove"; then
+      log_error "Cannot create symlink — target exists and could not be removed: $target"
+      summary_fail "Symlink: $(basename "$target")"
+      return 0
     fi
   fi
 
-  # Create the symlink (in dry-run, symlinks go into .cache/dry-run/ for inspection)
-  ln -snf "$source" "$actual_target"
+  # Create the symlink
+  ln -snf "$source" "$target"
 
-  if [[ "$DOTFILES_DRY_RUN" == "1" ]]; then
-    log_info "[DRY RUN] Created in sandbox: $actual_target -> $source"
-  fi
-
-  _CREATED_SYMLINKS+=("$actual_target -> $source")
+  _CREATED_SYMLINKS+=("$target -> $source")
   log_progress "Linked: $(basename "$target")"
 }
 
@@ -176,13 +139,7 @@ function cleanup_stale_symlinks {
         # Check if target still exists
         if [[ ! -e "$target" ]]; then
           log_warn "Removing stale symlink: $entry -> $target"
-
-          if [[ "$DOTFILES_DRY_RUN" == "1" ]]; then
-            log_info "[DRY RUN] Would remove: $entry"
-          else
-            rm "$entry"
-          fi
-
+          rm "$entry"
           _REMOVED_SYMLINKS+=("$entry")
           ((found_stale++)) || true
         fi
@@ -202,13 +159,7 @@ function cleanup_stale_symlinks {
           # Check if target still exists
           if [[ ! -e "$target" ]]; then
             log_warn "Removing stale symlink: $entry -> $target"
-
-            if [[ "$DOTFILES_DRY_RUN" == "1" ]]; then
-              log_info "[DRY RUN] Would remove: $entry"
-            else
-              rm "$entry"
-            fi
-
+            rm "$entry"
             _REMOVED_SYMLINKS+=("$entry")
             ((found_stale++)) || true
           fi
@@ -236,12 +187,6 @@ function create_all_symlinks {
   if [[ ! -d "$SOURCE_DIR" ]]; then
     log_error "Source directory not found: $SOURCE_DIR"
     return 1
-  fi
-
-  # Create dry-run directory if needed
-  if [[ "$DOTFILES_DRY_RUN" == "1" ]]; then
-    mkdir -p "$DRY_RUN_DIR"
-    log_warn "Dry-run mode: symlinks will be created in $DRY_RUN_DIR"
   fi
 
   # Walk home/ directory (dotglob is enabled, so * already matches dotfiles)

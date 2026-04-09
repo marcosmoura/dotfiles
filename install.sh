@@ -17,10 +17,6 @@ RUN_CORE=false
 RUN_ALL=false
 RUN_MODULES=()
 
-# Dry-run is CLI-only. Do not inherit it from the parent shell environment.
-DOTFILES_DRY_RUN=0
-export DOTFILES_DRY_RUN
-
 function show_usage {
   cat <<EOF
 Usage: $0 [OPTIONS]
@@ -29,7 +25,6 @@ Options:
   --all              Run core + all modules
   --core             Run core scripts only
   --module <name>    Run specific module(s) (can be used multiple times)
-  --dry-run          Enable dry-run mode (simulate changes)
   --help             Show this help message
 
 Available modules: zsh, node, lua, python, ruby, rust
@@ -38,7 +33,6 @@ Examples:
   $0 --all                    # Run everything
   $0 --core                   # Run only core scripts
   $0 --module zsh --module node  # Run specific modules
-  $0 --dry-run --all          # Dry run everything
 EOF
 }
 
@@ -63,11 +57,6 @@ else
         RUN_MODULES+=("$1")
         shift
       done
-      ;;
-    --dry-run)
-      DOTFILES_DRY_RUN=1
-      export DOTFILES_DRY_RUN
-      shift
       ;;
     --help)
       show_usage
@@ -96,11 +85,6 @@ echo "$TEXT_SEPARATOR"
 echo "        Marcos Moura Dotfiles"
 echo "$TEXT_SEPARATOR"
 echo ""
-
-if [[ "$DOTFILES_DRY_RUN" == "1" ]]; then
-  log_warn "DRY RUN MODE - Symlinks go to .cache/dry-run/; brew, modules, and macOS are log-only"
-  echo ""
-fi
 
 # -----------------------------------------------------------------------------
 # Core Scripts (always run in order)
@@ -255,7 +239,4 @@ echo ""
 log_success "Installation complete!"
 echo ""
 
-# Reload shell (skip in dry-run to stay in current session)
-if [[ "$DOTFILES_DRY_RUN" != "1" ]]; then
-  exec "$SHELL" -l
-fi
+exec "$SHELL" -l

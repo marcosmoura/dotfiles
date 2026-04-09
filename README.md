@@ -17,7 +17,7 @@ cd ./dotfiles
 
 ```text
 dotfiles/
-├── install.sh              # Entry point (--all, --core, --module, --dry-run)
+├── install.sh              # Entry point (--all, --core, --module)
 ├── packages/               # Declarative package lists
 │   ├── Brewfile            # Declarative Homebrew packages (brew bundle)
 │   ├── node-globals.txt
@@ -60,12 +60,9 @@ dotfiles/
 
 # Specific modules
 ./install.sh --module node rust
-
-# Dry run (symlinks go to .cache/ for inspection)
-./install.sh --dry-run
 ```
 
-> Note: the installer replaces an existing `~/.config` directory with the repo symlink. Set `DOTFILES_SYMLINK_BACKUP=1` if you want the existing directory renamed instead of removed.
+> Note: the installer replaces an existing `~/.config` directory with the repo symlink.
 
 ## Branch Strategy
 

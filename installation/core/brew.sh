@@ -14,16 +14,12 @@ fi
 
 log_step "Setting up Homebrew..."
 
-# -----------------------------------------------------------------------------
-# Setup Homebrew environment (always needed, even in dry-run)
-# -----------------------------------------------------------------------------
+# Setup Homebrew environment
 if [[ -f /opt/homebrew/bin/brew ]]; then
   eval "$(/opt/homebrew/bin/brew shellenv)"
 elif [[ -f /usr/local/bin/brew ]]; then
   eval "$(/usr/local/bin/brew shellenv)"
 fi
-
-if dry_run_guard "Homebrew" "Would install/update Homebrew, run brew bundle, cleanup"; then return 0; fi
 
 # Install Homebrew if not present
 if ! command -v brew &>/dev/null; then
@@ -38,12 +34,6 @@ fi
 log_progress "Updating Homebrew..."
 brew update
 brew upgrade || true
-
-# Install Rosetta (for Apple Silicon Macs)
-if [[ "$(uname -m)" == "arm64" ]]; then
-  log_progress "Installing Rosetta 2..."
-  sudo softwareupdate --install-rosetta --agree-to-license || true
-fi
 
 # Brew Bundle
 BREWFILE="$DOTFILES_DIR/home/Brewfile"
