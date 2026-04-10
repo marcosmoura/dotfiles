@@ -1,0 +1,38 @@
+approval_policy = "on-request"
+sandbox_mode = "workspace-write"
+personality = "pragmatic"
+approvals_reviewer = "guardian_subagent"
+model = "gpt-5.4"
+model_reasoning_effort = "xhigh"
+plan_mode_reasoning_effort = "xhigh"
+
+[sandbox_workspace_write]
+network_access = false
+
+[mcp_servers.grep]
+url = "https://mcp.grep.app"
+
+[mcp_servers.github]
+url = "https://api.githubcopilot.com/mcp/"
+bearer_token_env_var = "GH_PAT"
+
+[features]
+guardian_approval = true
+prevent_idle_sleep = true
+multi_agent = true
+fast_mode = true
+
+[tui]
+status_line = [
+  "model-with-reasoning",
+  "fast-mode",
+  "context-remaining",
+  "context-window-size",
+  "git-branch",
+  "session-id",
+  "current-dir",
+]
+
+[notice.model_migrations]
+"gpt-5.1-codex-mini" = "gpt-5.4"
+"gpt-5.3-codex" = "gpt-5.4"
