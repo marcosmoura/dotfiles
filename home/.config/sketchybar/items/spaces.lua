@@ -259,6 +259,4 @@ spaces_observer:subscribe("system_woke", function()
   refresh_spaces()
 end)
 
-if refresh_spaces ~= nil then
-  refresh_spaces()
-end
+refresh_spaces()
