@@ -44,7 +44,7 @@ after-startup-command = [
 
   # Clear wallpaper cache
   'exec-and-forget ~/.config/aerospace/scripts/wallpaper.sh clear-cache',
-  'exec-and-forget ~/.config/aerospace/scripts/wallpaper.sh set --radius 12',
+  'exec-and-forget ~/.config/aerospace/scripts/wallpaper.sh set --random --radius 12',
 ]
 
 persistent-workspaces = [
@@ -211,7 +211,7 @@ alt-shift-6 = 'move-node-to-workspace files --focus-follows-window'
 alt-shift-7 = 'move-node-to-workspace tasks --focus-follows-window'
 
 # ═══════  Wallpaper
-cmd-ctrl-shift-w = 'exec-and-forget ~/.config/aerospace/scripts/wallpaper.sh set --radius 12'
+cmd-ctrl-shift-w = 'exec-and-forget ~/.config/aerospace/scripts/wallpaper.sh set --random --radius 12'
 
 # ═══════  Disable built-in useless hotkeys
 cmd-h = []
