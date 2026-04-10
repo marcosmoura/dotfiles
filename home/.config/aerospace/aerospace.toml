@@ -5,6 +5,12 @@
 config-version = 2
 start-at-login = true
 
+exec-on-workspace-change = [
+  '/bin/bash',
+  '-c',
+  'sketchybar --trigger aerospace_workspace_change FOCUSED_WORKSPACE=$AEROSPACE_FOCUSED_WORKSPACE PREV_WORKSPACE=$AEROSPACE_PREV_WORKSPACE',
+]
+
 after-startup-command = [
   # Setup workspaces layouts
   'workspace terminal',
@@ -16,47 +22,38 @@ after-startup-command = [
   'workspace browser',
   'layout accordion',
 
-  'workspace music',
-  'layout tiles',
-
   'workspace design',
   'layout tiles',
 
   'workspace communication',
   'layout tiles',
 
-  'workspace misc',
-  'layout tiles',
-
   'workspace files',
   'layout tiles',
-
-  'workspace mail',
-  'layout v_tiles',
 
   'workspace tasks',
   'layout v_tiles',
 
   'workspace coding',
 
+  # Initial border update
+  'exec-and-forget ~/.config/aerospace/scripts/borders.sh',
+
   # Disable Caps Lock key
   "exec-and-forget hidutil property --set '{\"UserKeyMapping\":[{\"HIDKeyboardModifierMappingSrc\": 0x700000039, \"HIDKeyboardModifierMappingDst\": 0x7000000E3}]}'",
 
   # Clear wallpaper cache
   'exec-and-forget ~/.config/aerospace/scripts/wallpaper.sh clear-cache',
-  'exec-and-forget ~/.config/aerospace/scripts/wallpaper.sh set --radius 16',
+  'exec-and-forget ~/.config/aerospace/scripts/wallpaper.sh set --radius 12',
 ]
 
 persistent-workspaces = [
   "terminal",
   "coding",
   "browser",
-  "music",
   "design",
   "communication",
-  "misc",
   "files",
-  "mail",
   "tasks",
 ]
 
@@ -69,6 +66,11 @@ default-root-container-layout = 'tiles'
 default-root-container-orientation = 'auto'
 
 accordion-padding = 0
+
+on-focus-changed = ['exec-and-forget ~/.config/aerospace/scripts/borders.sh']
+on-focused-monitor-changed = [
+  'exec-and-forget ~/.config/aerospace/scripts/borders.sh',
+]
 
 # ╔═══════════════════════════════════════════════════════════════════════════════╗
 # ║                         NORMALIZATION SETTINGS                                ║
@@ -88,13 +90,13 @@ automatically-unhide-macos-hidden-apps = true
 # ╚═══════════════════════════════════════════════════════════════════════════════╝
 
 [gaps]
-inner.horizontal = 16
-inner.vertical = 16
+inner.horizontal = 12
+inner.vertical = 12
 
-outer.top = 16
-outer.right = 16
-outer.bottom = 16
-outer.left = 16
+outer.top = 52
+outer.right = 12
+outer.bottom = 12
+outer.left = 12
 
 # ╔═══════════════════════════════════════════════════════════════════════════════╗
 # ║                     WORKSPACE TO MONITOR ASSIGNMENT                           ║
@@ -104,13 +106,10 @@ outer.left = 16
 terminal = 'main'
 coding = 'main'
 browser = 'main'
-music = 'main'
 design = 'main'
 communication = 'main'
-misc = 'main'
 
 files = 'secondary'
-mail = 'secondary'
 tasks = 'secondary'
 
 # ╔═══════════════════════════════════════════════════════════════════════════════╗
@@ -151,11 +150,6 @@ run = 'move-node-to-workspace coding'
 if.app-id = 'com.google.Chrome'
 run = 'move-node-to-workspace browser'
 
-# Music
-[[on-window-detected]]
-if.app-id = 'com.tidal.desktop'
-run = 'move-node-to-workspace music'
-
 # Design
 [[on-window-detected]]
 if.app-id = 'com.figma.Desktop'
@@ -173,12 +167,15 @@ run = 'move-node-to-workspace communication'
 if.app-id = 'com.apple.finder'
 run = 'move-node-to-workspace files'
 
-# Mail
+# Tasks
 [[on-window-detected]]
 if.app-id = 'com.apple.mail'
-run = 'move-node-to-workspace mail'
+run = 'move-node-to-workspace tasks'
 
-# Tasks
+[[on-window-detected]]
+if.app-id = 'com.apple.calendar'
+run = 'move-node-to-workspace tasks'
+
 [[on-window-detected]]
 if.app-id = 'com.apple.reminders'
 run = 'move-node-to-workspace tasks'
@@ -200,34 +197,36 @@ run = 'layout floating'
 alt-1 = 'workspace terminal'
 alt-2 = 'workspace coding'
 alt-3 = 'workspace browser'
-alt-4 = 'workspace music'
-alt-5 = 'workspace design'
-alt-6 = 'workspace communication'
-alt-7 = 'workspace misc'
-alt-8 = 'workspace files'
-alt-9 = 'workspace mail'
-alt-0 = 'workspace tasks'
+alt-4 = 'workspace design'
+alt-5 = 'workspace communication'
+alt-6 = 'workspace files'
+alt-7 = 'workspace tasks'
 
 alt-shift-1 = 'move-node-to-workspace terminal --focus-follows-window'
 alt-shift-2 = 'move-node-to-workspace coding --focus-follows-window'
 alt-shift-3 = 'move-node-to-workspace browser --focus-follows-window'
-alt-shift-4 = 'move-node-to-workspace music --focus-follows-window'
-alt-shift-5 = 'move-node-to-workspace design --focus-follows-window'
-alt-shift-6 = 'move-node-to-workspace communication --focus-follows-window'
-alt-shift-7 = 'move-node-to-workspace misc --focus-follows-window'
-alt-shift-8 = 'move-node-to-workspace files --focus-follows-window'
-alt-shift-9 = 'move-node-to-workspace mail --focus-follows-window'
-alt-shift-0 = 'move-node-to-workspace tasks --focus-follows-window'
+alt-shift-4 = 'move-node-to-workspace design --focus-follows-window'
+alt-shift-5 = 'move-node-to-workspace communication --focus-follows-window'
+alt-shift-6 = 'move-node-to-workspace files --focus-follows-window'
+alt-shift-7 = 'move-node-to-workspace tasks --focus-follows-window'
 
 # ═══════  Wallpaper
-cmd-ctrl-shift-w = 'exec-and-forget ~/.config/aerospace/scripts/wallpaper.sh set --radius 16'
+cmd-ctrl-shift-w = 'exec-and-forget ~/.config/aerospace/scripts/wallpaper.sh set --radius 12'
 
 # ═══════  Disable built-in useless hotkeys
 cmd-h = []
 cmd-alt-h = []
 
+# ═══════  Take screenshots and copy to clipboard
+cmd-ctrl-s = 'exec-and-forget screencapture -i -c'
+
 # ═══════  Reload all configs
-cmd-ctrl-r = 'reload-config'
+cmd-ctrl-r = [
+  'reload-config',
+  'flatten-workspace-tree',
+  'balance-sizes',
+  'exec-and-forget sketchybar --reload',
+]
 
 # ═══════  Resize and balance workspace
 cmd-ctrl-equal = ['resize width +50', 'resize height +50']
@@ -235,11 +234,36 @@ cmd-ctrl-minus = ['resize width -50', 'resize height -50']
 cmd-ctrl-e = ['flatten-workspace-tree', 'balance-sizes']
 
 # ═══════  Layout shortcuts
-cmd-ctrl-b = 'layout tiles'
-cmd-ctrl-f = 'layout floating tiling'
-cmd-ctrl-a = 'layout accordion'
-cmd-ctrl-v = ['layout v_tiles', 'balance-sizes']
-cmd-ctrl-c = ['layout h_tiles', 'balance-sizes']
+cmd-ctrl-b = [
+  'layout tiles',
+  'exec-and-forget ~/.config/aerospace/scripts/borders.sh',
+]
+cmd-ctrl-g = [
+  'layout tiles',
+  'exec-and-forget ~/.config/aerospace/scripts/borders.sh',
+]
+cmd-ctrl-f = [
+  'layout floating tiling',
+  'exec-and-forget ~/.config/aerospace/scripts/borders.sh',
+]
+cmd-ctrl-a = [
+  'layout accordion',
+  'exec-and-forget ~/.config/aerospace/scripts/borders.sh',
+]
+cmd-ctrl-m = [
+  'layout accordion',
+  'exec-and-forget ~/.config/aerospace/scripts/borders.sh',
+]
+cmd-ctrl-v = [
+  'layout v_tiles',
+  'balance-sizes',
+  'exec-and-forget ~/.config/aerospace/scripts/borders.sh',
+]
+cmd-ctrl-c = [
+  'layout h_tiles',
+  'balance-sizes',
+  'exec-and-forget ~/.config/aerospace/scripts/borders.sh',
+]
 
 # ═══════  Move windows between displays
 cmd-alt-ctrl-left = 'move-node-to-monitor left'
