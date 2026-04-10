@@ -1,16 +1,16 @@
 local sbar = require("sketchybar")
 local colors = require("colors")
+local icons = require("icons")
 local settings = require("settings")
 local hover = require("helpers.hover")
+local popup = require("helpers.popup")
 
-local popup_font_size = settings.popup.font_size
 local popup_width = 180
-local popup_content_width = popup_width - (settings.icons.width + 24)
 
 local weather = sbar.add("item", "weather", {
   position = "right",
   icon = {
-    string = settings.weather_icons.default,
+    string = icons.weather.default,
   },
   label = {
     string = "--",
@@ -22,100 +22,32 @@ local weather = sbar.add("item", "weather", {
 })
 
 -- Popup detail items
-local popup_condition = sbar.add("item", "weather.popup.condition", {
-  position = "popup.weather",
+local popup_condition = popup.create_row("weather.popup.condition", "weather", {
   width = popup_width,
-  padding_left = 0,
-  padding_right = 0,
-  icon = {
-    string = "󰖐",
-    color = colors.sky,
-    font = { family = settings.font.icons, style = "Bold", size = popup_font_size },
-    width = settings.icons.width,
-    padding_left = 8,
-    padding_right = 4,
-  },
-  label = {
-    string = "Condition: ...",
-    color = colors.subtext0,
-    font = { family = settings.font.text, style = "Medium", size = popup_font_size },
-    width = popup_content_width,
-    align = "left",
-    padding_left = 4,
-    padding_right = 8,
-  },
+  icon = icons.weather.default,
+  icon_color = colors.sky,
+  label = "Condition: ...",
 })
 
-local popup_highlow = sbar.add("item", "weather.popup.highlow", {
-  position = "popup.weather",
+local popup_highlow = popup.create_row("weather.popup.highlow", "weather", {
   width = popup_width,
-  padding_left = 0,
-  padding_right = 0,
-  icon = {
-    string = "󰔏",
-    color = colors.peach,
-    font = { family = settings.font.icons, style = "Bold", size = popup_font_size },
-    width = settings.icons.width,
-    padding_left = 8,
-    padding_right = 4,
-  },
-  label = {
-    string = "H/L: ...",
-    color = colors.subtext0,
-    font = { family = settings.font.text, style = "Medium", size = popup_font_size },
-    width = popup_content_width,
-    align = "left",
-    padding_left = 4,
-    padding_right = 8,
-  },
+  icon = icons.weather_popup.temperature,
+  icon_color = colors.peach,
+  label = "H/L: ...",
 })
 
-local popup_humidity = sbar.add("item", "weather.popup.humidity", {
-  position = "popup.weather",
+local popup_humidity = popup.create_row("weather.popup.humidity", "weather", {
   width = popup_width,
-  padding_left = 0,
-  padding_right = 0,
-  icon = {
-    string = "󰖎",
-    color = colors.blue,
-    font = { family = settings.font.icons, style = "Bold", size = popup_font_size },
-    width = settings.icons.width,
-    padding_left = 8,
-    padding_right = 4,
-  },
-  label = {
-    string = "Humidity: ...",
-    color = colors.subtext0,
-    font = { family = settings.font.text, style = "Medium", size = popup_font_size },
-    width = popup_content_width,
-    align = "left",
-    padding_left = 4,
-    padding_right = 8,
-  },
+  icon = icons.weather_popup.humidity,
+  icon_color = colors.blue,
+  label = "Humidity: ...",
 })
 
-local popup_wind = sbar.add("item", "weather.popup.wind", {
-  position = "popup.weather",
+local popup_wind = popup.create_row("weather.popup.wind", "weather", {
   width = popup_width,
-  padding_left = 0,
-  padding_right = 0,
-  icon = {
-    string = "󰖝",
-    color = colors.teal,
-    font = { family = settings.font.icons, style = "Bold", size = popup_font_size },
-    width = settings.icons.width,
-    padding_left = 8,
-    padding_right = 4,
-  },
-  label = {
-    string = "Wind: ...",
-    color = colors.subtext0,
-    font = { family = settings.font.text, style = "Medium", size = popup_font_size },
-    width = popup_content_width,
-    align = "left",
-    padding_left = 4,
-    padding_right = 8,
-  },
+  icon = icons.weather_popup.wind,
+  icon_color = colors.teal,
+  label = "Wind: ...",
 })
 
 local popup_items = {
@@ -125,11 +57,30 @@ local popup_items = {
   popup_wind,
 }
 
-local function update_detail(data)
+local legacy_icon_keys = {
+  clear = "clearDay",
+  cloudy = "cloudy",
+  rainy = "rain",
+  snowy = "snow",
+  stormy = "thunder",
+  foggy = "fog",
+  default = "clearDay",
+}
+
+local function get_weather_icon(icon_key)
+  local key = icon_key or "default"
+  local normalized_key = legacy_icon_keys[key] or key
+
+  return icons.weather[normalized_key] or icons.weather.default
+end
+
+local function update_detail(data, condition_icon)
   if data == nil then
     return
   end
+
   popup_condition:set({
+    icon = { string = condition_icon },
     label = { string = "Condition: " .. (data.condition or "--") },
   })
   popup_highlow:set({
@@ -149,8 +100,7 @@ local function update_weather()
       return
     end
 
-    local icon_key = result.icon or "default"
-    local icon = settings.weather_icons[icon_key] or settings.weather_icons.default
+    local icon = get_weather_icon(result.icon)
 
     local label = result.feels_like or result.temp or "--"
     if result.location and result.location ~= "" then
@@ -162,7 +112,7 @@ local function update_weather()
       label = { string = label },
     })
 
-    update_detail(result)
+    update_detail(result, icon)
   end)
 end
 

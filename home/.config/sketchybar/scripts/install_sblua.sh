@@ -6,12 +6,25 @@ set -euo pipefail
 # This script is idempotent -- it will skip installation if the shared
 # object already exists at the expected location.
 
+export PATH="/opt/homebrew/bin:/usr/local/bin:$PATH"
+
 SBAR_LUA_DIR="$HOME/.local/share/sketchybar_lua"
 BUILD_DIR="${TMPDIR:-/tmp}/SbarLua"
+
+require_command() {
+  local cmd="$1"
+  if ! command -v "$cmd" >/dev/null 2>&1; then
+    echo "Missing required command: $cmd" >&2
+    return 1
+  fi
+}
 
 if [ -f "$SBAR_LUA_DIR/sketchybar.so" ]; then
   return 0
 fi
+
+require_command git || return 1
+require_command make || return 1
 
 echo "Installing SbarLua..."
 mkdir -p "$SBAR_LUA_DIR"

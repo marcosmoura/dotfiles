@@ -1,5 +1,6 @@
 local sbar = require("sketchybar")
 local colors = require("colors")
+local icons = require("icons")
 local hover = require("helpers.hover")
 
 local tmp_dir = os.getenv("TMPDIR") or "/tmp"
@@ -18,7 +19,7 @@ local pid_file_quoted = shell_quote(pid_file)
 local keepawake = sbar.add("item", "keepawake", {
   position = "right",
   icon = {
-    string = "󰅶",
+    string = icons.status.keepawake,
     color = colors.text,
   },
   label = { drawing = false },
@@ -47,7 +48,7 @@ local function set_active(active)
     keepawake:set({
       icon = {
         color = active and colors.green or colors.text,
-        string = active and "󰅶" or "󰛊"
+        string = icons.status.keepawake,
       },
     })
   end)

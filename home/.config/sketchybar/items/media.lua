@@ -1,5 +1,6 @@
 local sbar = require("sketchybar")
 local colors = require("colors")
+local icons = require("icons")
 local settings = require("settings")
 local hover = require("helpers.hover")
 
@@ -29,8 +30,10 @@ local media = sbar.add("item", "media", {
   background = { drawing = false },
   updates = true,
   icon = {
-    string = settings.media_icons.default,
-    color = colors.mauve,
+    string = icons.media.default,
+    color = colors.text,
+    padding_right = 8,
+    padding_left = 8
   },
   label = {
     string = "",
@@ -54,6 +57,18 @@ local media_bracket = sbar.add("bracket", "media.bracket", {
 
 local current_app = ""
 
+local media_icon_map = {
+  ["spotify"] = { string = icons.media.spotify, color = colors.green },
+  ["google chrome"] = { string = icons.media.edge, color = colors.red },
+}
+
+local default_media_icon = { string = icons.media.default, color = colors.text }
+
+local function get_media_icon(app_name)
+  local normalized_name = (app_name or ""):lower()
+  return media_icon_map[normalized_name] or default_media_icon
+end
+
 local function hide_media()
   current_app = ""
   media_bracket:set({ background = { color = colors.crust } })
@@ -76,9 +91,8 @@ local function update_media()
     end
 
     if result.title and result.title ~= "" then
-      local app = result.app or ""
-      local app_lower = app:lower()
-      local icon = settings.media_icons[app_lower] or settings.media_icons.default
+      local app_name = result.app or ""
+      local icon = get_media_icon(app_name)
       local is_playing = result.playing == true
 
       local display = result.title
@@ -89,7 +103,7 @@ local function update_media()
         display = "Paused: " .. display
       end
 
-      current_app = app
+      current_app = app_name
 
       local artwork = result.artwork or ""
       local artwork_size = tonumber(result.artwork_size) or cover_size
@@ -108,10 +122,7 @@ local function update_media()
       })
       media:set({
         drawing = true,
-        icon = {
-          string = icon,
-          color = is_playing and colors.mauve or colors.overlay0,
-        },
+        icon = icon,
         label = { string = display },
       })
     else

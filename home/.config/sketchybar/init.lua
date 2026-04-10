@@ -1,7 +1,23 @@
-package.cpath = package.cpath
-    .. ";"
-    .. os.getenv("HOME")
-    .. "/.local/share/sketchybar_lua/?.so"
+local function dirname(path)
+  return path:match("(.+)/[^/]+$") or "."
+end
+
+local source = debug.getinfo(1, "S").source
+local script_path = source:sub(1, 1) == "@" and source:sub(2) or source
+local config_dir = os.getenv("CONFIG_DIR") or dirname(script_path)
+local sbar_lua_dir = os.getenv("SBAR_LUA_DIR")
+  or (os.getenv("HOME") .. "/.local/share/sketchybar_lua")
+
+package.path = table.concat({
+  config_dir .. "/?.lua",
+  config_dir .. "/?/init.lua",
+  package.path,
+}, ";")
+
+package.cpath = table.concat({
+  sbar_lua_dir .. "/?.so",
+  package.cpath,
+}, ";")
 
 local sbar = require("sketchybar")
 local colors = require("colors")
@@ -26,12 +42,12 @@ sbar.bar({
   notch_width = 0,
 })
 
--- Default item properties (match Stache: 13px Maple Mono NF, 500 weight)
+-- Default item properties (match Stache proportions with Hugeicons icon font)
 sbar.default({
   icon = {
     font = {
       family = settings.font.icons,
-      style = "Bold",
+      style = "Regular",
       size = settings.icons.font_size,
     },
     align = "center",

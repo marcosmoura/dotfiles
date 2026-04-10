@@ -1,16 +1,16 @@
 local sbar = require("sketchybar")
 local colors = require("colors")
+local icons = require("icons")
 local settings = require("settings")
 local hover = require("helpers.hover")
+local popup = require("helpers.popup")
 
-local popup_font_size = settings.popup.font_size or 15.0
 local popup_width = 180
-local popup_content_width = popup_width - (settings.icons.width + 24)
 
 local battery = sbar.add("item", "battery", {
   position = "right",
   icon = {
-    string = settings.battery_icons.full,
+    string = icons.battery.full,
     color = colors.green,
   },
   label = {
@@ -23,96 +23,32 @@ local battery = sbar.add("item", "battery", {
 })
 
 -- Popup detail items
-local popup_health = sbar.add("item", "battery.popup.health", {
-  position = "popup.battery",
+local popup_health = popup.create_row("battery.popup.health", "battery", {
   width = popup_width,
-  padding_left = 0,
-  padding_right = 0,
-  icon = {
-    string = "󰓐",
-    color = colors.green,
-    width = settings.icons.width,
-    padding_left = 8,
-    padding_right = 4,
-  },
-  label = {
-    string = "Health: ...",
-    color = colors.subtext0,
-    font = { family = settings.font.text, style = "Medium", size = popup_font_size },
-    width = popup_content_width,
-    align = "left",
-    padding_left = 4,
-    padding_right = 8,
-  },
+  icon = icons.battery_popup.health,
+  icon_color = colors.green,
+  label = "Health: ...",
 })
 
-local popup_cycles = sbar.add("item", "battery.popup.cycles", {
-  position = "popup.battery",
+local popup_cycles = popup.create_row("battery.popup.cycles", "battery", {
   width = popup_width,
-  padding_left = 0,
-  padding_right = 0,
-  icon = {
-    string = "󰑓",
-    color = colors.blue,
-    width = settings.icons.width,
-    padding_left = 8,
-    padding_right = 4,
-  },
-  label = {
-    string = "Cycles: ...",
-    color = colors.subtext0,
-    font = { family = settings.font.text, style = "Medium", size = popup_font_size },
-    width = popup_content_width,
-    align = "left",
-    padding_left = 4,
-    padding_right = 8,
-  },
+  icon = icons.battery_popup.cycles,
+  icon_color = colors.blue,
+  label = "Cycles: ...",
 })
 
-local popup_temp = sbar.add("item", "battery.popup.temp", {
-  position = "popup.battery",
+local popup_temp = popup.create_row("battery.popup.temp", "battery", {
   width = popup_width,
-  padding_left = 0,
-  padding_right = 0,
-  icon = {
-    string = "󰔏",
-    color = colors.peach,
-    width = settings.icons.width,
-    padding_left = 8,
-    padding_right = 4,
-  },
-  label = {
-    string = "Temp: ...",
-    color = colors.subtext0,
-    font = { family = settings.font.text, style = "Medium", size = popup_font_size },
-    width = popup_content_width,
-    align = "left",
-    padding_left = 4,
-    padding_right = 8,
-  },
+  icon = icons.battery_popup.temperature,
+  icon_color = colors.peach,
+  label = "Temp: ...",
 })
 
-local popup_remaining = sbar.add("item", "battery.popup.remaining", {
-  position = "popup.battery",
+local popup_remaining = popup.create_row("battery.popup.remaining", "battery", {
   width = popup_width,
-  padding_left = 0,
-  padding_right = 0,
-  icon = {
-    string = "󰥔",
-    color = colors.lavender,
-    width = settings.icons.width,
-    padding_left = 8,
-    padding_right = 4,
-  },
-  label = {
-    string = "Time: ...",
-    color = colors.subtext0,
-    font = { family = settings.font.text, style = "Medium", size = popup_font_size },
-    width = popup_content_width,
-    align = "left",
-    padding_left = 4,
-    padding_right = 8,
-  },
+  icon = icons.battery_popup.time,
+  icon_color = colors.lavender,
+  label = "Time: ...",
 })
 
 local popup_items = {
@@ -122,14 +58,24 @@ local popup_items = {
   popup_remaining,
 }
 
-local function get_battery_icon(percentage, charging)
-  if charging then
-    return settings.battery_icons.charging
+local function get_battery_icon(percentage, state)
+  if state == "charging" then
+    return icons.battery.charging
+  end
+  if percentage == 100 then
+    return icons.battery.full
+  end
+  if percentage >= 75 then
+    return icons.battery.medium_high
+  end
+  if percentage >= 50 then
+    return icons.battery.medium
+  end
+  if percentage >= 25 then
+    return icons.battery.low
   end
 
-  local levels = settings.battery_icons.level
-  local index = math.max(1, math.ceil(percentage / 10))
-  return levels[index] or settings.battery_icons.full
+  return icons.battery.empty
 end
 
 local function get_battery_color(percentage, charging)
@@ -184,7 +130,7 @@ local function update_battery()
     local percent = tonumber(result.percentage) or 0
     local state = result.state or ""
     local charging = state == "charging"
-    local icon = get_battery_icon(percent, charging)
+    local icon = get_battery_icon(percent, state)
     local color = get_battery_color(percent, charging)
     local label = string.format("%.0f%%", percent)
     if charging then

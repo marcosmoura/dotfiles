@@ -1,7 +1,9 @@
 local sbar = require("sketchybar")
 local colors = require("colors")
+local icons = require("icons")
 local settings = require("settings")
 local hover = require("helpers.hover")
+local workspaces = require("workspaces")
 
 local spaces = {}
 local rendered_workspaces = {}
@@ -49,7 +51,7 @@ local function set_focused_workspace(workspace_name)
 end
 
 local function compare_workspaces(left, right)
-  local workspace_order = settings.workspace_order or {}
+  local workspace_order = workspaces.order or settings.workspace_order or {}
   local left_priority = workspace_order[left] or math.huge
   local right_priority = workspace_order[right] or math.huge
 
@@ -117,10 +119,12 @@ local function add_space_item(workspace_name, index, total)
       height = settings.item.height - 2,
     },
     icon = {
-      string = settings.workspace_icons[workspace_name] or "?",
+      string = icons.workspace[workspace_name] or icons.fallback.default,
       color = colors.text,
       width = 38,
-      align = 'center'
+      align = "center",
+      padding_right = 0,
+      padding_left = 0,
     },
     label = { drawing = false },
   })

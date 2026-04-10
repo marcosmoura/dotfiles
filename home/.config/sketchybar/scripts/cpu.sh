@@ -161,6 +161,11 @@ get_detail() {
     hot_processes+=("--")
   done
 
+  if ! command -v jq >/dev/null 2>&1; then
+    printf '%s\n' "${usage:-0}"
+    return
+  fi
+
   jq -n \
     --argjson usage "${usage:-0}" \
     --arg cpu_breakdown "${cpu_breakdown:-"--"}" \

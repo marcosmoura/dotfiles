@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-CONFIG_DIR="$HOME/.config/sketchybar"
-SBAR_LUA_DIR="$HOME/.local/share/sketchybar_lua"
+export CONFIG_DIR="$HOME/.config/sketchybar"
+export SBAR_LUA_DIR="$HOME/.local/share/sketchybar_lua"
 
 # Install SbarLua if not present
 if [ ! -f "$SBAR_LUA_DIR/sketchybar.so" ]; then
@@ -14,6 +14,11 @@ fi
 
 if [ ! -f "$SBAR_LUA_DIR/sketchybar.so" ]; then
   echo "Missing $SBAR_LUA_DIR/sketchybar.so after SbarLua bootstrap." >&2
+  exit 1
+fi
+
+if ! command -v lua >/dev/null 2>&1; then
+  echo "Missing lua interpreter." >&2
   exit 1
 fi
 

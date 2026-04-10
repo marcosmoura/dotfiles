@@ -4,13 +4,32 @@ set -euo pipefail
 # weather.sh
 # Fetch current weather data with caching support.
 # Uses wttr.in (free, no API key required) and caches results for 20 minutes.
-# Returns JSON: {"temp":"22°C","feels_like":"20°C","condition":"Sunny","icon":"clear",
+# Returns JSON: {"temp":"22°C","feels_like":"20°C","condition":"Sunny","icon":"clearDay",
 #                "high":"24°C","low":"18°C","humidity":"45%","wind":"8 km/h"}
 
 export PATH="/opt/homebrew/bin:/usr/local/bin:$PATH"
 
 CACHE_FILE="/tmp/sketchybar_weather.json"
 CACHE_MAX_AGE=1200 # 20 minutes in seconds
+DEFAULT_RESULT='{"temp":"--","feels_like":"--","condition":"Unknown","icon":"clearDay","high":"--","low":"--","humidity":"--","wind":"--","location":""}'
+
+print_cache_or_default() {
+  if [ -f "$CACHE_FILE" ]; then
+    cat "$CACHE_FILE"
+  else
+    printf '%s\n' "$DEFAULT_RESULT"
+  fi
+}
+
+if ! command -v curl >/dev/null 2>&1; then
+  print_cache_or_default
+  exit 0
+fi
+
+if ! command -v jq >/dev/null 2>&1; then
+  print_cache_or_default
+  exit 0
+fi
 
 # Return cached data if still fresh
 if [ -f "$CACHE_FILE" ]; then
@@ -21,20 +40,74 @@ if [ -f "$CACHE_FILE" ]; then
   fi
 fi
 
-# Map wttr.in condition descriptions to short icon keys
+# Map wttr.in condition descriptions to the icon keys used by stache.
 map_condition() {
   local condition
+  local is_day
   condition=$(printf '%s' "$1" | tr '[:upper:]' '[:lower:]')
+  is_day="${2:-yes}"
+
+  local day_variant=true
+  if [ "$is_day" = "no" ] || [ "$is_day" = "0" ]; then
+    day_variant=false
+  fi
 
   case "$condition" in
-  *clear* | *sunny*) echo "clear" ;;
+  *thunder* | *storm*)
+    if [[ "$condition" == *shower* ]] && [ "$day_variant" = true ]; then
+      echo "thunderShowersDay"
+    elif [ "$day_variant" = true ]; then
+      echo "thunder"
+    else
+      echo "thunderShowersNight"
+    fi
+    ;;
+  *snow* | *sleet* | *blizzard*)
+    if [[ "$condition" == *shower* ]]; then
+      if [ "$day_variant" = true ]; then
+        echo "snowShowersDay"
+      else
+        echo "snowShowersNight"
+      fi
+    else
+      echo "snow"
+    fi
+    ;;
+  *rain* | *drizzle* | *shower*)
+    if [[ "$condition" == *shower* ]]; then
+      if [ "$day_variant" = true ]; then
+        echo "rainDay"
+      else
+        echo "rainNight"
+      fi
+    else
+      echo "rain"
+    fi
+    ;;
+  *partly*cloud*)
+    if [ "$day_variant" = true ]; then
+      echo "partlyCloudyDay"
+    else
+      echo "partlyCloudyNight"
+    fi
+    ;;
   *cloud* | *overcast*) echo "cloudy" ;;
-  *rain* | *drizzle* | *shower*) echo "rainy" ;;
-  *snow* | *sleet* | *blizzard*) echo "snowy" ;;
-  *thunder* | *storm*) echo "stormy" ;;
-  *fog* | *mist* | *haze*) echo "foggy" ;;
+  *clear* | *sunny*)
+    if [ "$day_variant" = true ]; then
+      echo "clearDay"
+    else
+      echo "clearNight"
+    fi
+    ;;
+  *fog* | *mist* | *haze*) echo "fog" ;;
   *wind* | *gale* | *breezy*) echo "windy" ;;
-  *) echo "default" ;;
+  *)
+    if [ "$day_variant" = true ]; then
+      echo "clearDay"
+    else
+      echo "clearNight"
+    fi
+    ;;
   esac
 }
 
@@ -46,6 +119,7 @@ if [ -n "$weather" ]; then
   temp=$(echo "$current" | jq -r '.temp_C')
   feels_like=$(echo "$current" | jq -r '.FeelsLikeC')
   condition=$(echo "$current" | jq -r '.weatherDesc[0].value')
+  is_day=$(echo "$current" | jq -r '.isday // "yes"')
   humidity=$(echo "$current" | jq -r '.humidity')
   wind=$(echo "$current" | jq -r '.windspeedKmph')
   location=$(echo "$weather" | jq -r '.nearest_area[0].areaName[0].value')
@@ -54,7 +128,7 @@ if [ -n "$weather" ]; then
   high=$(echo "$forecast" | jq -r '.maxtempC')
   low=$(echo "$forecast" | jq -r '.mintempC')
 
-  icon=$(map_condition "$condition")
+  icon=$(map_condition "$condition" "$is_day")
 
   result=$(jq -n \
     --arg temp "${temp}°C" \
@@ -72,9 +146,5 @@ if [ -n "$weather" ]; then
   echo "$result"
 else
   # Network failure -- serve stale cache if available, otherwise return defaults
-  if [ -f "$CACHE_FILE" ]; then
-    cat "$CACHE_FILE"
-  else
-    echo '{"temp":"--","feels_like":"--","condition":"Unknown","icon":"default","high":"--","low":"--","humidity":"--","wind":"--","location":""}'
-  fi
+  print_cache_or_default
 fi

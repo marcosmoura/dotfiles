@@ -1,9 +1,10 @@
 local sbar = require("sketchybar")
 local colors = require("colors")
+local icons = require("icons")
 local settings = require("settings")
 local hover = require("helpers.hover")
+local popup = require("helpers.popup")
 
-local popup_font_size = settings.popup.font_size
 local weekday_names = { "Su", "Mo", "Tu", "We", "Th", "Fr", "Sa" }
 local calendar_left_padding = 12
 local calendar_width = 270
@@ -13,7 +14,7 @@ local combining_low_line = "\204\178"
 local clock = sbar.add("item", "clock", {
   position = "right",
   icon = {
-    string = "󰥔",
+    string = icons.status.clock,
   },
   padding_right = 0,
   background = {
@@ -32,35 +33,28 @@ local clock = sbar.add("item", "clock", {
 })
 
 -- Calendar popup header (month + year)
-local calendar_header = sbar.add("item", "clock.popup.header", {
-  position = "popup.clock",
-  icon = { drawing = false },
-  background = { drawing = false },
-  label = {
-    string = "...",
-    color = colors.mauve,
-    font = { family = settings.font.text, style = "Bold", size = popup_font_size * 1.2 },
-    width = calendar_width,
-    align = "center",
-    padding_left = 0,
-    padding_right = 0,
+local calendar_header = popup.create_text_row("clock.popup.header", "clock", {
+  width = calendar_width,
+  label = "...",
+  label_color = colors.mauve,
+  label_font = {
+    family = settings.font.text,
+    style = "Bold",
+    size = (settings.popup.font_size or 14.0) * 1.2,
   },
+  align = "center",
   padding_left = calendar_left_padding,
   padding_right = calendar_left_padding,
 })
 
-local calendar_weekdays = sbar.add("item", "clock.popup.weekdays", {
-  position = "popup.clock",
-  icon = { drawing = false },
-  background = { drawing = false },
-  label = {
-    string = "",
-    color = colors.surface1,
-    font = { family = settings.font.text, style = "Bold", size = popup_font_size },
-    width = calendar_width,
-    align = "left",
-    padding_left = 0,
-    padding_right = 0,
+local calendar_weekdays = popup.create_text_row("clock.popup.weekdays", "clock", {
+  width = calendar_width,
+  label = "",
+  label_color = colors.surface1,
+  label_font = {
+    family = settings.font.text,
+    style = "Bold",
+    size = settings.popup.font_size or 14.0,
   },
   padding_left = calendar_left_padding,
   padding_right = calendar_left_padding,
@@ -69,19 +63,9 @@ local calendar_weekdays = sbar.add("item", "clock.popup.weekdays", {
 -- Calendar week rows (up to 6 weeks in a month)
 local calendar_rows = {}
 for row = 1, 6 do
-  calendar_rows[row] = sbar.add("item", "clock.popup.row" .. row, {
-    position = "popup.clock",
-    icon = { drawing = false },
-    background = { drawing = false },
-    label = {
-      string = "",
-      color = colors.subtext0,
-      font = { family = settings.font.text, style = "Medium", size = popup_font_size },
-      width = calendar_width,
-      align = "left",
-      padding_left = 0,
-      padding_right = 0,
-    },
+  calendar_rows[row] = popup.create_text_row("clock.popup.row" .. row, "clock", {
+    width = calendar_width,
+    label = "",
     padding_left = calendar_left_padding,
     padding_right = calendar_left_padding,
   })
@@ -171,21 +155,10 @@ local function build_calendar()
   end
 end
 
--- nf-md-clock_time_{hour}_outline icons (12-hour, index 1=one .. 12=twelve)
-local clock_icons = {
-  "󱑋", "󱑌", "󱑍", "󱑎", "󱑏", "󱑐",
-  "󱑑", "󱑒", "󱑓", "󱑔", "󱑕", "󱑖",
-}
-
 local function update_clock()
-  local now = os.date("*t")
   local time = os.date("%a %b %d %H:%M:%S")
-  local hour12 = now.hour % 12
-  if hour12 == 0 then
-    hour12 = 12
-  end
   clock:set({
-    icon = { string = clock_icons[hour12] },
+    icon = { string = icons.status.clock },
     label = { string = time },
   })
 

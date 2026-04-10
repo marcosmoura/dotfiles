@@ -1,10 +1,11 @@
 local sbar = require("sketchybar")
 local colors = require("colors")
+local icons = require("icons")
 
 local cpu = sbar.add("item", "cpu", {
   position = "right",
   icon = {
-    string = "󰍛",
+    string = icons.status.cpu,
   },
   label = {
     string = "--%",
@@ -22,16 +23,28 @@ local function get_color(usage)
   end
 end
 
+local function get_temperature_value(raw_temperature)
+  if type(raw_temperature) ~= "string" then
+    return nil
+  end
+
+  return tonumber(raw_temperature:match("([%d%.]+)"))
+end
+
 local function update_cpu()
-  sbar.exec("$CONFIG_DIR/scripts/cpu.sh", function(result)
-    local usage = tonumber(result)
+  sbar.exec("$CONFIG_DIR/scripts/cpu.sh --detail", function(result)
+    local usage = tonumber(result and result.usage) or tonumber(result)
     if usage == nil then
       return
     end
 
+    local temperature = get_temperature_value(result and result.temperature)
+    local is_hot = temperature ~= nil and temperature >= 85
+    local icon = is_hot and icons.status.cpu_hot or icons.status.cpu
+
     sbar.animate("tanh", 15, function()
       cpu:set({
-        icon = { color = get_color(usage) },
+        icon = { string = icon, color = is_hot and colors.red or get_color(usage) },
         label = { string = string.format("%.0f%%", usage) },
       })
     end)

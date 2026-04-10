@@ -1,7 +1,9 @@
+local workspaces = require("workspaces")
+
 return {
   font = {
     text = "Maple Mono NF",
-    icons = "Maple Mono NF",
+    icons = "Hugeicons Stroke Rounded",
   },
 
   icons = {
@@ -39,52 +41,5 @@ return {
     },
   },
 
-  workspace_icons = {
-    terminal = "",
-    coding = "󰘦",
-    browser = "",
-    music = "󰝚",
-    design = "",
-    communication = "",
-    misc = "",
-    files = "",
-    mail = "󰇮",
-    tasks = "󰃭",
-  },
-
-  workspace_order = {
-    terminal = 1,
-    coding = 2,
-    browser = 3,
-    design = 4,
-    communication = 5,
-    files = 6,
-    tasks = 7,
-  },
-
-  battery_icons = {
-    charging = "󰂄",
-    full = "󰁹",
-    level = { "󰁺", "󰁻", "󰁼", "󰁽", "󰁾", "󰁿", "󰂀", "󰂁", "󰂂", "󰁹" },
-  },
-
-  media_icons = {
-    default = "󰝚",
-    spotify = "󰓇",
-    tidal = "󰝚",
-    music = "󰝚",
-    playing = "󰐊",
-    paused = "󰏤",
-  },
-
-  weather_icons = {
-    clear = "󰖙",
-    cloudy = "󰖐",
-    rainy = "󰖗",
-    snowy = "󰖘",
-    stormy = "󰖓",
-    foggy = "󰖑",
-    windy = "󰖝",
-    default = "󰖐",
-  },
+  workspace_order = workspaces.order,
 }

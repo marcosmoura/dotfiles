@@ -15,6 +15,11 @@ set -euo pipefail
 export PATH="/opt/homebrew/bin:/usr/local/bin:$PATH"
 
 get_basic() {
+  if ! command -v pmset >/dev/null 2>&1; then
+    echo '{"percentage":0,"state":"unavailable"}'
+    return
+  fi
+
   local batt_info
   batt_info=$(pmset -g batt)
 
@@ -61,7 +66,7 @@ get_detail() {
   temp_raw=$(echo "$ioreg_data" | grep '"Temperature" =' | head -1 | awk -F'= ' '{print $2}' | tr -d ' ' || true)
   local temp="--"
   if [ -n "$temp_raw" ]; then
-    temp=$(echo "scale=1; $temp_raw / 100" | bc)
+    temp=$(awk -v raw="$temp_raw" 'BEGIN { printf "%.1f", raw / 100 }')
   fi
 
   # Time remaining
@@ -73,8 +78,21 @@ get_detail() {
   fi
 
   local percentage state
-  percentage=$(echo "$basic" | jq -r '.percentage')
-  state=$(echo "$basic" | jq -r '.state')
+  if command -v jq >/dev/null 2>&1; then
+    percentage=$(echo "$basic" | jq -r '.percentage')
+    state=$(echo "$basic" | jq -r '.state')
+  else
+    percentage=$(echo "$basic" | sed -E 's/.*"percentage":([0-9]+).*/\1/')
+    state=$(echo "$basic" | sed -E 's/.*"state":"([^"]+)".*/\1/')
+    printf '{"percentage":%s,"state":"%s","cycles":"%s","health":"%s","temp":"%s","time_remaining":"%s"}\n' \
+      "${percentage:-0}" \
+      "${state:-unavailable}" \
+      "${cycles:---}" \
+      "${health}%" \
+      "${temp}°C" \
+      "${time_remaining:---}"
+    return
+  fi
 
   jq -n \
     --argjson percentage "$percentage" \
@@ -87,6 +105,6 @@ get_detail() {
 }
 
 case "${1:-}" in
---detail) get_detail ;;
-*) get_basic ;;
+  --detail) get_detail ;;
+  *) get_basic ;;
 esac
