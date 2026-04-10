@@ -9,7 +9,6 @@ local spaces = {}
 local rendered_workspaces = {}
 local focused_workspace = nil
 local hovered_workspaces = {}
-local refresh_spaces = nil
 local refresh_retry_pending = false
 local refresh_retry_token = 0
 
@@ -177,7 +176,7 @@ local function cancel_refresh_retry()
   refresh_retry_pending = false
 end
 
-local function schedule_refresh_retry()
+local function schedule_refresh_retry(refresh_callback)
   if refresh_retry_pending then
     return
   end
@@ -192,7 +191,10 @@ local function schedule_refresh_retry()
     end
 
     refresh_retry_pending = false
-    refresh_spaces()
+
+    if type(refresh_callback) == "function" then
+      refresh_callback()
+    end
   end)
 end
 
@@ -209,11 +211,11 @@ local function refresh_focused_workspace()
   end)
 end
 
-refresh_spaces = function(next_focused_workspace)
+local function refresh_spaces(next_focused_workspace)
   sbar.exec("$CONFIG_DIR/scripts/workspaces.sh", function(result)
     local workspace_names = normalize_workspaces(result)
     if #workspace_names == 0 then
-      schedule_refresh_retry()
+      schedule_refresh_retry(refresh_spaces)
       return
     end
 

@@ -2,8 +2,6 @@ return {
   {
     "akinsho/bufferline.nvim",
     event = "VeryLazy",
-    ---@module 'bufferline'
-    ---@type bufferline.Config
     opts = {
       options = {
         always_show_bufferline = true,
