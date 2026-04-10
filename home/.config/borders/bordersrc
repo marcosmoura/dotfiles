@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+options=(
+	active_color=0xffcba6f7
+	hidpi=on
+	inactive_color=0x00313244
+	order=a
+	style=round
+	width=6.0
+)
+
+borders "${options[@]}"
+
+# Trigger initial layout-aware border update
+~/.config/aerospace/scripts/borders.sh &
