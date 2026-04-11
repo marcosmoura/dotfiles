@@ -158,7 +158,6 @@ end
 local function update_clock()
   local time = os.date("%a %b %d %H:%M:%S")
   clock:set({
-    icon = { string = icons.status.clock },
     label = { string = time },
   })
 

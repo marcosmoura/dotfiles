@@ -6,7 +6,7 @@ local source = debug.getinfo(1, "S").source
 local script_path = source:sub(1, 1) == "@" and source:sub(2) or source
 local config_dir = os.getenv("CONFIG_DIR") or dirname(script_path)
 local sbar_lua_dir = os.getenv("SBAR_LUA_DIR")
-  or (os.getenv("HOME") .. "/.local/share/sketchybar_lua")
+    or (os.getenv("HOME") .. "/.local/share/sketchybar_lua")
 
 package.path = table.concat({
   config_dir .. "/?.lua",
@@ -57,7 +57,7 @@ sbar.default({
   },
   label = {
     color = colors.text,
-    font = { family = settings.font.text, style = "Medium", size = 13.0 },
+    font = { family = settings.font.text, style = "Medium", size = 13.2, features = "tnum" },
     padding_left = 0,
     padding_right = 10
   },
@@ -97,14 +97,12 @@ require("items.front_app")
 require("items.media")
 
 -- Load items (RIGHT section)
--- Order: REVERSED because sketchybar stacks right items right-to-left.
--- Visual order (left→right): Weather, KeepAwake, CPU, Battery, Clock
 require("items.clock")
 require("items.battery")
 require("items.cpu")
 require("items.keepawake")
 require("items.weather")
+require("items.status_aliases")
 
 sbar.end_config()
-
 sbar.event_loop()

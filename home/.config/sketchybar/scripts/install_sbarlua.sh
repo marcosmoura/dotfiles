@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# install_sblua.sh
+# install_sbarlua.sh
 # Compile and install SbarLua for sketchybar Lua plugin support.
 # This script is idempotent -- it will skip installation if the shared
 # object already exists at the expected location.

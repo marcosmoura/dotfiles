@@ -6,7 +6,7 @@ export SBAR_LUA_DIR="$HOME/.local/share/sketchybar_lua"
 
 # Install SbarLua if not present
 if [ ! -f "$SBAR_LUA_DIR/sketchybar.so" ]; then
-  if ! source "$CONFIG_DIR/scripts/install_sblua.sh"; then
+  if ! source "$CONFIG_DIR/scripts/install_sbarlua.sh"; then
     echo "Failed to bootstrap SbarLua." >&2
     exit 1
   fi
