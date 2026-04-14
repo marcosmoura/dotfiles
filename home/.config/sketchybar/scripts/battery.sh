@@ -39,8 +39,25 @@ get_basic() {
 }
 
 get_detail() {
-  local basic
-  basic=$(get_basic)
+  if ! command -v pmset >/dev/null 2>&1; then
+    echo '{"percentage":0,"state":"unavailable","cycles":"--","health":"--","temp":"--","time_remaining":"--"}'
+    return
+  fi
+
+  local batt_info
+  batt_info=$(pmset -g batt)
+
+  local percentage
+  percentage=$(echo "$batt_info" | grep -o '[0-9]*%' | head -1 | tr -d '%' || true)
+
+  local state="discharging"
+  if echo "$batt_info" | grep -q "AC Power"; then
+    if echo "$batt_info" | grep -q "charged"; then
+      state="full"
+    else
+      state="charging"
+    fi
+  fi
 
   # Use -rn and match exact "Key" = Value lines to avoid nested dictionary blobs
   local ioreg_data
@@ -69,21 +86,15 @@ get_detail() {
     temp=$(awk -v raw="$temp_raw" 'BEGIN { printf "%.1f", raw / 100 }')
   fi
 
-  # Time remaining
+  # Time remaining (reuse batt_info from above instead of calling pmset again)
   local time_remaining="--"
   local time_info
-  time_info=$(pmset -g batt | grep -Eo '[0-9]*:[0-9]* (remaining|until charged)' | head -1 || true)
+  time_info=$(echo "$batt_info" | grep -Eo '[0-9]*:[0-9]* (remaining|until charged)' | head -1 || true)
   if [ -n "$time_info" ]; then
     time_remaining=$(echo "$time_info" | awk '{print $1}')
   fi
 
-  local percentage state
-  if command -v jq >/dev/null 2>&1; then
-    percentage=$(echo "$basic" | jq -r '.percentage')
-    state=$(echo "$basic" | jq -r '.state')
-  else
-    percentage=$(echo "$basic" | sed -E 's/.*"percentage":([0-9]+).*/\1/')
-    state=$(echo "$basic" | sed -E 's/.*"state":"([^"]+)".*/\1/')
+  if ! command -v jq >/dev/null 2>&1; then
     printf '{"percentage":%s,"state":"%s","cycles":"%s","health":"%s","temp":"%s","time_remaining":"%s"}\n' \
       "${percentage:-0}" \
       "${state:-unavailable}" \
@@ -95,7 +106,7 @@ get_detail() {
   fi
 
   jq -n \
-    --argjson percentage "$percentage" \
+    --argjson percentage "${percentage:-0}" \
     --arg state "$state" \
     --arg cycles "${cycles:-0}" \
     --arg health "${health}%" \

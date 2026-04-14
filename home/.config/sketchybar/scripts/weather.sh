@@ -115,18 +115,19 @@ map_condition() {
 weather=$(curl -sf "wttr.in/?format=j1" 2>/dev/null) || true
 
 if [ -n "$weather" ]; then
-  current=$(echo "$weather" | jq -r '.current_condition[0]')
-  temp=$(echo "$current" | jq -r '.temp_C')
-  feels_like=$(echo "$current" | jq -r '.FeelsLikeC')
-  condition=$(echo "$current" | jq -r '.weatherDesc[0].value')
-  is_day=$(echo "$current" | jq -r '.isday // "yes"')
-  humidity=$(echo "$current" | jq -r '.humidity')
-  wind=$(echo "$current" | jq -r '.windspeedKmph')
-  location=$(echo "$weather" | jq -r '.nearest_area[0].areaName[0].value')
-
-  forecast=$(echo "$weather" | jq -r '.weather[0]')
-  high=$(echo "$forecast" | jq -r '.maxtempC')
-  low=$(echo "$forecast" | jq -r '.mintempC')
+  eval "$(echo "$weather" | jq -r '
+    (.current_condition[0]) as $c |
+    (.weather[0]) as $f |
+    "temp=" + ($c.temp_C | @sh) +
+    " feels_like=" + ($c.FeelsLikeC | @sh) +
+    " condition=" + ($c.weatherDesc[0].value | @sh) +
+    " is_day=" + (($c.isday // "yes") | @sh) +
+    " humidity=" + ($c.humidity | @sh) +
+    " wind=" + ($c.windspeedKmph | @sh) +
+    " location=" + (.nearest_area[0].areaName[0].value | @sh) +
+    " high=" + ($f.maxtempC | @sh) +
+    " low=" + ($f.mintempC | @sh)
+  ')"
 
   icon=$(map_condition "$condition" "$is_day")
 
