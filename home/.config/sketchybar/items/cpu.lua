@@ -32,7 +32,7 @@ local function get_temperature_value(raw_temperature)
 end
 
 local function update_cpu()
-  sbar.exec("$CONFIG_DIR/scripts/cpu.sh --detail", function(result)
+  sbar.exec("$CONFIG_DIR/scripts/cpu.sh --summary", function(result)
     local usage = tonumber(result and result.usage) or tonumber(result)
     if usage == nil then
       return

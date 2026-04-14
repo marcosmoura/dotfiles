@@ -195,7 +195,28 @@ get_detail() {
     }'
 }
 
+get_summary() {
+  local top_output usage temperature
+  top_output=$(get_top_output)
+  usage=0
+  if [ -n "$top_output" ]; then
+    usage=$(get_usage_from_output "$top_output")
+  fi
+  temperature="$(get_temperature)"
+
+  if ! command -v jq >/dev/null 2>&1; then
+    printf '%s\n' "${usage:-0}"
+    return
+  fi
+
+  jq -n \
+    --argjson usage "${usage:-0}" \
+    --arg temperature "${temperature:-"Unavailable"}" \
+    '{ usage: $usage, temperature: $temperature }'
+}
+
 case "${1:-}" in
   --detail) get_detail ;;
+  --summary) get_summary ;;
   *) get_basic ;;
 esac
