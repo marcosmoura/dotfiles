@@ -34,26 +34,9 @@ require_command() {
 }
 
 parse_args() {
-  while [ "$#" -gt 0 ]; do
-    case "$1" in
-      --radius)
-        [ "$#" -ge 2 ] || fail "Missing value for --radius"
-        [[ "$2" =~ ^[0-9]+$ ]] || fail "Radius must be a non-negative integer"
-        RADIUS="$2"
-        shift 2
-        ;;
-      --force)
-        FORCE=true
-        shift
-        ;;
-      *)
-        fail "Unknown option: $1"
-        ;;
-    esac
-  done
-}
+  local mode="$1"
+  shift
 
-parse_set_args() {
   while [ "$#" -gt 0 ]; do
     case "$1" in
       --radius)
@@ -67,6 +50,7 @@ parse_set_args() {
         shift
         ;;
       --random)
+        [ "$mode" = "set" ] || fail "Unknown option: $1"
         RANDOMIZE=true
         shift
         ;;
@@ -74,6 +58,7 @@ parse_set_args() {
         fail "Unknown option: $1"
         ;;
       *)
+        [ "$mode" = "set" ] || fail "Unknown option: $1"
         [ -z "$SELECTED_WALLPAPER" ] || fail "Specify only one wallpaper filename"
         SELECTED_WALLPAPER="$1"
         shift
@@ -81,12 +66,13 @@ parse_set_args() {
     esac
   done
 
-  if [ "$RANDOMIZE" = true ] && [ -n "$SELECTED_WALLPAPER" ]; then
-    fail "Use either a filename or --random, not both"
-  fi
-
-  if [ "$RANDOMIZE" = false ] && [ -z "$SELECTED_WALLPAPER" ]; then
-    fail "set requires a filename or --random"
+  if [ "$mode" = "set" ]; then
+    if [ "$RANDOMIZE" = true ] && [ -n "$SELECTED_WALLPAPER" ]; then
+      fail "Use either a filename or --random, not both"
+    fi
+    if [ "$RANDOMIZE" = false ] && [ -z "$SELECTED_WALLPAPER" ]; then
+      fail "set requires a filename or --random"
+    fi
   fi
 }
 
@@ -192,8 +178,6 @@ process_wallpaper() {
   fi
 
   WALLPAPER_CACHED=false
-  img_w=$(sips --getProperty pixelWidth "$wallpaper_path" | awk '/pixelWidth:/{print $2}')
-  img_h=$(sips --getProperty pixelHeight "$wallpaper_path" | awk '/pixelHeight:/{print $2}')
 
   if [ "$RADIUS" -eq 0 ]; then
     magick "$wallpaper_path" \
@@ -201,6 +185,8 @@ process_wallpaper() {
       -background black -gravity South -extent "${SCREEN_W}x${SCREEN_H}" \
       "$output_path"
   else
+    img_w=$(sips --getProperty pixelWidth "$wallpaper_path" | awk '/pixelWidth:/{print $2}')
+    img_h=$(sips --getProperty pixelHeight "$wallpaper_path" | awk '/pixelHeight:/{print $2}')
     local scaled_r
     scaled_r=$(awk -v radius="$RADIUS" -v image_width="$img_w" -v screen_width="$SCREEN_W" 'BEGIN { printf "%.0f", radius * image_width / screen_width }')
     magick \
@@ -227,7 +213,7 @@ EOF
 }
 
 cmd_set() {
-  parse_set_args "$@"
+  parse_args "set" "$@"
   prepare_environment
   load_wallpapers
   mkdir -p "$TMP_DIR"
@@ -253,7 +239,7 @@ cmd_set() {
 }
 
 cmd_generate_all() {
-  parse_args "$@"
+  parse_args "generate-all" "$@"
   prepare_environment
   load_wallpapers
   sort_wallpapers

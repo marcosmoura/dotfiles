@@ -12,7 +12,7 @@ BORDER_STYLE="round"
 
 LAST_COMMAND_FILE="/tmp/borders_last_command"
 DEBOUNCE_FILE="/tmp/borders_debounce"
-DEBOUNCE_MS=25
+DEBOUNCE_S=0.025
 
 send_borders() {
   python3 -c "
@@ -78,7 +78,7 @@ msg.descriptor.copy = MACH_MSG_VIRTUAL_COPY
 msg.descriptor.type = MACH_MSG_OOL_DESCRIPTOR
 
 lib.mach_msg(ctypes.byref(msg.header), MACH_SEND_MSG, ctypes.sizeof(mach_message), 0, MACH_PORT_NULL, 0, MACH_PORT_NULL)
-" 2>/dev/null || borders $1
+" 2>/dev/null || borders "$1"
 }
 
 get_layout() {
@@ -108,13 +108,17 @@ update_borders() {
   active_color=$(get_active_color)
 
   local command="active_color=$active_color inactive_color=$COLOR_INACTIVE style=$BORDER_STYLE width=$BORDER_WIDTH hidpi=on order=a"
+  local last_command=""
 
   # Deduplicate — skip if identical to last command
-  if [ -f "$LAST_COMMAND_FILE" ] && [ "$(cat "$LAST_COMMAND_FILE")" = "$command" ]; then
+  if [ -f "$LAST_COMMAND_FILE" ]; then
+    IFS= read -r last_command <"$LAST_COMMAND_FILE" || true
+  fi
+  if [ "$last_command" = "$command" ]; then
     return
   fi
 
-  echo "$command" >"$LAST_COMMAND_FILE"
+  printf '%s\n' "$command" >"$LAST_COMMAND_FILE"
 
   send_borders "$command"
 }
@@ -122,11 +126,13 @@ update_borders() {
 debounce() {
   local token
   token="$$.$RANDOM"
-  echo "$token" >"$DEBOUNCE_FILE"
+  printf '%s\n' "$token" >"$DEBOUNCE_FILE"
 
-  sleep "$(echo "$DEBOUNCE_MS / 1000" | bc -l)"
+  sleep "$DEBOUNCE_S"
 
-  if [ "$(cat "$DEBOUNCE_FILE" 2>/dev/null)" = "$token" ]; then
+  local debounce_token=""
+  IFS= read -r debounce_token <"$DEBOUNCE_FILE" 2>/dev/null || true
+  if [ "$debounce_token" = "$token" ]; then
     update_borders
   fi
 }
