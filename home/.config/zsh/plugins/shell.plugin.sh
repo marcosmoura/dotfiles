@@ -24,9 +24,6 @@ alias snano='sudo nano'
 # Better du
 alias du='dust -x -X .git -X node_modules'
 
-# Better man
-alias man='batman'
-
 # Chmod -x
 alias chmox='chmod -x'
 
