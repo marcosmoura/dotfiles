@@ -2,8 +2,8 @@ approval_policy = "on-request"
 sandbox_mode = "workspace-write"
 personality = "pragmatic"
 approvals_reviewer = "guardian_subagent"
-model = "gpt-5.4"
-model_reasoning_effort = "xhigh"
+model = "gpt-5.3-codex"
+model_reasoning_effort = "medium"
 plan_mode_reasoning_effort = "xhigh"
 
 [sandbox_workspace_write]
@@ -36,3 +36,6 @@ status_line = [
 [notice.model_migrations]
 "gpt-5.1-codex-mini" = "gpt-5.4"
 "gpt-5.3-codex" = "gpt-5.4"
+
+[projects."/Users/marcosmoura/Projects/dotfiles"]
+trust_level = "trusted"
