@@ -9,6 +9,8 @@ if not tmp_dir:match("/$") then
 end
 
 local pid_file = tmp_dir .. "sketchybar_keepawake.pid"
+local state_file = tmp_dir .. "sketchybar_keepawake.state"
+local STATE_DISABLED = "off"
 
 local function shell_quote(value)
   return "'" .. value:gsub("'", [['"'"']]) .. "'"
@@ -43,11 +45,36 @@ local function read_pid()
   return pid
 end
 
+local function is_enabled()
+  local file = io.open(state_file, "r")
+  if file == nil then
+    return true
+  end
+
+  local state = file:read("*l")
+  file:close()
+
+  return state ~= STATE_DISABLED
+end
+
+local function set_enabled(enabled)
+  if enabled then
+    os.remove(state_file)
+    return
+  end
+
+  local file = io.open(state_file, "w")
+  if file ~= nil then
+    file:write(STATE_DISABLED .. "\n")
+    file:close()
+  end
+end
+
 local function set_active(active)
   sbar.animate("tanh", 15, function()
     keepawake:set({
       icon = {
-        color = active and colors.green or colors.text,
+        color = active and colors.green or colors.overlay1,
         string = icons.status.keepawake,
       },
     })
@@ -71,22 +98,74 @@ local function update_state()
   end)
 end
 
-keepawake:subscribe("routine", update_state)
-keepawake:subscribe("forced", update_state)
+local function stop_keepawake(callback)
+  sbar.exec(
+    string.format("kill $(cat %s 2>/dev/null) 2>/dev/null || true; rm -f %s", pid_file_quoted, pid_file_quoted),
+    function()
+      if callback then
+        callback()
+      end
+    end)
+end
+
+local function has_required_flags(command)
+  return type(command) == "string"
+      and command:match("caffeinate") ~= nil
+      and command:match("%-d") ~= nil
+      and command:match("%-i") ~= nil
+end
+
+local function start_keepawake(callback)
+  sbar.exec(
+    string.format("caffeinate -d -i >/dev/null 2>&1 & echo $! > %s", pid_file_quoted),
+    function()
+      if callback then
+        callback()
+      end
+    end)
+end
+
+local function ensure_keepawake()
+  if not is_enabled() then
+    set_active(false)
+    return
+  end
+
+  local pid = read_pid()
+  if pid == nil then
+    start_keepawake(update_state)
+    return
+  end
+
+  sbar.exec(string.format("ps -p %d -o command= 2>/dev/null", pid), function(result)
+    if has_required_flags(result) then
+      set_active(true)
+      return
+    end
+
+    stop_keepawake(function()
+      start_keepawake(update_state)
+    end)
+  end)
+end
+
+keepawake:subscribe("routine", ensure_keepawake)
+keepawake:subscribe("forced", ensure_keepawake)
 
 keepawake:subscribe("mouse.clicked", function()
   local pid = read_pid()
   if pid ~= nil then
-    sbar.exec(string.format("kill %d 2>/dev/null || true; rm -f %s", pid, pid_file_quoted), function()
+    set_enabled(false)
+    stop_keepawake(function()
       update_state()
     end)
     return
   end
 
-  -- Use an idle-sleep assertion so long-running work keeps the system awake.
-  sbar.exec(string.format("caffeinate -i >/dev/null 2>&1 & echo $! > %s", pid_file_quoted), function()
+  set_enabled(true)
+  start_keepawake(function()
     update_state()
   end)
 end)
 
-update_state()
+ensure_keepawake()
