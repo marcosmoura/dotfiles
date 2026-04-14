@@ -47,15 +47,26 @@
       "WebSearch",
       "Write"
     ],
-    "deny": ["Bash(dd *)", "Bash(mkfs *)", "Bash(> /dev/sda*)"],
-    "ask": ["Bash(sudo *)", "Bash(rm -rf *)", "Bash(chmod)", "Bash(chown)"]
+    "deny": [
+      "Bash(dd *)",
+      "Bash(mkfs *)",
+      "Bash(> /dev/sda*)"
+    ],
+    "ask": [
+      "Bash(sudo *)",
+      "Bash(rm -rf *)",
+      "Bash(chmod)",
+      "Bash(chown)"
+    ]
   },
-  "model": "sonnet",
+  "model": "opus",
   "statusLine": {
     "type": "command",
     "command": "~/.claude/statusline.sh"
   },
   "enabledPlugins": {
+    "anthropic-commit-commands@stripe-internal-marketplace": true,
+    "claude-md-management@claude-plugins-official": true,
     "claude-pace@claude-pace-marketplace": true,
     "code-review@claude-plugins-official": true,
     "code-simplifier@claude-plugins-official": true,
@@ -67,6 +78,10 @@
     "github@claude-plugins-official": true,
     "lua-lsp@claude-plugins-official": true,
     "playwright@claude-plugins-official": true,
+    "sail-core@stripe-internal-marketplace": true,
+    "sail-deprecated-migration@stripe-internal-marketplace": true,
+    "sail-ui-team@stripe-internal-marketplace": true,
+    "sail@stripe-internal-marketplace": true,
     "security-guidance@claude-plugins-official": true,
     "slack@claude-plugins-official": true,
     "superpowers@claude-plugins-official": true,
@@ -86,5 +101,6 @@
       }
     }
   },
-  "promptSuggestionEnabled": false
+  "promptSuggestionEnabled": true,
+  "effortLevel": "high"
 }
