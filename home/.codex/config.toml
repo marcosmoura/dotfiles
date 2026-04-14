@@ -36,6 +36,3 @@ status_line = [
 [notice.model_migrations]
 "gpt-5.1-codex-mini" = "gpt-5.4"
 "gpt-5.3-codex" = "gpt-5.4"
-
-[projects."/Users/marcosmoura/Projects/dotfiles"]
-trust_level = "trusted"
