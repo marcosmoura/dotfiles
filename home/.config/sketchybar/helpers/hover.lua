@@ -318,7 +318,7 @@ function hover.item(item, options)
   local popup_item_states = {}
 
   if options.popup ~= true then
-    return
+    return controller
   end
 
   local function open_popup(env)
@@ -337,6 +337,7 @@ function hover.item(item, options)
     popup_state = "opening"
     set_popup_items_alpha(popup_item_states, 0x00)
     item:set({ popup = popup_style(popup_hidden_y_offset, 0x00) })
+    controller.set_pinned(true)
     animate_popup(function()
       if token ~= popup_token then
         return
@@ -344,9 +345,8 @@ function hover.item(item, options)
 
       set_popup_items_alpha(popup_item_states, 0xff)
       item:set({ popup = popup_style(popup_target_y_offset, 0xff) })
+      popup_state = "open"
     end)
-    popup_state = "open"
-    controller.set_pinned(true)
   end
 
   local function close_popup()

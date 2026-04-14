@@ -71,8 +71,7 @@ end
 
 local function hide_media()
   current_app = ""
-  media_bracket:set({ background = { color = colors.crust } })
-  media_bracket:set({ drawing = false })
+  media_bracket:set({ background = { color = colors.crust }, drawing = false })
   media_cover:set({ drawing = false })
   media:set({ drawing = false })
 end
@@ -133,8 +132,6 @@ end
 
 media:subscribe("routine", update_media)
 media:subscribe("forced", update_media)
-media_cover:subscribe("routine", update_media)
-media_cover:subscribe("forced", update_media)
 
 -- Delay the exit slightly so moving between cover art and label keeps the group highlighted.
 hover.group_background({ media_cover, media }, media_bracket, {

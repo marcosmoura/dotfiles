@@ -110,9 +110,12 @@ cache_is_fresh() {
   age="$((now - modified_at))"
   max_age="$CACHE_MAX_AGE"
 
-  cache_version="$(jq -r '.version // 0' <"$path" 2>/dev/null || printf '0')"
-  artwork_size="$(jq -r '.artwork_size // -1' <"$path" 2>/dev/null || printf '-1')"
-  artwork="$(jq -r '.artwork // ""' <"$path" 2>/dev/null || printf '')"
+  local cache_fields
+  cache_fields="$(jq -r '[(.version // 0), (.artwork_size // -1), (.artwork // "")] | @tsv' <"$path" 2>/dev/null)" || return 1
+  cache_version="${cache_fields%%	*}"
+  local _rest="${cache_fields#*	}"
+  artwork_size="${_rest%%	*}"
+  artwork="${_rest#*	}"
 
   [ "$cache_version" = "$CACHE_VERSION" ] || return 1
   [ "$artwork_size" -ge 0 ] 2>/dev/null || return 1
@@ -222,19 +225,23 @@ get_itunes_artwork() {
 }
 
 if [ -n "$result" ]; then
-  title="$(jq -r '.title // ""' <<<"$result")"
-  artist="$(jq -r '.artist // ""' <<<"$result")"
-  album="$(jq -r '.album // ""' <<<"$result")"
-  app="$(jq -r '.app // ""' <<<"$result")"
-  playing="$(jq -r '.playing // false' <<<"$result")"
+  eval "$(jq -r '
+    "title=" + ((.title // "") | @sh) +
+    " artist=" + ((.artist // "") | @sh) +
+    " album=" + ((.album // "") | @sh) +
+    " app=" + ((.app // "") | @sh) +
+    " playing=" + ((.playing // false) | tostring | @sh)
+  ' <<<"$result")"
 
   artwork=""
   artwork_size=0
   if [ -n "$title" ]; then
     track_hash="$(md5 -q -s "${title}|${artist}|${album}")"
     artwork_result="$(get_itunes_artwork "$track_hash" "$title" "$artist" "$album")"
-    artwork="$(jq -r '.artwork // ""' <<<"$artwork_result")"
-    artwork_size="$(jq -r '.artwork_size // 0' <<<"$artwork_result")"
+    eval "$(jq -r '
+      "artwork=" + ((.artwork // "") | @sh) +
+      " artwork_size=" + ((.artwork_size // 0) | tostring | @sh)
+    ' <<<"$artwork_result")"
   fi
 
   jq -cn \
