@@ -20,12 +20,8 @@ return {
   },
 
   item = {
-    spacing = 4,
-    icon_padding = 4,
-    label_padding = 4,
     corner_radius = 12,
     height = 28,
-    padding = 10,
   },
 
   popup = {

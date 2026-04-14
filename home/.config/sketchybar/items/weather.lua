@@ -1,7 +1,6 @@
 local sbar = require("sketchybar")
 local colors = require("colors")
 local icons = require("icons")
-local settings = require("settings")
 local hover = require("helpers.hover")
 local popup = require("helpers.popup")
 
@@ -21,41 +20,25 @@ local weather = sbar.add("item", "weather", {
   },
 })
 
--- Popup detail items
-local popup_condition = popup.create_row("weather.popup.condition", "weather", {
-  width = popup_width,
-  icon = icons.weather.default,
-  icon_color = colors.sky,
-  label = "Condition: ...",
-})
-
-local popup_highlow = popup.create_row("weather.popup.highlow", "weather", {
-  width = popup_width,
-  icon = icons.weather_popup.temperature,
-  icon_color = colors.peach,
-  label = "H/L: ...",
-})
-
-local popup_humidity = popup.create_row("weather.popup.humidity", "weather", {
-  width = popup_width,
-  icon = icons.weather_popup.humidity,
-  icon_color = colors.blue,
-  label = "Humidity: ...",
-})
-
-local popup_wind = popup.create_row("weather.popup.wind", "weather", {
-  width = popup_width,
-  icon = icons.weather_popup.wind,
-  icon_color = colors.teal,
-  label = "Wind: ...",
-})
-
-local popup_items = {
-  popup_condition,
-  popup_highlow,
-  popup_humidity,
-  popup_wind,
+local popup_row_specs = {
+  { key = "condition", icon = icons.weather.default, icon_color = colors.sky, label = "Condition: ..." },
+  { key = "highlow", icon = icons.weather_popup.temperature, icon_color = colors.peach, label = "H/L: ..." },
+  { key = "humidity", icon = icons.weather_popup.humidity, icon_color = colors.blue, label = "Humidity: ..." },
+  { key = "wind", icon = icons.weather_popup.wind, icon_color = colors.teal, label = "Wind: ..." },
 }
+local popup_items = {}
+local popup_rows = {}
+
+for _, row in ipairs(popup_row_specs) do
+  local item = popup.create_row("weather.popup." .. row.key, "weather", {
+    width = popup_width,
+    icon = row.icon,
+    icon_color = row.icon_color,
+    label = row.label,
+  })
+  popup_items[#popup_items + 1] = item
+  popup_rows[row.key] = item
+end
 
 local legacy_icon_keys = {
   clear = "clearDay",
@@ -79,17 +62,17 @@ local function update_detail(data, condition_icon)
     return
   end
 
-  popup_condition:set({
+  popup_rows.condition:set({
     icon = { string = condition_icon },
     label = { string = "Condition: " .. (data.condition or "--") },
   })
-  popup_highlow:set({
+  popup_rows.highlow:set({
     label = { string = "H: " .. (data.high or "?") .. "  L: " .. (data.low or "?") },
   })
-  popup_humidity:set({
+  popup_rows.humidity:set({
     label = { string = "Humidity: " .. (data.humidity or "?") },
   })
-  popup_wind:set({
+  popup_rows.wind:set({
     label = { string = "Wind: " .. (data.wind or "?") },
   })
 end

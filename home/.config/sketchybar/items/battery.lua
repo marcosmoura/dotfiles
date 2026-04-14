@@ -1,7 +1,6 @@
 local sbar = require("sketchybar")
 local colors = require("colors")
 local icons = require("icons")
-local settings = require("settings")
 local hover = require("helpers.hover")
 local popup = require("helpers.popup")
 
@@ -22,41 +21,25 @@ local battery = sbar.add("item", "battery", {
   },
 })
 
--- Popup detail items
-local popup_health = popup.create_row("battery.popup.health", "battery", {
-  width = popup_width,
-  icon = icons.battery_popup.health,
-  icon_color = colors.green,
-  label = "Health: ...",
-})
-
-local popup_cycles = popup.create_row("battery.popup.cycles", "battery", {
-  width = popup_width,
-  icon = icons.battery_popup.cycles,
-  icon_color = colors.blue,
-  label = "Cycles: ...",
-})
-
-local popup_temp = popup.create_row("battery.popup.temp", "battery", {
-  width = popup_width,
-  icon = icons.battery_popup.temperature,
-  icon_color = colors.peach,
-  label = "Temp: ...",
-})
-
-local popup_remaining = popup.create_row("battery.popup.remaining", "battery", {
-  width = popup_width,
-  icon = icons.battery_popup.time,
-  icon_color = colors.lavender,
-  label = "Time: ...",
-})
-
-local popup_items = {
-  popup_health,
-  popup_cycles,
-  popup_temp,
-  popup_remaining,
+local popup_row_specs = {
+  { key = "health", icon = icons.battery_popup.health, icon_color = colors.green, label = "Health: ..." },
+  { key = "cycles", icon = icons.battery_popup.cycles, icon_color = colors.blue, label = "Cycles: ..." },
+  { key = "temp", icon = icons.battery_popup.temperature, icon_color = colors.peach, label = "Temp: ..." },
+  { key = "remaining", icon = icons.battery_popup.time, icon_color = colors.lavender, label = "Time: ..." },
 }
+local popup_items = {}
+local popup_rows = {}
+
+for _, row in ipairs(popup_row_specs) do
+  local item = popup.create_row("battery.popup." .. row.key, "battery", {
+    width = popup_width,
+    icon = row.icon,
+    icon_color = row.icon_color,
+    label = row.label,
+  })
+  popup_items[#popup_items + 1] = item
+  popup_rows[row.key] = item
+end
 
 local function get_battery_icon(percentage, state)
   if state == "charging" then
@@ -106,16 +89,16 @@ local function update_detail()
       remaining_label = "Fully charged"
     end
 
-    popup_health:set({
+    popup_rows.health:set({
       label = { string = "Health: " .. (result.health or "--") },
     })
-    popup_cycles:set({
+    popup_rows.cycles:set({
       label = { string = "Cycles: " .. (result.cycles or "--") },
     })
-    popup_temp:set({
+    popup_rows.temp:set({
       label = { string = "Temp: " .. (result.temp or "--") },
     })
-    popup_remaining:set({
+    popup_rows.remaining:set({
       label = { string = remaining_label },
     })
   end)
