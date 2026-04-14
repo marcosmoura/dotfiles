@@ -160,6 +160,10 @@ run = 'move-node-to-workspace design'
 if.app-id = 'com.tinyspeck.slackmacgap'
 run = 'move-node-to-workspace communication'
 
+[[on-window-detected]]
+if.app-id = 'com.zoom.app'
+run = 'move-node-to-workspace communication'
+
 # ═══════  Monitor 2 Assignments
 
 # Files
