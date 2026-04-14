@@ -32,8 +32,8 @@ Options:
 Available modules: $modules_list
 
 Examples:
-  $0 --all                    # Run everything
-  $0 --core                   # Run only core scripts
+  $0 --all                       # Run everything
+  $0 --core                      # Run only core scripts
   $0 --module zsh --module node  # Run specific modules
 EOF
 }
