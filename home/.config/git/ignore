@@ -27,7 +27,6 @@ Temporary Items
 *.swo
 *~
 .idea/
-.vscode/settings.json
 .vscode/launch.json
 .session.vim
 

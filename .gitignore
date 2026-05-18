@@ -70,7 +70,6 @@ yarn-error.log*
 .claude.json
 home/.claude/*
 !home/.claude/CLAUDE.md
-!home/.claude/RTK.md
 !home/.claude/settings.json
 !home/.claude/statusline.json
 
@@ -78,5 +77,4 @@ home/.claude/*
 home/.codex/*
 !home/.codex/AGENTS.md
 !home/.codex/config.toml
-!home/.codex/RTK.md
 !home/.codex/rules/
