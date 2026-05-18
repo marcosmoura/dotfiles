@@ -16,6 +16,17 @@ fi
 
 export TEXT_SEPARATOR="-----------------------------------------"
 
+join_by_char() {
+  local sep="$1"
+  shift
+  local result="$1"
+  shift
+  for arg in "$@"; do
+    result="${result}${sep}${arg}"
+  done
+  echo "$result"
+}
+
 print_text() { echo "${TEXT_RESET}${1}${TEXT_RESET}"; }
 print_yellow() { print_text "${TEXT_YELLOW}${1}"; }
 print_green() { print_text "${TEXT_GREEN}${1}"; }
