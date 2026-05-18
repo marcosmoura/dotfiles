@@ -3,15 +3,47 @@
 
   "instructions": ["~/.config/opencode/rules/*.md"],
 
-  "model": "fireworks-ai/accounts/fireworks/routers/kimi-k2p5-turbo",
-  "small_model": "opencode-go/kimi-k2.5",
+  "model": "openai/gpt-5.5",
+  "small_model": "github-copilot/claude-haiku-4.5",
 
-  "agent": {
-    "explore": {
-      "disable": true
-    },
-    "general": {
-      "disable": true
+  "provider": {
+    "CrofAI": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "CrofAI",
+      "options": {
+        "baseURL": "https://crof.ai/v1",
+        "apiKey": "{file:~/.secrets/crof}"
+      },
+      "models": {
+        "deepseek-v4-pro": {
+          "name": "DeepSeek v4",
+          "limit": { "context": 1000000, "output": 131072 }
+        },
+        "deepseek-v4-pro-precision": {
+          "name": "DeepSeek v4 Precision",
+          "limit": { "context": 1000000, "output": 131072 }
+        },
+        "deepseek-v4-flash": {
+          "name": "DeepSeek v4 Flash",
+          "limit": { "context": 1000000, "output": 131072 }
+        },
+        "kimi-k2.6": {
+          "name": "Kimi k2.6",
+          "limit": { "context": 262144, "output": 262144 }
+        },
+        "kimi-k2.6-precision": {
+          "name": "Kimi k2.6 Precision",
+          "limit": { "context": 262144, "output": 262144 }
+        },
+        "glm-5.1": {
+          "name": "GLM 5.1",
+          "limit": { "context": 202752, "output": 202752 }
+        },
+        "glm-5.1-precision": {
+          "name": "GLM 5.1 Precision",
+          "limit": { "context": 202752, "output": 202752 }
+        }
+      }
     }
   },
 
@@ -25,7 +57,7 @@
       }
     },
 
-    "gh_grep": {
+    "grep": {
       "enabled": true,
       "type": "remote",
       "url": "https://mcp.grep.app"
@@ -95,7 +127,6 @@
   "plugin": [
     "@mohak34/opencode-notifier@latest",
     "@franlol/opencode-md-table-formatter@latest",
-    "@ex-machina/opencode-anthropic-auth@latest",
-    "oh-my-opencode-slim@latest"
+    "superpowers@git+https://github.com/obra/superpowers.git"
   ]
 }
