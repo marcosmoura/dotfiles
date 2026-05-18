@@ -1,0 +1,66 @@
+{
+  "name": "vscode-agent-terminal",
+  "displayName": "Agent Terminal",
+  "description": "Open OpenCode inside VS Code and keep the terminal title in sync with the active session.",
+  "version": "0.0.1",
+  "private": true,
+  "publisher": "local",
+  "license": "MIT",
+  "packageManager": "pnpm@10.33.0",
+  "type": "module",
+  "engines": {
+    "vscode": "^1.114.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "main": "./dist/extension.cjs",
+  "contributes": {
+    "commands": [
+      {
+        "command": "agentTerminal.openOpencode",
+        "title": "OpenCode: Open Terminal",
+        "category": "Agent Terminal",
+        "icon": {
+          "dark": "assets/opencode-dark.svg",
+          "light": "assets/opencode-light.svg"
+        }
+      }
+    ],
+    "menus": {
+      "editor/title": [
+        {
+          "command": "agentTerminal.openOpencode",
+          "group": "navigation"
+        }
+      ],
+      "terminal/title/context": [
+        {
+          "command": "agentTerminal.openOpencode",
+          "group": "1_create"
+        }
+      ],
+      "terminal/context": [
+        {
+          "command": "agentTerminal.openOpencode",
+          "group": "1_create"
+        }
+      ]
+    }
+  },
+  "scripts": {
+    "compile": "tsdown",
+    "watch": "tsdown --watch",
+    "package": "pnpm run compile && pnpm exec vsce package --allow-missing-repository --out dist/vscode-agent-terminal-${npm_package_version}.vsix"
+  },
+  "dependencies": {
+    "node-pty": "^1.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^25.5.2",
+    "@types/vscode": "^1.114.0",
+    "@vscode/vsce": "^3.7.1",
+    "tsdown": "^0.21.7",
+    "typescript": "^6.0.2"
+  }
+}

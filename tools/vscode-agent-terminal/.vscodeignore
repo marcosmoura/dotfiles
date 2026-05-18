@@ -1,0 +1,9 @@
+.gitignore
+.npmrc
+pnpm-lock.yaml
+src/**
+tsconfig.json
+tsdown.config.ts
+*.tsbuildinfo
+dist/*.vsix
+out/**
