@@ -38,6 +38,7 @@
       { "name": "MacBook Pro", "strategy": "startsWith" }
     ],
     "output": [
+      { "name": "SAMSUNG", "strategy": "contains" },
       { "name": "AirPods Pro 3", "strategy": "contains" },
       {
         "name": "External Speakers",
@@ -79,8 +80,13 @@
       },
       {
         "screen": "secondary",
-        "inner": 14,
-        "outer": 14
+        "inner": 24,
+        "outer": {
+          "top": 28,
+          "right": 44,
+          "bottom": 28,
+          "left": 44
+        }
       }
     ],
     "master": {
@@ -128,14 +134,14 @@
       },
       {
         "name": "coding",
-        "layout": "master",
+        "layout": "monocle",
         "screen": "main",
         "rules": [{ "appId": "com.microsoft.VSCode" }, { "appId": "com.cmuxterm.app" }]
       },
       {
         "name": "browser",
         "layout": "monocle",
-        "screen": "main",
+        "screen": "secondary",
         "rules": [{ "appId": "com.microsoft.edgemac.Dev" }, { "appId": "company.thebrowser.dia" }]
       },
       {
@@ -153,7 +159,7 @@
       {
         "name": "misc",
         "layout": "floating",
-        "screen": "main",
+        "screen": "secondary",
         "rules": [
           { "appId": "com.figma.Desktop" },
           { "appId": "com.nuvio.hub" },
@@ -216,7 +222,10 @@
     "Command+Control+R": "stache reload",
 
     // Change wallpaper
-    "Command+Control+Shift+W": "stache wallpaper set --random",
+    "CapsLock+W": "stache wallpaper set --random",
+
+    // Take screenshots and copy to clipboard
+    "Command+Control+S": "screencapture -i -c",
 
     // Switch to workspace
     "Option+1": "stache tiling workspace --focus terminal",

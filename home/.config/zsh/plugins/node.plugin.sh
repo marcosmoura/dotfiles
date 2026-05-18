@@ -2,19 +2,25 @@
 
 source ~/.config/zsh/utils.sh
 
-# pnpm
-export PNPM_HOME="$HOME/Library/pnpm"
-case ":$PATH:" in
-*":$PNPM_HOME:"*) ;;
-*) export PATH="$PNPM_HOME:$PATH" ;;
-esac
-
 # Mise
 if [[ "$TERM_PROGRAM" == "vscode" ]]; then
   eval "$(mise activate zsh --shims)"
 else
   eval "$(mise activate zsh)"
 fi
+
+# bun
+
+[ -s "/Users/marcosmoura/.bun/_bun" ] && source "/Users/marcosmoura/.bun/_bun"
+export BUN_INSTALL="$HOME/.bun"
+export PATH="$BUN_INSTALL/bin:$PATH"
+
+# pnpm
+export PNPM_HOME="/Users/marcosmoura/Library/pnpm"
+case ":$PATH:" in
+*":$PNPM_HOME/bin:"*) ;;
+*) export PATH="$PNPM_HOME/bin:$PATH" ;;
+esac
 
 function print_version {
   local name=$1
