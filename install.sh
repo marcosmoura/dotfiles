@@ -26,7 +26,7 @@ Options:
   --core             Run core scripts only
   --module <name>    Run specific module(s) (can be used multiple times)
 
-Available modules: brew, zsh, node, lua, python, ruby, rust
+Available modules: brew, zsh, node, lua, python, ruby, rust, vscode
 
 Examples:
   $0 --all                    # Run everything
@@ -145,7 +145,7 @@ EOF
 # -----------------------------------------------------------------------------
 # Module Scripts
 # -----------------------------------------------------------------------------
-AVAILABLE_MODULES=(brew zsh node lua python ruby rust)
+AVAILABLE_MODULES=(brew zsh node lua python ruby rust vscode)
 
 function run_module {
   local module="$1"
