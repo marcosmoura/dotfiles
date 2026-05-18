@@ -2,16 +2,19 @@ approval_policy = "on-request"
 sandbox_mode = "workspace-write"
 personality = "pragmatic"
 approvals_reviewer = "guardian_subagent"
-model = "gpt-5.4"
-model_reasoning_effort = "medium"
-plan_mode_reasoning_effort = "medium"
+model = "gpt-5.5"
+model_reasoning_effort = "xhigh"
+plan_mode_reasoning_effort = "xhigh"
+service_tier = "fast"
 
 [sandbox_workspace_write]
 network_access = false
 
 [mcp_servers.context7]
 url = "https://mcp.context7.com/mcp"
-env_http_headers = { "CONTEXT7_API_KEY" = "CONTEXT7_API_KEY" }
+
+[mcp_servers.context7.env_http_headers]
+CONTEXT7_API_KEY = "CONTEXT7_API_KEY"
 
 [mcp_servers.grep]
 url = "https://mcp.grep.app"
@@ -26,6 +29,15 @@ url = "https://mcp.figma.com/mcp"
 [projects."/Users/marcosmoura/Projects/sonora"]
 trust_level = "trusted"
 
+[projects."/Users/marcosmoura/Projects/city-country-search"]
+trust_level = "trusted"
+
+[projects."/Users/marcosmoura/Projects"]
+trust_level = "trusted"
+
+[projects."/Users/marcosmoura/Projects/stache"]
+trust_level = "trusted"
+
 [features]
 guardian_approval = true
 prevent_idle_sleep = true
@@ -34,9 +46,27 @@ multi_agent = true
 [tui]
 status_line = ["model-with-reasoning", "context-remaining", "current-dir", "five-hour-limit", "weekly-limit", "session-id", "fast-mode"]
 
+[tui.model_availability_nux]
+"gpt-5.5" = 4
+
+[notice]
+fast_default_opt_out = true
+
 [notice.model_migrations]
 "gpt-5.1-codex-mini" = "gpt-5.4"
 "gpt-5.3-codex" = "gpt-5.4"
 
 [plugins."figma@openai-curated"]
+enabled = true
+
+[plugins."build-web-apps@openai-curated"]
+enabled = true
+
+[plugins."build-ios-apps@openai-curated"]
+enabled = true
+
+[plugins."build-macos-apps@openai-curated"]
+enabled = true
+
+[plugins."superpowers@openai-curated"]
 enabled = true

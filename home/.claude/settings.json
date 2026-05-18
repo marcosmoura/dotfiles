@@ -59,19 +59,7 @@
       "Bash(chown)"
     ]
   },
-  "hooks": {
-    "PreToolUse": [
-      {
-        "matcher": "Bash",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "~/.claude/hooks/rtk-rewrite.sh"
-          }
-        ]
-      }
-    ]
-  },
+  "model": "sonnet",
   "statusLine": {
     "type": "command",
     "command": "~/.claude/statusline.sh"
@@ -87,7 +75,8 @@
     "github@claude-plugins-official": true,
     "context7@claude-plugins-official": true,
     "feature-dev@claude-plugins-official": true,
-    "playwright@claude-plugins-official": true
+    "playwright@claude-plugins-official": true,
+    "mempalace@mempalace": true
   },
   "extraKnownMarketplaces": {
     "claude-pace-marketplace": {
@@ -95,8 +84,17 @@
         "source": "github",
         "repo": "Astro-Han/claude-pace"
       }
+    },
+    "mempalace": {
+      "source": {
+        "source": "github",
+        "repo": "MemPalace/mempalace"
+      }
     }
   },
   "effortLevel": "high",
-  "promptSuggestionEnabled": false
+  "promptSuggestionEnabled": false,
+  "tui": "default",
+  "verbose": true,
+  "preferredNotifChannel": "ghostty"
 }
