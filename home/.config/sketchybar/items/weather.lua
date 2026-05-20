@@ -4,7 +4,7 @@ local icons = require("icons")
 local hover = require("helpers.hover")
 local popup = require("helpers.popup")
 
-local popup_width = 180
+local popup_width = 250
 
 local weather = sbar.add("item", "weather", {
   position = "right",
@@ -21,10 +21,30 @@ local weather = sbar.add("item", "weather", {
 })
 
 local popup_row_specs = {
-  { key = "condition", icon = icons.weather.default, icon_color = colors.sky, label = "Condition: ..." },
-  { key = "highlow", icon = icons.weather_popup.temperature, icon_color = colors.peach, label = "H/L: ..." },
-  { key = "humidity", icon = icons.weather_popup.humidity, icon_color = colors.blue, label = "Humidity: ..." },
-  { key = "wind", icon = icons.weather_popup.wind, icon_color = colors.teal, label = "Wind: ..." },
+  {
+    key = "condition",
+    icon = icons.weather.default,
+    icon_color = colors.sky,
+    label = "Condition: ..."
+  },
+  {
+    key = "highlow",
+    icon = icons.weather_popup.temperature,
+    icon_color = colors.peach,
+    label = "H/L: ..."
+  },
+  {
+    key = "humidity",
+    icon = icons.weather_popup.humidity,
+    icon_color = colors.blue,
+    label = "Humidity: ..."
+  },
+  {
+    key = "wind",
+    icon = icons.weather_popup.wind,
+    icon_color = colors.teal,
+    label = "Wind: ..."
+  },
 }
 local popup_items = {}
 local popup_rows = {}
