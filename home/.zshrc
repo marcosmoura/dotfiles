@@ -1,20 +1,24 @@
+### BEGIN STRIPE
+# All Stripe related shell configuration
+# is at ~/.stripe/shellinit/zshrc and is
+# persistently managed by Chef. You shouldn't
+# remove this unless you don't want to load
+# Stripe specific shell configurations.
+#
+# Feel free to add your customizations in this
+# file (~/.zshrc) after the Stripe config
+# is sourced.
+if [[ -f ~/.stripe/shellinit/zshrc ]]; then
+  source ~/.stripe/shellinit/zshrc
+fi
+### END STRIPE
+
 # ╔══════════════════════════════════════════════════════════════╗
 # ║  .zshrc — Interactive shell configuration                   ║
 # ║  Loaded for every interactive session (after .zprofile)     ║
 # ╚══════════════════════════════════════════════════════════════╝
 
 ZSH_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/zsh"
-
-# Ensure Homebrew is in PATH for non-login shells (e.g. zsh -i, tmux)
-if [[ -z "$HOMEBREW_PREFIX" ]]; then
-  export HOMEBREW_PREFIX="/opt/homebrew"
-  export HOMEBREW_CELLAR="/opt/homebrew/Cellar"
-  export HOMEBREW_REPOSITORY="/opt/homebrew"
-  export PATH="/opt/homebrew/bin:/opt/homebrew/sbin${PATH+:$PATH}"
-  export MANPATH="/opt/homebrew/share/man${MANPATH+:$MANPATH}:"
-  export INFOPATH="/opt/homebrew/share/info:${INFOPATH:-}"
-  FPATH="/opt/homebrew/share/zsh/site-functions:${FPATH}"
-fi
 
 # History
 source "$ZSH_DIR/history.zsh"
@@ -42,11 +46,3 @@ if [[ -o login ]]; then
   clear
   command -v systeminfo &>/dev/null && systeminfo
 fi
-
-# pnpm
-export PNPM_HOME="/Users/marcosmoura/.local/share/pnpm"
-case ":$PATH:" in
-  *":$PNPM_HOME:"*) ;;
-  *) export PATH="$PNPM_HOME:$PATH" ;;
-esac
-# pnpm end

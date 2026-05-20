@@ -21,3 +21,8 @@ fi
 if command -v direnv &>/dev/null; then
   eval "$(direnv hook zsh)"
 fi
+
+# rbenv
+if command -v rbenv &>/dev/null; then
+  eval "$(rbenv init - zsh)"
+fi
