@@ -1,7 +1,6 @@
 {
   "$schema": "https://json.schemastore.org/claude-code-settings.json",
   "env": {
-    "CLAUDE_CODE_DISABLE_1M_CONTEXT": "1",
     "CLAUDE_CODE_ENABLE_TELEMETRY": "0",
     "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1",
     "CLAUDE_CODE_ATTRIBUTION_HEADER": "0",
@@ -59,7 +58,7 @@
       "Bash(chown)"
     ]
   },
-  "model": "opus",
+  "model": "haiku",
   "statusLine": {
     "type": "command",
     "command": "~/.claude/statusline.sh"
@@ -101,6 +100,6 @@
       }
     }
   },
-  "promptSuggestionEnabled": true,
-  "effortLevel": "high"
+  "effortLevel": "high",
+  "promptSuggestionEnabled": true
 }
