@@ -17,6 +17,6 @@ if [ -z "$workspaces_json" ]; then
   exit 0
 fi
 
-printf '%s\n' "$workspaces_json" \
-  | jq -r '.[] | if type == "object" then .workspace // empty else . end' 2>/dev/null \
-  || true
+printf '%s\n' "$workspaces_json" |
+  jq -r '.[] | if type == "object" then .workspace // empty else . end' 2>/dev/null ||
+  true
