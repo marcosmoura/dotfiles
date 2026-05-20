@@ -103,14 +103,14 @@ outer.left = 12
 # ╚═══════════════════════════════════════════════════════════════════════════════╝
 
 [workspace-to-monitor-force-assignment]
-terminal = 'main'
-coding = 'main'
-browser = 'main'
-design = 'main'
-communication = 'main'
+terminal = 'secondary'
+coding = 'secondary'
+browser = 'secondary'
 
-files = 'secondary'
-tasks = 'secondary'
+communication = 'main'
+design = 'main'
+files = 'main'
+tasks = 'main'
 
 # ╔═══════════════════════════════════════════════════════════════════════════════╗
 # ║                            KEY MAPPING                                        ║
@@ -161,7 +161,7 @@ if.app-id = 'com.tinyspeck.slackmacgap'
 run = 'move-node-to-workspace communication'
 
 [[on-window-detected]]
-if.app-id = 'com.zoom.app'
+if.app-id = 'us.zoom.xos'
 run = 'move-node-to-workspace communication'
 
 # ═══════  Monitor 2 Assignments
@@ -173,15 +173,11 @@ run = 'move-node-to-workspace files'
 
 # Tasks
 [[on-window-detected]]
-if.app-id = 'com.apple.mail'
-run = 'move-node-to-workspace tasks'
-
-[[on-window-detected]]
-if.app-id = 'com.apple.calendar'
-run = 'move-node-to-workspace tasks'
-
-[[on-window-detected]]
 if.app-id = 'com.apple.reminders'
+run = 'move-node-to-workspace tasks'
+
+[[on-window-detected]]
+if.app-id = 'com.1password.1password'
 run = 'move-node-to-workspace tasks'
 
 # ═══════  Floating Layouts
