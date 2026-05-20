@@ -22,10 +22,30 @@ local battery = sbar.add("item", "battery", {
 })
 
 local popup_row_specs = {
-  { key = "health", icon = icons.battery_popup.health, icon_color = colors.green, label = "Health: ..." },
-  { key = "cycles", icon = icons.battery_popup.cycles, icon_color = colors.blue, label = "Cycles: ..." },
-  { key = "temp", icon = icons.battery_popup.temperature, icon_color = colors.peach, label = "Temp: ..." },
-  { key = "remaining", icon = icons.battery_popup.time, icon_color = colors.lavender, label = "Time: ..." },
+  {
+    key = "health",
+    icon = icons.battery_popup.health,
+    icon_color = colors.green,
+    label = "Health: ..."
+  },
+  {
+    key = "cycles",
+    icon = icons.battery_popup.cycles,
+    icon_color = colors.blue,
+    label = "Cycles: ..."
+  },
+  {
+    key = "temp",
+    icon = icons.battery_popup.temperature,
+    icon_color = colors.peach,
+    label = "Temp: ..."
+  },
+  {
+    key = "remaining",
+    icon = icons.battery_popup.time,
+    icon_color = colors.lavender,
+    label = "Time: ..."
+  },
 }
 local popup_items = {}
 local popup_rows = {}
