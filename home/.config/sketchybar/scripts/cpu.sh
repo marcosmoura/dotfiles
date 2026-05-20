@@ -216,7 +216,7 @@ get_summary() {
 }
 
 case "${1:-}" in
-  --detail) get_detail ;;
-  --summary) get_summary ;;
-  *) get_basic ;;
+--detail) get_detail ;;
+--summary) get_summary ;;
+*) get_basic ;;
 esac

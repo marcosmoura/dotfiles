@@ -116,6 +116,6 @@ get_detail() {
 }
 
 case "${1:-}" in
-  --detail) get_detail ;;
-  *) get_basic ;;
+--detail) get_detail ;;
+*) get_basic ;;
 esac
