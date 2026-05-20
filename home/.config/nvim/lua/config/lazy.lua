@@ -88,6 +88,7 @@ require("lazy").setup({
       enabled = true,
     },
     rtp = {
+      reset = false,
       disabled_plugins = {
         "2html_plugin",
         "bugreport",
