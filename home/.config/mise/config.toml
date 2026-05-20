@@ -1,9 +1,8 @@
 [tools]
-ruby = "latest"
 node = "latest"
 python = "latest"
 pnpm = "latest"
 
 [settings]
 experimental = true
-idiomatic_version_file_enable_tools = ["node", "ruby", "python"]
+idiomatic_version_file_enable_tools = ["node", "python"]
