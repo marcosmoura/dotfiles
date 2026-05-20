@@ -37,8 +37,10 @@ local media = sbar.add("item", "media", {
   },
   label = {
     string = "",
-    max_chars = 40,
+    max_chars = 75,
+    scroll_duration = 250
   },
+  scroll_texts = true,
   drawing = false,
   update_freq = 1,
 })
@@ -127,6 +129,12 @@ local function update_media()
     else
       hide_media()
     end
+  end)
+
+  sbar.exec("system_profiler SPDisplaysDataType 2>/dev/null | awk '/Resolution:/{print $2; exit}'", function(result)
+    local width = tonumber(result) / 2 or 0
+    local max_chars = width >= 2100 and 100 or 75
+    media:set({ label = { max_chars = max_chars } })
   end)
 end
 
