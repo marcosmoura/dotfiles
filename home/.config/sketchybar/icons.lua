@@ -12,6 +12,19 @@ return {
     cpu = glyph("F186D"),       -- cpu
     cpu_hot = glyph("F186B"),   -- cpu-charge
     keepawake = glyph("F17EE"), -- coffee-02
+    wifi = glyph("F268B"),           -- wifi-01
+    wifi_connected = glyph("F268E"), -- wifi-connected-01
+    wifi_disconnected = glyph("F2691"), -- wifi-disconnected-01
+    wifi_off = glyph("F269D"),       -- wifi-off-01
+  },
+
+  wifi_popup = {
+    interface = glyph("F268B"), -- wifi-01
+    address = glyph("F1C5E"),   -- internet
+    router = glyph("F21BB"),    -- router
+    dns = glyph("F223F"),       -- server-stack-01
+    security = glyph("F222F"),  -- security-wifi
+    network = glyph("F1B23"),   -- global
   },
 
   battery = {

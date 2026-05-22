@@ -1,8 +1,8 @@
 local sbar = require("sketchybar")
 
-sbar.add("alias", "Control Center,CodeReview", {
+sbar.add("alias", "Control Center,Item-0(10)", {
   position = "right",
-  update_freq = 2,
+  update_freq = 5,
   width = 34,
   icon = {
     padding_left = 0,
@@ -10,7 +10,6 @@ sbar.add("alias", "Control Center,CodeReview", {
   },
   background = {
     width = 34,
-    padding_left = 0,
-    padding_right = 2,
+    padding_right = -10,
   },
 })

@@ -106,9 +106,6 @@ local function update_weather()
     local icon = get_weather_icon(result.icon)
 
     local label = result.feels_like or result.temp or "--"
-    if result.location and result.location ~= "" then
-      label = label .. " (" .. result.location .. ")"
-    end
 
     weather:set({
       icon = { string = icon },

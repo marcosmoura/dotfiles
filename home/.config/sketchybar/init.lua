@@ -98,10 +98,11 @@ require("items.media")
 
 -- Load items (RIGHT section)
 require("items.clock")
+require("items.wifi")
+require("items.weather")
 require("items.battery")
 require("items.cpu")
 require("items.keepawake")
-require("items.weather")
 require("items.status_aliases")
 
 sbar.end_config()
