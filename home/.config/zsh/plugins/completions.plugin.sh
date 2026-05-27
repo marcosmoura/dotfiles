@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 # Sheldon
 eval "$(sheldon completions --shell zsh)" >/dev/null 2>&1
 

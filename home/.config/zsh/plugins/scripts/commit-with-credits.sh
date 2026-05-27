@@ -33,6 +33,6 @@ fi
 
 print_start "Commiting as $COMMIT_AUTHOR \n"
 
-git commit --author "$COMMIT_AUTHOR" -m $COMMIT_MESSAGE $4
+git commit --author "$COMMIT_AUTHOR" -m "$COMMIT_MESSAGE" "${@:4}"
 
 print_success "Done!"

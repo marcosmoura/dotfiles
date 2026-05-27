@@ -45,7 +45,7 @@ authenticateBeforeUpdate() {
   print_text "🔑 Authenticating"
   sudo -v || {
     print_error "Failed to acquire sudo credentials"
-    exit 1
+    return 1
   }
 
   if [ -n "${SUDO_KEEPALIVE_PID:-}" ] && kill -0 "${SUDO_KEEPALIVE_PID}" 2>/dev/null; then

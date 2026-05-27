@@ -20,8 +20,8 @@ fi
 print_start "Syncing fork on $TARGET_BRANCH branch \n"
 
 git fetch upstream -p
-git checkout $TARGET_BRANCH 2>/dev/null
-git rebase upstream/$TARGET_BRANCH $TARGET_BRANCH
+git switch "$TARGET_BRANCH" 2>/dev/null
+git rebase "upstream/$TARGET_BRANCH" "$TARGET_BRANCH"
 git po
 
 print_success "$TARGET_BRANCH branch updated!"

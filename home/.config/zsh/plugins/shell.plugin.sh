@@ -58,7 +58,12 @@ alias tree="tree --gitignore --dirsfirst --sort name -C"
 
 # Create a .tar.gz archive, using `zopfli`, `pigz` or `gzip` for compression
 function targz() {
-  local tmpFile="${@%/}.tar"
+  if [[ $# -eq 0 ]]; then
+    echo "Usage: targz <path> [path ...]" >&2
+    return 1
+  fi
+
+  local tmpFile="${1%/}.tar"
   tar -cvf "${tmpFile}" --exclude=".DS_Store" "${@}" || return 1
 
   size=$(
