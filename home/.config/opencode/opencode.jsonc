@@ -16,32 +16,53 @@
       },
       "models": {
         "deepseek-v4-pro": {
-          "name": "DeepSeek v4",
-          "limit": { "context": 1000000, "output": 131072 }
+          "name": "DeepSeek v4 Pro",
+          "limit": {
+            "context": 1000000,
+            "output": 131072
+          }
         },
         "deepseek-v4-pro-precision": {
-          "name": "DeepSeek v4 Precision",
-          "limit": { "context": 1000000, "output": 131072 }
+          "name": "DeepSeek v4 Pro Precision",
+          "limit": {
+            "context": 1000000,
+            "output": 131072
+          }
         },
         "deepseek-v4-flash": {
           "name": "DeepSeek v4 Flash",
-          "limit": { "context": 1000000, "output": 131072 }
+          "limit": {
+            "context": 1000000,
+            "output": 131072
+          }
         },
         "kimi-k2.6": {
           "name": "Kimi k2.6",
-          "limit": { "context": 262144, "output": 262144 }
+          "limit": {
+            "context": 262144,
+            "output": 262144
+          }
         },
         "kimi-k2.6-precision": {
           "name": "Kimi k2.6 Precision",
-          "limit": { "context": 262144, "output": 262144 }
+          "limit": {
+            "context": 262144,
+            "output": 262144
+          }
         },
         "glm-5.1": {
           "name": "GLM 5.1",
-          "limit": { "context": 202752, "output": 202752 }
+          "limit": {
+            "context": 202752,
+            "output": 202752
+          }
         },
         "glm-5.1-precision": {
           "name": "GLM 5.1 Precision",
-          "limit": { "context": 202752, "output": 202752 }
+          "limit": {
+            "context": 202752,
+            "output": 202752
+          }
         }
       }
     }
@@ -127,6 +148,8 @@
   "plugin": [
     "@mohak34/opencode-notifier@latest",
     "@franlol/opencode-md-table-formatter@latest",
-    "superpowers@git+https://github.com/obra/superpowers.git"
+    "superpowers@git+https://github.com/obra/superpowers.git",
+    "opencode-skills@latest",
+    "@tarquinen/opencode-dcp@latest"
   ]
 }
