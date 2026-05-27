@@ -11,6 +11,7 @@ service_tier = "fast"
 network_access = false
 
 [mcp_servers.context7]
+type = "http"
 url = "https://mcp.context7.com/mcp"
 
 [mcp_servers.context7.env_http_headers]
@@ -44,7 +45,15 @@ prevent_idle_sleep = true
 multi_agent = true
 
 [tui]
-status_line = ["model-with-reasoning", "context-remaining", "current-dir", "five-hour-limit", "weekly-limit", "session-id", "fast-mode"]
+status_line = [
+  "model-with-reasoning",
+  "context-remaining",
+  "current-dir",
+  "five-hour-limit",
+  "weekly-limit",
+  "session-id",
+  "fast-mode",
+]
 
 [tui.model_availability_nux]
 "gpt-5.5" = 4
