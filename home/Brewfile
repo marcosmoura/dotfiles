@@ -11,6 +11,7 @@ tap "nextdns/tap"
 brew "atuin"
 brew "bash"
 brew "bat"
+brew "borders", args: ["HEAD"]
 brew "btop"
 brew "chafa"
 brew "cloc"
@@ -54,6 +55,7 @@ brew "lua"
 brew "luajit"
 brew "luarocks"
 brew "mas"
+brew "media-control", args: ["HEAD"]
 brew "mise"
 brew "mole"
 brew "moreutils"
@@ -97,10 +99,6 @@ brew "yq"
 brew "zig"
 brew "zoxide"
 
-# Head-only formulas
-brew "borders", args: ["HEAD"]
-brew "media-control", args: ["HEAD"]
-
 # Applications
 cask "adguard"
 cask "betterdisplay"
@@ -139,6 +137,7 @@ cask "raycast"
 cask "rustdesk"
 cask "sf-symbols"
 cask "shottr"
+cask "spotify"
 cask "thebrowsercompany-dia"
 cask "tidal"
 cask "transmission@beta"

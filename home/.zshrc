@@ -31,3 +31,6 @@ if [[ -o login ]]; then
   clear
   command -v systeminfo &>/dev/null && systeminfo
 fi
+
+# bun completions
+[ -s "/Users/marcosmoura/.bun/_bun" ] && source "/Users/marcosmoura/.bun/_bun"

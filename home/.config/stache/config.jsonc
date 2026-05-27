@@ -68,9 +68,14 @@
       "unfocused": false,
       "focused": {
         "width": 6,
-        "gradient": { "from": "#cba6f7", "to": "#a6e3a1", "angle": 180 }
+        "gradient": { "from": "#f9e2af", "to": "#a6e3a1", "angle": 180 },
+        "animation": { "duration": 2000 }
       },
-      "monocle": { "width": 6, "color": "#89b4fa" }
+      "monocle": {
+        "width": 6,
+        "gradient": { "from": "#89dceb", "to": "#cba6f7", "angle": 180 },
+        "animation": { "duration": 2000 }
+      }
     },
     "gaps": [
       {
@@ -80,13 +85,8 @@
       },
       {
         "screen": "secondary",
-        "inner": 24,
-        "outer": {
-          "top": 28,
-          "right": 44,
-          "bottom": 28,
-          "left": 44
-        }
+        "inner": 10,
+        "outer": 10
       }
     ],
     "master": {
@@ -148,7 +148,7 @@
         "name": "music",
         "layout": "monocle",
         "screen": "main",
-        "rules": [{ "appId": "org.jeffvli.feishin" }]
+        "rules": [{ "appId": "org.jeffvli.feishin" }, { "appId": "com.debridmusic.app" }]
       },
       {
         "name": "communication",
