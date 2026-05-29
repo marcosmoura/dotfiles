@@ -25,8 +25,11 @@ after-startup-command = [
   'workspace design',
   'layout tiles',
 
+  'workspace music',
+  'layout accordion',
+
   'workspace communication',
-  'layout tiles',
+  'layout accordion',
 
   'workspace files',
   'layout tiles',
@@ -52,6 +55,7 @@ persistent-workspaces = [
   "coding",
   "browser",
   "design",
+  "music",
   "communication",
   "files",
   "tasks",
@@ -155,6 +159,11 @@ run = 'move-node-to-workspace browser'
 if.app-id = 'com.figma.Desktop'
 run = 'move-node-to-workspace design'
 
+# Music
+[[on-window-detected]]
+if.app-id = 'com.spotify.client'
+run = 'move-node-to-workspace music'
+
 # Communication
 [[on-window-detected]]
 if.app-id = 'com.tinyspeck.slackmacgap'
@@ -198,17 +207,19 @@ alt-1 = 'workspace terminal'
 alt-2 = 'workspace coding'
 alt-3 = 'workspace browser'
 alt-4 = 'workspace design'
-alt-5 = 'workspace communication'
-alt-6 = 'workspace files'
-alt-7 = 'workspace tasks'
+alt-5 = 'workspace music'
+alt-6 = 'workspace communication'
+alt-7 = 'workspace files'
+alt-8 = 'workspace tasks'
 
 alt-shift-1 = 'move-node-to-workspace terminal --focus-follows-window'
 alt-shift-2 = 'move-node-to-workspace coding --focus-follows-window'
 alt-shift-3 = 'move-node-to-workspace browser --focus-follows-window'
 alt-shift-4 = 'move-node-to-workspace design --focus-follows-window'
-alt-shift-5 = 'move-node-to-workspace communication --focus-follows-window'
-alt-shift-6 = 'move-node-to-workspace files --focus-follows-window'
-alt-shift-7 = 'move-node-to-workspace tasks --focus-follows-window'
+alt-shift-5 = 'move-node-to-workspace music --focus-follows-window'
+alt-shift-6 = 'move-node-to-workspace communication --focus-follows-window'
+alt-shift-7 = 'move-node-to-workspace files --focus-follows-window'
+alt-shift-8 = 'move-node-to-workspace tasks --focus-follows-window'
 
 # ═══════  Wallpaper
 cmd-ctrl-shift-w = 'exec-and-forget ~/.config/aerospace/scripts/wallpaper.sh set --random --radius 12'
