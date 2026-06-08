@@ -8,14 +8,14 @@ return {
   },
 
   status = {
-    clock = glyph("F24FA"),     -- time-03
-    cpu = glyph("F186D"),       -- cpu
-    cpu_hot = glyph("F186B"),   -- cpu-charge
-    keepawake = glyph("F17EE"), -- coffee-02
-    wifi = glyph("F268B"),           -- wifi-01
-    wifi_connected = glyph("F268E"), -- wifi-connected-01
+    clock = glyph("F24FA"),             -- time-03
+    cpu = glyph("F186D"),               -- cpu
+    cpu_hot = glyph("F186B"),           -- cpu-charge
+    keepawake = glyph("F17EE"),         -- coffee-02
+    wifi = glyph("F268B"),              -- wifi-01
+    wifi_connected = glyph("F268E"),    -- wifi-connected-01
     wifi_disconnected = glyph("F2691"), -- wifi-disconnected-01
-    wifi_off = glyph("F269D"),       -- wifi-off-01
+    wifi_off = glyph("F269D"),          -- wifi-off-01
   },
 
   wifi_popup = {
@@ -81,7 +81,7 @@ return {
     terminal = glyph("F2332"),      -- source-code-square (closest fallback for missing computer-terminal-01)
     coding = glyph("F17E8"),        -- code-simple
     browser = glyph("F1373"),       -- ai-browser
-    music = glyph("F1F29"),         -- music-note-03
+    music = glyph("F2348"),         -- spotify
     design = glyph("F1A15"),        -- figma
     communication = glyph("F1E47"), -- message-multiple-01
     guitar = glyph("F2641"),        -- vynil-02
@@ -92,42 +92,42 @@ return {
   },
 
   app = {
-    ["Ableton Live"] = glyph("F1F28"),          -- music-note-02
-    ["Activity Monitor"] = glyph("F1403"),      -- analytics-01
-    ["App Store"] = glyph("F1415"),             -- app-store
-    ["Archetype Gojira X"] = glyph("F1F28"),    -- music-note-02
-    ["Archetype John Mayer X"] = glyph("F1F28"), -- music-note-02
-    ["Archetype Nolly X"] = glyph("F1F28"),     -- music-note-02
-    ["Audio MIDI Setup"] = glyph("F1E84"),      -- mixer
-    ["Bloom"] = glyph("F1AAD"),                 -- folder-01
-    ["Code"] = glyph("F262F"),                  -- visual-studio-code
-    ["Dia"] = glyph("F1427"),                   -- arc-browser
-    ["Discord"] = glyph("F193C"),               -- discord
-    ["Feishin"] = glyph("F1F28"),               -- music-note-02
-    ["Finder"] = glyph("F1417"),                -- apple-finder
-    ["Figma"] = glyph("F1A15"),                 -- figma
+    ["Ableton Live"] = glyph("F1F28"),            -- music-note-02
+    ["Activity Monitor"] = glyph("F1403"),        -- analytics-01
+    ["App Store"] = glyph("F1415"),               -- app-store
+    ["Archetype Gojira X"] = glyph("F1F28"),      -- music-note-02
+    ["Archetype John Mayer X"] = glyph("F1F28"),  -- music-note-02
+    ["Archetype Nolly X"] = glyph("F1F28"),       -- music-note-02
+    ["Audio MIDI Setup"] = glyph("F1E84"),        -- mixer
+    ["Bloom"] = glyph("F1AAD"),                   -- folder-01
+    ["Code"] = glyph("F262F"),                    -- visual-studio-code
+    ["Dia"] = glyph("F1427"),                     -- arc-browser
+    ["Discord"] = glyph("F193C"),                 -- discord
+    ["Feishin"] = glyph("F1F28"),                 -- music-note-02
+    ["Finder"] = glyph("F1417"),                  -- apple-finder
+    ["Figma"] = glyph("F1A15"),                   -- figma
     ["Fortin Nameless Suite X"] = glyph("F1F28"), -- music-note-02
-    ["Ghostty"] = glyph("F2332"),               -- source-code-square (closest fallback for missing computer-terminal-01)
-    ["Google Chrome"] = glyph("F176C"),         -- chrome
-    ["Calendar"] = glyph("F1631"),              -- calendar-03
-    ["Mail"] = glyph("F1DA3"),                  -- mail-01
-    ["Microsoft Edge Dev"] = glyph("F15F0"),    -- browser
-    ["Proton Drive"] = glyph("F1B8E"),          -- hard-drive
-    ["Proton Pass"] = glyph("F222C"),           -- security-password
-    ["Proton VPN"] = glyph("F2227"),            -- secured-network
-    ["Reminders"] = glyph("F141C"),             -- apple-reminder
-    ["Safari"] = glyph("F21D0"),                -- safari
-    ["Settings"] = glyph("F224C"),              -- settings-01
-    ["System Preferences"] = glyph("F224C"),    -- settings-01
-    ["System Settings"] = glyph("F224C"),       -- settings-01
-    ["Slack"] = glyph("F22E7"),                 -- slack
-    ["Soldano SLO100 X"] = glyph("F1F28"),      -- music-note-02
-    ["Spotify"] = glyph("F2348"),               -- spotify
-    ["TIDAL"] = glyph("F2641"),                 -- vynil-02
-    ["Transmission"] = glyph("F196D"),          -- download-01
-    ["Visual Studio Code"] = glyph("F262F"),    -- visual-studio-code
-    ["WhatsApp"] = glyph("F2684"),              -- whatsapp
-    ["Zed Preview"] = glyph("F17E9"),           -- code-square
-    ["Zoom"] = glyph("F26F9"),                  -- zoom
+    ["Ghostty"] = glyph("F2332"),                 -- source-code-square (closest fallback for missing computer-terminal-01)
+    ["Google Chrome"] = glyph("F176C"),           -- chrome
+    ["Calendar"] = glyph("F1631"),                -- calendar-03
+    ["Mail"] = glyph("F1DA3"),                    -- mail-01
+    ["Microsoft Edge Dev"] = glyph("F15F0"),      -- browser
+    ["Proton Drive"] = glyph("F1B8E"),            -- hard-drive
+    ["Proton Pass"] = glyph("F222C"),             -- security-password
+    ["Proton VPN"] = glyph("F2227"),              -- secured-network
+    ["Reminders"] = glyph("F141C"),               -- apple-reminder
+    ["Safari"] = glyph("F21D0"),                  -- safari
+    ["Settings"] = glyph("F224C"),                -- settings-01
+    ["System Preferences"] = glyph("F224C"),      -- settings-01
+    ["System Settings"] = glyph("F224C"),         -- settings-01
+    ["Slack"] = glyph("F22E7"),                   -- slack
+    ["Soldano SLO100 X"] = glyph("F1F28"),        -- music-note-02
+    ["Spotify"] = glyph("F2348"),                 -- spotify
+    ["TIDAL"] = glyph("F2641"),                   -- vynil-02
+    ["Transmission"] = glyph("F196D"),            -- download-01
+    ["Visual Studio Code"] = glyph("F262F"),      -- visual-studio-code
+    ["WhatsApp"] = glyph("F2684"),                -- whatsapp
+    ["Zed Preview"] = glyph("F17E9"),             -- code-square
+    ["Zoom"] = glyph("F26F9"),                    -- zoom
   },
 }

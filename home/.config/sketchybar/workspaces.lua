@@ -3,6 +3,7 @@ local names = {
   "coding",
   "browser",
   "design",
+  "music",
   "communication",
   "files",
   "tasks",
