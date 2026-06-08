@@ -2,7 +2,7 @@ approval_policy = "on-request"
 sandbox_mode = "workspace-write"
 personality = "pragmatic"
 approvals_reviewer = "guardian_subagent"
-model = "gpt-5.5"
+model = "gpt-5.4-mini"
 model_reasoning_effort = "medium"
 plan_mode_reasoning_effort = "medium"
 
@@ -41,3 +41,15 @@ status_line = [
 
 [plugins."superpowers@openai-curated"]
 enabled = true
+
+[projects."/Users/marcosmoura/Projects/dotfiles"]
+trust_level = "trusted"
+
+[projects."/Users/marcosmoura/stripe/mint"]
+trust_level = "trusted"
+
+[marketplaces.stripe-internal-marketplace]
+last_updated = "2026-06-08T09:52:05Z"
+last_revision = "f5ddf4ed183788bca11bdf828cb30833c22ea682"
+source_type = "git"
+source = "http://codex-marketplace--northwest.corp.stripe.com.certproxy.localhost:7891/codex-marketplace.git"
