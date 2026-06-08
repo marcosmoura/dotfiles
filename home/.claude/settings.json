@@ -1,15 +1,54 @@
 {
   "$schema": "https://json.schemastore.org/claude-code-settings.json",
-  "env": {
-    "CLAUDE_CODE_ENABLE_TELEMETRY": "0",
-    "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1",
-    "CLAUDE_CODE_ATTRIBUTION_HEADER": "0",
-    "CLAUDE_CODE_NO_FLICKER": "1"
-  },
   "attribution": {
     "commit": "",
     "pr": ""
   },
+  "effortLevel": "high",
+  "enabledPlugins": {
+    "anthropic-commit-commands@stripe-internal-marketplace": true,
+    "claude-md-management@claude-plugins-official": true,
+    "claude-pace@claude-pace-marketplace": true,
+    "code-review@claude-plugins-official": true,
+    "code-simplifier@claude-plugins-official": true,
+    "commit-commands@claude-plugins-official": true,
+    "context7@claude-plugins-official": true,
+    "feature-dev@claude-plugins-official": true,
+    "figma@claude-plugins-official": true,
+    "frontend-design@claude-plugins-official": true,
+    "github@claude-plugins-official": true,
+    "lua-lsp@claude-plugins-official": true,
+    "playwright@claude-plugins-official": true,
+    "sail-core@stripe-internal-marketplace": true,
+    "sail-deprecated-migration@stripe-internal-marketplace": true,
+    "sail-ui-team@stripe-internal-marketplace": true,
+    "sail@stripe-internal-marketplace": true,
+    "security-guidance@claude-plugins-official": true,
+    "slack@claude-plugins-official": true,
+    "superpowers@claude-plugins-official": true,
+    "typescript-lsp@claude-plugins-official": true
+  },
+  "env": {
+    "CLAUDE_CODE_ATTRIBUTION_HEADER": "0",
+    "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1",
+    "CLAUDE_CODE_ENABLE_TELEMETRY": "0",
+    "CLAUDE_CODE_NO_FLICKER": "1"
+  },
+  "extraKnownMarketplaces": {
+    "claude-pace-marketplace": {
+      "source": {
+        "repo": "Astro-Han/claude-pace",
+        "source": "github"
+      }
+    },
+    "claude-plugins-official": {
+      "source": {
+        "repo": "anthropics/claude-plugins-official",
+        "source": "github"
+      }
+    }
+  },
+  "model": "sonnet",
   "permissions": {
     "allow": [
       "Bash(cat *)",
@@ -46,60 +85,21 @@
       "WebSearch",
       "Write"
     ],
-    "deny": [
-      "Bash(dd *)",
-      "Bash(mkfs *)",
-      "Bash(> /dev/sda*)"
-    ],
     "ask": [
       "Bash(sudo *)",
       "Bash(rm -rf *)",
       "Bash(chmod)",
       "Bash(chown)"
+    ],
+    "deny": [
+      "Bash(dd *)",
+      "Bash(mkfs *)",
+      "Bash(\u003e /dev/sda*)"
     ]
   },
-  "model": "haiku",
+  "promptSuggestionEnabled": true,
   "statusLine": {
-    "type": "command",
-    "command": "~/.claude/statusline.sh"
-  },
-  "enabledPlugins": {
-    "anthropic-commit-commands@stripe-internal-marketplace": true,
-    "claude-md-management@claude-plugins-official": true,
-    "claude-pace@claude-pace-marketplace": true,
-    "code-review@claude-plugins-official": true,
-    "code-simplifier@claude-plugins-official": true,
-    "commit-commands@claude-plugins-official": true,
-    "context7@claude-plugins-official": true,
-    "feature-dev@claude-plugins-official": true,
-    "figma@claude-plugins-official": true,
-    "frontend-design@claude-plugins-official": true,
-    "github@claude-plugins-official": true,
-    "lua-lsp@claude-plugins-official": true,
-    "playwright@claude-plugins-official": true,
-    "sail-core@stripe-internal-marketplace": true,
-    "sail-deprecated-migration@stripe-internal-marketplace": true,
-    "sail-ui-team@stripe-internal-marketplace": true,
-    "sail@stripe-internal-marketplace": true,
-    "security-guidance@claude-plugins-official": true,
-    "slack@claude-plugins-official": true,
-    "superpowers@claude-plugins-official": true,
-    "typescript-lsp@claude-plugins-official": true
-  },
-  "extraKnownMarketplaces": {
-    "claude-pace-marketplace": {
-      "source": {
-        "source": "github",
-        "repo": "Astro-Han/claude-pace"
-      }
-    },
-    "claude-plugins-official": {
-      "source": {
-        "source": "github",
-        "repo": "anthropics/claude-plugins-official"
-      }
-    }
-  },
-  "effortLevel": "high",
-  "promptSuggestionEnabled": true
+    "command": "~/.claude/statusline.sh",
+    "type": "command"
+  }
 }
