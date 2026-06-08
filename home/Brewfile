@@ -5,7 +5,7 @@ tap "stripe-internal/tap"
 brew "awscli"
 brew "bash"
 brew "bat"
-brew "borders"
+brew "borders", args: ["HEAD"]
 brew "btop"
 brew "buildifier"
 brew "buildozer"
@@ -83,7 +83,7 @@ brew "rustup"
 brew "semgrep"
 brew "shellcheck"
 brew "shfmt"
-brew "sketchybar", restart_service: true
+brew "sketchybar", args: ["HEAD"], restart_service: true
 brew "starship"
 brew "terminal-notifier"
 brew "thrift"
