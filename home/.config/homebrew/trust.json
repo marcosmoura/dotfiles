@@ -1,0 +1,11 @@
+{
+  "trustedtaps": [
+    "eth-p/software",
+    "felixkratz/formulae",
+    "githubutilities/tap",
+    "kgarner7/feishin",
+    "marcosmoura/tap",
+    "narugit/tap",
+    "nextdns/tap"
+  ]
+}
