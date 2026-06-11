@@ -38,9 +38,6 @@ return {
     opts = {
       servers = {
         eslint = {
-          settings = {
-            useFlatConfig = false,
-          },
         },
       },
     },
