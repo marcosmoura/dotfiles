@@ -17,6 +17,7 @@ return {
         "luacheck",
         "markdown-toc",
         "marksman",
+        "oxfmt",
         "oxlint",
         "prettier",
         "prettierd",
