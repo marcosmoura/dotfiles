@@ -136,7 +136,7 @@
         "name": "coding",
         "layout": "monocle",
         "screen": "main",
-        "rules": [{ "appId": "com.microsoft.VSCode" }, { "appId": "com.cmuxterm.app" }]
+        "rules": [{ "appId": "com.microsoft.VSCode" }]
       },
       {
         "name": "browser",
@@ -148,7 +148,7 @@
         "name": "music",
         "layout": "monocle",
         "screen": "main",
-        "rules": [{ "appId": "org.jeffvli.feishin" }, { "appId": "com.debridmusic.app" }]
+        "rules": [{ "appId": "com.spotify.client" }]
       },
       {
         "name": "communication",
@@ -162,10 +162,9 @@
         "screen": "secondary",
         "rules": [
           { "appId": "com.figma.Desktop" },
-          { "appId": "com.nuvio.hub" },
+          { "appId": "com.nuvio.media.desktop" },
           { "appId": "com.westbridge.stremio5-mac" },
-          { "appId": "org.m0k.transmission" },
-          { "appId": "win.stkc.omni" }
+          { "appId": "org.m0k.transmission" }
         ]
       },
       {
