@@ -1,155 +1,124 @@
 {
   "$schema": "https://opencode.ai/config.json",
-
   "instructions": ["~/.config/opencode/rules/*.md"],
 
-  "model": "openai/gpt-5.5",
-  "small_model": "github-copilot/claude-haiku-4.5",
+  "model": "openai/gpt-5.6-terra",
 
-  "provider": {
-    "CrofAI": {
-      "npm": "@ai-sdk/openai-compatible",
-      "name": "CrofAI",
-      "options": {
-        "baseURL": "https://crof.ai/v1",
-        "apiKey": "{file:~/.secrets/crof}"
-      },
-      "models": {
-        "deepseek-v4-pro": {
-          "name": "DeepSeek v4 Pro",
-          "limit": {
-            "context": 1000000,
-            "output": 131072
-          }
-        },
-        "deepseek-v4-pro-precision": {
-          "name": "DeepSeek v4 Pro Precision",
-          "limit": {
-            "context": 1000000,
-            "output": 131072
-          }
-        },
-        "deepseek-v4-flash": {
-          "name": "DeepSeek v4 Flash",
-          "limit": {
-            "context": 1000000,
-            "output": 131072
-          }
-        },
-        "kimi-k2.6": {
-          "name": "Kimi k2.6",
-          "limit": {
-            "context": 262144,
-            "output": 262144
-          }
-        },
-        "kimi-k2.6-precision": {
-          "name": "Kimi k2.6 Precision",
-          "limit": {
-            "context": 262144,
-            "output": 262144
-          }
-        },
-        "glm-5.1": {
-          "name": "GLM 5.1",
-          "limit": {
-            "context": 202752,
-            "output": 202752
-          }
-        },
-        "glm-5.1-precision": {
-          "name": "GLM 5.1 Precision",
-          "limit": {
-            "context": 202752,
-            "output": 202752
-          }
-        }
-      }
+  "agents": {
+    "title": {
+      "model": "opencode-go/deepseek-v4-flash"
+    },
+
+    "plan": {
+      "model": "openai/gpt-5.6-sol#high"
+    },
+
+    "build": {
+      "model": "opencode-go/deepseek-v4-flash#high"
+    },
+
+    "explore": {
+      "model": "opencode-go/deepseek-v4-flash#low"
+    },
+
+    "compaction": {
+      "model": "opencode-go/gpt-5.6-luna#xhigh"
+    },
+
+    "general": {
+      "model": "opencode-go/deepseek-v4-flash#high"
     }
   },
 
   "mcp": {
-    "context7": {
-      "type": "remote",
-      "url": "https://mcp.context7.com/mcp",
-      "enabled": true,
-      "headers": {
-        "CONTEXT7_API_KEY": "{file:~/.secrets/context7-key}"
-      }
-    },
+    "servers": {
+      "context7": {
+        "type": "remote",
+        "url": "https://mcp.context7.com/mcp",
+        "disabled": false,
+        "headers": {
+          "CONTEXT7_API_KEY": "{file:~/.secrets/context7-key}"
+        }
+      },
 
-    "grep": {
-      "enabled": true,
-      "type": "remote",
-      "url": "https://mcp.grep.app"
-    },
+      "grep": {
+        "type": "remote",
+        "url": "https://mcp.grep.app",
+        "disabled": false
+      },
 
-    "github": {
-      "enabled": true,
-      "type": "remote",
-      "url": "https://api.githubcopilot.com/mcp/",
-      "headers": {
-        "Authorization": "{file:~/.secrets/gh-pat-key}"
+      "github": {
+        "type": "remote",
+        "url": "https://api.githubcopilot.com/mcp/",
+        "disabled": false,
+        "headers": {
+          "Authorization": "{file:~/.secrets/gh-pat-key}"
+        }
+      },
+
+      "shoogle": {
+        "type": "remote",
+        "url": "https://mcp.shoogle.dev/mcp",
+        "disabled": false
       }
     }
   },
 
-  "permission": {
-    "bash": {
-      "*": "allow",
-      "echo *": "allow",
-      "git worktree *": "allow",
-      "git branch *": "allow",
-      "grep *": "allow",
-      "git -C *": "allow",
-      "cargo check *": "allow",
-      "cargo test *": "allow",
-      "gh pr create *": "allow",
-      "cat *": "allow",
-      "git rev-parse *": "allow",
-      "git ls-remote *": "allow",
-      "chmod *": "ask",
-      "chown *": "ask",
-      "fd *": "allow",
-      "find . *": "allow",
-      "git diff*": "allow",
-      "git log*": "allow",
-      "git show*": "allow",
-      "git status*": "allow",
-      "grep -r *": "allow",
-      "head *": "allow",
-      "ls *": "allow",
-      "node -e *": "allow",
-      "pwd": "allow",
-      "python -c *": "allow",
-      "rg *": "allow",
-      "rm -rf *": "deny",
-      "sudo *": "deny",
-      "tail *": "allow",
-      "type *": "allow",
-      "wc *": "allow",
-      "which *": "allow"
-    },
-    "codesearch": "allow",
-    "edit": "allow",
-    "glob": "allow",
-    "grep": "allow",
-    "list": "allow",
-    "lsp": "allow",
-    "read": "allow",
-    "skill": "allow",
-    "task": "allow",
-    "todoread": "allow",
-    "todowrite": "allow",
-    "webfetch": "allow",
-    "websearch": "allow"
-  },
+  "permissions": [
+    { "action": "shell", "resource": "*", "effect": "allow" },
+    { "action": "shell", "resource": "echo *", "effect": "allow" },
+    { "action": "shell", "resource": "git worktree *", "effect": "allow" },
+    { "action": "shell", "resource": "git branch *", "effect": "allow" },
+    { "action": "shell", "resource": "grep *", "effect": "allow" },
+    { "action": "shell", "resource": "git -C *", "effect": "allow" },
+    { "action": "shell", "resource": "cargo check *", "effect": "allow" },
+    { "action": "shell", "resource": "cargo test *", "effect": "allow" },
+    { "action": "shell", "resource": "gh pr create *", "effect": "allow" },
+    { "action": "shell", "resource": "cat *", "effect": "allow" },
+    { "action": "shell", "resource": "git rev-parse *", "effect": "allow" },
+    { "action": "shell", "resource": "git ls-remote *", "effect": "allow" },
+    { "action": "shell", "resource": "chmod *", "effect": "ask" },
+    { "action": "shell", "resource": "chown *", "effect": "ask" },
+    { "action": "shell", "resource": "fd *", "effect": "allow" },
+    { "action": "shell", "resource": "find . *", "effect": "allow" },
+    { "action": "shell", "resource": "git diff*", "effect": "allow" },
+    { "action": "shell", "resource": "git log*", "effect": "allow" },
+    { "action": "shell", "resource": "git show*", "effect": "allow" },
+    { "action": "shell", "resource": "git status*", "effect": "allow" },
+    { "action": "shell", "resource": "grep -r *", "effect": "allow" },
+    { "action": "shell", "resource": "head *", "effect": "allow" },
+    { "action": "shell", "resource": "ls *", "effect": "allow" },
+    { "action": "shell", "resource": "node -e *", "effect": "allow" },
+    { "action": "shell", "resource": "pwd", "effect": "allow" },
+    { "action": "shell", "resource": "python -c *", "effect": "allow" },
+    { "action": "shell", "resource": "rg *", "effect": "allow" },
+    { "action": "shell", "resource": "rm -rf *", "effect": "deny" },
+    { "action": "shell", "resource": "sudo *", "effect": "deny" },
+    { "action": "shell", "resource": "tail *", "effect": "allow" },
+    { "action": "shell", "resource": "type *", "effect": "allow" },
+    { "action": "shell", "resource": "wc *", "effect": "allow" },
+    { "action": "shell", "resource": "which *", "effect": "allow" },
+    { "action": "codesearch", "resource": "*", "effect": "allow" },
+    { "action": "edit", "resource": "*", "effect": "allow" },
+    { "action": "glob", "resource": "*", "effect": "allow" },
+    { "action": "grep", "resource": "*", "effect": "allow" },
+    { "action": "list", "resource": "*", "effect": "allow" },
+    { "action": "lsp", "resource": "*", "effect": "allow" },
+    { "action": "read", "resource": "*", "effect": "allow" },
+    { "action": "skill", "resource": "*", "effect": "allow" },
+    { "action": "subagent", "resource": "*", "effect": "allow" },
+    { "action": "todoread", "resource": "*", "effect": "allow" },
+    { "action": "todowrite", "resource": "*", "effect": "allow" },
+    { "action": "webfetch", "resource": "*", "effect": "allow" },
+    { "action": "websearch", "resource": "*", "effect": "allow" }
+  ],
 
-  "plugin": [
-    "@mohak34/opencode-notifier@latest",
-    "@franlol/opencode-md-table-formatter@latest",
+  "plugins": [
     "superpowers@git+https://github.com/obra/superpowers.git",
-    "opencode-skills@latest",
-    "@tarquinen/opencode-dcp@latest"
-  ]
+    "@franlol/opencode-md-table-formatter@latest",
+    "opencode-herdr",
+    "opencode-skills@latest"
+  ],
+
+  "lsp": true
 }
