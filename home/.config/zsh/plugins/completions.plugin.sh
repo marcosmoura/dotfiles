@@ -15,3 +15,6 @@ bindkey '^R' atuin-search
 
 # Stache completions
 eval "$(stache completions --shell zsh)" >/dev/null 2>&1
+
+# Herdr completions
+eval "$(herdr completion zsh)" >/dev/null 2>&1
