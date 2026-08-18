@@ -2,8 +2,8 @@ approval_policy = "on-request"
 sandbox_mode = "workspace-write"
 personality = "pragmatic"
 approvals_reviewer = "guardian_subagent"
-model = "gpt-5.5"
-model_reasoning_effort = "xhigh"
+model = "gpt-5.6-sol"
+model_reasoning_effort = "medium"
 plan_mode_reasoning_effort = "xhigh"
 service_tier = "fast"
 
@@ -39,7 +39,11 @@ trust_level = "trusted"
 [projects."/Users/marcosmoura/Projects/stache"]
 trust_level = "trusted"
 
+[projects."/Users/marcosmoura/Projects/self-hosting"]
+trust_level = "trusted"
+
 [features]
+hooks = true
 guardian_approval = true
 prevent_idle_sleep = true
 multi_agent = true
@@ -57,6 +61,7 @@ status_line = [
 
 [tui.model_availability_nux]
 "gpt-5.5" = 4
+"gpt-5.6-sol" = 1
 
 [notice]
 fast_default_opt_out = true
@@ -79,3 +84,8 @@ enabled = true
 
 [plugins."superpowers@openai-curated"]
 enabled = true
+
+[hooks.state]
+
+[hooks.state."/Users/marcosmoura/.codex/hooks.json:session_start:0:0"]
+trusted_hash = "sha256:13fa0c6678f3e3856f479ce3f4df6a853e4a7d56fe86489050a0ee69787b17aa"
