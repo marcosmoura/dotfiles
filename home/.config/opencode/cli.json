@@ -1,0 +1,38 @@
+{
+  "theme": {
+    "name": "catppuccin",
+    "mode": "dark"
+  },
+  "diffs": {
+    "wrap": "word"
+  },
+  "terminal": {
+    "title": true
+  },
+  "session": {
+    "sidebar": "auto",
+    "scrollbar": true,
+    "thinking": "show",
+    "image_preview": false
+  },
+  "animations": true,
+  "tabs": {
+    "layout": "horizontal",
+    "scope": "cwd"
+  },
+  "scroll": {
+    "speed": 8,
+    "acceleration": true
+  },
+  "prompt": {
+    "paste": "full",
+    "image_preview": true
+  },
+  "attention": {
+    "enabled": true,
+    "volume": 0.30000000000000016
+  },
+  "debug": {
+    "turn_tokens": true
+  }
+}
