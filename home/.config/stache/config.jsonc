@@ -263,6 +263,8 @@
     // Cycle, focus and move windows between screens
     "Command+`": "stache tiling window --focus next",
     "Command+Shift+`": "stache tiling window --focus previous",
+    "Command+§": "stache tiling window --focus next",
+    "Command+Shift+§": "stache tiling window --focus previous",
     "Control+Command+Shift+Up": "stache tiling window --focus up",
     "Control+Command+Shift+Right": "stache tiling window --focus right",
     "Control+Command+Shift+Left": "stache tiling window --focus left",
