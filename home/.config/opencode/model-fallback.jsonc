@@ -1,0 +1,41 @@
+{
+  "model": [
+    "openai/gpt-5.6-terra#high",
+    "opencode/muse-spark-1.2-contributor-free#max",
+    "opencode-go/deepseek-v4-flash#max"
+  ],
+  "agents": {
+    "title": [
+      "openai/gpt-5.6-luna#low",
+      "opencode/muse-spark-1.2-contributor-free#low",
+      "opencode-go/mimo-v2.5"
+    ],
+    "plan": [
+      "openai/gpt-5.6-sol#max",
+      "opencode/muse-spark-1.2-contributor-free#max",
+      "opencode-go/kimi-k3#max"
+    ],
+    "build": [
+      "openai/gpt-5.6-terra#high",
+      "opencode/muse-spark-1.2-contributor-free#max",
+      "opencode-go/deepseek-v4-flash#max"
+    ],
+    "explore": [
+      "openai/gpt-5.6-luna#low",
+      "opencode/nemotron-3.5-lightning-free",
+      "opencode-go/mimo-v2.5"
+    ],
+    "compaction": [
+      "openai/gpt-5.6-luna#xhigh",
+      "openai/gpt-5.6-sol#max",
+      "opencode/muse-spark-1.2-contributor-free#max",
+      "opencode-go/kimi-k3#max"
+    ],
+    "general": [
+      "openai/gpt-5.6-terra#high",
+      "opencode/muse-spark-1.2-contributor-free#max",
+      "opencode-go/deepseek-v4-flash#max"
+    ]
+  },
+  "strategy": ["quota", "outage"]
+}
