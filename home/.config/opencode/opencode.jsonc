@@ -1,32 +1,31 @@
 {
-  "$schema": "https://opencode.ai/config.json",
   "instructions": ["~/.config/opencode/rules/*.md"],
 
   "model": "openai/gpt-5.6-terra",
 
   "agents": {
     "title": {
-      "model": "opencode-go/deepseek-v4-flash"
+      "model": "openai/gpt-5.6-luna#low"
     },
 
     "plan": {
-      "model": "openai/gpt-5.6-sol#high"
+      "model": "openai/gpt-5.6-sol#max"
     },
 
     "build": {
-      "model": "opencode-go/deepseek-v4-flash#high"
+      "model": "openai/gpt-5.6-terra#high"
     },
 
     "explore": {
-      "model": "opencode-go/deepseek-v4-flash#low"
+      "model": "openai/gpt-5.6-luna#low"
     },
 
     "compaction": {
-      "model": "opencode-go/gpt-5.6-luna#xhigh"
+      "model": "openai/gpt-5.6-luna#xhigh"
     },
 
     "general": {
-      "model": "opencode-go/deepseek-v4-flash#high"
+      "model": "openai/gpt-5.6-terra#high"
     }
   },
 
@@ -114,11 +113,16 @@
   ],
 
   "plugins": [
-    "superpowers@git+https://github.com/obra/superpowers.git",
-    "@franlol/opencode-md-table-formatter@latest",
-    "opencode-herdr",
-    "opencode-skills@latest"
+    "~/superpowers/.opencode/plugins/superpowers.js"
   ],
 
-  "lsp": true
+  "lsp": true,
+
+  "websearch": {
+    "provider": "random"
+  },
+
+  "experimental": {
+    "subagent_depth": 3
+  }
 }
