@@ -16,6 +16,7 @@ home/.config/gh/hosts.yml
 home/.config/github-copilot/
 home/.config/herdr/*.lock
 home/.config/herdr/*.sock
+home/.config/homebrew/*.lock
 home/.config/herdr/plugins
 home/.config/herdr/release-notes.json
 home/.config/herdr/session*.json
