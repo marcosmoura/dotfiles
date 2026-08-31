@@ -86,3 +86,9 @@ home/.codex/*
 !home/.codex/AGENTS.md
 !home/.codex/config.toml
 !home/.codex/rules/
+
+# OMP (allow specific config files)
+home/.omp/*
+!home/.omp/agent
+home/.omp/agent/*
+!home/.omp/agent/config.yml
