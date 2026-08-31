@@ -13,7 +13,8 @@
     "sidebar": "auto",
     "scrollbar": true,
     "thinking": "show",
-    "image_preview": false
+    "image_preview": true,
+    "new_location": "inherit"
   },
   "animations": true,
   "tabs": {
