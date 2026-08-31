@@ -1,5 +1,5 @@
 schema_version = 1
-snapzy_min_version = "1.30.1"
+snapzy_min_version = "1.31.0"
 
 [general]
 language = "en"
@@ -19,6 +19,11 @@ channel = "stable"
 enabled = false
 retention_days = 3
 
+[menu_bar]
+icon_style = "default"
+item_order = ["captureArea", "captureAreaAnnotate", "captureApplication", "captureFullscreen", "captureActiveWindow", "scrollingCapture", "captureOCR", "captureSmartElement", "captureObjectCutout", "recordScreen", "recordApplication", "openAnnotate", "combineImages", "editVideo", "cloudUploads", "openHistory", "shortcutList"]
+hidden_items = []
+
 [capture]
 hide_desktop_icons = true
 hide_desktop_widgets = true
@@ -34,12 +39,16 @@ show_cursor = false
 freeze_area = false
 show_selection_area_overlay = true
 reverse_magnifier_zoom_direction = false
+show_magnifier_by_default = false
+show_magnifier_color_panel = true
 
 [capture.scrolling]
 show_hints = true
 
 [capture.ocr]
-success_notification = false
+success_notification = true
+selected_model = "builtin"
+custom_models = "[]"
 
 [capture.object_cutout]
 auto_crop = true
@@ -140,10 +149,14 @@ uploads_window_position = "center"
 
 [annotate]
 clipboard_image_open_behavior = "ask"
+default_tool = "selection"
+remember_last_tool = false
 close_after_drag = true
 bring_forward_after_drag = false
 quick_properties_sync = true
 combine_save_as_edit = true
+crop_snap_to_edges = true
+highlighter_text_snapping = true
 
 [shortcuts]
 enabled = true
@@ -157,6 +170,11 @@ modifiers = ["command", "shift"]
 enabled = true
 key = "S"
 modifiers = ["command", "shift"]
+
+[shortcuts.global.repeat_area]
+enabled = true
+key = "4"
+modifiers = ["command", "shift", "control"]
 
 [shortcuts.global.area_annotate]
 enabled = true
@@ -251,6 +269,44 @@ modifiers = []
 [shortcuts.quick_access.edit_latest_capture]
 enabled = false
 key = "↩"
+modifiers = ["command"]
+
+[shortcuts.quick_access.card_actions]
+enabled = true
+
+[shortcuts.quick_access.card_actions.copy]
+enabled = true
+key = "C"
+modifiers = ["command"]
+
+[shortcuts.quick_access.card_actions.save_or_open]
+enabled = true
+key = "S"
+modifiers = ["command"]
+
+[shortcuts.quick_access.card_actions.dismiss]
+enabled = true
+key = "W"
+modifiers = ["command"]
+
+[shortcuts.quick_access.card_actions.delete]
+enabled = true
+key = "⌫"
+modifiers = ["command"]
+
+[shortcuts.quick_access.card_actions.edit]
+enabled = true
+key = "E"
+modifiers = ["command"]
+
+[shortcuts.quick_access.card_actions.upload_to_cloud]
+enabled = true
+key = "U"
+modifiers = ["command"]
+
+[shortcuts.quick_access.card_actions.pin_to_screen]
+enabled = true
+key = "P"
 modifiers = ["command"]
 
 [shortcuts.annotate_tools]
