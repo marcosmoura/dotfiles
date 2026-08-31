@@ -1,19 +1,19 @@
 # OpenCode Launcher
 
-A minimal VS Code extension that launches [OpenCode](https://github.com/opencode-ai/opencode) in [Ghostty](https://ghostty.org/) terminal.
+A minimal VS Code extension that launches [OpenCode 2](https://opencode.ai/v2/) in [Ghostty](https://ghostty.org/) terminal.
 
 ## Features
 
 - **Command**: `OpenCode: Open Session` (ID: `opencode-launcher.openSession`)
 - **Keybinding**: `Cmd+Shift+O` on macOS
-- Opens a new Ghostty window with OpenCode running
+- Opens a new Ghostty window with OpenCode 2 running
 - Uses the first workspace folder as the working directory, or falls back to home directory
 - Applies Ghostty window settings: no padding, transparent titlebar
 
 ## Requirements
 
 - [Ghostty](https://ghostty.org/) must be installed and available in your `PATH`
-- [OpenCode](https://github.com/opencode-ai/opencode) must be installed
+- [OpenCode 2](https://opencode.ai/v2/) must be installed as `opencode2`
 
 ## Local Development
 

@@ -1,7 +1,7 @@
 {
   "name": "opencode-launcher",
   "displayName": "OpenCode Launcher",
-  "description": "Launch OpenCode sessions in Ghostty terminal",
+  "description": "Launch OpenCode 2 sessions in Ghostty terminal",
   "version": "1.0.0",
   "publisher": "local",
   "type": "module",
@@ -15,7 +15,7 @@
     "onCommand:opencode-launcher.openSession"
   ],
   "main": "./dist/extension.cjs",
-  "packageManager": "pnpm@10.33.0",
+  "packageManager": "pnpm@11.23.0",
   "contributes": {
     "commands": [
       {
@@ -39,9 +39,9 @@
     "vscode:prepublish": "pnpm run build"
   },
   "devDependencies": {
-    "@types/node": "^20.0.0",
-    "@types/vscode": "^1.74.0",
+    "@types/node": "^26.2.0",
+    "@types/vscode": "^1.134.0",
     "tsdown": "latest",
-    "typescript": "6.0.2"
+    "typescript": "7.0.2"
   }
 }

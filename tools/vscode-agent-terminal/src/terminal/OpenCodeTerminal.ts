@@ -62,7 +62,7 @@ export class OpenCodeTerminal
     try {
       ensureNodePtyHelperExecutable();
 
-      this.ptyProcess = pty.spawn("opencode", [], {
+      this.ptyProcess = pty.spawn("opencode2", [], {
         cols: initialDimensions?.columns ?? 80,
         cwd: this.cwd,
         env: {
@@ -74,7 +74,7 @@ export class OpenCodeTerminal
       });
     } catch (error) {
       this.writeEmitter.fire(
-        `\r\nFailed to start opencode: ${toErrorMessage(error)}\r\n`,
+        `\r\nFailed to start opencode2: ${toErrorMessage(error)}\r\n`,
       );
       this.cleanup({ exitCode: 1, killProcess: false });
       return;

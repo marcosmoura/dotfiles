@@ -1,12 +1,12 @@
 {
   "name": "vscode-agent-terminal",
   "displayName": "Agent Terminal",
-  "description": "Open OpenCode inside VS Code and keep the terminal title in sync with the active session.",
+  "description": "Open OpenCode 2 inside VS Code and keep the terminal title in sync with the active session.",
   "version": "0.0.1",
   "private": true,
   "publisher": "local",
   "license": "MIT",
-  "packageManager": "pnpm@10.33.0",
+  "packageManager": "pnpm@11.23.0",
   "type": "module",
   "engines": {
     "vscode": "^1.114.0"
@@ -57,10 +57,10 @@
     "node-pty": "^1.1.0"
   },
   "devDependencies": {
-    "@types/node": "^25.5.2",
-    "@types/vscode": "^1.114.0",
-    "@vscode/vsce": "^3.7.1",
-    "tsdown": "^0.21.7",
-    "typescript": "^6.0.2"
+    "@types/node": "^26.2.0",
+    "@types/vscode": "^1.134.0",
+    "@vscode/vsce": "^3.9.2",
+    "tsdown": "^0.22.14",
+    "typescript": "^7.0.2"
   }
 }

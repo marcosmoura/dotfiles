@@ -1,6 +1,6 @@
 # Agent Terminal
 
-Local VS Code extension for launching OpenCode inside the integrated terminal and syncing the terminal title with the active OpenCode session.
+Local VS Code extension for launching OpenCode 2 inside the integrated terminal and syncing the terminal title with the active OpenCode session.
 
 ## Development
 

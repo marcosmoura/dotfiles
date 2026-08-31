@@ -40,14 +40,14 @@ export function activate(context: vscode.ExtensionContext): void {
       ? workspaceFolders[0].uri.fsPath
       : homeDir;
 
-    const opencodePath = resolveExecutable('opencode', [
-      path.join(homeDir, '.opencode', 'bin', 'opencode'),
-      '/opt/homebrew/bin/opencode',
-      '/usr/local/bin/opencode'
+    const opencodePath = resolveExecutable('opencode2', [
+      path.join(homeDir, '.opencode', 'bin', 'opencode2'),
+      '/opt/homebrew/bin/opencode2',
+      '/usr/local/bin/opencode2'
     ]);
 
     if (!opencodePath) {
-      vscode.window.showErrorMessage('Failed to launch OpenCode: could not find the opencode executable.');
+      vscode.window.showErrorMessage('Failed to launch OpenCode 2: could not find the opencode2 executable.');
       return;
     }
 
