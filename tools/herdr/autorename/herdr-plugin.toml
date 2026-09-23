@@ -1,0 +1,47 @@
+id = "marcosmoura.autorename"
+name = "Autorename"
+version = "0.1.0"
+min_herdr_version = "0.9.0"
+description = "Rename tabs and panes from their active context."
+platforms = ["macos"]
+
+[[startup]]
+command = ["bun", "src/index.ts"]
+
+[[actions]]
+id = "refresh"
+title = "Refresh pane and tab names"
+contexts = ["workspace", "tab", "pane"]
+command = ["bun", "src/index.ts"]
+
+[[events]]
+on = "tab.created"
+command = ["bun", "src/index.ts"]
+
+[[events]]
+on = "pane.created"
+command = ["bun", "src/index.ts"]
+
+[[events]]
+on = "pane.focused"
+command = ["bun", "src/index.ts"]
+
+[[events]]
+on = "pane.closed"
+command = ["bun", "src/index.ts"]
+
+[[events]]
+on = "pane.exited"
+command = ["bun", "src/index.ts"]
+
+[[events]]
+on = "pane.moved"
+command = ["bun", "src/index.ts"]
+
+[[events]]
+on = "pane.agent_detected"
+command = ["bun", "src/index.ts"]
+
+[[events]]
+on = "pane.agent_status_changed"
+command = ["bun", "src/index.ts"]

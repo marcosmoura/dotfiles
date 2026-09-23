@@ -233,214 +233,100 @@
     }
   },
   {
-    "plugin_id": "herdr-file-viewer",
-    "name": "herdr-file-viewer",
-    "version": "1.14.0",
-    "min_herdr_version": "0.7.0",
-    "description": "A git-aware, read-only file viewer: a keyboard-driven TUI in a herdr split pane.",
-    "manifest_path": "/Users/marcosmoura/Projects/dotfiles/home/.config/herdr/plugins/github/herdr-file-viewer-c993314e2614/herdr-plugin.toml",
-    "plugin_root": "/Users/marcosmoura/Projects/dotfiles/home/.config/herdr/plugins/github/herdr-file-viewer-c993314e2614",
+    "plugin_id": "marcosmoura.autorename",
+    "name": "Autorename",
+    "version": "0.1.0",
+    "min_herdr_version": "0.9.0",
+    "description": "Rename tabs and panes from their active context.",
+    "manifest_path": "/Users/marcosmoura/Projects/dotfiles/tools/herdr/autorename/herdr-plugin.toml",
+    "plugin_root": "/Users/marcosmoura/Projects/dotfiles/tools/herdr/autorename",
     "enabled": true,
     "platforms": [
-      "linux",
-      "macos",
-      "windows"
+      "macos"
     ],
-    "build": [
+    "startup": [
       {
-        "platforms": [
-          "linux",
-          "macos"
-        ],
         "command": [
-          "/bin/sh",
-          "scripts/fetch-or-build.sh"
-        ]
-      },
-      {
-        "platforms": [
-          "windows"
-        ],
-        "command": [
-          "powershell",
-          "-NoProfile",
-          "-ExecutionPolicy",
-          "Bypass",
-          "-File",
-          "scripts/fetch-or-build.ps1"
+          "bun",
+          "src/index.ts"
         ]
       }
     ],
     "actions": [
       {
-        "id": "open-file-viewer",
-        "title": "Open file viewer",
-        "description": "Open the git-aware file viewer in a split pane beside the current work.",
-        "platforms": [
-          "linux",
-          "macos"
-        ],
-        "command": [
-          "bash",
-          "scripts/open-file-viewer.sh"
-        ]
-      },
-      {
-        "id": "open-file-viewer-tab",
-        "title": "Open file viewer (tab)",
-        "description": "Open the git-aware file viewer in its own tab (switch to it if already open).",
-        "platforms": [
-          "linux",
-          "macos"
-        ],
-        "command": [
-          "bash",
-          "scripts/open-file-viewer-tab.sh"
-        ]
-      },
-      {
-        "id": "open-file-viewer-tab-windows",
-        "title": "Open file viewer (tab)",
-        "description": "Open the git-aware file viewer in its own tab (switch to it if already open).",
-        "platforms": [
-          "windows"
-        ],
-        "command": [
-          "powershell",
-          "-NoProfile",
-          "-ExecutionPolicy",
-          "Bypass",
-          "-Command",
-          "$u=New-Object System.Text.UTF8Encoding($false); [Console]::OutputEncoding=$u; $OutputEncoding=$u; $b=$env:HERDR_BIN_PATH; if(-not $b){$b='herdr'}; $p=((& $b plugin list --json|ConvertFrom-Json).result.plugins|?{$_.plugin_id -eq 'herdr-file-viewer'}).plugin_root; if($p -and $p.StartsWith('\\\\?\\')){$p=$p.Substring(4)}; & (Join-Path (Join-Path $p 'scripts') 'open-file-viewer-tab.ps1')"
-        ]
-      },
-      {
-        "id": "open-file-viewer-windows",
-        "title": "Open file viewer",
-        "description": "Open the git-aware file viewer in a split pane beside the current work.",
-        "platforms": [
-          "windows"
-        ],
-        "command": [
-          "powershell",
-          "-NoProfile",
-          "-ExecutionPolicy",
-          "Bypass",
-          "-Command",
-          "$u=New-Object System.Text.UTF8Encoding($false); [Console]::OutputEncoding=$u; $OutputEncoding=$u; $b=$env:HERDR_BIN_PATH; if(-not $b){$b='herdr'}; $p=((& $b plugin list --json|ConvertFrom-Json).result.plugins|?{$_.plugin_id -eq 'herdr-file-viewer'}).plugin_root; if($p -and $p.StartsWith('\\\\?\\')){$p=$p.Substring(4)}; & (Join-Path (Join-Path $p 'scripts') 'open-file-viewer.ps1')"
-        ]
-      }
-    ],
-    "panes": [
-      {
-        "id": "file-viewer",
-        "title": "Files",
-        "placement": "split",
-        "command": [
-          "./target/release/herdr-file-viewer"
-        ]
-      }
-    ],
-    "source": {
-      "kind": "github",
-      "owner": "smarzban",
-      "repo": "herdr-file-viewer",
-      "resolved_commit": "96fcc0a2bdd2727ec88c38f8c8806f97b7ca0ea0",
-      "managed_path": "/Users/marcosmoura/.config/herdr/plugins/github/herdr-file-viewer-c993314e2614",
-      "installed_unix_ms": 1785178723643
-    }
-  },
-  {
-    "plugin_id": "persiyanov.reviewr",
-    "name": "reviewr",
-    "version": "0.25.1",
-    "min_herdr_version": "0.7.0",
-    "description": "Review agent-written diffs beside the chat and add line comments to the agent input.",
-    "manifest_path": "/Users/marcosmoura/Projects/dotfiles/home/.config/herdr/plugins/github/persiyanov.reviewr-e87b654a74f8/herdr-plugin.toml",
-    "plugin_root": "/Users/marcosmoura/Projects/dotfiles/home/.config/herdr/plugins/github/persiyanov.reviewr-e87b654a74f8",
-    "enabled": true,
-    "platforms": [
-      "macos",
-      "linux"
-    ],
-    "build": [
-      {
-        "command": [
-          "bash",
-          "herdr/install.sh"
-        ]
-      }
-    ],
-    "actions": [
-      {
-        "id": "close",
-        "title": "reviewr: close sidebar",
+        "id": "refresh",
+        "title": "Refresh pane and tab names",
         "contexts": [
-          "pane",
-          "workspace"
+          "workspace",
+          "tab",
+          "pane"
         ],
         "command": [
-          "bash",
-          "herdr/sidebar.sh",
-          "close"
-        ]
-      },
-      {
-        "id": "open",
-        "title": "reviewr: open sidebar",
-        "contexts": [
-          "pane",
-          "workspace"
-        ],
-        "command": [
-          "bash",
-          "herdr/sidebar.sh",
-          "open"
-        ]
-      },
-      {
-        "id": "toggle",
-        "title": "reviewr: toggle sidebar",
-        "contexts": [
-          "pane",
-          "workspace"
-        ],
-        "command": [
-          "bash",
-          "herdr/sidebar.sh",
-          "toggle"
+          "bun",
+          "src/index.ts"
         ]
       }
     ],
     "events": [
       {
-        "on": "worktree.created",
+        "on": "pane.agent_detected",
         "command": [
-          "bash",
-          "herdr/sidebar.sh",
-          "auto-open"
+          "bun",
+          "src/index.ts"
         ]
-      }
-    ],
-    "panes": [
+      },
       {
-        "id": "sidebar",
-        "title": "reviewr",
-        "placement": "split",
+        "on": "pane.agent_status_changed",
         "command": [
-          "sh",
-          "-c",
-          "exec \"$HERDR_PLUGIN_ROOT/bin/herdr-reviewr\""
+          "bun",
+          "src/index.ts"
+        ]
+      },
+      {
+        "on": "pane.closed",
+        "command": [
+          "bun",
+          "src/index.ts"
+        ]
+      },
+      {
+        "on": "pane.created",
+        "command": [
+          "bun",
+          "src/index.ts"
+        ]
+      },
+      {
+        "on": "pane.exited",
+        "command": [
+          "bun",
+          "src/index.ts"
+        ]
+      },
+      {
+        "on": "pane.focused",
+        "command": [
+          "bun",
+          "src/index.ts"
+        ]
+      },
+      {
+        "on": "pane.moved",
+        "command": [
+          "bun",
+          "src/index.ts"
+        ]
+      },
+      {
+        "on": "tab.created",
+        "command": [
+          "bun",
+          "src/index.ts"
         ]
       }
     ],
     "source": {
-      "kind": "github",
-      "owner": "persiyanov",
-      "repo": "herdr-reviewr",
-      "resolved_commit": "24046dacf0279afd149255c20e7f9d8e0ce8abf7",
-      "managed_path": "/Users/marcosmoura/.config/herdr/plugins/github/persiyanov.reviewr-e87b654a74f8",
-      "installed_unix_ms": 1785178742939
+      "kind": "local"
     }
   },
   {

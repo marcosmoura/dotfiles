@@ -106,5 +106,5 @@ apply = ["defer"]
 
 [plugins.dotfiles-plugins]
 local = "~/.config/zsh/plugins"
-use = ["*.plugin.sh", "!{compinit,completions,env,macOS}/*.plugin.sh"]
+use = ["*.plugin.sh", "*.plugin.zsh", "!{compinit,completions,env,macOS}/*.plugin.sh"]
 apply = ["defer"]
