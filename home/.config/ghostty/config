@@ -40,7 +40,7 @@ window-title-font-family = Maple Mono
 window-vsync = true
 macos-titlebar-style = tabs
 macos-window-shadow = true
-macos-option-as-alt = true
+macos-option-as-alt = left
 
 ########################################
 # Keybindings (custom overrides)
