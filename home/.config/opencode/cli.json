@@ -1,4 +1,5 @@
 {
+  "plugins": ["/Users/marcosmoura/Projects/dotfiles/tools/opencode/herdr-subagent-panels", "./herdr-opencode"],
   "theme": {
     "name": "catppuccin",
     "mode": "dark"
