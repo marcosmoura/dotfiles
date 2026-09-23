@@ -1,17 +1,17 @@
 [[plugin.deps]]
 use = "yazi-rs/plugins:no-status"
-rev = "39aaf6d"
+rev = "f703392"
 hash = "3e023d31f29201efdac2a6ae35fedb78"
 
 [[plugin.deps]]
 use = "Rolv-Apneseth/starship"
-rev = "159eaba"
-hash = "7de446280b1ba8c49ffd86dbc24bbbe6"
+rev = "ea92cf4"
+hash = "9776f378459072b6c2875eae5addc49d"
 
 [[plugin.deps]]
 use = "yazi-rs/plugins:git"
-rev = "39aaf6d"
-hash = "88e56a64b7ce7c4314427452343fef17"
+rev = "f703392"
+hash = "347cc6b190eb0c2fd60513cc7ae37412"
 
 [flavor]
 deps = []
