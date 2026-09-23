@@ -5,4 +5,5 @@ corepack
 nx
 prettier
 stylelint
+stylelint-lsp
 typescript
