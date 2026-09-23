@@ -7,7 +7,7 @@ appearance = "dark"
 play_sounds = true
 url_scheme_enabled = true
 show_menu_bar_icon = true
-start_at_login = true
+start_at_login = false
 export_location = "~/Desktop/Snapzy"
 
 [updates]
