@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "ES2020",
+    "moduleResolution": "bundler",
+    "strict": true,
+    "noEmit": true,
+    "skipLibCheck": true,
+    "lib": ["ES2020"],
+    "types": []
+  },
+  "files": ["init.ts", "types/fresh.d.ts", "types/plugins.d.ts"]
+}

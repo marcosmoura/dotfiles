@@ -1,0 +1,157 @@
+{
+  "version": 1,
+  "active_keybinding_map": "macos",
+  "theme": "catppuccin-mocha",
+  "packages": {
+    "sources": ["https://github.com/sinelaw/fresh-plugins-registry"]
+  },
+  "plugins": {
+    "welcome_screen": {
+      "settings": {
+        "showOnStartup": false
+      }
+    },
+    "git_explorer": {
+      "settings": {
+        "colorNames": true
+      }
+    }
+  },
+  "file_browser": {
+    "show_hidden": true
+  },
+  "editor": {
+    "tab_size": 2,
+    "use_tabs": false,
+    "line_wrap": false,
+    "rulers": [100],
+    "indentation_guide": "all",
+    "highlight_current_line": true,
+    "highlight_matching_brackets": true,
+    "rainbow_brackets": true,
+    "whitespace_show": true,
+    "whitespace_spaces_leading": false,
+    "whitespace_spaces_inner": false,
+    "whitespace_spaces_trailing": true,
+    "whitespace_tabs_leading": false,
+    "whitespace_tabs_inner": false,
+    "whitespace_tabs_trailing": true,
+    "trim_trailing_whitespace_on_save": true,
+    "ensure_final_newline_on_save": true,
+    "smooth_scroll": true,
+    "enable_inlay_hints": false,
+    "enable_semantic_tokens_full": true,
+    "diagnostics_inline_text": true,
+    "auto_save_enabled": true,
+    "auto_save_interval_secs": 2
+  },
+  "languages": {
+    "css": {
+      "formatter": {
+        "command": "prettier",
+        "args": ["--stdin-filepath", "$FILE"],
+        "stdin": true
+      },
+      "format_on_save": true
+    },
+    "javascript": {
+      "format_on_save": true
+    },
+    "json": {
+      "format_on_save": true
+    },
+    "jsonc": {
+      "format_on_save": true
+    },
+    "markdown": {
+      "line_wrap": true,
+      "wrap_column": 120,
+      "formatter": {
+        "command": "prettier",
+        "args": ["--stdin-filepath", "$FILE"],
+        "stdin": true
+      },
+      "format_on_save": true
+    },
+    "rust": {
+      "tab_size": 4,
+      "format_on_save": true
+    },
+    "bash": {
+      "formatter": {
+        "command": "shfmt",
+        "args": [],
+        "stdin": true
+      },
+      "format_on_save": true
+    },
+    "toml": {
+      "tab_size": 4
+    },
+    "typescript": {
+      "format_on_save": true
+    },
+    "yaml": {
+      "format_on_save": true
+    }
+  },
+  "lsp": {
+    "css": [
+      {
+        "command": "vscode-css-language-server",
+        "args": ["--stdio"],
+        "auto_start": true
+      },
+      {
+        "command": "stylelint-lsp",
+        "args": ["--stdio"],
+        "auto_start": true,
+        "root_markers": ["package.json", ".git"]
+      }
+    ],
+    "html": {
+      "auto_start": true
+    },
+    "json": {
+      "auto_start": true
+    },
+    "lua": {
+      "auto_start": true
+    },
+    "markdown": {
+      "auto_start": true
+    },
+    "rust": {
+      "auto_start": true
+    },
+    "tailwindcss": {
+      "auto_start": true
+    },
+    "scss": {
+      "command": "stylelint-lsp",
+      "args": ["--stdio"],
+      "auto_start": true,
+      "root_markers": ["package.json", ".git"]
+    },
+    "typescript": [
+      {
+        "command": "typescript-language-server",
+        "args": ["--stdio"],
+        "auto_start": true,
+        "root_markers": ["tsconfig.json", "jsconfig.json", "package.json", ".git"],
+        "language_id_overrides": {
+          "tsx": "typescriptreact"
+        }
+      },
+      {
+        "command": "vscode-eslint-language-server",
+        "args": ["--stdio"],
+        "auto_start": true,
+        "root_markers": ["package.json", ".git"]
+      }
+    ],
+    "yaml": {
+      "auto_start": true
+    }
+  }
+}
