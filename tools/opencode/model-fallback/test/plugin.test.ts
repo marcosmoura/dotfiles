@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test";
-import type { ModelInfo, OpenCodeEvent, SessionSyntheticInput } from "@opencode-ai/client";
+import type { ModelInfo, OpenCodeEvent, SessionSyntheticInput } from "@opencode/client";
 import { parseConfig } from "../src/fallback.js";
 import { startModelFallback } from "../src/index.js";
 

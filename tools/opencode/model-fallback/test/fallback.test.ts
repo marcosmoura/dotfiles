@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import type { ModelInfo, ModelRef, SessionStructuredError } from "@opencode-ai/client";
+import type { ModelInfo, ModelRef, SessionStructuredError } from "@opencode/client";
 import {
   chainForAgent,
   classifyFailure,

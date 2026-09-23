@@ -4,8 +4,8 @@ import type {
   OpenCodeEvent,
   SessionSyntheticInput,
   SessionStructuredError,
-} from '@opencode-ai/client';
-import type { Plugin } from '@opencode-ai/plugin';
+} from '@opencode/client';
+import type { Plugin } from '@opencode/plugin';
 import {
   classifyFailure,
   loadConfig,
@@ -22,7 +22,7 @@ interface RuntimeContext {
     get(input: { sessionID: string }): Promise<{ agent?: string; model?: ModelRef }>;
     switchModel(input: { sessionID: string; model: ModelRef }): Promise<void>;
     synthetic(input: SessionSyntheticInput): Promise<unknown>;
-    interrupt?(input: { sessionID: string }): Promise<void>;
+    interrupt?(input: { sessionID: string }): Promise<unknown>;
   };
   catalog: {
     model: {

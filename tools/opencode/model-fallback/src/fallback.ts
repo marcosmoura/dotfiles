@@ -5,7 +5,7 @@ import type {
   ModelRef,
   SessionSyntheticInput,
   SessionStructuredError,
-} from "@opencode-ai/client";
+} from "@opencode/client";
 
 export const strategies = ["quota", "availability", "outage", "failure"] as const;
 

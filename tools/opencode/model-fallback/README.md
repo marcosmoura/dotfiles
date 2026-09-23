@@ -24,6 +24,21 @@ The plugin only retries terminal model failures. It cancels OpenCode's scheduled
 
 Sessions running a model that appears in no chain are left untouched: the plugin neither switches the model nor cancels scheduled retries for it, so explicit picks outside the fallback chains keep OpenCode's native retry behavior.
 
+## Loading
+
+`opencode.jsonc` registers this package directory under `plugins`. OpenCode
+resolves a local plugin path by looking for `index.ts` at the package root,
+which is why `index.ts` sits beside `src/`:
+
+```json
+{
+  "plugins": ["/path/to/tools/opencode/model-fallback"]
+}
+```
+
+The plugin imports OpenCode types with `import type` only, so loading it needs
+no runtime `@opencode/*` dependency.
+
 ## Development
 
 ```bash

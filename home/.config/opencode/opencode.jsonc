@@ -113,7 +113,8 @@
   ],
 
   "plugins": [
-    "~/superpowers/.opencode/plugins/superpowers.js"
+    "~/Projects/dotfiles/tools/opencode/model-fallback",
+    "~/Projects/dotfiles/tools/opencode/superpowers"
   ],
 
   "lsp": true,

@@ -1,0 +1,10 @@
+allowBuilds:
+  msgpackr-extract: false
+  protobufjs: false
+minimumReleaseAgeExclude:
+  - '@opencode/ai@2.0.3'
+  - '@opencode/client@2.0.3'
+  - '@opencode/plugin@2.0.3'
+  - '@opencode/protocol@2.0.3'
+  - '@opencode/schema@2.0.3'
+  - '@opencode/util@2.0.3'
