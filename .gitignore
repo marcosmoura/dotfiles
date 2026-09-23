@@ -87,9 +87,6 @@ home/.codex/*
 !home/.codex/AGENTS.md
 !home/.codex/config.toml
 !home/.codex/rules/
-
-# OMP (allow specific config files)
-home/.omp/*
-!home/.omp/agent
-home/.omp/agent/*
-!home/.omp/agent/config.yml
+home/.config/opencode/herdr-tui-session.js
+home/.config/opencode/plugins/herdr-agent-state.js
+home/.config/opencode/herdr-opencode/
