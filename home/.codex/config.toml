@@ -2,16 +2,15 @@ approval_policy = "on-request"
 sandbox_mode = "workspace-write"
 personality = "pragmatic"
 approvals_reviewer = "guardian_subagent"
-model = "gpt-5.6-luna"
+model = "gpt-5.6-terra"
 model_reasoning_effort = "medium"
 plan_mode_reasoning_effort = "xhigh"
-service_tier = "fast"
+service_tier = "default"
 
 [sandbox_workspace_write]
 network_access = false
 
 [mcp_servers.context7]
-type = "http"
 url = "https://mcp.context7.com/mcp"
 
 [mcp_servers.context7.env_http_headers]
@@ -26,6 +25,13 @@ bearer_token_env_var = "GH_PAT"
 
 [mcp_servers.figma]
 url = "https://mcp.figma.com/mcp"
+
+[mcp_servers.xcode]
+command = "xcrun"
+args = ["mcpbridge"]
+
+[mcp_servers.shipswift]
+url = "https://api.shipswift.app/mcp"
 
 [projects."/Users/marcosmoura/Projects/sonora"]
 trust_level = "trusted"
@@ -43,6 +49,9 @@ trust_level = "trusted"
 trust_level = "trusted"
 
 [projects."/Users/marcosmoura/Projects/dotfiles"]
+trust_level = "trusted"
+
+[projects."/Users/marcosmoura/Projects/chores-app"]
 trust_level = "trusted"
 
 [features]
@@ -65,6 +74,7 @@ status_line = [
 [tui.model_availability_nux]
 "gpt-5.5" = 4
 "gpt-5.6-sol" = 1
+gpt-6-astra = 2
 
 [notice]
 fast_default_opt_out = true
