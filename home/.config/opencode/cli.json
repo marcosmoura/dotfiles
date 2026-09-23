@@ -8,7 +8,8 @@
     "wrap": "word"
   },
   "terminal": {
-    "title": true
+    "title": true,
+    "copy": "select"
   },
   "session": {
     "sidebar": "auto",
