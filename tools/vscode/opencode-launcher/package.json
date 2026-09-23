@@ -1,12 +1,12 @@
 {
-  "name": "vscode-agent-terminal",
-  "displayName": "Agent Terminal",
-  "description": "Open OpenCode 2 inside VS Code and keep the terminal title in sync with the active session.",
+  "name": "opencode-launcher",
+  "displayName": "Launch OpenCode",
+  "description": "Launch OpenCode inside the integrated terminal and keep the terminal title in sync with the active session.",
   "version": "0.0.1",
   "private": true,
   "publisher": "local",
   "license": "MIT",
-  "packageManager": "pnpm@11.23.0",
+  "packageManager": "pnpm@12.4.1",
   "type": "module",
   "engines": {
     "vscode": "^1.114.0"
@@ -18,9 +18,9 @@
   "contributes": {
     "commands": [
       {
-        "command": "agentTerminal.openOpencode",
-        "title": "OpenCode: Open Terminal",
-        "category": "Agent Terminal",
+        "command": "opencodeLauncher.launch",
+        "title": "Launch OpenCode",
+        "category": "Launch OpenCode",
         "icon": {
           "dark": "assets/opencode-dark.svg",
           "light": "assets/opencode-light.svg"
@@ -30,19 +30,19 @@
     "menus": {
       "editor/title": [
         {
-          "command": "agentTerminal.openOpencode",
+          "command": "opencodeLauncher.launch",
           "group": "navigation"
         }
       ],
       "terminal/title/context": [
         {
-          "command": "agentTerminal.openOpencode",
+          "command": "opencodeLauncher.launch",
           "group": "1_create"
         }
       ],
       "terminal/context": [
         {
-          "command": "agentTerminal.openOpencode",
+          "command": "opencodeLauncher.launch",
           "group": "1_create"
         }
       ]
@@ -51,16 +51,16 @@
   "scripts": {
     "compile": "tsdown",
     "watch": "tsdown --watch",
-    "package": "pnpm run compile && pnpm exec vsce package --allow-missing-repository --out dist/vscode-agent-terminal-${npm_package_version}.vsix"
+    "package": "pnpm run compile && pnpm exec vsce package --allow-missing-repository --out dist/opencode-launcher-${npm_package_version}.vsix"
   },
   "dependencies": {
     "node-pty": "^1.1.0"
   },
   "devDependencies": {
-    "@types/node": "^26.2.0",
-    "@types/vscode": "^1.134.0",
+    "@types/node": "^26.5.1",
+    "@types/vscode": "^1.137.0",
     "@vscode/vsce": "^3.9.2",
-    "tsdown": "^0.22.14",
+    "tsdown": "^0.23.0",
     "typescript": "^7.0.2"
   }
 }

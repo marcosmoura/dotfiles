@@ -1,4 +1,4 @@
-# Agent Terminal
+# Launch OpenCode
 
 Local VS Code extension for launching OpenCode 2 inside the integrated terminal and syncing the terminal title with the active OpenCode session.
 
@@ -15,5 +15,5 @@ Then press `F5` in this folder to launch an Extension Development Host.
 
 ```bash
 pnpm run package
-code --install-extension dist/vscode-agent-terminal-0.0.1.vsix
+code --install-extension dist/opencode-launcher-0.0.1.vsix
 ```

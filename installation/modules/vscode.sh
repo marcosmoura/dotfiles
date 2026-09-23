@@ -10,7 +10,7 @@ log_step "Installing VS Code extensions"
 require_command pnpm || return 1
 
 VSCODE_EXT_DIR="$HOME/.vscode/extensions"
-SOURCE_DIR="$DOTFILES_DIR/tools/opencode-launcher"
+SOURCE_DIR="$DOTFILES_DIR/tools/vscode/opencode-launcher"
 TARGET_LINK="$VSCODE_EXT_DIR/opencode-launcher"
 
 if [[ ! -d "$SOURCE_DIR" ]]; then
@@ -22,7 +22,7 @@ fi
 log_progress "Creating VS Code extensions directory"
 mkdir -p "$VSCODE_EXT_DIR"
 
-log_progress "Symlinking opencode-launcher extension"
+log_progress "Symlinking Launch OpenCode extension"
 if [[ -L "$TARGET_LINK" ]]; then
   rm -rf "$TARGET_LINK"
 elif [[ -e "$TARGET_LINK" ]]; then

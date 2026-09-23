@@ -4,7 +4,7 @@ import * as vscode from "vscode";
 
 import { OpenCodeTerminal } from "./terminal/OpenCodeTerminal";
 
-const OPEN_OPENCODE_COMMAND = "agentTerminal.openOpencode";
+const OPEN_OPENCODE_COMMAND = "opencodeLauncher.launch";
 
 export function activate(context: vscode.ExtensionContext): void {
   context.subscriptions.push(
