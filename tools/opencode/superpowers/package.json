@@ -1,0 +1,21 @@
+{
+  "name": "opencode-superpowers",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@12.4.1",
+  "engines": { "bun": ">=1.3.0" },
+  "exports": { ".": "./index.ts" },
+  "scripts": {
+    "test": "bun test",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "superpowers": "git+https://github.com/obra/superpowers.git#v6.3.0"
+  },
+  "devDependencies": {
+    "@opencode/plugin": "2.0.3",
+    "@types/bun": "1.4.2",
+    "typescript": "7.0.2"
+  }
+}
