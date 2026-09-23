@@ -65,6 +65,10 @@ For multi-step tasks, state a brief plan:
 
 Strong success criteria let you loop independently. Weak criteria ("make it work") require constant clarification.
 
+## 5. Git identity
+
+Commits must use the user's configured git identity (`~/.config/git/identity`). Never choose an author yourself: no `git -c user.name=...` / `-c user.email=...`, no `git config user.name` / `user.email`, no `git commit --author=...`, no `GIT_AUTHOR_*` / `GIT_COMMITTER_*` env vars. These are permission-denied; if a repo has no identity, stop and ask the user instead of inventing one.
+
 ---
 
 **These guidelines are working if:** fewer unnecessary changes in diffs, fewer rewrites due to overcomplication, and clarifying questions come before implementation rather than after mistakes.

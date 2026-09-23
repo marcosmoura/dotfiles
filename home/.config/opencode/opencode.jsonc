@@ -109,7 +109,18 @@
     { "action": "todoread", "resource": "*", "effect": "allow" },
     { "action": "todowrite", "resource": "*", "effect": "allow" },
     { "action": "webfetch", "resource": "*", "effect": "allow" },
-    { "action": "websearch", "resource": "*", "effect": "allow" }
+    { "action": "websearch", "resource": "*", "effect": "allow" },
+
+    // Never let an agent pick its own git identity (e.g. opencode <opencode@local>).
+    { "action": "shell", "resource": "*user.name=*", "effect": "deny" },
+    { "action": "shell", "resource": "*user.email=*", "effect": "deny" },
+    { "action": "shell", "resource": "git config*user.name *", "effect": "deny" },
+    { "action": "shell", "resource": "git config*user.email *", "effect": "deny" },
+    { "action": "shell", "resource": "*--author=*", "effect": "deny" },
+    { "action": "shell", "resource": "*GIT_AUTHOR_NAME=*", "effect": "deny" },
+    { "action": "shell", "resource": "*GIT_AUTHOR_EMAIL=*", "effect": "deny" },
+    { "action": "shell", "resource": "*GIT_COMMITTER_NAME=*", "effect": "deny" },
+    { "action": "shell", "resource": "*GIT_COMMITTER_EMAIL=*", "effect": "deny" }
   ],
 
   "plugins": [
