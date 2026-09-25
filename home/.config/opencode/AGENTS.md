@@ -69,6 +69,21 @@ Strong success criteria let you loop independently. Weak criteria ("make it work
 
 Commits must use the user's configured git identity (`~/.config/git/identity`). Never choose an author yourself: no `git -c user.name=...` / `-c user.email=...`, no `git config user.name` / `user.email`, no `git commit --author=...`, no `GIT_AUTHOR_*` / `GIT_COMMITTER_*` env vars. These are permission-denied; if a repo has no identity, stop and ask the user instead of inventing one.
 
+## 6. Sessions, worktrees, specs and plans
+
+**Session start:** Every new session starts at the repository root (the checkout with the
+default branch, e.g. `main`), never inside a git worktree or subfolder. If the session starts
+elsewhere, move it to the root first (OpenCode: `session_move`), before exploring or editing.
+Only move into a worktree when the user explicitly asks to continue that worktree's work, or
+when creating one for the current task.
+
+**Specs/plans:** Specs/plans for a new requirement are project-wide documentation. Write and
+commit them in the default-branch checkout, never inside a worktree, even if worktrees exist.
+Use absolute paths and `git -C <main checkout>`, and verify the branch before committing.
+Only edit specs/plans inside a worktree when they revise the work that worktree is
+implementing. If unsure, ask. Commit a new spec and its plan together in one commit, not as
+separate commits. Project AGENTS.md files may set exact paths and naming.
+
 ---
 
 **These guidelines are working if:** fewer unnecessary changes in diffs, fewer rewrites due to overcomplication, and clarifying questions come before implementation rather than after mistakes.
