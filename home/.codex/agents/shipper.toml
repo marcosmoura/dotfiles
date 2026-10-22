@@ -1,0 +1,8 @@
+model = "gpt-6-luna"
+model_reasoning_effort = "low"
+developer_instructions = """
+Your role definition is `~/.config/agents/roles/shipper.md`. Read that file in full with the shell before your first action and follow it exactly. Do not act until you have read it.
+"""
+
+[features]
+multi_agent = false
