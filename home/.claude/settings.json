@@ -2,10 +2,12 @@
   "$schema": "https://json.schemastore.org/claude-code-settings.json",
   "env": {
     "CLAUDE_CODE_ATTRIBUTION_HEADER": "0",
-    "CLAUDE_CODE_DISABLE_1M_CONTEXT": "1",
     "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1",
     "CLAUDE_CODE_ENABLE_TELEMETRY": "0",
-    "CLAUDE_CODE_NO_FLICKER": "1"
+    "CLAUDE_CODE_NO_FLICKER": "1",
+    "ANTHROPIC_DEFAULT_OPUS_MODEL": "claude-opus-5-5",
+    "ANTHROPIC_DEFAULT_SONNET_MODEL": "claude-sonnet-5-5",
+    "CLAUDE_CODE_SUBAGENT_MODEL": "sonnet"
   },
   "attribution": {
     "commit": "",
@@ -14,9 +16,6 @@
   "permissions": {
     "allow": [
       "Bash(cat *)",
-      "Bash(chmod *)",
-      "Bash(chown *)",
-      "Bash(cp *)",
       "Bash(echo *)",
       "Bash(fd *)",
       "Bash(find *)",
@@ -29,10 +28,7 @@
       "Bash(head *)",
       "Bash(ls *)",
       "Bash(mkdir *)",
-      "Bash(mv *)",
-      "Bash(node *)",
       "Bash(pwd)",
-      "Bash(python *)",
       "Bash(rg *)",
       "Bash(tail *)",
       "Bash(type *)",
@@ -48,38 +44,53 @@
       "Write"
     ],
     "deny": [
+      "Bash(> /dev/sda*)",
       "Bash(dd *)",
       "Bash(mkfs *)",
-      "Bash(> /dev/sda*)"
+      "Read(**/.env*)",
+      "Read(~/.aws/**)",
+      "Read(~/.gnupg/**)",
+      "Read(~/.ssh/**)"
     ],
-    "ask": [
-      "Bash(sudo *)",
-      "Bash(rm -rf *)",
-      "Bash(chmod)",
-      "Bash(chown)"
+    "ask": ["Bash(sudo *)", "Bash(rm -rf *)"],
+    "defaultMode": "auto"
+  },
+  "model": "opus",
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "^(startup|resume|clear|compact|fork)$",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash '/Users/marcosmoura/.claude/hooks/herdr-agent-state.sh' session",
+            "timeout": 10
+          }
+        ]
+      }
     ]
   },
-  "model": "sonnet",
-  "hooks": {
-    "SessionStart": [{"matcher":"^(startup|resume|clear|compact|fork)$","hooks":[{"type":"command","command":"bash '/Users/marcosmoura/.claude/hooks/herdr-agent-state.sh' session","timeout":10}]}]
+  "worktree": {
+    "symlinkDirectories": ["node_modules"],
+    "baseRef": "head"
   },
   "statusLine": {
     "type": "command",
     "command": "~/.claude/statusline.sh"
   },
   "enabledPlugins": {
+    "claude-code-setup@claude-plugins-official": true,
     "code-review@claude-plugins-official": true,
     "code-simplifier@claude-plugins-official": true,
     "context7@claude-plugins-official": true,
     "feature-dev@claude-plugins-official": true,
     "frontend-design@claude-plugins-official": true,
-    "github@claude-plugins-official": true,
-    "mempalace@mempalace": true,
     "playwright@claude-plugins-official": true,
     "rust-analyzer-lsp@claude-plugins-official": true,
     "security-guidance@claude-plugins-official": true,
-    "superpowers@claude-plugins-official": true,
-    "typescript-lsp@claude-plugins-official": true
+    "swift-lsp@claude-plugins-official": true,
+    "typescript-lsp@claude-plugins-official": true,
+    "figma@claude-plugins-official": true
   },
   "extraKnownMarketplaces": {
     "claude-pace-marketplace": {
@@ -88,16 +99,27 @@
         "repo": "Astro-Han/claude-pace"
       }
     },
-    "mempalace": {
+    "anthropic-agent-skills": {
       "source": {
         "source": "github",
-        "repo": "MemPalace/mempalace"
+        "repo": "anthropics/skills"
       }
     }
   },
   "effortLevel": "high",
-  "promptSuggestionEnabled": false,
+  "modelSettings": {
+    "claude-opus-5-5": {
+      "effortLevel": "medium"
+    },
+    "claude-sonnet-5-5": {
+      "effortLevel": "high"
+    }
+  },
+  "promptSuggestionEnabled": true,
   "tui": "default",
   "verbose": true,
-  "preferredNotifChannel": "ghostty"
+  "preferredNotifChannel": "ghostty",
+  "autoMode": {
+    "environment": ["$defaults", "GitHub repos under marcosmoura/* are owned by the user"]
+  }
 }
