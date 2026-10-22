@@ -2,9 +2,9 @@ approval_policy = "on-request"
 sandbox_mode = "workspace-write"
 personality = "pragmatic"
 approvals_reviewer = "guardian_subagent"
-model = "gpt-5.6-terra"
+model = "gpt-6.1-sol"
 model_reasoning_effort = "medium"
-plan_mode_reasoning_effort = "xhigh"
+plan_mode_reasoning_effort = "high"
 service_tier = "default"
 
 [agents.worker]
@@ -70,6 +70,9 @@ trust_level = "trusted"
 [projects."/Users/marcosmoura/Projects/chores-app"]
 trust_level = "trusted"
 
+[projects."/Users/marcosmoura/Projects/life-planner"]
+trust_level = "trusted"
+
 [features]
 hooks = true
 guardian_approval = true
@@ -86,18 +89,13 @@ status_line = [
   "session-id",
   "fast-mode",
 ]
+screen_reader_detection_done = true
 
 [tui.model_availability_nux]
-"gpt-5.5" = 4
-"gpt-5.6-sol" = 1
-gpt-6-astra = 2
+"gpt-6.1-sol" = 4
 
 [notice]
 fast_default_opt_out = true
-
-[notice.model_migrations]
-"gpt-5.1-codex-mini" = "gpt-5.4"
-"gpt-5.3-codex" = "gpt-5.4"
 
 [plugins."figma@openai-curated"]
 enabled = true
@@ -111,10 +109,10 @@ enabled = true
 [plugins."build-macos-apps@openai-curated"]
 enabled = true
 
-[plugins."superpowers@openai-curated"]
-enabled = true
-
 [hooks.state]
 
 [hooks.state."/Users/marcosmoura/.codex/hooks.json:session_start:0:0"]
 trusted_hash = "sha256:13fa0c6678f3e3856f479ce3f4df6a853e4a7d56fe86489050a0ee69787b17aa"
+
+[hooks.state."/Users/marcosmoura/Projects/life-planner/.codex/hooks.json:pre_tool_use:0:0"]
+trusted_hash = "sha256:89651286aa669c01eb13cb6a2dde3e19a9d79c9996b1783663814036795c4f42"
