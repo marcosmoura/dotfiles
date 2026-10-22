@@ -2,4 +2,4 @@ nodeLinker: hoisted
 allowBuilds:
   node-pty: false
   keytar: false
-  '@vscode/vsce-sign': false
+  "@vscode/vsce-sign": false

@@ -12,9 +12,7 @@ export function activate(context: vscode.ExtensionContext): void {
       const cwd = resolveWorkspaceDirectory();
 
       if (!cwd) {
-        void vscode.window.showErrorMessage(
-          "OpenCode terminals require an open workspace folder.",
-        );
+        void vscode.window.showErrorMessage("OpenCode terminals require an open workspace folder.");
         return;
       }
 
@@ -53,9 +51,10 @@ function resolveWorkspaceDirectory(): string | undefined {
   return vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
 }
 
-function terminalIconPath(
-  context: vscode.ExtensionContext,
-): { dark: vscode.Uri; light: vscode.Uri } {
+function terminalIconPath(context: vscode.ExtensionContext): {
+  dark: vscode.Uri;
+  light: vscode.Uri;
+} {
   return {
     dark: vscode.Uri.file(join(context.extensionPath, "assets", "opencode-dark.svg")),
     light: vscode.Uri.file(join(context.extensionPath, "assets", "opencode-light.svg")),

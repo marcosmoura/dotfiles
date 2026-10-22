@@ -17,11 +17,10 @@ type OpenCodeTerminalOptions = {
  *
  * We also match OSC 2 (explicit window title).
  */
+// eslint-disable-next-line no-control-regex -- OSC sequences contain ESC/BEL control bytes
 const OSC_TITLE_RE = /\x1b\]([02]);([^\x07\x1b]*?)(?:\x07|\x1b\\)/;
 
-export class OpenCodeTerminal
-  implements vscode.Pseudoterminal, vscode.Disposable
-{
+export class OpenCodeTerminal implements vscode.Pseudoterminal, vscode.Disposable {
   readonly title = "OpenCode";
 
   private readonly changeNameEmitter = new vscode.EventEmitter<string>();
@@ -73,9 +72,7 @@ export class OpenCodeTerminal
         rows: initialDimensions?.rows ?? 24,
       });
     } catch (error) {
-      this.writeEmitter.fire(
-        `\r\nFailed to start opencode2: ${toErrorMessage(error)}\r\n`,
-      );
+      this.writeEmitter.fire(`\r\nFailed to start opencode2: ${toErrorMessage(error)}\r\n`);
       this.cleanup({ exitCode: 1, killProcess: false });
       return;
     }

@@ -1,20 +1,31 @@
 {
   "name": "opencode-launcher",
   "displayName": "Launch OpenCode",
-  "description": "Launch OpenCode inside the integrated terminal and keep the terminal title in sync with the active session.",
   "version": "0.0.1",
   "private": true,
-  "publisher": "local",
-  "license": "MIT",
-  "packageManager": "pnpm@12.4.1",
-  "type": "module",
-  "engines": {
-    "vscode": "^1.114.0"
-  },
+  "description": "Launch OpenCode inside the integrated terminal and keep the terminal title in sync with the active session.",
   "categories": [
     "Other"
   ],
+  "license": "MIT",
+  "publisher": "local",
+  "type": "module",
   "main": "./dist/extension.cjs",
+  "scripts": {
+    "compile": "tsdown",
+    "watch": "tsdown --watch",
+    "package": "pnpm run compile && pnpm exec vsce package --allow-missing-repository --out dist/opencode-launcher-${npm_package_version}.vsix"
+  },
+  "dependencies": {
+    "node-pty": "^1.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.5",
+    "@types/vscode": "^1.140.0",
+    "@vscode/vsce": "^4.0.0",
+    "tsdown": "^0.23.1",
+    "typescript": "^7.0.2"
+  },
   "contributes": {
     "commands": [
       {
@@ -48,19 +59,8 @@
       ]
     }
   },
-  "scripts": {
-    "compile": "tsdown",
-    "watch": "tsdown --watch",
-    "package": "pnpm run compile && pnpm exec vsce package --allow-missing-repository --out dist/opencode-launcher-${npm_package_version}.vsix"
+  "engines": {
+    "vscode": "^1.114.0"
   },
-  "dependencies": {
-    "node-pty": "^1.1.0"
-  },
-  "devDependencies": {
-    "@types/node": "^26.5.1",
-    "@types/vscode": "^1.137.0",
-    "@vscode/vsce": "^3.9.2",
-    "tsdown": "^0.23.0",
-    "typescript": "^7.0.2"
-  }
+  "packageManager": "pnpm@12.4.1"
 }
