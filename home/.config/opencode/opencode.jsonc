@@ -1,5 +1,5 @@
 {
-  "instructions": ["~/.config/opencode/rules/*.md"],
+  "instructions": ["~/.config/agents/orchestrator.md", "~/.config/opencode/rules/*.md"],
 
   "model": "openai/gpt-5.6-terra",
 
@@ -25,8 +25,28 @@
     },
 
     "general": {
-      "model": "openai/gpt-5.6-terra#medium"
-    }
+      "model": "openai/gpt-5.6-terra#medium",
+    },
+
+    "worker": {
+      "mode": "subagent",
+      "model": "opencode-go/deepseek-v4.1-flash#max",
+    },
+
+    "reviewer": {
+      "mode": "subagent",
+      "model": "anthropic/claude-opus-5-5#max",
+    },
+
+    "explorer": {
+      "mode": "subagent",
+      "model": "opencode-go/deepseek-v4.1-flash#low",
+    },
+
+    "shipper": {
+      "mode": "subagent",
+      "model": "opencode-go/deepseek-v4.1-flash#low",
+    },
   },
 
   "mcp": {
