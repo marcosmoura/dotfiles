@@ -8,54 +8,28 @@
     "manifest_path": "/Users/marcosmoura/Projects/dotfiles/home/.config/herdr/plugins/github/cloudmanic.herdr-plus-0cce37b56fb9/herdr-plugin.toml",
     "plugin_root": "/Users/marcosmoura/Projects/dotfiles/home/.config/herdr/plugins/github/cloudmanic.herdr-plus-0cce37b56fb9",
     "enabled": true,
-    "platforms": [
-      "linux",
-      "macos",
-      "windows"
-    ],
+    "platforms": ["linux", "macos", "windows"],
     "build": [
       {
-        "platforms": [
-          "linux",
-          "macos"
-        ],
-        "command": [
-          "sh",
-          "scripts/build.sh"
-        ]
+        "platforms": ["linux", "macos"],
+        "command": ["sh", "scripts/build.sh"]
       },
       {
-        "platforms": [
-          "windows"
-        ],
-        "command": [
-          "go",
-          "build",
-          "-o",
-          "bin/herdr-plus.exe",
-          "."
-        ]
+        "platforms": ["windows"],
+        "command": ["go", "build", "-o", "bin/herdr-plus.exe", "."]
       }
     ],
     "actions": [
       {
         "id": "ping",
         "title": "Herdr Plus: ping",
-        "platforms": [
-          "linux",
-          "macos"
-        ],
-        "command": [
-          "./bin/herdr-plus",
-          "ping"
-        ]
+        "platforms": ["linux", "macos"],
+        "command": ["./bin/herdr-plus", "ping"]
       },
       {
         "id": "ping-windows",
         "title": "Herdr Plus: ping",
-        "platforms": [
-          "windows"
-        ],
+        "platforms": ["windows"],
         "command": [
           "powershell",
           "-NoProfile",
@@ -67,21 +41,13 @@
       {
         "id": "projects",
         "title": "Herdr Plus: Projects",
-        "platforms": [
-          "linux",
-          "macos"
-        ],
-        "command": [
-          "./bin/herdr-plus",
-          "projects"
-        ]
+        "platforms": ["linux", "macos"],
+        "command": ["./bin/herdr-plus", "projects"]
       },
       {
         "id": "projects-windows",
         "title": "Herdr Plus: Projects",
-        "platforms": [
-          "windows"
-        ],
+        "platforms": ["windows"],
         "command": [
           "powershell",
           "-NoProfile",
@@ -93,21 +59,13 @@
       {
         "id": "quick-actions",
         "title": "Herdr Plus: Quick Actions",
-        "platforms": [
-          "linux",
-          "macos"
-        ],
-        "command": [
-          "./bin/herdr-plus",
-          "quick-actions"
-        ]
+        "platforms": ["linux", "macos"],
+        "command": ["./bin/herdr-plus", "quick-actions"]
       },
       {
         "id": "quick-actions-windows",
         "title": "Herdr Plus: Quick Actions",
-        "platforms": [
-          "windows"
-        ],
+        "platforms": ["windows"],
         "command": [
           "powershell",
           "-NoProfile",
@@ -120,20 +78,12 @@
     "events": [
       {
         "on": "worktree.created",
-        "platforms": [
-          "linux",
-          "macos"
-        ],
-        "command": [
-          "./bin/herdr-plus",
-          "on-worktree"
-        ]
+        "platforms": ["linux", "macos"],
+        "command": ["./bin/herdr-plus", "on-worktree"]
       },
       {
         "on": "worktree.created",
-        "platforms": [
-          "windows"
-        ],
+        "platforms": ["windows"],
         "command": [
           "powershell",
           "-NoProfile",
@@ -144,20 +94,12 @@
       },
       {
         "on": "worktree.opened",
-        "platforms": [
-          "linux",
-          "macos"
-        ],
-        "command": [
-          "./bin/herdr-plus",
-          "on-worktree"
-        ]
+        "platforms": ["linux", "macos"],
+        "command": ["./bin/herdr-plus", "on-worktree"]
       },
       {
         "on": "worktree.opened",
-        "platforms": [
-          "windows"
-        ],
+        "platforms": ["windows"],
         "command": [
           "powershell",
           "-NoProfile",
@@ -171,49 +113,28 @@
       {
         "id": "picker",
         "title": "Herdr Plus: Projects",
-        "platforms": [
-          "linux",
-          "macos"
-        ],
+        "platforms": ["linux", "macos"],
         "placement": "zoomed",
-        "command": [
-          "./bin/herdr-plus",
-          "projects-ui"
-        ]
+        "command": ["./bin/herdr-plus", "projects-ui"]
       },
       {
         "id": "picker-windows",
         "title": "Herdr Plus: Projects",
-        "platforms": [
-          "windows"
-        ],
+        "platforms": ["windows"],
         "placement": "zoomed",
-        "command": [
-          "powershell",
-          "-NoProfile",
-          "-Command",
-          "& .\\bin\\herdr-plus.exe projects-ui"
-        ]
+        "command": ["powershell", "-NoProfile", "-Command", "& .\\bin\\herdr-plus.exe projects-ui"]
       },
       {
         "id": "quick-actions-picker",
         "title": "Quick Actions",
-        "platforms": [
-          "linux",
-          "macos"
-        ],
+        "platforms": ["linux", "macos"],
         "placement": "overlay",
-        "command": [
-          "./bin/herdr-plus",
-          "quick-actions-ui"
-        ]
+        "command": ["./bin/herdr-plus", "quick-actions-ui"]
       },
       {
         "id": "quick-actions-picker-windows",
         "title": "Quick Actions",
-        "platforms": [
-          "windows"
-        ],
+        "platforms": ["windows"],
         "placement": "overlay",
         "command": [
           "powershell",
@@ -241,88 +162,52 @@
     "manifest_path": "/Users/marcosmoura/Projects/dotfiles/tools/herdr/autorename/herdr-plugin.toml",
     "plugin_root": "/Users/marcosmoura/Projects/dotfiles/tools/herdr/autorename",
     "enabled": true,
-    "platforms": [
-      "macos"
-    ],
+    "platforms": ["macos"],
     "startup": [
       {
-        "command": [
-          "bun",
-          "src/index.ts"
-        ]
+        "command": ["bun", "src/index.ts"]
       }
     ],
     "actions": [
       {
         "id": "refresh",
         "title": "Refresh pane and tab names",
-        "contexts": [
-          "workspace",
-          "tab",
-          "pane"
-        ],
-        "command": [
-          "bun",
-          "src/index.ts"
-        ]
+        "contexts": ["workspace", "tab", "pane"],
+        "command": ["bun", "src/index.ts"]
       }
     ],
     "events": [
       {
         "on": "pane.agent_detected",
-        "command": [
-          "bun",
-          "src/index.ts"
-        ]
+        "command": ["bun", "src/index.ts"]
       },
       {
         "on": "pane.agent_status_changed",
-        "command": [
-          "bun",
-          "src/index.ts"
-        ]
+        "command": ["bun", "src/index.ts"]
       },
       {
         "on": "pane.closed",
-        "command": [
-          "bun",
-          "src/index.ts"
-        ]
+        "command": ["bun", "src/index.ts"]
       },
       {
         "on": "pane.created",
-        "command": [
-          "bun",
-          "src/index.ts"
-        ]
+        "command": ["bun", "src/index.ts"]
       },
       {
         "on": "pane.exited",
-        "command": [
-          "bun",
-          "src/index.ts"
-        ]
+        "command": ["bun", "src/index.ts"]
       },
       {
         "on": "pane.focused",
-        "command": [
-          "bun",
-          "src/index.ts"
-        ]
+        "command": ["bun", "src/index.ts"]
       },
       {
         "on": "pane.moved",
-        "command": [
-          "bun",
-          "src/index.ts"
-        ]
+        "command": ["bun", "src/index.ts"]
       },
       {
         "on": "tab.created",
-        "command": [
-          "bun",
-          "src/index.ts"
-        ]
+        "command": ["bun", "src/index.ts"]
       }
     ],
     "source": {
@@ -338,102 +223,59 @@
     "manifest_path": "/Users/marcosmoura/Projects/dotfiles/home/.config/herdr/plugins/github/rjyo.window-title-sync-aa963fbbc3d9/herdr-plugin.toml",
     "plugin_root": "/Users/marcosmoura/Projects/dotfiles/home/.config/herdr/plugins/github/rjyo.window-title-sync-aa963fbbc3d9",
     "enabled": true,
-    "platforms": [
-      "macos",
-      "linux"
-    ],
+    "platforms": ["macos", "linux"],
     "actions": [
       {
         "id": "refresh",
         "title": "Refresh terminal title",
-        "contexts": [
-          "workspace",
-          "tab",
-          "pane"
-        ],
-        "command": [
-          "bun",
-          "sync-title.js"
-        ]
+        "contexts": ["workspace", "tab", "pane"],
+        "command": ["bun", "sync-title.js"]
       }
     ],
     "events": [
       {
         "on": "pane.agent_detected",
-        "command": [
-          "bun",
-          "sync-title.js"
-        ]
+        "command": ["bun", "sync-title.js"]
       },
       {
         "on": "pane.agent_status_changed",
-        "command": [
-          "bun",
-          "sync-title.js"
-        ]
+        "command": ["bun", "sync-title.js"]
       },
       {
         "on": "pane.closed",
-        "command": [
-          "bun",
-          "sync-title.js"
-        ]
+        "command": ["bun", "sync-title.js"]
       },
       {
         "on": "pane.created",
-        "command": [
-          "bun",
-          "sync-title.js"
-        ]
+        "command": ["bun", "sync-title.js"]
       },
       {
         "on": "pane.focused",
-        "command": [
-          "bun",
-          "sync-title.js"
-        ]
+        "command": ["bun", "sync-title.js"]
       },
       {
         "on": "pane.moved",
-        "command": [
-          "bun",
-          "sync-title.js"
-        ]
+        "command": ["bun", "sync-title.js"]
       },
       {
         "on": "tab.focused",
-        "command": [
-          "bun",
-          "sync-title.js"
-        ]
+        "command": ["bun", "sync-title.js"]
       },
       {
         "on": "tab.renamed",
-        "command": [
-          "bun",
-          "sync-title.js"
-        ]
+        "command": ["bun", "sync-title.js"]
       },
       {
         "on": "workspace.focused",
-        "command": [
-          "bun",
-          "sync-title.js"
-        ]
+        "command": ["bun", "sync-title.js"]
       },
       {
         "on": "workspace.renamed",
-        "command": [
-          "bun",
-          "sync-title.js"
-        ]
+        "command": ["bun", "sync-title.js"]
       },
       {
         "on": "workspace.updated",
-        "command": [
-          "bun",
-          "sync-title.js"
-        ]
+        "command": ["bun", "sync-title.js"]
       }
     ],
     "source": {
