@@ -1,0 +1,30 @@
+{
+  "$schema": "https://raw.githubusercontent.com/cortexkit/magic-context/master/assets/magic-context.schema.json",
+
+  "historian": {
+    "opencode": {
+      "model": {
+        "model": "opencode-go/deepseek-v4.1-flash",
+        "variant": "low",
+      },
+    },
+  },
+
+  "dreamer": {
+    "disable": true,
+  },
+
+  "embedding": {
+    "provider": "local",
+  },
+
+  "memory": {
+    "enabled": true,
+    "auto_promote": true,
+    "injection_budget_tokens": 1000,
+  },
+
+  "prompt_surface": {
+    "default": "light",
+  },
+}

@@ -1,0 +1,12 @@
+// Shared preferences for OpenCode TUI plugins.
+// One top-level key per plugin (short name). See each plugin's README for its
+// supported settings. This file is safe to hand-edit; plugins update individual
+// keys and preserve the rest (values and comments).
+{
+  "magic-context": {
+    "header": {
+      "label": "Memory"
+    },
+    "collapsed": true
+  }
+}
