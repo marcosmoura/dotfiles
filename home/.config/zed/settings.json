@@ -1,0 +1,222 @@
+// Zed settings
+//
+// For information on how to configure Zed, see the Zed
+// documentation: https://zed.dev/docs/configuring-zed
+//
+// To see all of Zed's default settings without changing your
+// custom settings, run `zed: open default settings` from the
+// command palette (cmd-shift-p / ctrl-shift-p)
+{
+  "active_pane_modifiers": {
+    "border_size": 0,
+  },
+  "agent": {
+    "default_model": {
+      "effort": "high",
+      "enable_thinking": true,
+      "model": "go/deepseek-v4.1-flash",
+      "provider": "opencode",
+    },
+    "favorite_models": [
+      {
+        "effort": "high",
+        "enable_thinking": true,
+        "model": "go/deepseek-v4.1-flash",
+        "provider": "opencode",
+      },
+      {
+        "effort": "high",
+        "enable_thinking": true,
+        "model": "go/glm-5.3-flash",
+        "provider": "opencode",
+      },
+    ],
+    "model_parameters": [],
+    "play_sound_when_agent_done": "always",
+    "show_turn_stats": true,
+  },
+  "agent_buffer_font_family": "Maple Mono NF",
+  "agent_buffer_font_size": 17,
+  "agent_servers": {
+    "claude-acp": {
+      "type": "registry",
+    },
+    "codex-acp": {
+      "type": "registry",
+    },
+  },
+  "agent_ui_font_family": "Maple Mono NF",
+  "agent_ui_font_size": 16,
+  "auto_indent": "syntax_aware",
+  "auto_indent_on_paste": true,
+  "auto_install_extensions": {
+    "html": true,
+    "oxc": true,
+  },
+  "base_keymap": "VSCode",
+  "buffer_font_family": "Maple Mono NF",
+  "buffer_font_size": 17,
+  "buffer_font_weight": 450,
+  "buffer_line_height": {
+    "custom": 1.75,
+  },
+  "cli_default_open_behavior": "new_window",
+  "code_actions_on_format": {
+    "source.addMissingImports.ts": true,
+    "source.fixAll.eslint": true,
+    "source.fixAll.oxc": true,
+    "source.fixAll.stylelint": true,
+    "source.fixAll.ts": true,
+    "source.removeUnusedImports": true,
+  },
+  "colorize_brackets": true,
+  "completions": {
+    "words": "disabled",
+  },
+  "current_line_highlight": "all",
+  "cursor_blink": true,
+  "cursor_shape": "bar",
+  "edit_predictions": {
+    "provider": "copilot",
+  },
+  "ensure_final_newline_on_save": true,
+  "file_types": {
+    "json": [".prettierrc"],
+    "shellscript": [".ssh-config", "yabairc"],
+  },
+  "format_on_save": "on",
+  "git_commit_buffer_font_size": 16,
+  "git_panel": {
+    "default_width": 400,
+    "dock": "left",
+    "file_icons": true,
+  },
+  "icon_theme": "Catppuccin Mocha",
+  "indent_guides": {
+    "enabled": true,
+  },
+  "language_models": {
+    "opencode": {
+      "available_models": [
+        {
+          "display_name": "DeepSeek V4.1 Flash",
+          "interleaved_reasoning": true,
+          "max_output_tokens": 384000,
+          "max_tokens": 1000000,
+          "name": "deepseek-v4.1-flash",
+          "protocol": "openai_chat",
+          "reasoning_effort_levels": ["low", "high", "max"],
+          "subscription": "go",
+        },
+        {
+          "display_name": "GLM-5.3 Flash",
+          "interleaved_reasoning": true,
+          "max_output_tokens": 131072,
+          "max_tokens": 1000000,
+          "name": "glm-5.3-flash",
+          "protocol": "openai_chat",
+          "reasoning_effort_levels": ["low", "high", "max"],
+          "subscription": "go",
+        },
+      ],
+    },
+  },
+  "linked_edits": true,
+  "lsp": {
+    "oxfmt": {
+      "initialization_options": {
+        "settings": {
+          "fmt.configPath": null,
+          "run": "onSave",
+        },
+      },
+    },
+    "oxlint": {
+      "initialization_options": {
+        "settings": {
+          "configPath": null,
+          "disableNestedConfig": false,
+          "fixKind": "safe_fix",
+          "run": "onType",
+          "unusedDisableDirectives": "deny",
+        },
+      },
+    },
+  },
+  "markdown_preview": {
+    "code_font_family": "Maple Mono NF",
+    "font_family": "Hanken Grotesk",
+    "font_size": 18,
+  },
+  "minimap": {
+    "show": "never",
+  },
+  "multi_cursor_modifier": "cmd_or_ctrl",
+  "node": {
+    "npm_path": "pnpm",
+  },
+  "outline_panel": {
+    "button": false,
+  },
+  "project_panel": {
+    "auto_fold_dirs": false,
+    "bold_folder_labels": true,
+    "default_width": 300,
+    "diagnostic_badges": true,
+    "dock": "right",
+    "git_status_indicator": true,
+    "hide_root": false,
+    "indent_size": 24,
+    "scrollbar": {
+      "show": "system",
+    },
+    "show_diagnostics": "all",
+    "sticky_scroll": false,
+  },
+  "remove_trailing_whitespace_on_save": true,
+  "show_edit_predictions": true,
+  "show_whitespaces": "trailing",
+  "soft_wrap": "none",
+  "sticky_scroll": {
+    "enabled": false,
+  },
+  "tab_size": 2,
+  "tabs": {
+    "file_icons": true,
+    "git_status": true,
+    "show_diagnostics": "all",
+  },
+  "telemetry": {
+    "anthropic_retention": false,
+    "diagnostics": false,
+    "metrics": false,
+  },
+  "terminal": {
+    "blinking": "on",
+    "copy_on_select": true,
+    "cursor_shape": "bar",
+    "font_size": 17,
+    "font_weight": 450,
+    "line_height": {
+      "custom": 1.75,
+    },
+    "max_scroll_history_lines": 9999999,
+  },
+  "theme": "Catppuccin Mocha (Blur) [Heavy]",
+  "title_bar": {
+    "show_onboarding_banner": false,
+    "show_sign_in": false,
+    "show_user_menu": false,
+    "show_user_picture": true,
+    "show_worktree_name": true,
+  },
+  "toolbar": {
+    "breadcrumbs": false,
+    "quick_actions": false,
+  },
+  "ui_font_family": "Maple Mono NF",
+  "ui_font_size": 16,
+  "ui_font_weight": 450,
+  "window_title_format": "${separator}${relativePath}",
+  "wrap_guides": [100],
+}
