@@ -1,8 +1,8 @@
-import { execFile } from 'node:child_process';
-import { basename } from 'node:path';
-import { promisify } from 'node:util';
+import { execFile } from "node:child_process";
+import { basename } from "node:path";
+import { promisify } from "node:util";
 
-import { clearPaneLabel, foregroundBinary, renamePane, renameTab, snapshot } from './herdr.js';
+import { clearPaneLabel, foregroundBinary, renamePane, renameTab, snapshot } from "./herdr.js";
 import {
   clean,
   directoryName,
@@ -10,10 +10,10 @@ import {
   terminalTitle,
   type PaneContext,
   tabLabel,
-} from './naming.js';
-import { sessionTitle } from './session-title.js';
-import { load, save } from './state.js';
-import type { Pane } from './types.js';
+} from "./naming.js";
+import { sessionTitle } from "./session-title.js";
+import { load, save } from "./state.js";
+import type { Pane } from "./types.js";
 
 const execFileAsync = promisify(execFile);
 
@@ -21,8 +21,8 @@ async function projectName(pane: Pane): Promise<string> {
   const cwd = pane.foreground_cwd ?? pane.cwd;
   if (!cwd) return directoryName(pane);
   try {
-    const { stdout } = await execFileAsync('git', ['-C', cwd, 'rev-parse', '--show-toplevel'], {
-      encoding: 'utf8',
+    const { stdout } = await execFileAsync("git", ["-C", cwd, "rev-parse", "--show-toplevel"], {
+      encoding: "utf8",
       timeout: 1_000,
     });
     return basename(stdout.trim()) || directoryName(pane);
