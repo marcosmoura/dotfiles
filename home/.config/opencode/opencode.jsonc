@@ -1,31 +1,31 @@
 {
   "instructions": ["~/.config/agents/orchestrator.md", "~/.config/opencode/rules/*.md"],
 
-  "model": "openai/gpt-5.6-terra",
+  "model": "anthropic/claude-opus-5-5",
 
   "agents": {
     "title": {
-      "model": "openai/gpt-5.6-luna#low"
+      "model": "opencode-go/deepseek-v4.1-flash#low",
     },
 
     "plan": {
-      "model": "openai/gpt-5.6-sol#max"
+      "model": "anthropic/claude-opus-5-5#medium",
     },
 
     "build": {
-      "model": "openai/gpt-5.6-terra#medium"
+      "model": "opencode-go/deepseek-v4.1-flash#max",
     },
 
     "explore": {
-      "model": "openai/gpt-5.6-luna#low"
+      "model": "opencode-go/deepseek-v4.1-flash#low",
     },
 
     "compaction": {
-      "model": "openai/gpt-5.6-sol#max"
+      "model": "anthropic/claude-opus-5-5#max",
     },
 
     "general": {
-      "model": "openai/gpt-5.6-terra#medium",
+      "model": "opencode-go/deepseek-v4.1-flash#max",
     },
 
     "worker": {
@@ -56,14 +56,14 @@
         "url": "https://mcp.context7.com/mcp",
         "disabled": false,
         "headers": {
-          "CONTEXT7_API_KEY": "{file:~/.secrets/context7-key}"
-        }
+          "CONTEXT7_API_KEY": "{file:~/.secrets/context7-key}",
+        },
       },
 
       "grep": {
         "type": "remote",
         "url": "https://mcp.grep.app",
-        "disabled": false
+        "disabled": false,
       },
 
       "github": {
@@ -71,16 +71,10 @@
         "url": "https://api.githubcopilot.com/mcp/",
         "disabled": false,
         "headers": {
-          "Authorization": "{file:~/.secrets/gh-pat-key}"
-        }
+          "Authorization": "{file:~/.secrets/gh-pat-key}",
+        },
       },
-
-      "shoogle": {
-        "type": "remote",
-        "url": "https://mcp.shoogle.dev/mcp",
-        "disabled": false
-      }
-    }
+    },
   },
 
   "permissions": [
@@ -130,31 +124,39 @@
     { "action": "todowrite", "resource": "*", "effect": "allow" },
     { "action": "webfetch", "resource": "*", "effect": "allow" },
     { "action": "websearch", "resource": "*", "effect": "allow" },
-
-    // Never let an agent pick its own git identity (e.g. opencode <opencode@local>).
-    { "action": "shell", "resource": "*user.name=*", "effect": "deny" },
-    { "action": "shell", "resource": "*user.email=*", "effect": "deny" },
-    { "action": "shell", "resource": "git config*user.name *", "effect": "deny" },
-    { "action": "shell", "resource": "git config*user.email *", "effect": "deny" },
-    { "action": "shell", "resource": "*--author=*", "effect": "deny" },
-    { "action": "shell", "resource": "*GIT_AUTHOR_NAME=*", "effect": "deny" },
-    { "action": "shell", "resource": "*GIT_AUTHOR_EMAIL=*", "effect": "deny" },
-    { "action": "shell", "resource": "*GIT_COMMITTER_NAME=*", "effect": "deny" },
-    { "action": "shell", "resource": "*GIT_COMMITTER_EMAIL=*", "effect": "deny" }
   ],
 
   "plugins": [
-    "~/Projects/dotfiles/tools/opencode/model-fallback",
-    "~/Projects/dotfiles/tools/opencode/superpowers"
+    "github:m-uvex/opencode-topics",
+    "~/Projects/dotfiles/tools/opencode/model-profiles",
+    "@cortexkit/opencode-magic-context@0.49.16",
+    "opencode-claude-auth-v2@latest",
+    {
+      "package": "opencode-tps-meter@latest",
+      "options": {
+        "enabled": true,
+        "format": "compact",
+        "showAverage": true,
+        "showInstant": true,
+        "showTotalTokens": false,
+        "showElapsed": false,
+        "enableColorCoding": true,
+      },
+    },
   ],
 
   "lsp": true,
 
+  "compaction": {
+    "auto": false,
+    "prune": false,
+  },
+
   "websearch": {
-    "provider": "random"
+    "provider": "random",
   },
 
   "experimental": {
-    "subagent_depth": 3
-  }
+    "subagent_depth": 3,
+  },
 }

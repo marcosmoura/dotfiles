@@ -1,11 +1,16 @@
 {
-  "plugins": ["/Users/marcosmoura/Projects/dotfiles/tools/opencode/herdr-subagent-panels", "./herdr-opencode"],
+  "$schema": "https://opencode.ai/v2/cli.json",
+
+  "keybinds": {
+    "agent.cycle": "tab"
+  },
   "theme": {
     "name": "catppuccin",
     "mode": "dark"
   },
   "diffs": {
-    "wrap": "word"
+    "wrap": "word",
+    "view": "auto"
   },
   "terminal": {
     "title": true,
@@ -14,17 +19,21 @@
   "session": {
     "sidebar": "auto",
     "scrollbar": true,
-    "thinking": "show",
+    "thinking": "hide",
     "image_preview": true,
-    "new_location": "inherit"
+    "new_location": "inherit",
+    "permissions": "autoaccept",
+    "verbosity": "medium"
   },
   "animations": true,
   "tabs": {
     "layout": "horizontal",
-    "scope": "cwd"
+    "scope": "cwd",
+    "mode": "on",
+    "indicators": "status"
   },
   "scroll": {
-    "speed": 8,
+    "speed": 6,
     "acceleration": true
   },
   "prompt": {
@@ -32,10 +41,16 @@
     "image_preview": true
   },
   "attention": {
-    "enabled": true,
-    "volume": 0.30000000000000016
+    "volume": 0.3,
+    "notifications": true,
+    "sound": true
   },
+  "plugins": ["./herdr-opencode"],
   "debug": {
+    "devtools": false,
     "turn_tokens": true
+  },
+  "leader": {
+    "timeout": 2500
   }
 }
