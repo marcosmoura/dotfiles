@@ -21,6 +21,8 @@ home/.config/herdr/plugins
 home/.config/herdr/release-notes.json
 home/.config/herdr/session*.json
 home/.config/herdr/sessions
+home/.config/herdr/session-snapshots
+home/.config/herdr/herdr.sock.agent
 home/.config/mole/
 home/.config/opencode/opencode-notifier-state.json
 home/.config/opencode/service.json
@@ -31,6 +33,8 @@ home/.config/sheldon/repos/
 home/.config/stache/.env
 home/.config/yarn/
 home/.config/yazi/plugins/
+home/.config/zed/prompts/
+.cortexkit/
 
 # Git identity (machine-specific, created by install.sh)
 home/.config/git/identity
@@ -79,14 +83,18 @@ yarn-error.log*
 .claude.json
 home/.claude/*
 !home/.claude/CLAUDE.md
+!home/.claude/agents/
 !home/.claude/settings.json
-!home/.claude/statusline.json
+!home/.claude/statusline.sh
 
 # Codex (allow specific config files)
 home/.codex/*
 !home/.codex/AGENTS.md
 !home/.codex/config.toml
+!home/.codex/agents/
 !home/.codex/rules/
+
+# OpenCode specific files
 home/.config/opencode/herdr-tui-session.js
 home/.config/opencode/plugins/herdr-agent-state.js
 home/.config/opencode/herdr-opencode/
