@@ -7,55 +7,55 @@
       "1": "green",
       "2": "yellow",
       "3": "red",
-      "4": "magenta"
+      "4": "magenta",
     },
     "padding": {
       "top": 0,
       "right": 4,
-      "left": 2
-    }
+      "left": 2,
+    },
   },
   "display": {
     "color": "yellow",
-    "separator": " "
+    "separator": " ",
   },
   "modules": [
     {
       "type": "os",
       "key": "  OS         ",
-      "format": "{2} - {8} {10}"
+      "format": "{2} - {8} {10}",
     },
     {
       "type": "display",
       "key": "󰍹  Display    ",
-      "format": "{6}: {1}x{2} @ {3}Hz in {12}\""
+      "format": "{6}: {1}x{2} @ {3}Hz in {12}\"",
     },
     {
       "type": "terminal",
       "key": "  Terminal   ",
-      "format": "{5}"
+      "format": "{5}",
     },
     {
       "type": "shell",
       "key": "  Shell      ",
-      "format": "{1}"
+      "format": "{1}",
     },
     {
       "type": "packages",
-      "key": "  Packages   "
+      "key": "  Packages   ",
     },
     {
       "type": "uptime",
-      "key": "  Uptime     "
+      "key": "  Uptime     ",
     },
     {
       "type": "battery",
-      "key": "  Battery    "
+      "key": "  Battery    ",
     },
     {
       "type": "colors",
       "key": "              ",
-      "symbol": "circle"
-    }
-  ]
+      "symbol": "circle",
+    },
+  ],
 }
