@@ -1,0 +1,186 @@
+{
+  "openai": {
+    "description": "OpenAI Models",
+    "model": "openai/gpt-6.1-sol#medium",
+    "agents": {
+      "title": {
+        "model": "openai/gpt-6-luna#low"
+      },
+      "plan": {
+        "model": "openai/gpt-6.1-sol#high"
+      },
+      "build": {
+        "model": "openai/gpt-6.1-sol#medium"
+      },
+      "explore": {
+        "model": "openai/gpt-6-luna#low"
+      },
+      "compaction": {
+        "model": "openai/gpt-6.1-sol#high"
+      },
+      "general": {
+        "model": "openai/gpt-6.1-sol#medium"
+      },
+      "worker": {
+        "model": "openai/gpt-6.1-sol#medium"
+      },
+      "reviewer": {
+        "model": "openai/gpt-6.1-sol#max"
+      },
+      "explorer": {
+        "model": "openai/gpt-6-luna#low"
+      },
+      "shipper": {
+        "model": "openai/gpt-6-luna#low"
+      }
+    }
+  },
+
+  "opencode-free": {
+    "description": "Free OpenCode models",
+    "model": "opencode/deepseek-v4.1-flash-free#max",
+    "agents": {
+      "title": {
+        "model": "opencode/deepseek-v4.1-flash-free#low"
+      },
+      "plan": {
+        "model": "opencode/deepseek-v4.1-flash-free#max"
+      },
+      "build": {
+        "model": "opencode/deepseek-v4.1-flash-free#max"
+      },
+      "explore": {
+        "model": "opencode/deepseek-v4.1-flash-free#low"
+      },
+      "compaction": {
+        "model": "opencode/deepseek-v4.1-flash-free#max"
+      },
+      "general": {
+        "model": "opencode/deepseek-v4.1-flash-free#max"
+      },
+      "worker": {
+        "model": "opencode/deepseek-v4.1-flash-free#max"
+      },
+      "reviewer": {
+        "model": "opencode/deepseek-v4.1-flash-free#max"
+      },
+      "explorer": {
+        "model": "opencode/deepseek-v4.1-flash-free#low"
+      },
+      "shipper": {
+        "model": "opencode/deepseek-v4.1-flash-free#low"
+      }
+    }
+  },
+
+  "opencode-go": {
+    "description": "OpenCode Go Plan",
+    "model": "opencode-go/deepseek-v4.1-flash#max",
+    "agents": {
+      "title": {
+        "model": "opencode-go/deepseek-v4.1-flash#low"
+      },
+      "plan": {
+        "model": "opencode-go/deepseek-v4.1-flash#max"
+      },
+      "build": {
+        "model": "opencode-go/deepseek-v4.1-flash#max"
+      },
+      "explore": {
+        "model": "opencode-go/deepseek-v4.1-flash#low"
+      },
+      "compaction": {
+        "model": "opencode-go/deepseek-v4.1-flash#max"
+      },
+      "general": {
+        "model": "opencode-go/deepseek-v4.1-flash#max"
+      },
+      "worker": {
+        "model": "opencode-go/deepseek-v4.1-flash#max"
+      },
+      "reviewer": {
+        "model": "opencode-go/deepseek-v4.1-flash#max"
+      },
+      "explorer": {
+        "model": "opencode-go/deepseek-v4.1-flash#low"
+      },
+      "shipper": {
+        "model": "opencode-go/deepseek-v4.1-flash#low"
+      }
+    }
+  },
+
+  "anthropic": {
+    "description": "Anthropic Models",
+    "model": "anthropic/claude-sonnet-5-5#medium",
+    "agents": {
+      "title": {
+        "model": "anthropic/claude-haiku-5-5#low"
+      },
+      "plan": {
+        "model": "anthropic/claude-opus-5-5#medium"
+      },
+      "build": {
+        "model": "anthropic/claude-sonnet-5-5#medium"
+      },
+      "explore": {
+        "model": "anthropic/claude-haiku-5-5#low"
+      },
+      "compaction": {
+        "model": "anthropic/claude-opus-5-5#high"
+      },
+      "general": {
+        "model": "anthropic/claude-sonnet-5-5#medium"
+      },
+      "worker": {
+        "model": "anthropic/claude-sonnet-5-5#medium"
+      },
+      "reviewer": {
+        "model": "anthropic/claude-opus-5-5#max"
+      },
+      "explorer": {
+        "model": "anthropic/claude-haiku-5-5#low"
+      },
+      "shipper": {
+        "model": "anthropic/claude-haiku-5-5#low"
+      }
+    }
+  },
+
+  "cheap": {
+    "description": "Opus for orchestration, DeepSeek for implementation",
+    "model": "anthropic/claude-opus-5-5#medium",
+    "agents": {
+      "title": {
+        "model": "opencode-go/deepseek-v4.1-flash#low"
+      },
+      "plan": {
+        "model": "anthropic/claude-opus-5-5#medium"
+      },
+      "build": {
+        "model": "opencode-go/deepseek-v4.1-flash#max"
+      },
+      "explore": {
+        "model": "opencode-go/deepseek-v4.1-flash#low"
+      },
+      "compaction": {
+        "model": "anthropic/claude-opus-5-5#max"
+      },
+      "general": {
+        "model": "opencode-go/deepseek-v4.1-flash#max"
+      },
+      "worker": {
+        "model": "opencode-go/deepseek-v4.1-flash#max"
+      },
+      "reviewer": {
+        "model": "anthropic/claude-opus-5-5#max"
+      },
+      "explorer": {
+        "model": "opencode-go/deepseek-v4.1-flash#low"
+      },
+      "shipper": {
+        "model": "opencode-go/deepseek-v4.1-flash#low"
+      }
+    }
+  }
+}
