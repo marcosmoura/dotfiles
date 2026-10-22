@@ -93,8 +93,8 @@
       }
     ],
     "master": {
-      "ratio": 60,
-      "position": "right"
+      "ratio": 70,
+      "position": "left"
     },
     "floating": {
       "defaultPosition": "center",
@@ -131,7 +131,7 @@
       // Main screen workspaces
       {
         "name": "terminal",
-        "layout": "monocle",
+        "layout": "master",
         "screen": "main",
         "rules": [{ "appId": "com.mitchellh.ghostty" }, { "appId": "com.apple.dt.Devices" }]
       },
@@ -139,13 +139,13 @@
         "name": "coding",
         "layout": "monocle",
         "screen": "main",
-        "rules": [{ "appId": "com.microsoft.VSCode" }]
+        "rules": [{ "appId": "com.microsoft.VSCode" }, { "appId": "dev.zed.Zed" }]
       },
       {
         "name": "browser",
         "layout": "monocle",
         "screen": "secondary",
-        "rules": [{ "appId": "com.microsoft.edgemac.Dev" }, { "appId": "company.thebrowser.dia" }]
+        "rules": [{ "appId": "company.thebrowser.dia" }, { "appId": "com.apple.Safari" }]
       },
       {
         "name": "music",
@@ -165,6 +165,7 @@
         "screen": "secondary",
         "rules": [
           { "appId": "com.figma.Desktop" },
+          { "appId": "ai.storyteller.figcraft" },
           { "appId": "com.nuvio.media.desktop" },
           { "appId": "com.westbridge.stremio5-mac" },
           { "appId": "org.m0k.transmission" }
