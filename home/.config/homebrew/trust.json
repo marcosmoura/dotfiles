@@ -1,5 +1,7 @@
 {
   "trustedtaps": [
+    "abue-ammar/tinycast",
+    "can1357/tap",
     "eth-p/software",
     "felixkratz/formulae",
     "githubutilities/tap",
@@ -7,5 +9,6 @@
     "marcosmoura/tap",
     "narugit/tap",
     "nextdns/tap"
-  ]
+  ],
+  "trustedcasks": ["abue-ammar/tinycast/tinycast"]
 }
