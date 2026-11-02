@@ -1,13 +1,12 @@
 ---
 description: Commit, push and open or update a pull request after implementation and review are complete. Use only when the user has explicitly asked to commit, push, open a PR or ship the completed changes.
 mode: subagent
-steps: 11
 permissions:
   - action: edit
-    resource: "*"
+    resource: '*'
     effect: deny
   - action: subagent
-    resource: "*"
+    resource: '*'
     effect: deny
 ---
 

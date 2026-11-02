@@ -3,7 +3,7 @@ description: Use proactively whenever code needs to be written, modified, refact
 mode: subagent
 permissions:
   - action: subagent
-    resource: "*"
+    resource: '*'
     effect: deny
 ---
 

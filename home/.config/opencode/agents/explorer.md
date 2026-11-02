@@ -1,22 +1,21 @@
 ---
 description: Use at the start of a non-trivial coding task when the relevant code is unfamiliar, to gather scope, acceptance criteria, relevant code, tests and implementation boundaries before planning. Skip it only when the main session expects to read 3 or fewer files it has not already read.
 mode: subagent
-steps: 13
 permissions:
   - action: edit
-    resource: "*"
+    resource: '*'
     effect: deny
   - action: shell
-    resource: "git *commit*"
+    resource: 'git *commit*'
     effect: deny
   - action: shell
-    resource: "git *push*"
+    resource: 'git *push*'
     effect: deny
   - action: shell
-    resource: "gh *pr create*"
+    resource: 'gh *pr create*'
     effect: deny
   - action: subagent
-    resource: "*"
+    resource: '*'
     effect: deny
 ---
 

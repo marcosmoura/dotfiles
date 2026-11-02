@@ -3,19 +3,19 @@ description: Use only when the user asks for a code review, or when a change is 
 mode: subagent
 permissions:
   - action: edit
-    resource: "*"
+    resource: '*'
     effect: deny
   - action: shell
-    resource: "git *commit*"
+    resource: 'git *commit*'
     effect: deny
   - action: shell
-    resource: "git *push*"
+    resource: 'git *push*'
     effect: deny
   - action: shell
-    resource: "gh *pr create*"
+    resource: 'gh *pr create*'
     effect: deny
   - action: subagent
-    resource: "*"
+    resource: '*'
     effect: deny
 ---
 
