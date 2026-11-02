@@ -10,5 +10,5 @@
     "narugit/tap",
     "nextdns/tap"
   ],
-  "trustedcasks": ["abue-ammar/tinycast/tinycast"]
+  "trustedcasks": ["abue-ammar/tinycast/tinycast", "tylergraydev/cctm/claude-code-tool-manager"]
 }
