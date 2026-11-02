@@ -93,7 +93,7 @@
       }
     ],
     "master": {
-      "ratio": 70,
+      "ratio": 75,
       "position": "left"
     },
     "floating": {
@@ -145,7 +145,7 @@
         "name": "browser",
         "layout": "monocle",
         "screen": "secondary",
-        "rules": [{ "appId": "company.thebrowser.dia" }, { "appId": "com.apple.Safari" }]
+        "rules": [{ "appId": "at.studio.AsideBrowser" }, { "appId": "com.apple.Safari" }]
       },
       {
         "name": "music",
@@ -157,7 +157,7 @@
         "name": "communication",
         "layout": "floating",
         "screen": "main",
-        "rules": [{ "appId": "net.whatsapp.WhatsApp" }, { "appId": "com.hnc.Discord" }]
+        "rules": [{ "appId": "net.whatsapp.WhatsApp" }, { "appId": "com.hnc.Discord" }, { "appId": "com.tinyspeck.slackmacgap" }]
       },
       {
         "name": "misc",
