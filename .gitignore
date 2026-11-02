@@ -23,6 +23,14 @@ home/.config/herdr/session*.json
 home/.config/herdr/sessions
 home/.config/herdr/session-snapshots
 home/.config/herdr/herdr.sock.agent
+# herdr-app: commit personal config only; Herdr rewrites the rest on start
+home/.config/herdr-app/*
+!home/.config/herdr-app/keys.json
+!home/.config/herdr-app/settings.json
+!home/.config/herdr-app/programs.json
+!home/.config/herdr-app/themes/
+home/.config/herdr-app/themes/*
+!home/.config/herdr-app/themes/catppuccin.json
 home/.config/mole/
 home/.config/opencode/opencode-notifier-state.json
 home/.config/opencode/service.json
