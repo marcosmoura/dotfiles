@@ -77,3 +77,4 @@ __pycache__/
 
 # Claude Code
 **/.claude/settings.local.json
+**/.claude/.cc-writes/

@@ -1,18 +1,74 @@
 {
   "$schema": "https://json.schemastore.org/claude-code-settings.json",
-  "env": {
-    "CLAUDE_CODE_ATTRIBUTION_HEADER": "0",
-    "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1",
-    "CLAUDE_CODE_ENABLE_TELEMETRY": "0",
-    "CLAUDE_CODE_NO_FLICKER": "1",
-    "ANTHROPIC_DEFAULT_OPUS_MODEL": "claude-opus-5-5",
-    "ANTHROPIC_DEFAULT_SONNET_MODEL": "claude-sonnet-5-5",
-    "CLAUDE_CODE_SUBAGENT_MODEL": "sonnet"
-  },
   "attribution": {
     "commit": "",
     "pr": ""
   },
+  "autoMode": {
+    "environment": ["$defaults", "GitHub repos under marcosmoura/* are owned by the user"]
+  },
+  "effortLevel": "medium",
+  "enabledPlugins": {
+    "claude-code-setup@claude-plugins-official": true,
+    "code-review@claude-plugins-official": true,
+    "code-simplifier@claude-plugins-official": true,
+    "context7@claude-plugins-official": true,
+    "feature-dev@claude-plugins-official": true,
+    "figma@claude-plugins-official": true,
+    "frontend-design@claude-plugins-official": true,
+    "playwright@claude-plugins-official": true,
+    "rust-analyzer-lsp@claude-plugins-official": true,
+    "security-guidance@claude-plugins-official": true,
+    "swift-lsp@claude-plugins-official": true,
+    "typescript-lsp@claude-plugins-official": true
+  },
+  "env": {
+    "ANTHROPIC_DEFAULT_OPUS_MODEL": "claude-opus-5-5",
+    "ANTHROPIC_DEFAULT_SONNET_MODEL": "claude-sonnet-5-5",
+    "CLAUDE_CODE_ATTRIBUTION_HEADER": "0",
+    "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1",
+    "CLAUDE_CODE_ENABLE_TELEMETRY": "0",
+    "CLAUDE_CODE_NO_FLICKER": "1",
+    "CLAUDE_CODE_SUBAGENT_MODEL": "sonnet"
+  },
+  "extraKnownMarketplaces": {
+    "anthropic-agent-skills": {
+      "source": {
+        "repo": "anthropics/skills",
+        "source": "github"
+      }
+    },
+    "claude-pace-marketplace": {
+      "source": {
+        "repo": "Astro-Han/claude-pace",
+        "source": "github"
+      }
+    }
+  },
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "command": "bash '/Users/marcosmoura/.claude/hooks/herdr-agent-state.sh' session",
+            "timeout": 10,
+            "type": "command"
+          }
+        ],
+        "matcher": "^(startup|resume|clear|compact|fork)$"
+      }
+    ]
+  },
+  "model": "opus",
+  "modelSettings": {
+    "claude-opus-5-5": {
+      "effortLevel": "medium"
+    },
+    "claude-sonnet-5-5": {
+      "effortLevel": "medium"
+    }
+  },
+  "outputStyle": "concise",
   "permissions": {
     "allow": [
       "Bash(cat *)",
@@ -43,6 +99,8 @@
       "WebSearch",
       "Write"
     ],
+    "ask": ["Bash(sudo *)", "Bash(rm -rf *)"],
+    "defaultMode": "auto",
     "deny": [
       "Bash(> /dev/sda*)",
       "Bash(dd *)",
@@ -51,75 +109,26 @@
       "Read(~/.aws/**)",
       "Read(~/.gnupg/**)",
       "Read(~/.ssh/**)"
-    ],
-    "ask": ["Bash(sudo *)", "Bash(rm -rf *)"],
-    "defaultMode": "auto"
-  },
-  "model": "opus",
-  "hooks": {
-    "SessionStart": [
-      {
-        "matcher": "^(startup|resume|clear|compact|fork)$",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash '/Users/marcosmoura/.claude/hooks/herdr-agent-state.sh' session",
-            "timeout": 10
-          }
-        ]
-      }
     ]
   },
-  "worktree": {
-    "symlinkDirectories": ["node_modules"],
-    "baseRef": "head"
+  "preferredNotifChannel": "ghostty",
+  "promptSuggestionEnabled": true,
+  "sandbox": {
+    "enabled": true
   },
+  "showTurnDuration": true,
   "statusLine": {
     "type": "command",
-    "command": "~/.claude/statusline.sh"
+    "command": "bunx -y ccstatusline@latest",
+    "padding": 0,
+    "refreshInterval": 5
   },
-  "enabledPlugins": {
-    "claude-code-setup@claude-plugins-official": true,
-    "code-review@claude-plugins-official": true,
-    "code-simplifier@claude-plugins-official": true,
-    "context7@claude-plugins-official": true,
-    "feature-dev@claude-plugins-official": true,
-    "frontend-design@claude-plugins-official": true,
-    "playwright@claude-plugins-official": true,
-    "rust-analyzer-lsp@claude-plugins-official": true,
-    "security-guidance@claude-plugins-official": true,
-    "swift-lsp@claude-plugins-official": true,
-    "typescript-lsp@claude-plugins-official": true,
-    "figma@claude-plugins-official": true
-  },
-  "extraKnownMarketplaces": {
-    "claude-pace-marketplace": {
-      "source": {
-        "source": "github",
-        "repo": "Astro-Han/claude-pace"
-      }
-    },
-    "anthropic-agent-skills": {
-      "source": {
-        "source": "github",
-        "repo": "anthropics/skills"
-      }
-    }
-  },
-  "effortLevel": "high",
-  "modelSettings": {
-    "claude-opus-5-5": {
-      "effortLevel": "medium"
-    },
-    "claude-sonnet-5-5": {
-      "effortLevel": "high"
-    }
-  },
-  "promptSuggestionEnabled": true,
+  "terminalProgressBarEnabled": true,
+  "theme": "auto",
   "tui": "default",
   "verbose": true,
-  "preferredNotifChannel": "ghostty",
-  "autoMode": {
-    "environment": ["$defaults", "GitHub repos under marcosmoura/* are owned by the user"]
+  "worktree": {
+    "baseRef": "head",
+    "symlinkDirectories": ["node_modules"]
   }
 }
