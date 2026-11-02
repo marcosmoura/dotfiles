@@ -31,6 +31,10 @@ export PAGER="less"
 # Bat
 export BAT_CONFIG_PATH="$XDG_CONFIG_HOME/bat/batconfig"
 
+# Graphify — semantic extraction through the Claude Code plan, no API key
+export GRAPHIFY_BACKEND="claude-cli"
+export GRAPHIFY_CLAUDE_CLI_MODEL="haiku"
+
 # PATH additions — deduplicated via path_prepend
 path_prepend() {
   [ -d "$1" ] || return 0
