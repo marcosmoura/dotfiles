@@ -19,7 +19,7 @@
   "session": {
     "sidebar": "auto",
     "scrollbar": true,
-    "thinking": "hide",
+    "thinking": "show",
     "image_preview": true,
     "new_location": "inherit",
     "permissions": "autoaccept",

@@ -9,8 +9,8 @@
   },
   "magic-context": {
     "header": {
-      "label": "Memory"
+      "label": "Context"
     },
-    "collapsed": false
+    "collapsed": true
   }
 }
