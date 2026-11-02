@@ -27,7 +27,7 @@
       "reviewer": {
         "model": "openai/gpt-6.1-sol#medium"
       },
-      "explorer": {
+      "scout": {
         "model": "openai/gpt-6-luna#low"
       },
       "shipper": {
@@ -64,7 +64,7 @@
       "reviewer": {
         "model": "opencode/deepseek-v4.1-flash-free#high"
       },
-      "explorer": {
+      "scout": {
         "model": "opencode/deepseek-v4.1-flash-free#low"
       },
       "shipper": {
@@ -101,7 +101,7 @@
       "reviewer": {
         "model": "opencode-go/deepseek-v4.1-flash#high"
       },
-      "explorer": {
+      "scout": {
         "model": "opencode-go/deepseek-v4.1-flash#low"
       },
       "shipper": {
@@ -138,7 +138,7 @@
       "reviewer": {
         "model": "claude-agent/claude-opus-5-5#high"
       },
-      "explorer": {
+      "scout": {
         "model": "claude-agent/claude-haiku-5-5#low"
       },
       "shipper": {
@@ -175,7 +175,7 @@
       "reviewer": {
         "model": "claude-agent/claude-opus-5-5#high"
       },
-      "explorer": {
+      "scout": {
         "model": "opencode-go/deepseek-v4.1-flash#low"
       },
       "shipper": {
@@ -212,7 +212,7 @@
       "reviewer": {
         "model": "openai/gpt-6.1-sol#xhigh"
       },
-      "explorer": {
+      "scout": {
         "model": "opencode-go/deepseek-v4.1-flash#low"
       },
       "shipper": {

@@ -19,4 +19,4 @@ permissions:
     effect: deny
 ---
 
-Use the `read` tool to read `~/.config/agents/roles/explorer.md` in full before you do anything else. It is your complete role definition; follow it exactly. Do not act until you have read it.
+Use the `read` tool to read `~/.config/agents/roles/scout.md` in full before you do anything else. It is your complete role definition; follow it exactly. Do not act until you have read it.

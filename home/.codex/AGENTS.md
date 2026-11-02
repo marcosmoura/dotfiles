@@ -20,5 +20,5 @@ Read `~/.config/agents/orchestrator.md` in full before your first action and fol
 ## Codex delegation notes
 
 - Spawn a role with `spawn_agent` and pass the role name in `agent_type`.
-- For `explorer` and `shipper`, set `fork_turns = "none"` to start them without parent history. The role's model applies regardless of inherited history; `fork_turns` only controls context.
+- For `scout` and `shipper`, set `fork_turns = "none"` to start them without parent history. The role's model applies regardless of inherited history; `fork_turns` only controls context.
 - Continue an existing worker with `followup_task` so it keeps its context.

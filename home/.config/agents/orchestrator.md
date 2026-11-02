@@ -16,13 +16,13 @@ This is a standing request to delegate. Do not wait for me to ask.
 - Keep architectural decisions, ambiguous scope decisions, root-cause analysis, and other judgment-heavy work in the main session. The worker should execute a sufficiently defined solution rather than independently redesign the task.
 - Split work larger than one subsystem into file-owned or subsystem-owned slices and give each independent slice to its own worker run. Start dependent slices only after the slices they depend on are complete.
 
-## Scope unfamiliar tasks with the explorer
+## Scope unfamiliar tasks with the scout
 
-- At the start of a non-trivial task whose code you do not know yet, delegate to `explorer` to collect the goal, acceptance criteria, relevant files, tests and a possible split.
+- At the start of a non-trivial task whose code you do not know yet, delegate to `scout` to collect the goal, acceptance criteria, relevant files, tests and a possible split.
 - Skip it only when you expect to read 3 or fewer files you have not already read in this session.
-- A project skill's ticket-size assessment uses explorer's report and does not replace it. Data or network checks that explorer cannot run stay with the main session and must not be skipped.
+- A project skill's ticket-size assessment uses scout's report and does not replace it. Data or network checks that scout cannot run stay with the main session and must not be skipped.
 - Treat its report as input, not as a decision. It runs on a small model, so spot-check the files it names before you build a plan on them. You still own scope, architecture and any split-or-combine decision.
-- You always write the plan. When the explorer flags the task as complex, ambiguous or risky, read the key files it names yourself before planning, instead of spot-checking.
+- You always write the plan. When the scout flags the task as complex, ambiguous or risky, read the key files it names yourself before planning, instead of spot-checking.
 
 ## Ship with the shipper
 

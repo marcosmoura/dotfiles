@@ -38,7 +38,7 @@
       "model": "claude-agent/claude-opus-5-5#high",
     },
 
-    "explorer": {
+    "scout": {
       "mode": "subagent",
       "model": "opencode-go/deepseek-v4.1-flash#low",
     },
