@@ -7,7 +7,7 @@
         "model": "openai/gpt-6-luna#low"
       },
       "plan": {
-        "model": "openai/gpt-6.1-sol#high"
+        "model": "openai/gpt-6.1-sol#medium"
       },
       "build": {
         "model": "openai/gpt-6.1-sol#medium"
@@ -16,7 +16,7 @@
         "model": "openai/gpt-6-luna#low"
       },
       "compaction": {
-        "model": "openai/gpt-6.1-sol#high"
+        "model": "openai/gpt-6.1-sol#medium"
       },
       "general": {
         "model": "openai/gpt-6.1-sol#medium"
@@ -25,7 +25,7 @@
         "model": "openai/gpt-6.1-sol#medium"
       },
       "reviewer": {
-        "model": "openai/gpt-6.1-sol#max"
+        "model": "openai/gpt-6.1-sol#medium"
       },
       "explorer": {
         "model": "openai/gpt-6-luna#low"
@@ -38,31 +38,31 @@
 
   "opencode-free": {
     "description": "Free OpenCode models",
-    "model": "opencode/deepseek-v4.1-flash-free#max",
+    "model": "opencode/deepseek-v4.1-flash-free#high",
     "agents": {
       "title": {
         "model": "opencode/deepseek-v4.1-flash-free#low"
       },
       "plan": {
-        "model": "opencode/deepseek-v4.1-flash-free#max"
+        "model": "opencode/deepseek-v4.1-flash-free#high"
       },
       "build": {
-        "model": "opencode/deepseek-v4.1-flash-free#max"
+        "model": "opencode/deepseek-v4.1-flash-free#high"
       },
       "explore": {
         "model": "opencode/deepseek-v4.1-flash-free#low"
       },
       "compaction": {
-        "model": "opencode/deepseek-v4.1-flash-free#max"
+        "model": "opencode/deepseek-v4.1-flash-free#high"
       },
       "general": {
-        "model": "opencode/deepseek-v4.1-flash-free#max"
+        "model": "opencode/deepseek-v4.1-flash-free#high"
       },
       "worker": {
-        "model": "opencode/deepseek-v4.1-flash-free#max"
+        "model": "opencode/deepseek-v4.1-flash-free#high"
       },
       "reviewer": {
-        "model": "opencode/deepseek-v4.1-flash-free#max"
+        "model": "opencode/deepseek-v4.1-flash-free#high"
       },
       "explorer": {
         "model": "opencode/deepseek-v4.1-flash-free#low"
@@ -75,31 +75,31 @@
 
   "opencode-go": {
     "description": "OpenCode Go Plan",
-    "model": "opencode-go/deepseek-v4.1-flash#max",
+    "model": "opencode-go/deepseek-v4.1-flash#high",
     "agents": {
       "title": {
         "model": "opencode-go/deepseek-v4.1-flash#low"
       },
       "plan": {
-        "model": "opencode-go/deepseek-v4.1-flash#max"
+        "model": "opencode-go/deepseek-v4.1-flash#high"
       },
       "build": {
-        "model": "opencode-go/deepseek-v4.1-flash#max"
+        "model": "opencode-go/deepseek-v4.1-flash#high"
       },
       "explore": {
         "model": "opencode-go/deepseek-v4.1-flash#low"
       },
       "compaction": {
-        "model": "opencode-go/deepseek-v4.1-flash#max"
+        "model": "opencode-go/deepseek-v4.1-flash#high"
       },
       "general": {
-        "model": "opencode-go/deepseek-v4.1-flash#max"
+        "model": "opencode-go/deepseek-v4.1-flash#high"
       },
       "worker": {
-        "model": "opencode-go/deepseek-v4.1-flash#max"
+        "model": "opencode-go/deepseek-v4.1-flash#high"
       },
       "reviewer": {
-        "model": "opencode-go/deepseek-v4.1-flash#max"
+        "model": "opencode-go/deepseek-v4.1-flash#high"
       },
       "explorer": {
         "model": "opencode-go/deepseek-v4.1-flash#low"
@@ -112,68 +112,105 @@
 
   "anthropic": {
     "description": "Anthropic Models",
-    "model": "anthropic/claude-sonnet-5-5#medium",
+    "model": "claude-agent/claude-sonnet-5-5#medium",
     "agents": {
       "title": {
-        "model": "anthropic/claude-haiku-5-5#low"
+        "model": "claude-agent/claude-haiku-5-5#low"
       },
       "plan": {
-        "model": "anthropic/claude-opus-5-5#medium"
+        "model": "claude-agent/claude-opus-5-5#medium"
       },
       "build": {
-        "model": "anthropic/claude-sonnet-5-5#medium"
+        "model": "claude-agent/claude-sonnet-5-5#medium"
       },
       "explore": {
-        "model": "anthropic/claude-haiku-5-5#low"
+        "model": "claude-agent/claude-haiku-5-5#low"
       },
       "compaction": {
-        "model": "anthropic/claude-opus-5-5#high"
+        "model": "claude-agent/claude-opus-5-5#high"
       },
       "general": {
-        "model": "anthropic/claude-sonnet-5-5#medium"
+        "model": "claude-agent/claude-sonnet-5-5#medium"
       },
       "worker": {
-        "model": "anthropic/claude-sonnet-5-5#medium"
+        "model": "claude-agent/claude-sonnet-5-5#medium"
       },
       "reviewer": {
-        "model": "anthropic/claude-opus-5-5#max"
+        "model": "claude-agent/claude-opus-5-5#high"
       },
       "explorer": {
-        "model": "anthropic/claude-haiku-5-5#low"
+        "model": "claude-agent/claude-haiku-5-5#low"
       },
       "shipper": {
-        "model": "anthropic/claude-haiku-5-5#low"
+        "model": "claude-agent/claude-haiku-5-5#low"
       }
     }
   },
 
-  "cheap": {
+  "mixed-anthropic": {
     "description": "Opus for orchestration, DeepSeek for implementation",
-    "model": "anthropic/claude-opus-5-5#medium",
+    "model": "claude-agent/claude-opus-5-5#medium",
     "agents": {
       "title": {
         "model": "opencode-go/deepseek-v4.1-flash#low"
       },
       "plan": {
-        "model": "anthropic/claude-opus-5-5#medium"
+        "model": "claude-agent/claude-opus-5-5#medium"
       },
       "build": {
-        "model": "opencode-go/deepseek-v4.1-flash#max"
+        "model": "claude-agent/claude-opus-5-5#medium"
       },
       "explore": {
         "model": "opencode-go/deepseek-v4.1-flash#low"
       },
       "compaction": {
-        "model": "anthropic/claude-opus-5-5#max"
+        "model": "claude-agent/claude-opus-5-5#high"
       },
       "general": {
-        "model": "opencode-go/deepseek-v4.1-flash#max"
+        "model": "opencode-go/deepseek-v4.1-flash#high"
       },
       "worker": {
-        "model": "opencode-go/deepseek-v4.1-flash#max"
+        "model": "opencode-go/deepseek-v4.1-flash#high"
       },
       "reviewer": {
-        "model": "anthropic/claude-opus-5-5#max"
+        "model": "claude-agent/claude-opus-5-5#high"
+      },
+      "explorer": {
+        "model": "opencode-go/deepseek-v4.1-flash#low"
+      },
+      "shipper": {
+        "model": "opencode-go/deepseek-v4.1-flash#low"
+      }
+    }
+  },
+
+  "mixed-openai": {
+    "description": "Sol for orchestration, DeepSeek for implementation",
+    "model": "openai/gpt-6.1-sol#medium",
+    "agents": {
+      "title": {
+        "model": "opencode-go/deepseek-v4.1-flash#low"
+      },
+      "plan": {
+        "model": "openai/gpt-6.1-sol#medium"
+      },
+      "build": {
+        "model": "opencode-go/deepseek-v4.1-flash#high"
+      },
+      "explore": {
+        "model": "opencode-go/deepseek-v4.1-flash#low"
+      },
+      "compaction": {
+        "model": "openai/gpt-6.1-sol#xhigh"
+      },
+      "general": {
+        "model": "opencode-go/deepseek-v4.1-flash#high"
+      },
+      "worker": {
+        "model": "opencode-go/deepseek-v4.1-flash#high"
+      },
+      "reviewer": {
+        "model": "openai/gpt-6.1-sol#xhigh"
       },
       "explorer": {
         "model": "opencode-go/deepseek-v4.1-flash#low"

@@ -1,7 +1,7 @@
 {
   "instructions": ["~/.config/agents/orchestrator.md", "~/.config/opencode/rules/*.md"],
 
-  "model": "anthropic/claude-opus-5-5",
+  "model": "claude-agent/claude-opus-5-5",
 
   "agents": {
     "title": {
@@ -9,11 +9,11 @@
     },
 
     "plan": {
-      "model": "anthropic/claude-opus-5-5#medium",
+      "model": "claude-agent/claude-opus-5-5#medium",
     },
 
     "build": {
-      "model": "opencode-go/deepseek-v4.1-flash#max",
+      "model": "opencode-go/deepseek-v4.1-flash#high",
     },
 
     "explore": {
@@ -21,21 +21,21 @@
     },
 
     "compaction": {
-      "model": "anthropic/claude-opus-5-5#max",
+      "model": "claude-agent/claude-opus-5-5#high",
     },
 
     "general": {
-      "model": "opencode-go/deepseek-v4.1-flash#max",
+      "model": "opencode-go/deepseek-v4.1-flash#high",
     },
 
     "worker": {
       "mode": "subagent",
-      "model": "opencode-go/deepseek-v4.1-flash#max",
+      "model": "opencode-go/deepseek-v4.1-flash#high",
     },
 
     "reviewer": {
       "mode": "subagent",
-      "model": "anthropic/claude-opus-5-5#max",
+      "model": "claude-agent/claude-opus-5-5#high",
     },
 
     "explorer": {
