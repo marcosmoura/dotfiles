@@ -112,59 +112,59 @@
 
   "anthropic": {
     "description": "Anthropic Models",
-    "model": "claude-agent/claude-sonnet-5-5#medium",
+    "model": "claude-agent/sonnet#medium",
     "agents": {
       "title": {
-        "model": "claude-agent/claude-haiku-5-5#low"
+        "model": "claude-agent/haiku#low"
       },
       "plan": {
-        "model": "claude-agent/claude-opus-5-5#medium"
+        "model": "claude-agent/opus#medium"
       },
       "build": {
-        "model": "claude-agent/claude-sonnet-5-5#medium"
+        "model": "claude-agent/sonnet#medium"
       },
       "explore": {
-        "model": "claude-agent/claude-haiku-5-5#low"
+        "model": "claude-agent/haiku#low"
       },
       "compaction": {
-        "model": "claude-agent/claude-opus-5-5#high"
+        "model": "claude-agent/opus#high"
       },
       "general": {
-        "model": "claude-agent/claude-sonnet-5-5#medium"
+        "model": "claude-agent/sonnet#medium"
       },
       "worker": {
-        "model": "claude-agent/claude-sonnet-5-5#medium"
+        "model": "claude-agent/sonnet#medium"
       },
       "reviewer": {
-        "model": "claude-agent/claude-opus-5-5#high"
+        "model": "claude-agent/opus#high"
       },
       "scout": {
-        "model": "claude-agent/claude-haiku-5-5#low"
+        "model": "claude-agent/haiku#low"
       },
       "shipper": {
-        "model": "claude-agent/claude-haiku-5-5#low"
+        "model": "claude-agent/haiku#low"
       }
     }
   },
 
   "mixed-anthropic": {
     "description": "Opus for orchestration, DeepSeek for implementation",
-    "model": "claude-agent/claude-opus-5-5#medium",
+    "model": "claude-agent/opus#medium",
     "agents": {
       "title": {
         "model": "opencode-go/deepseek-v4.1-flash#low"
       },
       "plan": {
-        "model": "claude-agent/claude-opus-5-5#medium"
+        "model": "claude-agent/opus#medium"
       },
       "build": {
-        "model": "claude-agent/claude-opus-5-5#medium"
+        "model": "claude-agent/opus#medium"
       },
       "explore": {
         "model": "opencode-go/deepseek-v4.1-flash#low"
       },
       "compaction": {
-        "model": "claude-agent/claude-opus-5-5#high"
+        "model": "claude-agent/opus#high"
       },
       "general": {
         "model": "opencode-go/deepseek-v4.1-flash#high"
@@ -173,7 +173,7 @@
         "model": "opencode-go/deepseek-v4.1-flash#high"
       },
       "reviewer": {
-        "model": "claude-agent/claude-opus-5-5#high"
+        "model": "claude-agent/opus#high"
       },
       "scout": {
         "model": "opencode-go/deepseek-v4.1-flash#low"
