@@ -129,10 +129,10 @@
   "plugins": [
     "github:m-uvex/opencode-topics",
     "~/Projects/dotfiles/tools/opencode/model-profiles",
-    "@cortexkit/opencode-magic-context@0.49.16",
-    "opencode-claude-auth-v2@latest",
+    "@cortexkit/opencode-magic-context",
+    "@cortexkit/aft-opencode@0.63.4",
     {
-      "package": "opencode-tps-meter@latest",
+      "package": "opencode-tps-meter",
       "options": {
         "enabled": true,
         "format": "compact",

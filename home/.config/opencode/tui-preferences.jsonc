@@ -3,10 +3,14 @@
 // supported settings. This file is safe to hand-edit; plugins update individual
 // keys and preserve the rest (values and comments).
 {
+  "aft": {
+    "footer": false,
+    "collapsed": true
+  },
   "magic-context": {
     "header": {
       "label": "Memory"
     },
-    "collapsed": true
+    "collapsed": false
   }
 }
