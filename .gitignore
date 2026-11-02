@@ -106,3 +106,6 @@ home/.codex/*
 home/.config/opencode/herdr-tui-session.js
 home/.config/opencode/plugins/herdr-agent-state.js
 home/.config/opencode/herdr-opencode/
+
+# SOPS
+sops/
