@@ -1,7 +1,7 @@
 {
   "instructions": ["~/.config/agents/orchestrator.md", "~/.config/opencode/rules/*.md"],
 
-  "model": "claude-agent/claude-opus-5-5",
+  "model": "openai/gpt-6.1-sol",
 
   "agents": {
     "title": {
@@ -9,7 +9,7 @@
     },
 
     "plan": {
-      "model": "claude-agent/claude-opus-5-5#medium",
+      "model": "openai/gpt-6.1-sol#medium",
     },
 
     "build": {
@@ -21,7 +21,7 @@
     },
 
     "compaction": {
-      "model": "claude-agent/claude-opus-5-5#high",
+      "model": "openai/gpt-6.1-sol#high",
     },
 
     "general": {
@@ -35,7 +35,7 @@
 
     "reviewer": {
       "mode": "subagent",
-      "model": "claude-agent/claude-opus-5-5#high",
+      "model": "openai/gpt-6.1-sol#high",
     },
 
     "scout": {
