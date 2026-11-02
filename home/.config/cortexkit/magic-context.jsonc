@@ -5,13 +5,21 @@
     "opencode": {
       "model": {
         "model": "opencode-go/deepseek-v4.1-flash",
-        "variant": "low",
       },
     },
   },
 
   "dreamer": {
-    "disable": true,
+    "disable": false,
+    "opencode": {
+      "model": {
+        "model": "opencode-go/deepseek-v4.1-flash",
+        "variant": "high",
+      },
+    },
+    "tasks": {
+      "review-user-memories": { "schedule": "" },
+    },
   },
 
   "embedding": {
@@ -21,7 +29,7 @@
   "memory": {
     "enabled": true,
     "auto_promote": true,
-    "injection_budget_tokens": 1000,
+    "injection_budget_tokens": 4000,
   },
 
   "prompt_surface": {
