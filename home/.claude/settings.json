@@ -1,27 +1,5 @@
 {
   "$schema": "https://json.schemastore.org/claude-code-settings.json",
-  "attribution": {
-    "commit": "",
-    "pr": ""
-  },
-  "autoMode": {
-    "environment": ["$defaults", "GitHub repos under marcosmoura/* are owned by the user"]
-  },
-  "effortLevel": "medium",
-  "enabledPlugins": {
-    "claude-code-setup@claude-plugins-official": true,
-    "code-review@claude-plugins-official": true,
-    "code-simplifier@claude-plugins-official": true,
-    "context7@claude-plugins-official": true,
-    "feature-dev@claude-plugins-official": true,
-    "figma@claude-plugins-official": true,
-    "frontend-design@claude-plugins-official": true,
-    "playwright@claude-plugins-official": true,
-    "rust-analyzer-lsp@claude-plugins-official": true,
-    "security-guidance@claude-plugins-official": true,
-    "swift-lsp@claude-plugins-official": true,
-    "typescript-lsp@claude-plugins-official": true
-  },
   "env": {
     "ANTHROPIC_DEFAULT_OPUS_MODEL": "claude-opus-5-5",
     "ANTHROPIC_DEFAULT_SONNET_MODEL": "claude-sonnet-5-5",
@@ -31,44 +9,10 @@
     "CLAUDE_CODE_NO_FLICKER": "1",
     "CLAUDE_CODE_SUBAGENT_MODEL": "sonnet"
   },
-  "extraKnownMarketplaces": {
-    "anthropic-agent-skills": {
-      "source": {
-        "repo": "anthropics/skills",
-        "source": "github"
-      }
-    },
-    "claude-pace-marketplace": {
-      "source": {
-        "repo": "Astro-Han/claude-pace",
-        "source": "github"
-      }
-    }
+  "attribution": {
+    "commit": "",
+    "pr": ""
   },
-  "hooks": {
-    "SessionStart": [
-      {
-        "hooks": [
-          {
-            "command": "bash \"$HOME/.claude/hooks/herdr-agent-state.sh\" session",
-            "timeout": 10,
-            "type": "command"
-          }
-        ],
-        "matcher": "^(startup|resume|clear|compact|fork)$"
-      }
-    ]
-  },
-  "model": "opus",
-  "modelSettings": {
-    "claude-opus-5-5": {
-      "effortLevel": "medium"
-    },
-    "claude-sonnet-5-5": {
-      "effortLevel": "medium"
-    }
-  },
-  "outputStyle": "concise",
   "permissions": {
     "allow": [
       "Bash(cat *)",
@@ -99,8 +43,6 @@
       "WebSearch",
       "Write"
     ],
-    "ask": ["Bash(sudo *)", "Bash(rm -rf *)"],
-    "defaultMode": "auto",
     "deny": [
       "Bash(> /dev/sda*)",
       "Bash(dd *)",
@@ -109,26 +51,91 @@
       "Read(~/.aws/**)",
       "Read(~/.gnupg/**)",
       "Read(~/.ssh/**)"
+    ],
+    "ask": ["Bash(sudo *)", "Bash(rm -rf *)"],
+    "defaultMode": "auto"
+  },
+  "model": "opus",
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "^(startup|resume|clear|compact|fork)$",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$HOME/.claude/hooks/herdr-agent-state.sh\" session",
+            "timeout": 10
+          }
+        ]
+      }
     ]
   },
-  "preferredNotifChannel": "ghostty",
-  "promptSuggestionEnabled": true,
-  "sandbox": {
-    "enabled": true
+  "worktree": {
+    "symlinkDirectories": ["node_modules"],
+    "baseRef": "head"
   },
-  "showTurnDuration": true,
   "statusLine": {
     "type": "command",
     "command": "bunx ccstatusline@2.2.33",
     "padding": 0,
     "refreshInterval": 5
   },
-  "terminalProgressBarEnabled": true,
-  "theme": "auto",
+  "enabledPlugins": {
+    "claude-code-setup@claude-plugins-official": true,
+    "code-review@claude-plugins-official": true,
+    "code-simplifier@claude-plugins-official": true,
+    "context7@claude-plugins-official": true,
+    "feature-dev@claude-plugins-official": true,
+    "figma@claude-plugins-official": true,
+    "frontend-design@claude-plugins-official": true,
+    "playwright@claude-plugins-official": true,
+    "rust-analyzer-lsp@claude-plugins-official": true,
+    "security-guidance@claude-plugins-official": true,
+    "swift-lsp@claude-plugins-official": true,
+    "typescript-lsp@claude-plugins-official": true,
+    "humanizer@humanizer": true
+  },
+  "extraKnownMarketplaces": {
+    "anthropic-agent-skills": {
+      "source": {
+        "source": "github",
+        "repo": "anthropics/skills"
+      }
+    },
+    "claude-pace-marketplace": {
+      "source": {
+        "source": "github",
+        "repo": "Astro-Han/claude-pace"
+      }
+    },
+    "humanizer": {
+      "source": {
+        "source": "github",
+        "repo": "blader/humanizer"
+      }
+    }
+  },
+  "outputStyle": "concise",
+  "sandbox": {
+    "enabled": true
+  },
+  "effortLevel": "medium",
+  "modelSettings": {
+    "claude-opus-5-5": {
+      "effortLevel": "medium"
+    },
+    "claude-sonnet-5-5": {
+      "effortLevel": "medium"
+    }
+  },
+  "promptSuggestionEnabled": true,
   "tui": "default",
+  "theme": "auto",
   "verbose": true,
-  "worktree": {
-    "baseRef": "head",
-    "symlinkDirectories": ["node_modules"]
+  "preferredNotifChannel": "ghostty",
+  "showTurnDuration": true,
+  "terminalProgressBarEnabled": true,
+  "autoMode": {
+    "environment": ["$defaults", "GitHub repos under marcosmoura/* are owned by the user"]
   }
 }
