@@ -50,7 +50,7 @@
       {
         "hooks": [
           {
-            "command": "bash '/Users/marcosmoura/.claude/hooks/herdr-agent-state.sh' session",
+            "command": "bash \"$HOME/.claude/hooks/herdr-agent-state.sh\" session",
             "timeout": 10,
             "type": "command"
           }
@@ -119,7 +119,7 @@
   "showTurnDuration": true,
   "statusLine": {
     "type": "command",
-    "command": "bunx -y ccstatusline@latest",
+    "command": "bunx ccstatusline@2.2.33",
     "padding": 0,
     "refreshInterval": 5
   },
