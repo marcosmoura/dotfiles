@@ -1,0 +1,13 @@
+{
+  "zoom": 1,
+  "sounds": {
+    "enabled": true
+  },
+  "minimum_contrast": 1,
+  "appearance": "dark",
+  "theme": "catppuccin",
+  "font": "Maple Mono NF",
+  "font_size": 15,
+  "ui_font": "Maple Mono NF",
+  "telemetry": false
+}
