@@ -201,7 +201,7 @@
         "model": "opencode-go/deepseek-v4.1-flash#low"
       },
       "compaction": {
-        "model": "openai/gpt-6.1-sol#xhigh"
+        "model": "openai/gpt-6.1-sol#high"
       },
       "general": {
         "model": "opencode-go/deepseek-v4.1-flash#high"
@@ -210,7 +210,7 @@
         "model": "opencode-go/deepseek-v4.1-flash#high"
       },
       "reviewer": {
-        "model": "openai/gpt-6.1-sol#xhigh"
+        "model": "openai/gpt-6.1-sol#high"
       },
       "scout": {
         "model": "opencode-go/deepseek-v4.1-flash#low"
