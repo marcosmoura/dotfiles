@@ -1,7 +1,7 @@
 {
   "instructions": ["~/.config/agents/orchestrator.md", "~/.config/opencode/rules/*.md"],
 
-  "model": "openai/gpt-6.1-sol",
+  "model": "claude-agent/opus",
 
   "agents": {
     "title": {
@@ -9,11 +9,11 @@
     },
 
     "plan": {
-      "model": "openai/gpt-6.1-sol#medium",
+      "model": "claude-agent/opus#medium",
     },
 
     "build": {
-      "model": "opencode-go/deepseek-v4.1-flash#high",
+      "model": "claude-agent/opus#medium",
     },
 
     "explore": {
@@ -21,7 +21,7 @@
     },
 
     "compaction": {
-      "model": "openai/gpt-6.1-sol#high",
+      "model": "claude-agent/opus#high",
     },
 
     "general": {
@@ -35,7 +35,7 @@
 
     "reviewer": {
       "mode": "subagent",
-      "model": "openai/gpt-6.1-sol#high",
+      "model": "claude-agent/opus#high",
     },
 
     "scout": {
@@ -127,10 +127,10 @@
   ],
 
   "plugins": [
-    "github:m-uvex/opencode-topics",
     "~/Projects/dotfiles/tools/opencode/model-profiles",
     "@cortexkit/opencode-magic-context",
     "@cortexkit/aft-opencode@0.63.4",
+    "opencode-subagent-statusline",
     {
       "package": "opencode-tps-meter",
       "options": {
