@@ -1,10 +1,11 @@
-import { readFileSync, writeFileSync } from "node:fs";
+import { readFileSync, statSync, writeFileSync } from "node:fs";
 import { homedir } from "node:os";
 import { Plugin } from "@opencode/plugin/tui";
 import { applyPlan, readConfigState } from "./config.js";
 import {
-  parseProfiles,
+  loadProfiles as loadMergedProfiles,
   planSwitch,
+  profileColor,
   resolveProfiles,
   type ConfigState,
   type Profiles,
@@ -26,14 +27,26 @@ export default Plugin.define({
     const location = () => context.location ?? context.data.location.default();
     const resolve = (): Resolution => resolveProfiles(location().directory, homedir());
 
-    const loadProfiles = (res: Resolution): Profiles => {
-      let text: string;
+    const readProfilesFile = (path: string): string | undefined => {
       try {
-        text = readFileSync(res.profilesPath, "utf8");
-      } catch {
-        throw new Error(`profiles file not found: ${res.profilesPath}`);
+        return readFileSync(path, "utf8");
+      } catch (error) {
+        if ((error as NodeJS.ErrnoException).code === "ENOENT") return undefined;
+        throw new Error(`cannot read ${path}: ${error instanceof Error ? error.message : error}`);
       }
-      return parseProfiles(text);
+    };
+
+    const loadProfiles = (res: Resolution): Profiles => loadMergedProfiles(res, readProfilesFile);
+
+    // The sidebar renders often; re-read the profiles only when a file changes.
+    let colorCache: { key: string; profiles: Profiles } | undefined;
+    const sidebarProfiles = (res: Resolution): Profiles => {
+      const mtime = (path: string) => statSync(path, { throwIfNoEntry: false })?.mtimeMs ?? -1;
+      const key = [res.profilesPath, mtime(res.profilesPath)]
+        .concat(res.local ? [res.globalProfilesPath, mtime(res.globalProfilesPath)] : [])
+        .join("|");
+      if (colorCache?.key !== key) colorCache = { key, profiles: loadProfiles(res) };
+      return colorCache.profiles;
     };
 
     const readConfig = (res: Resolution): string => {
@@ -168,8 +181,20 @@ export default Plugin.define({
     const unregisterSidebar = context.ui.slot({
       append: "sidebar.content",
       render: () => {
-        const name = state.active[resolve().configPath] ?? "default";
-        return <text fg={context.theme.text.base}>Model Profile: {name}</text>;
+        let name = "default";
+        let color: string | undefined;
+        try {
+          const res = resolve();
+          name = state.active[res.configPath] ?? "default";
+          color = profileColor(name, sidebarProfiles(res));
+        } catch {
+          // Missing, unreadable or invalid profiles: render the name uncolored.
+        }
+        return (
+          <text fg={context.theme.text.base}>
+            Model Profile: <span style={{ fg: color ?? context.theme.text.base }}>{name}</span>
+          </text>
+        );
       },
     });
 

@@ -1,0 +1,231 @@
+{
+  "profiles": {
+    "openai": {
+      "description": "OpenAI Models",
+      "color": "#10a37f",
+      "model": "openai/gpt-6.1-sol#medium",
+      "agents": {
+        "title": {
+          "model": "openai/gpt-6-luna#low"
+        },
+        "plan": {
+          "model": "openai/gpt-6.1-sol#medium"
+        },
+        "build": {
+          "model": "openai/gpt-6.1-terra#medium"
+        },
+        "explore": {
+          "model": "openai/gpt-6-luna#low"
+        },
+        "compaction": {
+          "model": "openai/gpt-6.1-sol#medium"
+        },
+        "general": {
+          "model": "openai/gpt-6.1-sol#medium"
+        },
+        "worker": {
+          "model": "openai/gpt-6.1-terra#medium"
+        },
+        "reviewer": {
+          "model": "openai/gpt-6.1-sol#medium"
+        },
+        "scout": {
+          "model": "openai/gpt-6-luna#low"
+        },
+        "shipper": {
+          "model": "openai/gpt-6-luna#low"
+        }
+      }
+    },
+
+    "opencode-free": {
+      "description": "Free OpenCode models",
+      "color": "#fab283",
+      "model": "opencode/deepseek-v4.1-flash-free#high",
+      "agents": {
+        "title": {
+          "model": "opencode/deepseek-v4.1-flash-free#low"
+        },
+        "plan": {
+          "model": "opencode/deepseek-v4.1-flash-free#high"
+        },
+        "build": {
+          "model": "opencode/deepseek-v4.1-flash-free#high"
+        },
+        "explore": {
+          "model": "opencode/deepseek-v4.1-flash-free#low"
+        },
+        "compaction": {
+          "model": "opencode/deepseek-v4.1-flash-free#high"
+        },
+        "general": {
+          "model": "opencode/deepseek-v4.1-flash-free#high"
+        },
+        "worker": {
+          "model": "opencode/deepseek-v4.1-flash-free#high"
+        },
+        "reviewer": {
+          "model": "opencode/deepseek-v4.1-flash-free#high"
+        },
+        "scout": {
+          "model": "opencode/deepseek-v4.1-flash-free#low"
+        },
+        "shipper": {
+          "model": "opencode/deepseek-v4.1-flash-free#low"
+        }
+      }
+    },
+
+    "opencode-go": {
+      "description": "OpenCode Go Plan",
+      "color": "#fab283",
+      "model": "opencode-go/deepseek-v4.1-flash#high",
+      "agents": {
+        "title": {
+          "model": "opencode-go/deepseek-v4.1-flash#low"
+        },
+        "plan": {
+          "model": "opencode-go/deepseek-v4.1-flash#high"
+        },
+        "build": {
+          "model": "opencode-go/deepseek-v4.1-flash#high"
+        },
+        "explore": {
+          "model": "opencode-go/deepseek-v4.1-flash#low"
+        },
+        "compaction": {
+          "model": "opencode-go/deepseek-v4.1-flash#high"
+        },
+        "general": {
+          "model": "opencode-go/deepseek-v4.1-flash#high"
+        },
+        "worker": {
+          "model": "opencode-go/deepseek-v4.1-flash#high"
+        },
+        "reviewer": {
+          "model": "opencode-go/deepseek-v4.1-flash#high"
+        },
+        "scout": {
+          "model": "opencode-go/deepseek-v4.1-flash#low"
+        },
+        "shipper": {
+          "model": "opencode-go/deepseek-v4.1-flash#low"
+        }
+      }
+    },
+
+    "anthropic": {
+      "description": "Anthropic Models",
+      "color": "#d97757",
+      "model": "claude-agent/sonnet#medium",
+      "agents": {
+        "title": {
+          "model": "claude-agent/haiku#low"
+        },
+        "plan": {
+          "model": "claude-agent/opus#medium"
+        },
+        "build": {
+          "model": "claude-agent/sonnet#medium"
+        },
+        "explore": {
+          "model": "claude-agent/haiku#low"
+        },
+        "compaction": {
+          "model": "claude-agent/opus#high"
+        },
+        "general": {
+          "model": "claude-agent/sonnet#medium"
+        },
+        "worker": {
+          "model": "claude-agent/sonnet#medium"
+        },
+        "reviewer": {
+          "model": "claude-agent/opus#high"
+        },
+        "scout": {
+          "model": "claude-agent/haiku#low"
+        },
+        "shipper": {
+          "model": "claude-agent/haiku#low"
+        }
+      }
+    },
+
+    "mixed-anthropic": {
+      "description": "Opus for orchestration, DeepSeek for implementation",
+      "color": "#e4a089",
+      "model": "claude-agent/opus#medium",
+      "agents": {
+        "title": {
+          "model": "opencode-go/deepseek-v4.1-flash#low"
+        },
+        "plan": {
+          "model": "claude-agent/opus#medium"
+        },
+        "build": {
+          "model": "claude-agent/opus#medium"
+        },
+        "explore": {
+          "model": "opencode-go/deepseek-v4.1-flash#low"
+        },
+        "compaction": {
+          "model": "claude-agent/opus#high"
+        },
+        "general": {
+          "model": "opencode-go/deepseek-v4.1-flash#high"
+        },
+        "worker": {
+          "model": "opencode-go/deepseek-v4.1-flash#high"
+        },
+        "reviewer": {
+          "model": "claude-agent/opus#high"
+        },
+        "scout": {
+          "model": "opencode-go/deepseek-v4.1-flash#low"
+        },
+        "shipper": {
+          "model": "opencode-go/deepseek-v4.1-flash#low"
+        }
+      }
+    },
+
+    "mixed-openai": {
+      "description": "Sol for orchestration, DeepSeek for implementation",
+      "color": "#63c3ac",
+      "model": "openai/gpt-6.1-sol#medium",
+      "agents": {
+        "title": {
+          "model": "opencode-go/deepseek-v4.1-flash#low"
+        },
+        "plan": {
+          "model": "openai/gpt-6.1-sol#medium"
+        },
+        "build": {
+          "model": "opencode-go/deepseek-v4.1-flash#high"
+        },
+        "explore": {
+          "model": "opencode-go/deepseek-v4.1-flash#low"
+        },
+        "compaction": {
+          "model": "openai/gpt-6.1-sol#high"
+        },
+        "general": {
+          "model": "opencode-go/deepseek-v4.1-flash#high"
+        },
+        "worker": {
+          "model": "opencode-go/deepseek-v4.1-flash#high"
+        },
+        "reviewer": {
+          "model": "openai/gpt-6.1-sol#high"
+        },
+        "scout": {
+          "model": "opencode-go/deepseek-v4.1-flash#low"
+        },
+        "shipper": {
+          "model": "opencode-go/deepseek-v4.1-flash#low"
+        }
+      }
+    }
+  }
+}

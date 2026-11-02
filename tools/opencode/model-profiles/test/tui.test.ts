@@ -124,19 +124,24 @@ describe("session model switching", () => {
   }
 }
 `;
-  const PROFILES = JSON.stringify({
-    go: {
-      description: "OpenCode Go",
-      model: "opencode-go/mimo-v2.6#medium",
-      agents: { build: { model: "opencode-go/mimo-v2.6#max" } },
+  const PROFILES = `{
+  // project profiles
+  "profiles": {
+    "go": {
+      "description": "OpenCode Go",
+      "color": "#ff8800",
+      "model": "opencode-go/mimo-v2.6#medium",
+      "agents": { "build": { "model": "opencode-go/mimo-v2.6#max" } },
     },
-  });
+  },
+}
+`;
 
   function makeFixture() {
     const dir = mkdtempSync(join(tmpdir(), "model-profiles-"));
     const opencodeDir = join(dir, ".opencode");
     mkdirSync(opencodeDir, { recursive: true });
-    writeFileSync(join(opencodeDir, "model-profiles.json"), PROFILES);
+    writeFileSync(join(opencodeDir, "model-profiles.jsonc"), PROFILES);
     writeFileSync(join(opencodeDir, "opencode.jsonc"), CONFIG);
     return { dir, configPath: join(opencodeDir, "opencode.jsonc") };
   }
@@ -162,7 +167,25 @@ describe("session model switching", () => {
         model: { providerID: "opencode-go", id: "mimo-v2.6", variant: "max" },
       },
     ]);
-    expect(readFileSync(fixture.configPath, "utf8")).toContain("opencode-go/mimo-v2.6");
+    const written = readFileSync(fixture.configPath, "utf8");
+    expect(written).toContain("opencode-go/mimo-v2.6");
+    expect(written).not.toContain("#ff8800");
+    expect(written).not.toContain("OpenCode Go");
+  });
+
+  test("an invalid profiles file aborts before writing and names the file", async () => {
+    const fixture = makeFixture();
+    const profilesPath = join(fixture.dir, ".opencode", "model-profiles.jsonc");
+    writeFileSync(profilesPath, JSON.stringify({ profiles: { go: { color: "red" } } }));
+    const host = makeContext(fixture.dir, { type: "session", sessionID: "ses_123" });
+
+    await runCommand(host, "go");
+
+    expect(readFileSync(fixture.configPath, "utf8")).toBe(CONFIG);
+    expect(host.toasts).toEqual([
+      { message: expect.stringContaining(profilesPath), variant: "error" },
+    ]);
+    expect(host.switchModelCalls).toEqual([]);
   });
 
   test("switching back to default restores the session model too", async () => {
@@ -199,8 +222,8 @@ describe("session model switching", () => {
     const fixture = makeFixture();
     // Profile defines neither a build model nor a root model.
     writeFileSync(
-      join(fixture.dir, ".opencode", "model-profiles.json"),
-      JSON.stringify({ bare: { description: "No models" } }),
+      join(fixture.dir, ".opencode", "model-profiles.jsonc"),
+      JSON.stringify({ profiles: { bare: { description: "No models" } } }),
     );
     const host = makeContext(fixture.dir, { type: "session", sessionID: "ses_123" });
 
