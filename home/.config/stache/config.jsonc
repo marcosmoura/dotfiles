@@ -133,7 +133,11 @@
         "name": "terminal",
         "layout": "master",
         "screen": "main",
-        "rules": [{ "appId": "com.mitchellh.ghostty" }, { "appId": "com.apple.dt.Devices" }]
+        "rules": [
+          { "appId": "com.mitchellh.ghostty" },
+          { "appId": "com.apple.dt.Devices" },
+          { "appId": "dev.herdr.app" }
+        ]
       },
       {
         "name": "coding",

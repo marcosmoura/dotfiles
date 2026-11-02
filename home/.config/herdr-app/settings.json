@@ -7,7 +7,7 @@
   "appearance": "dark",
   "theme": "catppuccin",
   "font": "Maple Mono NF",
-  "font_size": 15,
+  "font_size": 16,
   "ui_font": "Maple Mono NF",
   "telemetry": false
 }
