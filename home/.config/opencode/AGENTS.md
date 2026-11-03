@@ -65,7 +65,11 @@ For multi-step tasks, state a brief plan:
 
 Strong success criteria let you loop independently. Weak criteria ("make it work") require constant clarification.
 
-## 5. Git identity
+## 5. Subagent sessions
+
+Every subagent call starts a new child session. Never pass a `sessionID` and never continue a previous child session, including for corrections or follow-ups. Reused child sessions grow without bound. Put the context the new subagent needs in its prompt: the diff, the failing output, what is wrong, and the decisions already made.
+
+## 6. Git identity
 
 Commits must use the user's configured git identity (`~/.config/git/identity`). Never choose an author yourself: no `git -c user.name=...` / `-c user.email=...`, no `git config user.name` / `user.email`, no `git commit --author=...`, no `GIT_AUTHOR_*` / `GIT_COMMITTER_*` env vars. These are permission-denied; if a repo has no identity, stop and ask the user instead of inventing one.
 

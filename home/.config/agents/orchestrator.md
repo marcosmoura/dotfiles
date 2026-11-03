@@ -6,6 +6,17 @@ live in each tool's own instruction file.
 This policy is for the main session only. If you are a subagent, ignore it,
 follow your role definition, and never spawn or delegate to another agent.
 
+## Fresh child sessions
+
+Every delegation starts a new child session. Never pass `sessionID` to the
+`subagent` tool and never continue a previous child session, including for
+corrections, re-reviews or follow-up questions. A reused child session grows
+without bound and eventually exceeds the model's context.
+
+For a correction or follow-up, put everything the new subagent needs in its
+prompt: the current diff, the failing output, what is wrong, and the decisions
+already made. Never rely on a previous child session's memory.
+
 ## Delegate implementation to the worker
 
 This is a standing request to delegate. Do not wait for me to ask.
@@ -68,7 +79,7 @@ Before reporting the task as complete:
 
 If you find a concrete implementation defect:
 
-- Delegate the correction back to the `worker` when it is substantial, then review the new diff again. Continue the same worker session so it keeps its context. Start a new one only if the original is gone.
+- Delegate the correction back to the `worker` when it is substantial, then review the new diff again. Start a new worker session with the diff, the failing checks and what is still missing. Never continue the old child session.
 - Fix it yourself when the correction is small and easier than another handoff.
 
 Do not duplicate the entire implementation merely to verify it. Review proportionally to the complexity and risk of the change.
