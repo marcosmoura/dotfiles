@@ -7,10 +7,35 @@
 // custom settings, run `zed: open default settings` from the
 // command palette (cmd-shift-p / ctrl-shift-p)
 {
+  "go_to_definition_fallback": "find_all_references",
+  "diagnostics": {
+    "lsp_pull_diagnostics": {
+      "enabled": true
+    }
+  },
+  "semantic_tokens": "combined",
+  "enable_language_server": true,
+  "git": {
+    "inline_blame": {
+      "location": "inline",
+      "show_commit_summary": true,
+    },
+  },
+  "code_lens": "on",
+  "inlay_hints": {
+    "show_other_hints": false,
+    "show_parameter_hints": false,
+    "show_type_hints": false,
+    "enabled": true,
+  },
   "active_pane_modifiers": {
     "border_size": 0,
   },
   "agent": {
+    "tool_permissions": {
+      "default": "allow",
+      "tools": {}
+    },
     "default_model": {
       "effort": "high",
       "enable_thinking": true,
@@ -53,7 +78,7 @@
     "html": true,
     "oxc": true,
   },
-  "base_keymap": "VSCode",
+  "base_keymap": "SublimeText",
   "buffer_font_family": "Maple Mono NF",
   "buffer_font_size": 17,
   "buffer_font_weight": 450,
@@ -77,6 +102,8 @@
   "cursor_blink": true,
   "cursor_shape": "bar",
   "edit_predictions": {
+    "mode": "subtle",
+    "allow_data_collection": "no",
     "provider": "copilot",
   },
   "ensure_final_newline_on_save": true,
@@ -176,7 +203,7 @@
   "project_panel": {
     "auto_fold_dirs": false,
     "bold_folder_labels": true,
-    "default_width": 300,
+    "default_width": 360,
     "diagnostic_badges": true,
     "dock": "right",
     "git_status_indicator": true,
@@ -212,12 +239,50 @@
     "cursor_shape": "bar",
     "font_size": 17,
     "font_weight": 450,
+    "font_family": "Maple Mono NF",
     "line_height": {
-      "custom": 1.75,
+      "custom": 1.53,
     },
     "max_scroll_history_lines": 9999999,
+    "minimum_contrast": 0,
+    "toolbar": {
+      "breadcrumbs": false,
+    },
   },
   "theme": "Catppuccin Mocha (Blur) [Heavy]",
+  "theme_overrides": {
+    "Catppuccin Mocha (Blur) [Heavy]": {
+      "terminal.background": "#1e1e2ee6",
+      "terminal.ansi.background": "#1e1e2e",
+      "terminal.foreground": "#cdd6f4",
+      "terminal.bright_foreground": "#cdd6f4",
+      "terminal.dim_foreground": "#7f849c",
+      "terminal.ansi.black": "#45475a",
+      "terminal.ansi.red": "#f38ba8",
+      "terminal.ansi.green": "#a6e3a1",
+      "terminal.ansi.yellow": "#f9e2af",
+      "terminal.ansi.blue": "#89b4fa",
+      "terminal.ansi.magenta": "#f5c2e7",
+      "terminal.ansi.cyan": "#94e2d5",
+      "terminal.ansi.white": "#a6adc8",
+      "terminal.ansi.bright_black": "#585b70",
+      "terminal.ansi.bright_red": "#f38ba8",
+      "terminal.ansi.bright_green": "#a6e3a1",
+      "terminal.ansi.bright_yellow": "#f9e2af",
+      "terminal.ansi.bright_blue": "#89b4fa",
+      "terminal.ansi.bright_magenta": "#f5c2e7",
+      "terminal.ansi.bright_cyan": "#94e2d5",
+      "terminal.ansi.bright_white": "#bac2de",
+      "terminal.ansi.dim_black": "#45475a",
+      "terminal.ansi.dim_red": "#f38ba8",
+      "terminal.ansi.dim_green": "#a6e3a1",
+      "terminal.ansi.dim_yellow": "#f9e2af",
+      "terminal.ansi.dim_blue": "#89b4fa",
+      "terminal.ansi.dim_magenta": "#f5c2e7",
+      "terminal.ansi.dim_cyan": "#94e2d5",
+      "terminal.ansi.dim_white": "#a6adc8",
+    },
+  },
   "title_bar": {
     "show_onboarding_banner": false,
     "show_sign_in": false,

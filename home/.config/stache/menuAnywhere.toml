@@ -1,0 +1,15 @@
+#:schema https://raw.githubusercontent.com/marcosmoura/stache/main/schemas/menuAnywhere.schema.json
+
+# Whether the feature should run.
+enabled = true
+
+# Modifiers that must be held exactly while clicking: any of "control",
+# "option", "command" and "shift". Duplicates count once.
+#
+# CAUTION: `[]` is valid and captures every unmodified matching click
+# system-wide while enabled.
+modifiers = ["control", "command"]
+
+# The mouse button that summons the menu: `right_click` or `middle_click`.
+# `middle_click` means button number 2 only, not back or forward buttons.
+mouse_button = "right_click"

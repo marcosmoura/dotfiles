@@ -39,7 +39,7 @@ hide_tab_bar_when_single_tab = true
 tab_bar_position = "top"
 window_title = "{hostname}: {workspace}"
 agent_panel_sort = "spaces"
-status_indicators = "dots"
+status_indicators = "symbols"
 
 [ui.sidebar.spaces]
 row_gap = 1
@@ -57,3 +57,6 @@ manage_ssh_config = true
 
 [experimental]
 pane_history = true
+
+[ui.sound]
+enabled = true

@@ -1,9 +1,6 @@
 {
   "$schema": "https://opencode.ai/v2/cli.json",
 
-  "keybinds": {
-    "agent.cycle": "tab"
-  },
   "theme": {
     "name": "catppuccin",
     "mode": "dark"

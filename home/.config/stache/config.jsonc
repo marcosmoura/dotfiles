@@ -71,13 +71,15 @@
       "unfocused": false,
       "focused": {
         "width": 6,
-        "gradient": { "from": "#f9e2af", "to": "#a6e3a1", "angle": 180 },
-        "animation": { "duration": 2000 }
+        "color": "#f9e2af"
+      },      
+      "grid": {
+        "width": 6,
+        "color": "#a6e3a1"
       },
       "monocle": {
         "width": 6,
-        "gradient": { "from": "#89dceb", "to": "#cba6f7", "angle": 180 },
-        "animation": { "duration": 2000 }
+        "color": "#89dceb"
       }
     },
     "gaps": [
@@ -155,13 +157,21 @@
         "name": "music",
         "layout": "monocle",
         "screen": "main",
-        "rules": [{ "appId": "com.spotify.client" }]
+        "rules": [
+          { "appId": "com.spotify.client" },
+          { "appId": "io.github.viren070.aiostreams" },
+          { "appId": "com.nuvio.media.desktop" }
+        ]
       },
       {
         "name": "communication",
         "layout": "floating",
         "screen": "main",
-        "rules": [{ "appId": "net.whatsapp.WhatsApp" }, { "appId": "com.hnc.Discord" }, { "appId": "com.tinyspeck.slackmacgap" }]
+        "rules": [
+          { "appId": "net.whatsapp.WhatsApp" },
+          { "appId": "com.hnc.Discord" },
+          { "appId": "com.tinyspeck.slackmacgap" }
+        ]
       },
       {
         "name": "misc",
@@ -170,8 +180,6 @@
         "rules": [
           { "appId": "com.figma.Desktop" },
           { "appId": "ai.storyteller.figcraft" },
-          { "appId": "com.nuvio.media.desktop" },
-          { "appId": "com.westbridge.stremio5-mac" },
           { "appId": "org.m0k.transmission" }
         ]
       },

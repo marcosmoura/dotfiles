@@ -1,0 +1,22 @@
+#:schema https://raw.githubusercontent.com/marcosmoura/stache/main/schemas/proxyAudio.schema.json
+# Whether the module should run.
+enabled = true
+
+# Ordered input devices; the first eligible entry wins.
+# The device name or pattern to match.
+# How the device name is matched.
+input = [
+  { name = "AirPods Pro 3", strategy = "contains" },
+  { name = "AT2020USB", strategy = "starts_with" },
+  { name = "MacBook Pro", strategy = "starts_with" },
+]
+
+# Ordered output devices; the first eligible entry wins.
+# A device that must be connected before this entry is eligible.
+# The name or pattern of the required device.
+# How the required device name is matched.
+output = [
+  { name = "AirPods Pro 3", strategy = "contains" },
+  { name = "External Speakers", depends_on = { name = "MiniFuse", strategy = "starts_with" } },
+  { name = "MacBook Pro", strategy = "starts_with" },
+]

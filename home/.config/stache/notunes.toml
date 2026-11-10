@@ -1,0 +1,9 @@
+#:schema https://raw.githubusercontent.com/marcosmoura/stache/main/schemas/notunes.schema.json
+
+# Whether the blocker should run.
+enabled = true
+
+# The replacement opened after a blocked application: an absolute `.app`
+# path or a bundle identifier. Omitting it blocks without launching
+# anything.
+target_app = "com.spotify.client"

@@ -1,0 +1,11 @@
+#:schema https://raw.githubusercontent.com/marcosmoura/stache/main/schemas/commandQuit.schema.json
+
+# Whether Hold-to-Quit is enabled. Disabled by default.
+enabled = true
+
+# How long Cmd+Q must be held before the quit proceeds, in milliseconds.
+# Any value from 0 to 9223372036854775807 (the largest TOML integer) is accepted.
+#
+# Not exported to the generated TypeScript: `number` cannot represent
+# every `u64`. A future consumer must approve an explicit representation.
+hold_duration = 1000

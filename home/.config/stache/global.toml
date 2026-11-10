@@ -1,0 +1,12 @@
+#:schema https://raw.githubusercontent.com/marcosmoura/stache/main/schemas/global.schema.json
+
+# Commands to execute once per desktop launch.
+exec_on_startup = []
+
+# Logging behavior for the host.
+[logging]
+# Whether the host includes development-only detail in its records.
+debug = false
+
+# Minimum severity the host writes.
+level = "debug"

@@ -5,6 +5,7 @@
     "ANTHROPIC_DEFAULT_SONNET_MODEL": "claude-sonnet-5-5",
     "CLAUDE_CODE_ATTRIBUTION_HEADER": "0",
     "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1",
+    "CLAUDE_CODE_SKIP_FAST_MODE_NETWORK_ERRORS": "1",
     "CLAUDE_CODE_ENABLE_TELEMETRY": "0",
     "CLAUDE_CODE_NO_FLICKER": "1",
     "CLAUDE_CODE_SUBAGENT_MODEL": "sonnet"
@@ -52,10 +53,13 @@
       "Read(~/.gnupg/**)",
       "Read(~/.ssh/**)"
     ],
-    "ask": ["Bash(sudo *)", "Bash(rm -rf *)"],
+    "ask": [
+      "Bash(sudo *)",
+      "Bash(rm -rf *)"
+    ],
     "defaultMode": "auto"
   },
-  "model": "opus",
+  "model": "claude-fable-5-2",
   "hooks": {
     "SessionStart": [
       {
@@ -71,7 +75,9 @@
     ]
   },
   "worktree": {
-    "symlinkDirectories": ["node_modules"],
+    "symlinkDirectories": [
+      "node_modules"
+    ],
     "baseRef": "head"
   },
   "statusLine": {
@@ -93,7 +99,8 @@
     "security-guidance@claude-plugins-official": true,
     "swift-lsp@claude-plugins-official": true,
     "typescript-lsp@claude-plugins-official": true,
-    "humanizer@humanizer": true
+    "humanizer@humanizer": true,
+    "flightdeck@claude-flightdeck": true
   },
   "extraKnownMarketplaces": {
     "anthropic-agent-skills": {
@@ -113,6 +120,12 @@
         "source": "github",
         "repo": "blader/humanizer"
       }
+    },
+    "claude-flightdeck": {
+      "source": {
+        "source": "github",
+        "repo": "scasella/claude-flightdeck"
+      }
     }
   },
   "outputStyle": "concise",
@@ -130,12 +143,15 @@
   },
   "promptSuggestionEnabled": true,
   "tui": "default",
-  "theme": "auto",
+  "theme": "custom:catppuccin-mocha",
   "verbose": true,
   "preferredNotifChannel": "ghostty",
   "showTurnDuration": true,
   "terminalProgressBarEnabled": true,
   "autoMode": {
-    "environment": ["$defaults", "GitHub repos under marcosmoura/* are owned by the user"]
+    "environment": [
+      "$defaults",
+      "GitHub repos under marcosmoura/* are owned by the user"
+    ]
   }
 }

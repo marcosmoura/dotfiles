@@ -1,0 +1,26 @@
+#:schema https://raw.githubusercontent.com/marcosmoura/stache/main/schemas/wallpapers.schema.json
+
+# Whether Wallpapers should run.
+enabled = true
+
+# Blur level in pixels for the Gaussian blur effect.
+blur = 10
+
+# Time in seconds between wallpaper changes. Zero changes only once, when
+# rotation starts. The largest accepted value is 9223372036854775807, the
+# largest TOML integer.
+#
+# The Rust field and schema are `u64`; the generated TypeScript uses
+# `number`, which loses precision above 2^53.
+interval = 0
+
+# Wallpaper selection mode: random or sequential.
+mode = "random"
+
+# Directory containing wallpaper images.
+# If specified, all image files in this directory are used and the `list`
+# field is ignored.
+path = "~/Projects/dotfiles/home/.config/wallpapers"
+
+# Radius in pixels for rounded corners.
+radius = 20

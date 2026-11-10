@@ -1,0 +1,27 @@
+#:schema https://raw.githubusercontent.com/marcosmoura/stache/main/schemas/bar.schema.json
+
+# Whether the status bar is enabled. Validates today but starts nothing.
+enabled = true
+
+# Height of the status bar in pixels. Zero is preserved, not replaced.
+height = 28
+
+# Padding around the status bar in pixels. Zero is preserved, not replaced.
+padding = 14
+
+# Weather status bar configuration.
+[weather]
+# Path to an environment file containing API keys (for example
+# `VISUAL_CROSSING_API_KEY=...`).
+#
+# The value is trimmed. `~` and `~/...` expand to the home directory,
+# absolute paths are used as written and anything else is relative to the
+# configuration directory. Environment variables and shell syntax are not
+# expanded, and the process working directory is never used.
+api_keys = ".env"
+
+# Default location for weather data when geolocation fails.
+# Can be a city name, address, or coordinates.
+default_location = "Barcelona"
+
+precise_location = true

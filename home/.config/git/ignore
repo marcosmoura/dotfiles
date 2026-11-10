@@ -75,6 +75,9 @@ target/
 *.pyc
 __pycache__/
 
+# CortexKit (Magic Context)
+.cortexkit/
+
 # Claude Code
 **/.claude/settings.local.json
 **/.claude/.cc-writes/

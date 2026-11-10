@@ -1,0 +1,191 @@
+#:schema https://raw.githubusercontent.com/marcosmoura/stache/main/schemas/tiling.schema.json
+# Whether the tiling window manager should run.
+enabled = true
+
+# Gaps, global or per display.
+gaps = [
+  { inner = 14, outer = 14, screen = "main" },
+  { inner = 10, outer = 10, screen = "secondary" },
+]
+
+# Windows that are never managed.
+# Bundle identifier, matched case-insensitively and exactly.
+ignore = [
+  { app_id = "com.apple.Spotlight" },
+  { app_id = "com.apple.dock" },
+  { app_id = "com.apple.notificationcenterui" },
+  { app_id = "com.apple.systempreferences" },
+  { app_id = "com.apple.loginwindow" },
+  { app_id = "com.apple.weather.menu" },
+  { app_id = "cc.ffitch.shottr" },
+  { app_id = "com.wulkano.kap" },
+  { app_id = "com.raycast.macos" },
+]
+
+# Window transition animations.
+[animations]
+# Animation duration in milliseconds for large movements.
+duration = 350
+
+# Easing function for animations.
+easing = "ease_out_expo"
+
+# Whether animations are enabled.
+enabled = true
+
+# Window borders.
+[borders]
+# Whether borders are enabled. Setting this to `true` is your explicit
+# consent for Stache to overwrite the shared `JankyBorders` settings it names:
+# width, style, hidpi, active and inactive colors and the blacklist. Their
+# previous values are not read or restored. Stache never starts, restarts or
+# kills the `JankyBorders` service (it must already be running) and, when
+# borders stop or are disabled, leaves the last settings it sent in place.
+enabled = true
+
+# Retina support (`hidpi`); omitted uses the external service default (true).
+hidpi = true
+
+# Border style; omitted uses the external service default (round).
+style = "round"
+
+# Unfocused windows; `false` hides them.
+unfocused = false
+
+# Focused windows.
+[borders.focused]
+color = "#f9e2af"
+width = 6
+
+# Windows in grid layout.
+[borders.grid]
+color = "#a6e3a1"
+width = 6
+
+# Windows in monocle layout.
+[borders.monocle]
+color = "#89dceb"
+width = 6
+
+# Master layout settings.
+[master]
+# Position of the master window.
+position = "left"
+
+# Master window size as a percentage, 0 to 100.
+ratio = 72
+
+# Floating window defaults and presets.
+# Default position for newly floating windows.
+[floating]
+default_position = "center"
+
+# Named presets.
+# Center on the display; `x` and `y` are ignored.
+# Height in pixels (`900`) or percent (`"100%"`).
+# Unique preset name, compared case-insensitively.
+# Width in pixels (`1440`) or percent (`"50%"`).
+# X position; ignored when `center` is true.
+# Y position; ignored when `center` is true.
+presets = [
+  { center = true, height = 1080, name = "centered", width = 1920 },
+  { center = true, height = "100%", name = "full", width = "100%" },
+  { height = "100%", name = "aligned-left", width = "50%", x = 0, y = 0 },
+  { height = "100%", name = "aligned-right", width = "50%", x = "50%", y = 0 },
+]
+
+# Workspace definitions. Empty means one default workspace per display.
+# Layout; omitted uses `default_layout`.
+# Unique workspace name.
+# Display: `main`/`primary`, `secondary` or a display name.
+# Rules that assign windows to this workspace.
+[[workspaces]]
+name = "terminal"
+layout = "master"
+screen = "main"
+rules = [
+  { app_id = "com.mitchellh.ghostty" },
+  { app_id = "com.apple.dt.Devices" },
+  { app_id = "dev.herdr.app" },
+]
+
+[[workspaces]]
+name = "coding"
+layout = "monocle"
+screen = "main"
+rules = [
+  { app_id = "com.microsoft.VSCode" },
+  { app_id = "dev.zed.Zed" },
+]
+
+[[workspaces]]
+name = "browser"
+layout = "monocle"
+screen = "secondary"
+rules = [
+  { app_id = "at.studio.AsideBrowser" },
+  { app_id = "com.apple.Safari" },
+]
+
+[[workspaces]]
+name = "music"
+layout = "monocle"
+screen = "main"
+rules = [
+  { app_id = "com.spotify.client" },
+  { app_id = "io.github.viren070.aiostreams" },
+  { app_id = "com.nuvio.media.desktop" },
+]
+
+[[workspaces]]
+name = "communication"
+layout = "floating"
+screen = "main"
+rules = [
+  { app_id = "net.whatsapp.WhatsApp" },
+  { app_id = "com.hnc.Discord" },
+  { app_id = "com.tinyspeck.slackmacgap" },
+]
+
+[[workspaces]]
+name = "misc"
+layout = "floating"
+screen = "secondary"
+rules = [
+  { app_id = "com.figma.Desktop" },
+  { app_id = "ai.storyteller.figcraft" },
+  { app_id = "org.m0k.transmission" },
+]
+
+[[workspaces]]
+name = "guitar"
+layout = "floating"
+screen = "main"
+rules = [
+  { app_id = "com.apple.audio.AudioMIDISetup" },
+  { app_id = "com.ableton.live" },
+  { app_id = "com.NeuralDSP.ArchetypeNollyX" },
+  { app_id = "com.NeuralDSP.ArchetypeGojiraX" },
+  { app_id = "com.NeuralDSP.ArchetypeJohnMayerX" },
+  { app_id = "com.NeuralDSP.SoldanoSLO100X" },
+  { app_id = "com.NeuralDSP.FortinNamelessSuiteX" },
+]
+
+[[workspaces]]
+name = "files"
+layout = "grid"
+screen = "secondary"
+rules = [
+  { app_id = "com.apple.finder" },
+  { app_id = "com.asiafu.Bloom" },
+]
+
+[[workspaces]]
+name = "tasks"
+layout = "grid"
+screen = "secondary"
+rules = [
+  { app_id = "com.apple.reminders" },
+  { app_id = "me.proton.pass.electron" },
+  { app_id = "ch.protonvpn.mac" },
+]

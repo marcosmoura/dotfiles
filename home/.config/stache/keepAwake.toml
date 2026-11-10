@@ -1,0 +1,4 @@
+#:schema https://raw.githubusercontent.com/marcosmoura/stache/main/schemas/keepAwake.schema.json
+
+# Whether Keep Awake should prevent display, idle and system sleep.
+enabled = true
