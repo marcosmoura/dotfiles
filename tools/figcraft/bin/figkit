@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+# Launcher for figkit. Resolves symlinks so it works when linked onto PATH.
+set -euo pipefail
+
+source="${BASH_SOURCE[0]}"
+
+while [ -L "$source" ]; do
+  directory="$(cd -P "$(dirname "$source")" && pwd)"
+  source="$(readlink "$source")"
+  [[ "$source" != /* ]] && source="$directory/$source"
+done
+
+root="$(cd -P "$(dirname "$source")/.." && pwd)"
+
+exec bun "$root/src/cli.ts" "$@"
