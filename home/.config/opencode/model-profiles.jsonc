@@ -22,18 +22,6 @@
         },
         "general": {
           "model": "openai/gpt-6.1-sol#medium"
-        },
-        "worker": {
-          "model": "openai/gpt-6.1-terra#medium"
-        },
-        "reviewer": {
-          "model": "openai/gpt-6.1-sol#medium"
-        },
-        "scout": {
-          "model": "openai/gpt-6-luna#low"
-        },
-        "shipper": {
-          "model": "openai/gpt-6-luna#low"
         }
       }
     },
@@ -60,18 +48,6 @@
         },
         "general": {
           "model": "opencode/deepseek-v4.1-flash-free#high"
-        },
-        "worker": {
-          "model": "opencode/deepseek-v4.1-flash-free#high"
-        },
-        "reviewer": {
-          "model": "opencode/deepseek-v4.1-flash-free#high"
-        },
-        "scout": {
-          "model": "opencode/deepseek-v4.1-flash-free#low"
-        },
-        "shipper": {
-          "model": "opencode/deepseek-v4.1-flash-free#low"
         }
       }
     },
@@ -98,18 +74,6 @@
         },
         "general": {
           "model": "opencode-go/deepseek-v4.1-flash#high"
-        },
-        "worker": {
-          "model": "opencode-go/deepseek-v4.1-flash#high"
-        },
-        "reviewer": {
-          "model": "opencode-go/deepseek-v4.1-flash#high"
-        },
-        "scout": {
-          "model": "opencode-go/deepseek-v4.1-flash#low"
-        },
-        "shipper": {
-          "model": "opencode-go/deepseek-v4.1-flash#low"
         }
       }
     },
@@ -136,18 +100,6 @@
         },
         "general": {
           "model": "claude-agent/sonnet#medium"
-        },
-        "worker": {
-          "model": "claude-agent/sonnet#medium"
-        },
-        "reviewer": {
-          "model": "claude-agent/opus#high"
-        },
-        "scout": {
-          "model": "claude-agent/haiku#low"
-        },
-        "shipper": {
-          "model": "claude-agent/haiku#low"
         }
       }
     },
@@ -174,18 +126,6 @@
         },
         "general": {
           "model": "opencode-go/deepseek-v4.1-flash#high"
-        },
-        "worker": {
-          "model": "opencode-go/deepseek-v4.1-flash#high"
-        },
-        "reviewer": {
-          "model": "claude-agent/opus#high"
-        },
-        "scout": {
-          "model": "opencode-go/deepseek-v4.1-flash#low"
-        },
-        "shipper": {
-          "model": "opencode-go/deepseek-v4.1-flash#low"
         }
       }
     },
@@ -212,18 +152,6 @@
         },
         "general": {
           "model": "opencode-go/deepseek-v4.1-flash#high"
-        },
-        "worker": {
-          "model": "opencode-go/deepseek-v4.1-flash#high"
-        },
-        "reviewer": {
-          "model": "openai/gpt-6.1-sol#high"
-        },
-        "scout": {
-          "model": "opencode-go/deepseek-v4.1-flash#low"
-        },
-        "shipper": {
-          "model": "opencode-go/deepseek-v4.1-flash#low"
         }
       }
     }

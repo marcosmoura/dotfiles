@@ -4,24 +4,8 @@ personality = "pragmatic"
 approvals_reviewer = "guardian_subagent"
 model = "gpt-6.1-sol"
 model_reasoning_effort = "medium"
-plan_mode_reasoning_effort = "high"
+plan_mode_reasoning_effort = "medium"
 service_tier = "default"
-
-[agents.worker]
-description = "Use proactively whenever code needs to be written, modified, refactored, or tests need to be added or fixed after the task is sufficiently understood. Delegate substantial implementation work to this role."
-config_file = "agents/worker.toml"
-
-[agents.reviewer]
-description = "Use only when the user asks for a code review, or when a change is risky (security, concurrency, data migrations, state machines, broad public API changes). The main thread reviews routine changes itself; do not run this role in addition to that review."
-config_file = "agents/reviewer.toml"
-
-[agents.scout]
-description = "Use at the start of a non-trivial coding task when the relevant code is unfamiliar, to gather scope, acceptance criteria, relevant code, tests and implementation boundaries before planning. Skip it only when the main thread expects to read 3 or fewer files it has not already read."
-config_file = "agents/scout.toml"
-
-[agents.shipper]
-description = "Commit, push and open or update a pull request after implementation and review are complete. Use only when the user has explicitly asked to commit, push, open a PR or ship the completed changes."
-config_file = "agents/shipper.toml"
 
 [sandbox_workspace_write]
 network_access = false
@@ -52,9 +36,6 @@ url = "https://api.shipswift.app/mcp"
 [projects."/Users/marcosmoura/Projects/sonora"]
 trust_level = "trusted"
 
-[projects."/Users/marcosmoura/Projects/city-country-search"]
-trust_level = "trusted"
-
 [projects."/Users/marcosmoura/Projects"]
 trust_level = "trusted"
 
@@ -67,10 +48,10 @@ trust_level = "trusted"
 [projects."/Users/marcosmoura/Projects/dotfiles"]
 trust_level = "trusted"
 
-[projects."/Users/marcosmoura/Projects/chores-app"]
+[projects."/Users/marcosmoura/Projects/life-planner"]
 trust_level = "trusted"
 
-[projects."/Users/marcosmoura/Projects/life-planner"]
+[projects."/Users/marcosmoura/Projects/budget"]
 trust_level = "trusted"
 
 [features]

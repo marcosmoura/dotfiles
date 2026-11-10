@@ -1,11 +1,9 @@
 {
-  "instructions": ["~/.config/agents/orchestrator.md", "~/.config/opencode/rules/*.md"],
-
-  "model": "claude-agent/opus",
+  "model": "claude-agent/sonnet",
 
   "agents": {
     "title": {
-      "model": "opencode-go/deepseek-v4.1-flash#low",
+      "model": "claude-agent/haiku#low",
     },
 
     "plan": {
@@ -13,11 +11,11 @@
     },
 
     "build": {
-      "model": "claude-agent/opus#medium",
+      "model": "claude-agent/sonnet#medium",
     },
 
     "explore": {
-      "model": "opencode-go/deepseek-v4.1-flash#low",
+      "model": "claude-agent/haiku#low",
     },
 
     "compaction": {
@@ -25,27 +23,7 @@
     },
 
     "general": {
-      "model": "opencode-go/deepseek-v4.1-flash#high",
-    },
-
-    "worker": {
-      "mode": "subagent",
-      "model": "opencode-go/deepseek-v4.1-flash#high",
-    },
-
-    "reviewer": {
-      "mode": "subagent",
-      "model": "claude-agent/opus#high",
-    },
-
-    "scout": {
-      "mode": "subagent",
-      "model": "opencode-go/deepseek-v4.1-flash#low",
-    },
-
-    "shipper": {
-      "mode": "subagent",
-      "model": "opencode-go/deepseek-v4.1-flash#low",
+      "model": "claude-agent/sonnet#medium",
     },
   },
 
@@ -129,7 +107,6 @@
   "plugins": [
     "~/Projects/dotfiles/tools/opencode/model-profiles",
     "@cortexkit/opencode-magic-context",
-    "@cortexkit/aft-opencode@0.63.4",
     "opencode-subagent-statusline",
     {
       "package": "opencode-tps-meter",

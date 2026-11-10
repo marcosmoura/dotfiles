@@ -12,13 +12,3 @@ Do not use for: refactoring, writing scripts from scratch, debugging business lo
 4. Answer using the fetched docs
 
 <!-- context7 -->
-
-## Shared orchestrator
-
-Read `~/.config/agents/orchestrator.md` in full before your first action and follow it exactly. It defines delegation, scoping, shipping, review, and escalation.
-
-## Codex delegation notes
-
-- Spawn a role with `spawn_agent` and pass the role name in `agent_type`.
-- For `scout` and `shipper`, set `fork_turns = "none"` to start them without parent history. The role's model applies regardless of inherited history; `fork_turns` only controls context.
-- Continue an existing worker with `followup_task` so it keeps its context.
