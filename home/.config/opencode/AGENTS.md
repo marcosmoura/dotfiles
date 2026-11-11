@@ -75,9 +75,11 @@ Commits must use the user's configured git identity (`~/.config/git/identity`). 
 
 <!-- context7 -->
 
-Use Context7 MCP to fetch current documentation whenever the user asks about a library, framework, SDK, API, CLI tool, or cloud service -- even well-known ones like React, Next.js, Prisma, Express, Tailwind, Django, or Spring Boot. This includes API syntax, configuration, version migration, library-specific debugging, setup instructions, and CLI tool usage. Use even when you think you know the answer -- your training data may not reflect recent changes. Prefer this over web search for library docs.
+Use Context7 MCP to fetch current documentation when a task depends on details of a library, framework, SDK, API, CLI tool, or cloud service that are version-sensitive or unfamiliar: recent or fast-moving releases, version migration, configuration and setup, library-specific debugging, or an API you are not sure about. Skip it for stable, well-known APIs you can answer confidently -- the free tier is limited, so do not spend calls confirming what you already know. Prefer this over web search for library docs.
 
 Do not use for: refactoring, writing scripts from scratch, debugging business logic, code review, or general programming concepts.
+
+If Context7 is rate-limited or does not have the library, or the question is how a public GitHub repository works internally, use the DeepWiki MCP instead.
 
 ## Steps
 

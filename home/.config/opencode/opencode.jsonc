@@ -44,13 +44,10 @@
         "disabled": false,
       },
 
-      "github": {
+      "deepwiki": {
         "type": "remote",
-        "url": "https://api.githubcopilot.com/mcp/",
+        "url": "https://mcp.deepwiki.com/mcp",
         "disabled": false,
-        "headers": {
-          "Authorization": "{file:~/.secrets/gh-pat-key}",
-        },
       },
     },
   },
