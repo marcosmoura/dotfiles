@@ -2,19 +2,41 @@ import type { Command } from './engine';
 
 type Scalar = number | string;
 
+/** A component property of a `set`, bound to the layer of that name in each variant that has one. */
+export type SetProperty = {
+  name: string;
+  type: 'boolean' | 'text' | 'instanceSwap';
+  default?: unknown;
+  /** Layer name inside the variants. */
+  layer: string;
+};
+
 /**
- * One layer in a `build` tree. Exactly one of `frame`, `text`, `instance` or `shape` says what it
- * is. A string where a number is expected names a variable to bind; a number is set as is.
+ * One layer in a `build` tree. Exactly one of `frame`, `text`, `instance`, `shape`, `section` or
+ * `set` says what it is. A string where a number is expected names a variable to bind; a number is
+ * set as is.
  */
 export type TreeNode = {
   /** Auto-layout frame; the value is its name. */
   frame?: string;
   /** Text layer; the value is its characters. */
   text?: string;
-  /** Component instance; the value is the component's name or id. */
-  instance?: string | number;
+  /**
+   * Component instance; the value is the component's name or id, or {"$ref": "<as>"} for a
+   * component or set built earlier in the same tree.
+   */
+  instance?: string | number | { $ref: string };
   /** rectangle, ellipse, line, vector, polygon, star or arrow. */
   shape?: string;
+  /** Section; the value is its name. Its children are placed by x and y. */
+  section?: string;
+  /**
+   * Component set; the value is its name. Its children are the variants, frames named
+   * "Property=Value, Property=Value". Takes the frame keys for its own layout.
+   */
+  set?: string;
+  /** On a frame: make it a component. */
+  component?: boolean;
 
   name?: string;
   /** Names this layer so the result reports its id. */
@@ -52,8 +74,8 @@ export type TreeNode = {
   style?: string;
   textAlign?: string;
 
-  // Instances
-  properties?: Record<string, unknown>;
+  /** On an instance: property values. On a set: the component properties to add. */
+  properties?: Record<string, unknown> | SetProperty[];
 
   // Vectors
   path?: string;
@@ -84,10 +106,21 @@ export type ExpandOptions = {
 
 export class TreeError extends Error {}
 
-const KINDS = ['frame', 'text', 'instance', 'shape'] as const;
+const KINDS = ['frame', 'text', 'instance', 'shape', 'section', 'set'] as const;
+
+/** The kinds that hold other layers. */
+const CONTAINERS = new Set<string>(['frame', 'section', 'set']);
+
+/** What a component property of each type binds on its layer. */
+const PROPERTY_FIELDS: Record<string, string> = {
+  boolean: 'visible',
+  text: 'characters',
+  instanceSwap: 'mainComponent',
+};
 
 const KEYS = new Set([
   ...KINDS,
+  'component',
   'name',
   'as',
   'x',
@@ -142,6 +175,10 @@ export function expandTree(input: TreeNode | TreeNode[], options: ExpandOptions)
 
 class Builder {
   private counter = 0;
+  /** One per variant being built: the first layer of each name inside it. */
+  private readonly scopes: Map<string, Ref>[] = [];
+  /** The children created for each container. */
+  private readonly built = new Map<TreeNode, { node: TreeNode; self: Ref }[]>();
 
   constructor(
     private readonly out: Expansion,
@@ -166,10 +203,14 @@ class Builder {
       throw new TreeError(`${path}: needs exactly one of ${KINDS.join(', ')}`);
     }
 
-    const kind = kinds[0];
+    const kind = kinds[0] as (typeof KINDS)[number];
 
-    if (node.children && kind !== 'frame') {
-      throw new TreeError(`${path}: only a frame can have children`);
+    if (node.children && !CONTAINERS.has(kind)) {
+      throw new TreeError(`${path}: only a frame, a section or a set can have children`);
+    }
+
+    if (node.component !== undefined && kind !== 'frame') {
+      throw new TreeError(`${path}: only a frame can be a component`);
     }
 
     this.counter += 1;
@@ -177,9 +218,22 @@ class Builder {
 
     const ref = `n${this.counter}`;
     const self: Ref = { $ref: ref };
+    const layerName = node.name ?? node.frame ?? (kind === 'text' ? String(node.text).slice(0, 40) : undefined);
+
+    for (const scope of this.scopes) {
+      if (layerName !== undefined && !scope.has(layerName)) {
+        scope.set(layerName, self);
+      }
+    }
+
     let created: number;
 
-    if (kind === 'frame') {
+    if (kind === 'set') {
+      // A set is made out of its variants, so they come first and it has no children of its own.
+      created = this.componentSet(node, parent, ref, self, path);
+    } else if (kind === 'section') {
+      created = this.section(node, parent, ref, self);
+    } else if (kind === 'frame') {
       created = this.frame(node, parent, ref, self);
     } else if (kind === 'text') {
       created = this.text(node, parent, ref, self);
@@ -201,23 +255,58 @@ class Builder {
       this.out.named[node.as] = created;
     }
 
-    (node.children ?? []).forEach((child, index) => {
-      this.node(child, self, `${path}.children[${index}]`);
-    });
+    if (kind !== 'set') {
+      this.built.set(
+        node,
+        (node.children ?? []).map((child, index) => {
+          const made = this.node(child, self, `${path}.children[${index}]`);
+
+          return { node: child, self: { $ref: this.out.commands[made]?.as as string } };
+        }),
+      );
+    }
+
+    if (kind === 'frame') {
+      this.refill(self, node);
+    }
+
+    if (node.component) {
+      this.emit('component.create', { ids: [self] });
+    }
 
     return created;
   }
 
-  private frame(node: TreeNode, parent: Parent, ref: string, self: Ref): number {
-    const layout = node.layout === undefined ? 'vertical' : node.layout;
-    const props: Record<string, unknown> = { layout };
-    const binds: [string, string][] = [];
+  /**
+   * FigCraft does not let a frame hug an axis that a child fills: the child's fill makes the
+   * frame fixed at the size it had then, which is before its other children existed, and hugging
+   * again makes the child fixed. So the frame hugs once everything is inside it and the fill is
+   * applied last. The frame ends up fixed at the size of its content.
+   */
+  private refill(self: Ref, node: TreeNode): void {
+    const sizing = frameSizing(node);
+    const children = this.built.get(node) ?? [];
 
-    // A new frame is white by default; a frame with no `fill` is a plain container.
-    if (node.fill === undefined) {
-      props.fills = [];
+    for (const [axis, side] of [
+      ['sizingH', 'w'],
+      ['sizingV', 'h'],
+    ] as const) {
+      const filling = children.filter((child) => child.node[side] === 'fill');
+
+      if (sizing[axis] !== 'hug' || filling.length === 0) {
+        continue;
+      }
+
+      this.set(self, { [axis]: 'hug' });
+
+      for (const child of filling) {
+        this.set(child.self, { [axis]: 'fill' });
+      }
     }
+  }
 
+  /** The layout properties a frame and a set share. */
+  private container(node: TreeNode, props: Record<string, unknown>, binds: [string, string][]): void {
     if (node.align) props.mainAlign = node.align;
     if (node.cross) props.crossAlign = node.cross;
     if (node.clip !== undefined) props.clip = node.clip;
@@ -225,6 +314,18 @@ class Builder {
     this.scalar(node.gap, 'gap', 'gap', props, binds);
     this.padding(node.pad, props, binds);
     this.appearance(node, props, binds);
+  }
+
+  private frame(node: TreeNode, parent: Parent, ref: string, self: Ref): number {
+    const props: Record<string, unknown> = { layout: layoutOf(node) };
+    const binds: [string, string][] = [];
+
+    // A new frame is white by default; a frame with no `fill` is a plain container.
+    if (node.fill === undefined) {
+      props.fills = [];
+    }
+
+    this.container(node, props, binds);
 
     const created = this.emit(
       'node.create',
@@ -233,16 +334,133 @@ class Builder {
     );
 
     this.binds(self, binds);
+    this.set(self, { ...frameSizing(node), ...node.props });
+    this.rawBinds(self, node.bind);
 
-    const sizing: Record<string, unknown> = {};
+    return created;
+  }
 
-    if (layout !== null) {
-      sizing.sizingH = sizingOf(node.w) ?? (typeof node.w === 'number' ? 'fixed' : 'hug');
-      sizing.sizingV = sizingOf(node.h) ?? (typeof node.h === 'number' ? 'fixed' : 'hug');
+  private section(node: TreeNode, parent: Parent, ref: string, self: Ref): number {
+    const props: Record<string, unknown> = {};
+    const binds: [string, string][] = [];
+
+    this.appearance(node, props, binds);
+    Object.assign(props, node.props);
+
+    const params: Record<string, unknown> = {
+      type: 'section',
+      name: node.section,
+      ...placement(node, parent),
+    };
+
+    if (Object.keys(props).length > 0) params.props = props;
+
+    const created = this.emit('node.create', params, ref);
+
+    this.binds(self, binds);
+    this.rawBinds(self, node.bind);
+
+    return created;
+  }
+
+  /**
+   * Builds the variants beside each other, makes them components and combines them. The set's
+   * id is the result of the combine step, which is the one `ref` names.
+   */
+  private componentSet(node: TreeNode, parent: Parent, ref: string, self: Ref, path: string): number {
+    const children = node.children ?? [];
+
+    if (children.length === 0) {
+      throw new TreeError(`${path}: a set needs its variants as "children"`);
     }
 
-    this.set(self, { ...sizing, ...node.props });
+    const variants = children.map((child, index) => {
+      const childPath = `${path}.children[${index}]`;
+
+      if (!child || typeof child !== 'object' || child.frame === undefined || child.component) {
+        throw new TreeError(
+          `${childPath}: a variant is a plain frame named "Property=Value, Property=Value"`,
+        );
+      }
+
+      const layers = new Map<string, Ref>();
+
+      this.scopes.push(layers);
+
+      const created = this.node(child, parent, childPath);
+
+      this.scopes.pop();
+
+      return { node: child, layers, self: { $ref: this.out.commands[created]?.as as string } };
+    });
+    const ids = variants.map((variant) => variant.self);
+
+    this.emit('component.createMultiple', { ids });
+
+    const created = this.emit('component.combineVariants', { ids }, ref);
+    // A set has a stroke of its own; counted in, it would push the variants off the padding.
+    const props: Record<string, unknown> = {
+      name: node.set,
+      layout: layoutOf(node),
+      strokesIncluded: false,
+    };
+    const binds: [string, string][] = [];
+
+    this.container(node, props, binds);
+
+    if (node.x !== undefined) props.x = node.x;
+    if (node.y !== undefined) props.y = node.y;
+    if (typeof node.w === 'number') props.width = node.w;
+    if (typeof node.h === 'number') props.height = node.h;
+
+    this.set(self, { ...props, ...frameSizing(node), ...node.props });
+    this.binds(self, binds);
     this.rawBinds(self, node.bind);
+
+    // Combining leaves every variant at a fixed size.
+    for (const variant of variants) {
+      this.set(variant.self, frameSizing(variant.node));
+      this.refill(variant.self, variant.node);
+    }
+
+    const properties = node.properties ?? [];
+
+    if (!Array.isArray(properties)) {
+      throw new TreeError(`${path}: a set's "properties" is a list of {name, type, layer, default?}`);
+    }
+
+    for (const property of properties) {
+      const field = PROPERTY_FIELDS[property.type];
+      const layers = variants.flatMap((variant) => variant.layers.get(property.layer) ?? []);
+      const [first, ...rest] = layers;
+
+      if (!field) {
+        throw new TreeError(
+          `${path}: property "${property.name}" needs a type: ${Object.keys(PROPERTY_FIELDS).join(', ')}`,
+        );
+      }
+
+      if (!first) {
+        throw new TreeError(
+          `${path}: property "${property.name}" names the layer "${property.layer}", which no variant has`,
+        );
+      }
+
+      const definition: Record<string, unknown> = {
+        id: self,
+        name: property.name,
+        type: property.type,
+        layer: first,
+      };
+
+      if (property.default !== undefined) definition.default = property.default;
+
+      this.emit('component.addProperty', definition);
+
+      for (const layer of rest) {
+        this.emit('component.bindProperty', { layer, property: property.name, field });
+      }
+    }
 
     return created;
   }
@@ -293,18 +511,26 @@ class Builder {
   }
 
   private instance(node: TreeNode, parent: Parent, ref: string, self: Ref, path: string): number {
-    let component: number;
+    let component: number | Ref;
 
     if (typeof node.instance === 'number') {
       component = node.instance;
+    } else if (typeof node.instance === 'object' && node.instance !== null) {
+      // A component or set built earlier in this tree, by its "as" name.
+      const index = this.out.named[node.instance.$ref];
+      const internal = index === undefined ? undefined : this.out.commands[index]?.as;
+
+      if (!internal) {
+        throw new TreeError(`${path}: no earlier layer has "as": "${node.instance.$ref}"`);
+      }
+
+      component = { $ref: internal };
     } else {
-      const found = this.options.component(String(node.instance));
+      const name = String(node.instance);
+      const found = this.options.component(name);
 
       if (found === null) {
-        throw new UnknownName(`${path}: no component named "${node.instance}"`, {
-          kind: 'component',
-          name: String(node.instance),
-        });
+        throw new UnknownName(`${path}: no component named "${name}"`, { kind: 'component', name });
       }
 
       component = found;
@@ -317,6 +543,10 @@ class Builder {
     if (node.y !== undefined) params.y = node.y;
 
     const created = this.emit('instance.create', params, ref);
+
+    if (Array.isArray(node.properties)) {
+      throw new TreeError(`${path}: an instance's "properties" is an object of {name: value}`);
+    }
 
     if (node.properties && Object.keys(node.properties).length > 0) {
       this.emit('instance.setProperties', { ids: [self], properties: node.properties });
@@ -545,6 +775,22 @@ function placement(node: TreeNode, parent: Parent, withSize = true): Record<stri
   }
 
   return params;
+}
+
+function layoutOf(node: TreeNode): TreeNode['layout'] {
+  return node.layout === undefined ? 'vertical' : node.layout;
+}
+
+/** How an auto-layout frame sizes: by its `w` and `h`, hugging by default. */
+function frameSizing(node: TreeNode): Record<string, unknown> {
+  if (layoutOf(node) === null) {
+    return {};
+  }
+
+  return {
+    sizingH: sizingOf(node.w) ?? (typeof node.w === 'number' ? 'fixed' : 'hug'),
+    sizingV: sizingOf(node.h) ?? (typeof node.h === 'number' ? 'fixed' : 'hug'),
+  };
 }
 
 function sizingOf(value: Scalar | undefined): 'fill' | 'hug' | null {

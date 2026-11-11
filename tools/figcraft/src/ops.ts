@@ -4,11 +4,19 @@ import { join } from 'node:path';
 
 import { expandTree, UnknownName, type NameUse, type TreeNode } from './build';
 import { byteLength } from './bytes';
-import { findComponent, findPage, suggest, type Catalog, type CatalogStore } from './catalog';
+import {
+  findComponent,
+  findPage,
+  suggest,
+  type Catalog,
+  type CatalogComponent,
+  type CatalogStore,
+} from './catalog';
 import type { Command, Engine } from './engine';
 import { fit, prune } from './prune';
 import type { Project } from './project';
 import type { Config } from './settings';
+import { mergeVariableCommands, parseSnapshot, worthMerging } from './variables';
 
 export type Context = {
   config: Config;
@@ -25,7 +33,7 @@ export class OpError extends Error {}
 // ---------------------------------------------------------------------------------------------
 
 export type FindInput = {
-  kind?: 'layer' | 'variable' | 'style' | 'component' | 'page';
+  kind?: 'layer' | 'variable' | 'style' | 'component' | 'page' | 'collection';
   name?: string;
   type?: string;
   text?: string;
@@ -110,11 +118,18 @@ function findName(catalog: Catalog, kind: string, input: FindInput, limit: numbe
       .filter((entry) => matches(entry.name))
       .map((entry) => `${entry.id}\t${entry.name}${entry.set ? '\t(set)' : ''}`);
   } else if (kind === 'page') {
+    // The index is the page's place in the document, which is what page.move takes.
     rows = catalog.pages
       .filter((entry) => matches(entry.name))
-      .map((entry) => `${entry.id}\t${entry.name}`);
+      .map((entry) => `${entry.id}\t${entry.name}\tindex ${entry.index}`);
+  } else if (kind === 'collection') {
+    rows = catalog.collections
+      .filter((entry) => matches(entry.name))
+      .map((entry) => `${entry.name}\tmodes: ${entry.modes.join(', ')}`);
   } else {
-    throw new OpError(`unknown kind "${kind}". Use layer, variable, style, component or page.`);
+    throw new OpError(
+      `unknown kind "${kind}". Use layer, variable, style, component, page or collection.`,
+    );
   }
 
   if (rows.length === 0) {
@@ -144,12 +159,21 @@ async function searchRoots(ctx: Context, input: FindInput): Promise<number[]> {
   return catalog.pages.map((page) => page.id);
 }
 
+/** An id that arrived as a string of digits, as some clients send numbers, is still an id. */
+function asId<T>(value: T): T | number {
+  return typeof value === 'string' && /^\d+$/.test(value) ? Number(value) : value;
+}
+
 function pageId(catalog: Catalog, page: string | number): number {
   if (typeof page === 'number') {
     return page;
   }
 
   const found = findPage(catalog, page);
+
+  if (!found && typeof asId(page) === 'number') {
+    return Number(page);
+  }
 
   if (!found) {
     const names = suggest(
@@ -175,26 +199,127 @@ export type ReadInput = {
   page?: string | number;
   /** Properties to return instead of the outline. */
   fields?: string[];
+  /** Write the layers and every layer inside them to a JSON file, and return its path. */
+  deep?: boolean;
 };
+
+/** The most layers one `node.find` returns. */
+const MAX_DEEP_LAYERS = 10_000;
+
+const DEEP_FIELDS = ['name', 'type', 'absoluteBounds'];
 
 export async function read(ctx: Context, input: ReadInput): Promise<unknown> {
   const ids = input.ids?.length ? input.ids : [await layerId(ctx, input)];
+
+  if (input.deep) {
+    return readDeep(ctx, ids, [...DEEP_FIELDS, ...(input.fields ?? [])]);
+  }
+
   const shape = input.fields?.length ? { fields: input.fields } : { outline: true };
   const steps = await must(
     ctx,
     ids.map((id) => ({ command: 'node.get', params: { id, ...shape } })),
   );
+  const results = (await withNames(
+    ctx,
+    steps.map((step) => step.result ?? null),
+  )) as unknown[];
   // The byte budget is shared, so asking for many layers cannot return more than one would.
   const budget = Math.floor(ctx.config.maxBytes / ids.length);
-  const nodes = steps.map((step, index) => {
-    if (!step.result) {
+  const nodes = results.map((result, index) => {
+    if (!result) {
       throw new OpError(`no layer with id ${ids[index]}.`);
     }
 
-    return fit('get_node', prune(step.result, true), budget).value;
+    // The layer's own values come before its children's, which can be many.
+    const { children, ...own } = prune(result, true) as Record<string, unknown>;
+
+    return fit('get_node', children === undefined ? own : { ...own, children }, budget).value;
   });
 
   return input.ids?.length ? nodes : nodes[0];
+}
+
+/**
+ * FigCraft reports a bound variable or an applied style by id ("VariableID:48", "S:2"), and every
+ * other command takes names. Replaces those ids with the names, wherever they appear.
+ */
+async function withNames(ctx: Context, value: unknown): Promise<unknown> {
+  const text = JSON.stringify(value);
+
+  if (!/"(VariableID|S):\d+"/.test(text)) {
+    return value;
+  }
+
+  const catalog = await ctx.catalog.get();
+  const names = new Map(
+    [...catalog.variables, ...catalog.styles].map((entry) => [entry.id, entry.name]),
+  );
+
+  return JSON.parse(text, (_key, item: unknown) =>
+    typeof item === 'string' ? (names.get(item) ?? item) : item,
+  );
+}
+
+/**
+ * A subtree is far too large for a model to read, and measuring it is a script's job: the layers
+ * go to a file as a flat list, each with its `parent` and `children` ids.
+ */
+async function readDeep(ctx: Context, roots: number[], fields: string[]): Promise<string> {
+  const found = await must(
+    ctx,
+    roots.map((root) => ({ command: 'node.find', params: { root, limit: MAX_DEEP_LAYERS } })),
+  );
+  const ids = [...roots];
+
+  for (const [index, step] of found.entries()) {
+    const result = (step.result ?? {}) as { ids?: number[]; total?: number };
+
+    if ((result.total ?? 0) > MAX_DEEP_LAYERS) {
+      throw new OpError(
+        `layer ${roots[index]} has ${result.total} layers inside it, and a deep read stops at ` +
+          `${MAX_DEEP_LAYERS}. Read its children instead.`,
+      );
+    }
+
+    ids.push(...(result.ids ?? []));
+  }
+
+  const unique = [...new Set(ids)];
+  const steps = await must(
+    ctx,
+    unique.map((id) => ({
+      command: 'node.get',
+      params: { id, fields: [...new Set([...fields, 'children'])] },
+    })),
+  );
+  const parents = new Map<number, number>();
+  const layers = steps.map((step, index) => {
+    const node = (step.result ?? {}) as Record<string, unknown> & { children?: { id: number }[] };
+    const id = unique[index] as number;
+    const children = (node.children ?? []).map((child) => child.id);
+
+    for (const child of children) {
+      parents.set(child, id);
+    }
+
+    return { ...node, id, children };
+  });
+  const directory = join(ctx.config.tempDir, 'reads');
+  const path = join(directory, `${roots[0]}-${Date.now()}.json`);
+
+  await mkdir(directory, { recursive: true });
+  await Bun.write(
+    path,
+    JSON.stringify(
+      await withNames(
+        ctx,
+        layers.map((layer) => ({ ...layer, parent: parents.get(layer.id) ?? null })),
+      ),
+    ),
+  );
+
+  return `${path}\t${layers.length} layers`;
 }
 
 /** Resolves `id`, or a `name` that matches exactly one layer. */
@@ -266,10 +391,9 @@ export async function build(ctx: Context, input: BuildInput): Promise<unknown> {
 
   const needsCatalog = input.page !== undefined || usesComponentNames(input.tree);
   const catalog = needsCatalog ? await ctx.catalog.get() : null;
+  const given = asId(input.parent);
   const parent =
-    typeof input.parent === 'string'
-      ? await layerId(ctx, { name: input.parent, page: input.page })
-      : input.parent;
+    typeof given === 'string' ? await layerId(ctx, { name: given, page: input.page }) : given;
   let expansion;
 
   try {
@@ -314,8 +438,12 @@ export async function build(ctx: Context, input: BuildInput): Promise<unknown> {
     throw new OpError(`nothing was changed. ${result.error}${hint}`);
   }
 
-  // A build creates layers only, so the known names are still right.
-  await ctx.catalog.carry();
+  // Layers leave the known names as they were; a new component or set adds one.
+  if (expansion.commands.some((entry) => entry.command.startsWith('component.'))) {
+    ctx.catalog.invalidate();
+  } else {
+    await ctx.catalog.carry();
+  }
 
   const idAt = (index: number): number =>
     ((result.steps[index + prefix.length]?.result ?? {}) as { id: number }).id;
@@ -374,9 +502,23 @@ function namesOfKind(catalog: Catalog, kind: NameUse['kind']): string[] {
 // ---------------------------------------------------------------------------------------------
 
 export type RunInput = {
-  commands: Command[];
+  commands: (Command & { where?: Where })[];
   /** Save afterwards. Defaults to true when a command changes the document. */
   write?: boolean;
+};
+
+/** Picks a command's layers by what they are instead of by id; fills its `ids`. */
+export type Where = {
+  /** Search inside this layer or these layers, or on this page. One of the two is required. */
+  root?: number | number[];
+  page?: string | number;
+  /** The exact layer name. */
+  name?: string;
+  type?: string;
+  /** Text content, as a substring. */
+  text?: string;
+  /** Instances of the main component with this name (substring). */
+  component?: string;
 };
 
 const MAX_STEP_BYTES = 4_096;
@@ -389,28 +531,39 @@ export async function run(ctx: Context, input: RunInput): Promise<unknown> {
     throw new OpError('run needs a non-empty "commands" array of {command, params, as?}.');
   }
 
-  const write = input.write ?? (await changesDocument(ctx.config, input.commands));
+  // A selector or name that cannot be resolved stops the call before FigCraft sees it.
+  const { commands, matched } = await resolveWhere(ctx, input.commands).catch((error: unknown) => {
+    throw error instanceof OpError ? new OpError(`nothing was changed. ${error.message}`) : error;
+  });
+  const write = input.write ?? (await changesDocument(ctx.config, commands));
 
   if (write) {
     assertWritable(ctx);
   }
 
-  const result = await ctx.engine.run(input.commands, { write });
+  const merged = await mergeVariables(ctx, commands);
+  const result = await ctx.engine.run(merged.commands, { write });
 
   if (!result.ok) {
     throw new OpError(`nothing was changed. ${result.error}`);
   }
 
   if (write) {
-    if (input.commands.some((entry) => NAME_COMMANDS.test(entry.command))) {
+    if (commands.some((entry) => NAME_COMMANDS.test(entry.command))) {
       ctx.catalog.invalidate();
     } else {
       await ctx.catalog.carry();
     }
   }
 
-  return result.steps.map((step) => {
-    const value = prune(step.result);
+  return merged.stepOf.map((index, original) => {
+    const step = result.steps[index] ?? { command: '' };
+    const pruned = prune(step.result);
+    // A selector's result says how many layers it reached, so nothing has to be read back.
+    const value =
+      matched[original] === undefined
+        ? pruned
+        : { ...(pruned && typeof pruned === 'object' ? pruned : {}), matched: matched[original] };
     const bytes = byteLength(JSON.stringify(value ?? null));
 
     if (bytes <= MAX_STEP_BYTES) {
@@ -425,6 +578,201 @@ export async function run(ctx: Context, input: RunInput): Promise<unknown> {
   });
 }
 
+/**
+ * Turns each command's `where` into `ids`, so a change to every layer of a kind needs no script
+ * that looks the ids up first. A selector that matches nothing fails before anything changes.
+ */
+async function resolveWhere(
+  ctx: Context,
+  commands: RunInput['commands'],
+): Promise<{ commands: Command[]; matched: (number | undefined)[] }> {
+  const needsCatalog = commands.some(
+    (entry) =>
+      usesComponentName(entry) ||
+      (entry.where && (entry.where.root === undefined || entry.where.component)),
+  );
+  const catalog = needsCatalog ? await ctx.catalog.get() : null;
+
+  // One search per root of each selector, all in one step.
+  const searches: { command: number; params: Record<string, unknown> }[] = [];
+  // The component whose instances a selector wants, when `component` names one exactly.
+  const wanted = new Map<number, CatalogComponent>();
+
+  for (const [index, entry] of commands.entries()) {
+    if (!entry.where) {
+      continue;
+    }
+
+    const { root, page, name, type, text, component } = entry.where;
+
+    if (JSON.stringify(entry.where).includes('"$ref"')) {
+      throw new OpError(
+        `${label(index, entry)}: "where" is looked up before the commands run, so it cannot use ` +
+          '"$ref". Create the layers in one call and select inside them in the next.',
+      );
+    }
+
+    if (root === undefined && page === undefined) {
+      throw new OpError(`${label(index, entry)}: "where" needs a "root" layer id or a "page".`);
+    }
+
+    const roots =
+      root === undefined
+        ? [pageId(catalog as Catalog, page as string | number)]
+        : (Array.isArray(root) ? root : [root]).map(asId);
+    const known = component ? findComponent(catalog as Catalog, component) : null;
+
+    if (known) {
+      wanted.set(index, known);
+    }
+
+    for (const each of roots) {
+      const params: Record<string, unknown> = { root: each, limit: MAX_DEEP_LAYERS };
+
+      if (name) params.name = name;
+      if (text) params.text = text;
+
+      if (known) {
+        // FigCraft's own `component` filter matches the variant's name, never the set's, so the
+        // instances are found here and kept by their main component below.
+        params.type = type ?? 'INSTANCE';
+      } else {
+        if (type) params.type = type;
+        if (component) params.component = component;
+      }
+
+      searches.push({ command: index, params });
+    }
+  }
+
+  if (searches.length === 0 && !commands.some(usesComponentName)) {
+    return { commands, matched: commands.map(() => undefined) };
+  }
+
+  const sets = [...new Set([...wanted.values()].filter((entry) => entry.set).map((entry) => entry.id))];
+  const found = await must(ctx, [
+    ...searches.map((search) => ({ command: 'node.find', params: search.params })),
+    ...sets.map((id) => ({ command: 'node.get', params: { id, fields: ['children'] } })),
+  ]);
+  const matches = new Map<number, number[]>();
+  const variants = new Map<number, number[]>();
+
+  for (const [index, search] of searches.entries()) {
+    const ids = ((found[index]?.result ?? {}) as { ids?: number[] }).ids ?? [];
+
+    matches.set(search.command, [...(matches.get(search.command) ?? []), ...ids]);
+  }
+
+  for (const [index, id] of sets.entries()) {
+    const result = (found[searches.length + index]?.result ?? {}) as { children?: { id: number }[] };
+
+    variants.set(
+      id,
+      (result.children ?? []).map((child) => child.id),
+    );
+  }
+
+  // FigCraft matches names as substrings, and a change to many layers should hit the exact name
+  // only; and an instance is kept by which component it shows.
+  const checked = [
+    ...new Set(
+      [...matches].flatMap(([command, ids]) =>
+        commands[command]?.where?.name || wanted.has(command) ? ids : [],
+      ),
+    ),
+  ];
+  const details = new Map<number, { name?: string; mainComponent?: number }>();
+
+  if (checked.length > 0) {
+    const read = await must(
+      ctx,
+      checked.map((id) => ({ command: 'node.get', params: { id, fields: ['name', 'mainComponent'] } })),
+    );
+
+    for (const [index, step] of read.entries()) {
+      details.set(checked[index] as number, (step.result ?? {}) as { name?: string });
+    }
+  }
+
+  const matched: (number | undefined)[] = [];
+  const resolved = commands.map((entry, index) => {
+    const { where, ...command } = entry;
+    let params = command.params;
+
+    if (usesComponentName(entry)) {
+      const name = params?.component as string;
+      const component = findComponent(catalog as Catalog, name);
+
+      if (!component) {
+        const close = namesFor(catalog as Catalog, { kind: 'component', name });
+
+        throw new OpError(
+          `${label(index, entry)}: no component named "${name}".${didYouMean(close)}`,
+        );
+      }
+
+      params = { ...params, component: component.id };
+    }
+
+    if (!where) {
+      matched.push(undefined);
+
+      return { ...command, params };
+    }
+
+    const component = wanted.get(index);
+    const mains = component
+      ? component.set
+        ? (variants.get(component.id) ?? [])
+        : [component.id]
+      : null;
+    const ids = [...new Set(matches.get(index) ?? [])].filter((id) => {
+      const layer = details.get(id);
+
+      return (
+        (!where.name || layer?.name === where.name) &&
+        (!mains || mains.includes(layer?.mainComponent as number))
+      );
+    });
+
+    if (ids.length === 0) {
+      throw new OpError(`${label(index, entry)}: "where" matched no layers.`);
+    }
+
+    matched.push(ids.length);
+
+    return { ...command, params: { ...params, ids } };
+  });
+
+  return { commands: resolved, matched };
+}
+
+function usesComponentName(entry: Command): boolean {
+  return entry.command.startsWith('instance.') && typeof entry.params?.component === 'string';
+}
+
+/** Names a command in an error: a call often holds several of the same kind. */
+function label(index: number, entry: Command): string {
+  return `step ${index} (${entry.command})`;
+}
+
+/** Folds plain variable creates and sets into imports; see `variables.ts` for why. */
+async function mergeVariables(ctx: Context, commands: Command[]) {
+  const asWritten = { commands, stepOf: commands.map((_, index) => index) };
+
+  if (!worthMerging(commands)) {
+    return asWritten;
+  }
+
+  const exported = await ctx.engine.run([{ command: 'variable.export', params: {} }], {
+    write: false,
+  });
+  const text = exported.ok ? (exported.steps[0]?.result as { text?: string } | undefined)?.text : '';
+  const snapshot = text ? parseSnapshot(text) : null;
+
+  return snapshot ? mergeVariableCommands(commands, snapshot) : asWritten;
+}
+
 // ---------------------------------------------------------------------------------------------
 // shot
 // ---------------------------------------------------------------------------------------------
@@ -435,10 +783,17 @@ export type ShotInput = {
   page?: string | number;
   /** Export scale; chosen from the layer's size when absent. */
   scale?: number;
+  /** Variable modes to show the layers in, for this export only: { collection: mode }. */
+  mode?: Record<string, string>;
 };
 
 export async function shot(ctx: Context, input: ShotInput): Promise<string> {
   const ids = input.ids?.length ? input.ids : [await layerId(ctx, input)];
+  // Not saved: the export runs in the same step as the mode change, and the step is dropped.
+  const modes = Object.entries(input.mode ?? {}).map(([collection, mode]) => ({
+    command: 'variable.setMode',
+    params: { ids, collection, mode },
+  }));
   const sizes = await must(
     ctx,
     ids.map((id) => ({ command: 'node.get', params: { id, fields: ['name', 'width', 'height'] } })),
@@ -464,12 +819,17 @@ export async function shot(ctx: Context, input: ShotInput): Promise<string> {
       },
     };
   });
-  const written = await must(ctx, exports);
+  // The sizes are read again after the mode change, which can resize the layers.
+  const steps = await must(ctx, [
+    ...modes,
+    ...exports,
+    ...ids.map((id) => ({ command: 'node.get', params: { id, fields: ['name', 'width', 'height'] } })),
+  ]);
 
-  return written
-    .map((step, index) => {
-      const result = (step.result ?? {}) as { path?: string; bytes?: number };
-      const node = (sizes[index]?.result ?? {}) as Record<string, unknown>;
+  return ids
+    .map((_, index) => {
+      const result = (steps[modes.length + index]?.result ?? {}) as { path?: string };
+      const node = (steps[modes.length + ids.length + index]?.result ?? {}) as Record<string, unknown>;
 
       return `${result.path}\t${size(node)} @${exports[index]?.params.scale}x\t${node.name ?? ''}`;
     })
@@ -517,8 +877,9 @@ export async function help(ctx: Context, input: { query?: string }): Promise<str
 
   return matches
     .map((entry) => {
+      // One command asked for by id gets its parameters in full: the answer is often at the end.
       const params =
-        byteLength(entry.params) > MAX_PARAM_BYTES
+        exact.length !== 1 && byteLength(entry.params) > MAX_PARAM_BYTES
           ? `${entry.params.slice(0, MAX_PARAM_BYTES)}…`
           : entry.params;
 

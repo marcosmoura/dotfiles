@@ -44,7 +44,7 @@ describe('parseRunOutput', () => {
   });
 
   test('shortens long errors', () => {
-    expect(shortError('x'.repeat(5_000)).length).toBeLessThan(700);
+    expect(shortError('x'.repeat(5_000)).length).toBeLessThan(3_100);
   });
 });
 

@@ -35,15 +35,20 @@ figkit find --kind variable --name space/
 figkit find "Budget overview" --page Screens
 figkit read 4                          # outline
 figkit read 4 --fields '["width","layout","boundVariables"]'
+figkit read 4 --deep                   # the whole subtree, to a JSON file for a script to measure
 figkit build @card.json                # or '<json>' or - for stdin
 figkit shot --ids '[4]'
+figkit shot --ids '[4]' --mode '{"Color":"Dark"}'   # in that mode, for this export only
+figkit find --kind collection          # variable collections with their mode names
+figkit find --kind page                # pages with the index page.move takes
 figkit help node.reparent
 ```
 
 ### `build` trees
 
 Each node has exactly one of `frame` (its name), `text` (its characters), `instance` (a component
-name or id) or `shape` (`rectangle`, `ellipse`, `line`, `vector`).
+name or id), `shape` (`rectangle`, `ellipse`, `line`, `vector`), `section` (its name) or `set` (a
+component set's name).
 
 ```json
 {
@@ -75,13 +80,73 @@ name or id) or `shape` (`rectangle`, `ellipse`, `line`, `vector`).
 - `mode` sets variable modes on a layer: `{ "Dynamic Type": "AX3" }`.
 - `as` names a layer; the result reports its id.
 
+Components are built in the same step as their layers:
+
+```json
+{
+  "set": "Control/Tag",
+  "as": "set",
+  "layout": "horizontal",
+  "gap": 40,
+  "pad": 40,
+  "properties": [{ "name": "Show Icon?", "type": "boolean", "layer": "Icon", "default": true }],
+  "children": [
+    { "frame": "Tone=Neutral", "children": [{ "shape": "rectangle", "name": "Icon", "w": 16, "h": 16 }] },
+    { "frame": "Tone=Positive", "children": [{ "shape": "rectangle", "name": "Icon", "w": 16, "h": 16 }] }
+  ]
+}
+```
+
+- A `set`'s `children` are its variants, plain frames named `Property=Value, Property=Value`. They
+  are built, made components and combined; the set then takes the frame keys for its own layout,
+  and the variants get their sizing back, which combining fixes.
+- `properties` adds component properties (`boolean`, `text`, `instanceSwap`), each bound to the
+  layer named `layer` in every variant that has one.
+- `"component": true` on a frame makes it a single component.
+- `{ "instance": { "$ref": "set" } }` is an instance of a set or component built earlier in the same
+  tree, by its `as` name.
+- A `section`'s children are placed by `x` and `y`.
+
 The result is the root id, the named ids and, with `shot`, the image path. An unknown variable,
 style or component fails before anything changes and lists the closest names.
 
-Limits worth knowing: a `text` layer with `"h": "fill"` or a frame with fill children inside a
-hugging parent sizes the way FigCraft does, which is not always what you expect; read the result
-back. Some FigCraft commands (for example `component.create`) check their target before a script
-runs, so they need a real id from an earlier call instead of a `$ref`.
+Limits worth knowing: FigCraft does not let a frame hug an axis that a child fills. Giving a child
+`"w": "fill"` makes its parent fixed at the size it had then, and hugging again makes the child
+fixed. `build` therefore hugs the parent once its children exist and applies the fill last, so the
+parent ends up fixed at the size of its content and does not grow afterwards. A `text` layer with
+`"h": "fill"` sizes the way FigCraft does; read the result back.
+
+### Selectors in `run`
+
+A command can take `where` in place of `ids`, so a change to every layer of a kind needs no script
+that looks the ids up first:
+
+```json
+{ "command": "node.set", "where": { "root": 42, "name": "Amount", "type": "TEXT" }, "params": { "visible": false } }
+```
+
+`root` is a layer id or a list of ids (`page` works in its place). `name` matches exactly; `type`
+and `text` (substring) narrow it further. `component` selects instances: of a component or set
+when it names one, since FigCraft's own filter matches only the variant's name
+(`Tone=Warning`) and never the set's; any other text goes to that filter. The step's result
+reports `matched`, the number of layers reached. A selector that matches nothing fails before
+anything changes, and names its step. Selectors are looked up before the commands run, so they
+cannot use `$ref`; FigCraft's own references can, including `{"$ref": "copy", "field": "ids/0"}`
+for a part of a result other than `id`.
+
+`instance.*` commands take `component` as a name, resolved the way `build` resolves it. `read`
+returns bound variables and applied styles by name instead of FigCraft's ids.
+
+### Variables in `run`
+
+FigCraft recomputes the whole document after each change to a variable's definition: about 20
+seconds per `variable.set` or `variable.create` on a 200,000-layer file (figcraft-cli 0.17.0). One
+`variable.import` pays that once for any number of variables, so `run` folds the plain creates and
+sets of a call into imports (`src/variables.ts`). Plain means number, string or boolean literals, a
+`variable.create` that names every mode in `values` (or gives one `value`) and has no `as`. A rename
+starts a new import. Aliases, colours, a missing mode and any other variable command are left as
+written, and so is everything after the first one that cannot be folded. The folded commands all
+report the import's result.
 
 ## Project setup
 
@@ -97,10 +162,27 @@ checkout is on `main` (override with `"branch": "<name>"`).
 
 `FIGKIT_FILE=<path>` points at a file directly, for scratch copies and tests.
 
+Keep one design file. FigCraft re-applies every variable binding in a document whenever its
+variables change, so a variable edit costs more the more bound layers a file holds, and it is
+tempting to move documentation frames into a second file that uses the first as a library. That
+was tried with figcraft-cli 0.17.0 and dropped: the second file pays the same recompute when it
+takes the library's update, a cross-file paste leaves the bindings, modes and style links of plain
+layers pointing at ids that do not exist in the new file, and taking an update drops linked
+variables that only a text style uses, so that text stops following its frame's mode.
+
 ## Headless and live
 
-- Headless (default) runs `figcraft-cli run` on the file. It never starts the app. A write replaces
-  the file on disk, so the app must not have it open with unsaved changes.
+- Headless (default) never starts the app. A write replaces the file on disk, so the app must not
+  have it open with unsaved changes. It runs in one of two ways:
+  - A one-off `figkit <command>` runs `figcraft-cli run` for each step, and every one loads the file
+    again: 2 seconds for a 16 MB file, several times per command.
+  - `figkit mcp` keeps one `figcraft-cli mcp` process with the file open for as long as the server
+    runs (`createSessionEngine`). On that file a read, a search or an export takes milliseconds and a
+    write about a second, the save. The session starts again from disk when the file changes under
+    it, and after a call that changed the document without saving. `build` and `run` take
+    `{"file": "<path>"}` there, to read their input from a JSON file. Prefer this for agents.
+    A write that changes a variable's definition still goes to a one-off `figcraft-cli run`:
+    FigCraft's recompute takes about twice as long in a session (45 against 25 seconds).
 - Live (`--live`) attaches to the open FigCraft app, makes the same edits there and saves after each
   write. It launches the app when it is not running, and refuses to start when another client is
   already attached. With `figkit mcp --live` the attach happens on the first tool call, not when the
@@ -144,5 +226,6 @@ bun run typecheck
 ```
 
 `src/build.ts` is the tree expansion, `src/ops.ts` the six commands, `src/engine.ts` the headless
-and live backends, `src/catalog.ts` the cached names. `src/app.ts`, `src/lock.ts` and `src/prune.ts`
+and live backends, `src/catalog.ts` the cached names, `src/variables.ts` the folding of variable
+commands. `src/app.ts`, `src/lock.ts` and `src/prune.ts`
 came from the old proxy with their tests.

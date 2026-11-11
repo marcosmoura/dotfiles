@@ -12,10 +12,13 @@ export type CatalogComponent = { id: number; name: string; set: boolean };
  * (hundreds of kilobytes on a real design system), so only names and ids are kept.
  */
 export type Catalog = {
-  variables: { name: string; type: string; collection: string }[];
-  styles: { name: string; type: string }[];
+  variables: { id: string; name: string; type: string; collection: string }[];
+  styles: { id: string; name: string; type: string }[];
   components: CatalogComponent[];
-  pages: { id: number; name: string }[];
+  /** `index` is the page's place among all pages, dividers included. */
+  pages: { id: number; name: string; index: number }[];
+  /** Variable collections with their mode names, in order; the first is the default. */
+  collections: { name: string; modes: string[] }[];
 };
 
 export type CatalogStore = {
@@ -30,6 +33,12 @@ type Listing = Record<string, unknown>;
 
 export function createCatalogStore(engine: Engine, config: Config, file: string): CatalogStore {
   let memory: Catalog | null = null;
+  // The state of the file `memory` was read from: a server outlives many changes to the file,
+  // including ones made by the app or another tool.
+  let memoryAt: string | null = null;
+  // The app's document can differ from the file on disk, so only headless reads are cached.
+  const cachePath = (): string | null =>
+    engine.mode === 'headless' ? cacheFile(config, file) : null;
 
   return {
     invalidate() {
@@ -37,23 +46,24 @@ export function createCatalogStore(engine: Engine, config: Config, file: string)
     },
     async carry() {
       // The cache is keyed by the file's state, which the write just changed.
-      const path = memory && engine.mode === 'headless' ? cacheFile(config, file) : null;
+      const path = memory ? cachePath() : null;
 
       if (path) {
+        memoryAt = path;
         await Bun.write(path, JSON.stringify(memory));
       }
     },
     async get(refresh = false) {
-      if (memory && !refresh) {
+      const path = cachePath();
+
+      if (memory && !refresh && (path === null || path === memoryAt)) {
         return memory;
       }
 
-      // The app's document can differ from the file on disk, so only headless reads are cached.
-      const cachePath = engine.mode === 'headless' ? cacheFile(config, file) : null;
-
-      if (cachePath && !refresh && existsSync(cachePath)) {
+      if (path && !refresh && existsSync(path)) {
         try {
-          memory = (await Bun.file(cachePath).json()) as Catalog;
+          memory = (await Bun.file(path).json()) as Catalog;
+          memoryAt = path;
 
           return memory;
         } catch {
@@ -61,25 +71,12 @@ export function createCatalogStore(engine: Engine, config: Config, file: string)
         }
       }
 
-      const result = await engine.run(
-        [
-          { command: 'variable.list', params: {} },
-          { command: 'style.list', params: {} },
-          { command: 'component.list', params: {} },
-          { command: 'page.list', params: {} },
-        ],
-        { write: false },
-      );
+      memory = await readNames(engine);
+      memoryAt = path;
 
-      if (!result.ok) {
-        throw new Error(`could not list the document's names: ${result.error}`);
-      }
-
-      memory = toCatalog(result.steps.map((step) => step.result));
-
-      if (cachePath) {
+      if (path) {
         await mkdir(config.tempDir, { recursive: true });
-        await Bun.write(cachePath, JSON.stringify(memory));
+        await Bun.write(path, JSON.stringify(memory));
       }
 
       return memory;
@@ -87,12 +84,79 @@ export function createCatalogStore(engine: Engine, config: Config, file: string)
   };
 }
 
+async function readNames(engine: Engine): Promise<Catalog> {
+  const result = await engine.run(
+    [
+      { command: 'variable.list', params: {} },
+      { command: 'style.list', params: {} },
+      { command: 'page.list', params: {} },
+    ],
+    { write: false },
+  );
+
+  if (!result.ok) {
+    throw new Error(`could not list the document's names: ${result.error}`);
+  }
+
+  const [variables, styles, pages] = result.steps.map((step) => step.result);
+
+  return toCatalog([variables, styles, await listComponents(engine, pages), pages]);
+}
+
+const FIND_LIMIT = 10_000;
+
+/**
+ * The components, by searching each page. FigCraft's `component.list` also counts every
+ * component's instances, which takes 10 to 15 seconds on a 200,000-layer file; it is only the
+ * fallback for a page with more components than one search returns.
+ */
+async function listComponents(engine: Engine, pages: unknown): Promise<unknown> {
+  const roots = asList(pages).map((page) => Number(page.id));
+  const found = await engine.run(
+    roots.flatMap((root) =>
+      ['COMPONENT_SET', 'COMPONENT'].map((type) => ({
+        command: 'node.find',
+        params: { root, type, limit: FIND_LIMIT },
+      })),
+    ),
+    { write: false },
+  );
+  const results = found.ok
+    ? found.steps.map((step) => (step.result ?? {}) as { ids?: number[]; total?: number })
+    : [];
+  const ids = results.flatMap((entry) => entry.ids ?? []);
+
+  if (found.ok && ids.length === 0) {
+    return [];
+  }
+
+  if (found.ok && results.every((entry) => (entry.total ?? 0) <= FIND_LIMIT)) {
+    const named = await engine.run(
+      ids.map((id) => ({ command: 'node.get', params: { id, fields: ['name', 'type'] } })),
+      { write: false },
+    );
+
+    if (named.ok) {
+      return named.steps.map((step) => step.result);
+    }
+  }
+
+  const listed = await engine.run([{ command: 'component.list', params: {} }], { write: false });
+
+  if (!listed.ok) {
+    throw new Error(`could not list the document's components: ${listed.error}`);
+  }
+
+  return listed.steps[0]?.result;
+}
+
 function cacheFile(config: Config, file: string): string | null {
   try {
     const stat = statSync(file);
     const key = Bun.hash(`${file}:${stat.mtimeMs}:${stat.size}`).toString(36);
 
-    return join(config.tempDir, `catalog-${key}.json`);
+    // The number is the shape of the cached catalog; raise it when the shape changes.
+    return join(config.tempDir, `catalog5-${key}.json`);
   } catch {
     return null;
   }
@@ -107,11 +171,13 @@ export function toCatalog(listings: unknown[]): Catalog {
 
   return {
     variables: (variables.variables ?? []).map((entry) => ({
+      id: String(entry.id),
       name: String(entry.name),
       type: String(entry.resolvedType ?? ''),
       collection: collections.get(String(entry.collection)) ?? '',
     })),
     styles: asList(styleList).map((entry) => ({
+      id: String(entry.id),
       name: String(entry.name),
       type: String(entry.type ?? ''),
     })),
@@ -120,10 +186,19 @@ export function toCatalog(listings: unknown[]): Catalog {
       name: String(entry.name),
       set: entry.type === 'COMPONENT_SET',
     })),
-    pages: asList(pageList)
-      .filter((entry) => entry.divider !== true)
-      .map((entry) => ({ id: Number(entry.id), name: String(entry.name).trim() })),
+    pages: pagesOf(pageList),
+    collections: (variables.collections ?? []).map((entry) => ({
+      name: String(entry.name),
+      modes: asList(entry.modes).map((mode) => String(mode.name)),
+    })),
   };
+}
+
+function pagesOf(pageList: unknown): Catalog['pages'] {
+  return asList(pageList)
+    .map((entry, index) => ({ entry, index }))
+    .filter(({ entry }) => entry.divider !== true)
+    .map(({ entry, index }) => ({ id: Number(entry.id), name: String(entry.name).trim(), index }));
 }
 
 function asList(value: unknown): Listing[] {

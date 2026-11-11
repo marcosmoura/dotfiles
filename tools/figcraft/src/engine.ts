@@ -1,4 +1,4 @@
-import { existsSync } from 'node:fs';
+import { existsSync, statSync } from 'node:fs';
 import { mkdir, rm } from 'node:fs/promises';
 import { join } from 'node:path';
 
@@ -7,6 +7,7 @@ import { truncateToBytes } from './bytes';
 import { acquireAppLock, type AppLock } from './lock';
 import { log } from './logger';
 import type { Config } from './settings';
+import { changesVariables } from './variables';
 
 export type Command = { command: string; params?: Record<string, unknown>; as?: string };
 
@@ -28,7 +29,8 @@ export type Engine = {
   close(): Promise<void>;
 };
 
-const MAX_ERROR_BYTES = 600;
+/** Long enough for FigCraft's "valid keys" lists, which are the useful part of its errors. */
+const MAX_ERROR_BYTES = 3_000;
 
 export function shortError(message: string): string {
   const text = message.replace(/\s+/g, ' ').trim();
@@ -128,6 +130,134 @@ export function parseRunOutput(stdout: string, stderr: string, code: number): Ru
   }
 
   return { ok: true, steps };
+}
+
+// ---------------------------------------------------------------------------------------------
+// Session: one headless `figcraft-cli mcp` process that keeps the file open, for a server that
+// takes many calls. Loading a large file costs seconds; a command on an open one, milliseconds.
+// ---------------------------------------------------------------------------------------------
+
+/** A batch that changes many variables can take minutes on a large file. */
+const SESSION_TIMEOUT_MS = 600_000;
+
+export function createSessionEngine(
+  config: Config,
+  file: string,
+  spawn: (config: Config) => LiveProcess = (settings) =>
+    Bun.spawn([settings.figcraftBin, 'mcp'], { stdin: 'pipe', stdout: 'pipe', stderr: 'inherit' }),
+): Engine {
+  let client: RpcClient | null = null;
+  // The file as it was when the session read or wrote it; null before the first read.
+  let loaded: string | null = null;
+
+  const onDisk = (): string => {
+    try {
+      const stat = statSync(file);
+
+      return `${stat.mtimeMs}:${stat.size}`;
+    } catch {
+      return 'missing';
+    }
+  };
+
+  const stop = (): void => {
+    client?.stop();
+    client = null;
+    loaded = null;
+  };
+
+  /** Makes the session's document the file as it is on disk now. */
+  const sync = async (): Promise<RpcClient> => {
+    const current = onDisk();
+
+    if (client && loaded === current) {
+      return client;
+    }
+
+    // Someone else wrote the file (the app, another tool): start again from what is on disk.
+    stop();
+
+    const started = new RpcClient(spawn(config), Math.max(config.requestTimeoutMs, SESSION_TIMEOUT_MS));
+
+    try {
+      await started.request('initialize', {
+        protocolVersion: '2024-11-05',
+        capabilities: {},
+        clientInfo: { name: 'figkit', version: '1' },
+      });
+      started.notify('notifications/initialized');
+
+      if (current !== 'missing') {
+        await started.tool('open_file', { path: file });
+      }
+    } catch (error) {
+      started.stop();
+      throw error;
+    }
+
+    client = started;
+    loaded = current;
+
+    return started;
+  };
+
+  const oneOff = createHeadlessEngine(config, file);
+
+  return {
+    mode: 'headless',
+    async close() {
+      stop();
+    },
+    async run(commands, { write }) {
+      if (!write && !existsSync(file)) {
+        return { ok: false, error: `design file not found: ${file}`, failedStep: null };
+      }
+
+      // FigCraft's recompute after a variable changes takes about twice as long in a session as
+      // in a one-off run (45 against 25 seconds on a 200,000-layer file, figcraft-cli 0.17.0),
+      // which is more than loading the file again costs. The session follows the file afterwards.
+      if (write && commands.some((entry) => changesVariables(entry.command))) {
+        return oneOff.run(commands, { write });
+      }
+
+      try {
+        const session = await sync();
+        // A failed batch is rolled back by FigCraft, so the open document stays the saved one.
+        const results = await session.tool('batch', { commands, onError: 'abort' });
+        const list = Array.isArray(results) ? results : [];
+
+        if (write) {
+          await session.tool('save_file', { path: file });
+          loaded = onDisk();
+        } else {
+          const documents = await session.tool('run_command', { command: 'doc.list' });
+          const changed =
+            Array.isArray(documents) &&
+            documents.some((entry: { active?: boolean; dirty?: boolean }) => entry.active && entry.dirty);
+
+          // A run that is not saved must leave no trace, as a one-off process would not.
+          if (changed) {
+            stop();
+          }
+        }
+
+        return {
+          ok: true,
+          steps: commands.map((entry, index) => ({ command: entry.command, result: list[index] })),
+        };
+      } catch (error) {
+        const message = error instanceof Error ? error.message : String(error);
+        const step = /step (\d+)/.exec(message);
+
+        // A dead or timed-out process cannot be trusted; a rejected command leaves it usable.
+        if (/connection closed|did not respond/.test(message)) {
+          stop();
+        }
+
+        return { ok: false, error: shortError(message), failedStep: step ? Number(step[1]) : null };
+      }
+    },
+  };
 }
 
 // ---------------------------------------------------------------------------------------------

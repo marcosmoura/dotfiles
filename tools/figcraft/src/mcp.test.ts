@@ -195,5 +195,20 @@ describe.skipIf(!hasCli)('mcp server tool calls', () => {
 
     expect(second.replies[2]?.result?.isError).toBe(true);
     expect(text(second.replies[2])).toContain('nothing was changed');
+
+    // The session keeps the file open, so a change that is not saved must not stay in it.
+    const third = await converse([
+      call(1, 'run', {
+        write: false,
+        commands: [{ command: 'node.set', params: { ids: [built.root], opacity: 0.25 } }],
+      }),
+      call(2, 'read', { id: built.root, fields: ['opacity'] }),
+      call(3, 'shot', { ids: [built.root], scale: 1 }),
+    ]);
+
+    expect(third.replies[0]?.result?.isError).toBeUndefined();
+    // FigCraft leaves a default value out, so full opacity reads as no value at all.
+    expect((JSON.parse(text(third.replies[1])) as { opacity?: number }).opacity ?? 1).toBe(1);
+    expect(text(third.replies[2]).split('\t')[0]).toEndWith('.png');
   }, 60_000);
 });

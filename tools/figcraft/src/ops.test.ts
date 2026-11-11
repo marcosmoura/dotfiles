@@ -12,10 +12,12 @@ import { loadConfig, resolveBin } from './settings';
 describe('catalog', () => {
   const catalog = toCatalog([
     {
-      collections: [{ id: 'C:1', name: 'Space' }],
-      variables: [{ name: 'space/16', resolvedType: 'number', collection: 'C:1', values: {} }],
+      collections: [{ id: 'C:1', name: 'Space', modes: [{ name: 'Compact' }, { name: 'Roomy' }] }],
+      variables: [
+        { id: 'VariableID:1', name: 'space/16', resolvedType: 'number', collection: 'C:1', values: {} },
+      ],
     },
-    [{ name: 'Docs/Body', type: 'text', style: { font_size: 15 } }],
+    [{ id: 'S:1', name: 'Docs/Body', type: 'text', style: { font_size: 15 } }],
     [
       { id: 2, name: 'Button', type: 'COMPONENT' },
       { id: 1, name: 'Button', type: 'COMPONENT_SET' },
@@ -28,9 +30,12 @@ describe('catalog', () => {
   ]);
 
   test('keeps names and ids only', () => {
-    expect(catalog.variables).toEqual([{ name: 'space/16', type: 'number', collection: 'Space' }]);
-    expect(catalog.styles).toEqual([{ name: 'Docs/Body', type: 'text' }]);
-    expect(catalog.pages).toEqual([{ id: 10, name: 'Colors' }]);
+    expect(catalog.variables).toEqual([
+      { id: 'VariableID:1', name: 'space/16', type: 'number', collection: 'Space' },
+    ]);
+    expect(catalog.styles).toEqual([{ id: 'S:1', name: 'Docs/Body', type: 'text' }]);
+    expect(catalog.pages).toEqual([{ id: 10, name: 'Colors', index: 0 }]);
+    expect(catalog.collections).toEqual([{ name: 'Space', modes: ['Compact', 'Roomy'] }]);
   });
 
   test('prefers a component set over a variant of the same name', () => {
@@ -172,7 +177,151 @@ describe.skipIf(!hasCli)('against figcraft-cli', () => {
 
     expect(fields.width).toBe(320);
     expect(Object.keys(fields.boundVariables)).toContain('gap');
+    // Bound variables come back by name, which is what every other command takes.
+    expect(fields.boundVariables.gap).toBe('space/16');
     expect(await ops.find(ctx, { name: 'Card' })).toMatch(new RegExp(`^${built.root}\\tFRAME\\t320×`));
+
+    const deep = (await ops.read(ctx, { id: built.root, deep: true })) as string;
+    const [path, count] = deep.split('\t');
+    const layers = (await Bun.file(path as string).json()) as {
+      id: number;
+      parent: number | null;
+      children: number[];
+      absoluteBounds: { width: number };
+    }[];
+
+    expect(count).toBe('3 layers');
+    expect(layers[0]).toMatchObject({ id: built.root, parent: null, absoluteBounds: { width: 320 } });
+    expect(layers[0]?.children).toEqual([built.ids.title as number, built.ids.badge as number]);
+    expect(layers.slice(1).map((layer) => layer.parent)).toEqual([built.root, built.root]);
+
+    // `where` picks layers by exact name, so no script has to look the ids up.
+    const changed = await ops.run(ctx, {
+      commands: [
+        { command: 'node.set', where: { root: [built.root], name: 'Title' }, params: { opacity: 0.5 } },
+      ],
+    });
+
+    expect(changed).toEqual([expect.objectContaining({ matched: 1 })]);
+    expect(await ops.read(ctx, { id: built.ids.title, fields: ['opacity'] })).toMatchObject({
+      opacity: 0.5,
+    });
+    await expect(
+      ops.run(ctx, {
+        commands: [{ command: 'node.set', where: { root: built.root, name: 'Tit' }, params: {} }],
+      }),
+    ).rejects.toThrow(/matched no layers/);
+  }, 60_000);
+
+  test('builds a component set with a property and its instances in one step', async () => {
+    const variant = (tone: string) => ({
+      frame: `Tone=${tone}`,
+      pad: 'space/16',
+      children: [{ text: 'Label' }, { shape: 'rectangle', name: 'Icon', w: 16, h: 16 }],
+    });
+    const built = (await ops.build(ctx, {
+      at: [0, 1200],
+      tree: [
+        {
+          set: 'Stat',
+          as: 'set',
+          layout: 'horizontal',
+          gap: 'space/16',
+          pad: 'space/16',
+          properties: [{ name: 'Show Icon?', type: 'boolean', layer: 'Icon', default: true }],
+          children: [variant('Neutral'), variant('Positive')],
+        },
+        {
+          frame: 'Doc',
+          as: 'doc',
+          y: 1600,
+          children: [
+            { instance: { $ref: 'set' }, properties: { Tone: 'Positive' } },
+            { instance: { $ref: 'set' } },
+          ],
+        },
+      ],
+    })) as { ids: { set: number; doc: number } };
+
+    const set = (await ops.read(ctx, { id: built.ids.set, fields: ['name', 'type', 'sizing'] })) as {
+      name: string;
+      type: string;
+      sizing: { horizontal: string };
+      children: { sizing: { horizontal: string } }[];
+    };
+
+    expect(set).toMatchObject({ name: 'Stat', type: 'COMPONENT_SET', sizing: { horizontal: 'hug' } });
+    // Combining fixes the variants' size; the build sets them back to hugging.
+    expect(set.children.map((child) => child.sizing.horizontal)).toEqual(['hug', 'hug']);
+
+    const [properties] = (await ops.run(ctx, {
+      commands: [{ command: 'component.properties', params: { id: built.ids.set } }],
+    })) as [{ properties: { name: string; type: string }[] }];
+
+    expect(properties.properties).toContainEqual(
+      expect.objectContaining({ name: 'Show Icon?', type: 'boolean' }),
+    );
+
+    // An instance shows a variant, whose name is not the set's; the set's name still selects it.
+    const hidden = await ops.run(ctx, {
+      commands: [
+        {
+          command: 'node.set',
+          where: { root: built.ids.doc, component: 'Stat' },
+          params: { opacity: 0.5 },
+        },
+      ],
+    });
+
+    expect(hidden).toEqual([expect.objectContaining({ matched: 2 })]);
+
+    // An id that arrives as a string is still an id.
+    await ops.build(ctx, { parent: String(built.ids.doc), tree: { text: 'Caption' } });
+    expect(await ops.find(ctx, { name: 'Caption', root: built.ids.doc })).toMatch(/\tCaption$/);
+
+    await expect(
+      ops.run(ctx, {
+        commands: [
+          { command: 'node.set', where: { root: { $ref: 'x' } as never, name: 'Label' }, params: {} },
+        ],
+      }),
+    ).rejects.toThrow(/nothing was changed. step 0 \(node.set\).*cannot use "\$ref"/);
+  }, 60_000);
+
+  test('a child that fills a hugging frame is as wide as the widest sibling', async () => {
+    const built = (await ops.build(ctx, {
+      at: [0, 2400],
+      tree: {
+        frame: 'Hugging',
+        pad: 16,
+        as: 'card',
+        children: [
+          { frame: 'Row', layout: 'horizontal', w: 'fill', as: 'row', children: [{ text: 'Short' }] },
+          { text: 'A line that is much wider than the row above it', as: 'line' },
+        ],
+      },
+    })) as { ids: { card: number; row: number; line: number } };
+    const [card, row, line] = (await ops.read(ctx, {
+      ids: [built.ids.card, built.ids.row, built.ids.line],
+      fields: ['width'],
+    })) as { width: number }[];
+
+    // Without the second pass FigCraft fixes the frame at its first child's width.
+    expect(row?.width).toBe(line?.width as number);
+    expect(card?.width).toBe((line?.width as number) + 32);
+  }, 60_000);
+
+  test('lists a collection with its modes and exports in a mode without saving', async () => {
+    const listed = await ops.find(ctx, { kind: 'collection', name: 'Tokens' });
+    const mode = /^Tokens\tmodes: (.+)$/.exec(listed)?.[1] as string;
+
+    expect(mode).toBeTruthy();
+
+    const before = (await stat(ctx.project.file)).mtimeMs;
+    const line = await ops.shot(ctx, { name: 'Card', mode: { Tokens: mode } });
+
+    expect((await stat(line.split('\t')[0] as string)).size).toBeGreaterThan(100);
+    expect((await stat(ctx.project.file)).mtimeMs).toBe(before);
   }, 60_000);
 
   test('a failing build changes nothing and suggests the right name', async () => {

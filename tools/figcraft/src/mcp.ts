@@ -48,12 +48,15 @@ export async function serve(options: { live: boolean }): Promise<number> {
         }
 
         try {
-          state.context ??= createContext(options);
+          // A server takes many calls, so headless work keeps the file open between them.
+          state.context ??= createContext({ ...options, session: true });
 
-          const args =
+          const args = await fromFile(
+            tool.name,
             params.arguments && typeof params.arguments === 'object'
               ? (params.arguments as Record<string, unknown>)
-              : {};
+              : {},
+          );
 
           return { content: [{ type: 'text', text: render(await tool.call(await state.context, args)) }] };
         } catch (error) {
@@ -114,6 +117,28 @@ export async function serve(options: { live: boolean }): Promise<number> {
   }
 
   return 0;
+}
+
+/**
+ * `file` names a JSON file holding the input, so a generated tree or command list is not pasted
+ * into the call. The other arguments override its keys.
+ */
+async function fromFile(
+  tool: string,
+  args: Record<string, unknown>,
+): Promise<Record<string, unknown>> {
+  const { file, ...rest } = args;
+
+  if (typeof file !== 'string') {
+    return args;
+  }
+
+  const parsed = JSON.parse(await Bun.file(file).text()) as unknown;
+  const input = Array.isArray(parsed)
+    ? { [tool === 'run' ? 'commands' : 'tree']: parsed }
+    : (parsed as Record<string, unknown>);
+
+  return { ...input, ...rest };
 }
 
 class RpcError extends Error {
