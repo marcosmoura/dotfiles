@@ -8,7 +8,8 @@
     "CLAUDE_CODE_SKIP_FAST_MODE_NETWORK_ERRORS": "1",
     "CLAUDE_CODE_ENABLE_TELEMETRY": "0",
     "CLAUDE_CODE_NO_FLICKER": "1",
-    "CLAUDE_CODE_SUBAGENT_MODEL": "sonnet"
+    "CLAUDE_CODE_SUBAGENT_MODEL": "sonnet",
+    "ENABLE_CLAUDEAI_MCP_SERVERS": "false"
   },
   "attribution": {
     "commit": "",
@@ -19,7 +20,6 @@
       "Bash(cat *)",
       "Bash(echo *)",
       "Bash(fd *)",
-      "Bash(find *)",
       "Bash(git branch *)",
       "Bash(git diff *)",
       "Bash(git log *)",
@@ -45,13 +45,25 @@
       "Write"
     ],
     "deny": [
-      "Bash(> /dev/sda*)",
       "Bash(dd *)",
-      "Bash(mkfs *)",
+      "Bash(diskutil erase*)",
+      "Bash(git -c user.*)",
+      "Bash(git * -c user.*)",
+      "Bash(git config *user.name*)",
+      "Bash(git config *user.email*)",
+      "Bash(git * config *user.name*)",
+      "Bash(git * config *user.email*)",
+      "Bash(git commit *--author*)",
+      "Bash(*GIT_AUTHOR_*)",
+      "Bash(*GIT_COMMITTER_*)",
       "Read(**/.env*)",
       "Read(~/.aws/**)",
       "Read(~/.gnupg/**)",
-      "Read(~/.ssh/**)"
+      "Read(~/.ssh/**)",
+      "Read(~/.secrets/**)",
+      "Read(~/.claude.json)",
+      "Read(~/.codex/auth.json)",
+      "Read(~/.config/opencode/service.json)"
     ],
     "ask": [
       "Bash(sudo *)",
@@ -88,10 +100,7 @@
   },
   "enabledPlugins": {
     "claude-code-setup@claude-plugins-official": true,
-    "code-review@claude-plugins-official": true,
-    "code-simplifier@claude-plugins-official": true,
     "feature-dev@claude-plugins-official": true,
-    "figma@claude-plugins-official": true,
     "frontend-design@claude-plugins-official": true,
     "playwright@claude-plugins-official": true,
     "rust-analyzer-lsp@claude-plugins-official": true,
@@ -102,18 +111,6 @@
     "flightdeck@claude-flightdeck": true
   },
   "extraKnownMarketplaces": {
-    "anthropic-agent-skills": {
-      "source": {
-        "source": "github",
-        "repo": "anthropics/skills"
-      }
-    },
-    "claude-pace-marketplace": {
-      "source": {
-        "source": "github",
-        "repo": "Astro-Han/claude-pace"
-      }
-    },
     "humanizer": {
       "source": {
         "source": "github",

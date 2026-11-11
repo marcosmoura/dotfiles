@@ -1,5 +1,6 @@
 approval_policy = "on-request"
 sandbox_mode = "workspace-write"
+default_permissions = "workspace-no-secrets"
 personality = "pragmatic"
 approvals_reviewer = "guardian_subagent"
 model = "gpt-6.1-sol"
@@ -10,11 +11,24 @@ service_tier = "default"
 [sandbox_workspace_write]
 network_access = false
 
+# Workspace sandbox that also blocks reads of credential files.
+# Real paths are listed because ~/.codex and ~/.config are symlinks into this repo.
+[permissions.workspace-no-secrets]
+extends = ":workspace"
+
+[permissions.workspace-no-secrets.filesystem]
+"~/.secrets" = "none"
+"~/.ssh" = "none"
+"~/.aws" = "none"
+"~/.gnupg" = "none"
+"~/.claude.json" = "none"
+"~/Projects/dotfiles/home/.codex/auth.json" = "none"
+"~/Projects/dotfiles/home/.config/opencode/service.json" = "none"
+
+# The key is read from ~/.secrets on connect, so it works without the shell env.
 [mcp_servers.context7]
 url = "https://mcp.context7.com/mcp"
-
-[mcp_servers.context7.env_http_headers]
-CONTEXT7_API_KEY = "CONTEXT7_API_KEY"
+http_headers_helper = """key=$(cat "$HOME/.secrets/context7-key") || exit 1; printf '{"CONTEXT7_API_KEY":"%s"}' "$key""""
 
 [mcp_servers.grep]
 url = "https://mcp.grep.app"
@@ -66,9 +80,6 @@ screen_reader_detection_done = true
 
 [notice]
 fast_default_opt_out = true
-
-[plugins."figma@openai-curated"]
-enabled = true
 
 [plugins."build-web-apps@openai-curated"]
 enabled = true
