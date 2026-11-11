@@ -22,13 +22,6 @@ url = "https://mcp.grep.app"
 [mcp_servers.deepwiki]
 url = "https://mcp.deepwiki.com/mcp"
 
-[mcp_servers.xcode]
-command = "xcrun"
-args = ["mcpbridge"]
-
-[mcp_servers.shipswift]
-url = "https://api.shipswift.app/mcp"
-
 [projects."/Users/marcosmoura/Projects/sonora"]
 trust_level = "trusted"
 
