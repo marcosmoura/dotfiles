@@ -111,7 +111,7 @@ rules = [
 
 [[workspaces]]
 name = "coding"
-layout = "monocle"
+layout = "grid"
 screen = "main"
 rules = [
   { app_id = "com.microsoft.VSCode" },
