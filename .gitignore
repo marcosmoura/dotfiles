@@ -93,6 +93,7 @@ home/.claude/*
 !home/.claude/CLAUDE.md
 !home/.claude/agents/
 !home/.claude/settings.json
+!home/.claude/themes/
 
 # Codex (allow specific config files)
 home/.codex/*
