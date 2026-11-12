@@ -1,0 +1,7 @@
+{
+  "name": "sidebar",
+  "version": "0.1.0",
+  "description": "A docked sidebar: session vitals, the context window by category, a rail of prompts and a timeline of subagents.",
+  "author": { "name": "Marcos Moura" },
+  "types": "./types/index.d.ts"
+}

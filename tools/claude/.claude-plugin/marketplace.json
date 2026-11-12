@@ -1,0 +1,14 @@
+{
+  "name": "dotfiles",
+  "metadata": {
+    "description": "Claude Code plugins kept in my dotfiles and loaded straight from this folder."
+  },
+  "owner": { "name": "Marcos Moura" },
+  "plugins": [
+    {
+      "name": "sidebar",
+      "source": "./sidebar",
+      "description": "A docked sidebar: session vitals, the context window by category, a rail of prompts and a timeline of subagents."
+    }
+  ]
+}
