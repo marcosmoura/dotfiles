@@ -13,19 +13,19 @@ gaps = [
 ignore = [
   { app_id = "com.apple.Spotlight" },
   { app_id = "com.apple.dock" },
+  { app_id = "com.apple.loginwindow" },
   { app_id = "com.apple.notificationcenterui" },
   { app_id = "com.apple.systempreferences" },
-  { app_id = "com.apple.loginwindow" },
   { app_id = "com.apple.weather.menu" },
-  { app_id = "cc.ffitch.shottr" },
+  { app_id = "com.tinycast.app" },
+  { app_id = "com.trongduong.snapzy" },
   { app_id = "com.wulkano.kap" },
-  { app_id = "com.raycast.macos" },
 ]
 
 # Window transition animations.
 [animations]
 # Animation duration in milliseconds for large movements.
-duration = 350
+duration = 275
 
 # Easing function for animations.
 easing = "ease_out_expo"
@@ -35,19 +35,18 @@ enabled = true
 
 # Window borders.
 [borders]
-# Whether borders are enabled. Setting this to `true` is your explicit
-# consent for Stache to overwrite the shared `JankyBorders` settings it names:
-# width, style, hidpi, active and inactive colors and the blacklist. Their
-# previous values are not read or restored. Stache never starts, restarts or
-# kills the `JankyBorders` service (it must already be running) and, when
-# borders stop or are disabled, leaves the last settings it sent in place.
+# Whether Stache draws borders around Tiling-managed windows.
 enabled = true
 
-# Retina support (`hidpi`); omitted uses the external service default (true).
+# Retina support (`hidpi`): draw borders at the display's scale.
 hidpi = true
 
-# Border style; omitted uses the external service default (round).
-style = "round"
+# Where the border sits: `below` (under its window) or `above` (over it).
+order = "above"
+
+# Focus animation: with `unfocused = false` the focused border grows in and
+# the previous one shrinks out; otherwise the colors cross-fade.
+transition = { duration = 250, easing = "ease_out" }
 
 # Unfocused windows; `false` hides them.
 unfocused = false
@@ -64,7 +63,17 @@ width = 6
 
 # Windows in monocle layout.
 [borders.monocle]
-color = "#89dceb"
+color = "#89b4fa"
+width = 6
+
+# Floating windows.
+[borders.floating]
+color = "#f5c2e7"
+width = 6
+
+# Windows in master layout.
+[borders.master]
+color = "#f9e2af"
 width = 6
 
 # Master layout settings.
@@ -100,13 +109,20 @@ presets = [
 # Display: `main`/`primary`, `secondary` or a display name.
 # Rules that assign windows to this workspace.
 [[workspaces]]
+name = "files"
+layout = "grid"
+screen = "secondary"
+rules = [
+  { app_id = "com.apple.finder" },
+]
+
+[[workspaces]]
 name = "terminal"
 layout = "master"
 screen = "main"
 rules = [
   { app_id = "com.mitchellh.ghostty" },
   { app_id = "com.apple.dt.Devices" },
-  { app_id = "dev.herdr.app" },
 ]
 
 [[workspaces]]
@@ -114,8 +130,8 @@ name = "coding"
 layout = "grid"
 screen = "main"
 rules = [
-  { app_id = "com.microsoft.VSCode" },
   { app_id = "dev.zed.Zed" },
+  { app_id = "com.microsoft.VSCode" },
 ]
 
 [[workspaces]]
@@ -128,13 +144,12 @@ rules = [
 ]
 
 [[workspaces]]
-name = "music"
+name = "design"
 layout = "monocle"
-screen = "main"
+screen = "secondary"
 rules = [
-  { app_id = "com.spotify.client" },
-  { app_id = "io.github.viren070.aiostreams" },
-  { app_id = "com.nuvio.media.desktop" },
+  { app_id = "com.figma.Desktop" },
+  { app_id = "ai.storyteller.figcraft" },
 ]
 
 [[workspaces]]
@@ -148,22 +163,24 @@ rules = [
 ]
 
 [[workspaces]]
-name = "misc"
-layout = "floating"
-screen = "secondary"
+name = "media"
+layout = "monocle"
+screen = "main"
 rules = [
-  { app_id = "com.figma.Desktop" },
-  { app_id = "ai.storyteller.figcraft" },
-  { app_id = "org.m0k.transmission" },
+  { app_id = "com.spotify.client" },
+  { app_id = "io.github.viren070.aiostreams" },
+  { app_id = "com.nuvio.media.desktop" },
 ]
 
 [[workspaces]]
-name = "guitar"
+name = "misc"
 layout = "floating"
 screen = "main"
 rules = [
+  { app_id = "org.m0k.transmission" },
   { app_id = "com.apple.audio.AudioMIDISetup" },
   { app_id = "com.ableton.live" },
+  { app_id = "studio.pymss.desktop" },
   { app_id = "com.NeuralDSP.ArchetypeNollyX" },
   { app_id = "com.NeuralDSP.ArchetypeGojiraX" },
   { app_id = "com.NeuralDSP.ArchetypeJohnMayerX" },
@@ -172,20 +189,12 @@ rules = [
 ]
 
 [[workspaces]]
-name = "files"
-layout = "grid"
-screen = "secondary"
-rules = [
-  { app_id = "com.apple.finder" },
-  { app_id = "com.asiafu.Bloom" },
-]
-
-[[workspaces]]
 name = "tasks"
 layout = "grid"
 screen = "secondary"
 rules = [
-  { app_id = "com.apple.reminders" },
   { app_id = "me.proton.pass.electron" },
+  { app_id = "com.apple.iCal" },
   { app_id = "ch.protonvpn.mac" },
+  { app_id = "com.apple.reminders" },
 ]
