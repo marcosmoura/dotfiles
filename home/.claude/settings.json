@@ -4,7 +4,10 @@
     "ANTHROPIC_DEFAULT_OPUS_MODEL": "claude-opus-5-5",
     "ANTHROPIC_DEFAULT_SONNET_MODEL": "claude-sonnet-5-5",
     "CLAUDE_CODE_ATTRIBUTION_HEADER": "0",
-    "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1",
+    "DISABLE_TELEMETRY": "1",
+    "DISABLE_ERROR_REPORTING": "1",
+    "DISABLE_AUTOUPDATER": "1",
+    "DISABLE_FEEDBACK_COMMAND": "1",
     "CLAUDE_CODE_SKIP_FAST_MODE_NETWORK_ERRORS": "1",
     "CLAUDE_CODE_ENABLE_TELEMETRY": "0",
     "CLAUDE_CODE_NO_FLICKER": "1",
@@ -71,7 +74,7 @@
     ],
     "defaultMode": "auto"
   },
-  "model": "claude-fable-5-2",
+  "model": "opus",
   "hooks": {
     "SessionStart": [
       {
@@ -92,12 +95,6 @@
     ],
     "baseRef": "head"
   },
-  "statusLine": {
-    "type": "command",
-    "command": "bunx ccstatusline@2.2.33",
-    "padding": 0,
-    "refreshInterval": 5
-  },
   "enabledPlugins": {
     "claude-code-setup@claude-plugins-official": true,
     "feature-dev@claude-plugins-official": true,
@@ -108,7 +105,9 @@
     "swift-lsp@claude-plugins-official": true,
     "typescript-lsp@claude-plugins-official": true,
     "humanizer@humanizer": true,
-    "flightdeck@claude-flightdeck": true
+    "image-view@claude-image-view": true,
+    "prismantis@prismantis": true,
+    "sidebar@dotfiles": true
   },
   "extraKnownMarketplaces": {
     "humanizer": {
@@ -117,10 +116,22 @@
         "repo": "blader/humanizer"
       }
     },
-    "claude-flightdeck": {
+    "claude-image-view": {
       "source": {
         "source": "github",
-        "repo": "scasella/claude-flightdeck"
+        "repo": "jarrodwatts/claude-image-view"
+      }
+    },
+    "prismantis": {
+      "source": {
+        "source": "github",
+        "repo": "NahumLitvin/prismantis"
+      }
+    },
+    "dotfiles": {
+      "source": {
+        "source": "directory",
+        "path": "/Users/marcosmoura/Projects/dotfiles/tools/claude"
       }
     }
   },
@@ -135,13 +146,39 @@
     },
     "claude-sonnet-5-5": {
       "effortLevel": "medium"
+    },
+    "claude-fable-5-2": {
+      "effortLevel": "medium"
     }
   },
   "promptSuggestionEnabled": true,
+  "pluginConfigs": {
+    "prismantis@prismantis": {
+      "options": {
+        "theme": "catppuccin-mocha",
+        "tableStyle": "box",
+        "taskStyle": "progress",
+        "listMarker": "dots",
+        "headingStyle": "banner",
+        "copyButtonStyle": "inline",
+        "promptStyle": "wide",
+        "replyStyle": "auto",
+        "bubbleLabels": "small",
+        "clock": "24h",
+        "toolStyle": "tree-dim",
+        "toolOutput": "full",
+        "diffStyle": "card",
+        "codeStyle": "framed",
+        "pieStyle": "bars"
+      }
+    }
+  },
   "tui": "default",
+  "timeFormat": "24-hour",
   "theme": "custom:catppuccin-mocha",
   "verbose": true,
   "preferredNotifChannel": "ghostty",
+  "idleCompaction": false,
   "showTurnDuration": true,
   "terminalProgressBarEnabled": true,
   "autoMode": {
