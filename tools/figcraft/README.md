@@ -32,10 +32,12 @@ nested tree and expands it into FigCraft commands itself.
 
 ```sh
 figkit find --kind variable --name space/
+figkit find --kind variable --name color/surface/card --values   # its value in every mode, aliases followed
 figkit find "Budget overview" --page Screens
 figkit read 4                          # outline
 figkit read 4 --fields '["width","layout","boundVariables"]'
 figkit read 4 --deep                   # the whole subtree (up to 50,000 layers), to a JSON file for a script to measure
+figkit read 4 --tree                   # the layers inside as text, one line each, in the words build takes
 figkit build @card.json                # or '<json>' or - for stdin
 figkit shot --ids '[4]'
 figkit shot --ids '[4]' --mode '{"Color":"Dark"}'   # in that mode, for this export only
@@ -43,6 +45,26 @@ figkit find --kind collection          # variable collections with their mode na
 figkit find --kind page                # pages with the index page.move takes
 figkit help node.reparent
 ```
+
+### `read --tree`
+
+Copying the structure of an existing component used to take a deep read and a script that printed
+it. `read` with `tree` prints it: the layer and every layer inside it, one indented line each,
+without going into instances.
+
+```text
+2272017 "Stack" FRAME w=fill h=hug 306x52 layout=horizontal gap=space/8 pad=[space/0,space/12,space/0,space/0] bind={minHeight:size/row/regular}
+  2272021 "Name" TEXT w=fill h=hug 211x21 fill=color/text/primary style=iOS/Callout Medium text="Main Checking"
+  2272014 "Icon" INSTANCE w=icon/glyph/size h=icon/glyph/size 19x19 instance=52787 "Icon/bank" glyph=color/icon/primary
+```
+
+The words are `build`'s: `w`, `h`, `layout`, `align`, `cross`, `gap`, `pad` (top, right, bottom,
+left), `radius`, `fill`, `stroke`, `bind` for any other bound variable, `style` and `text`; a frame
+that does not clip says `clip=false`. A bound
+value shows its variable's name, an unbound one its number, so a raw value stands out. The size
+after `h` is the measured one. An instance shows its main component's id and name, its properties
+and, for an icon, the colour bound to its glyph. The output stops at the reply's byte limit and
+says how many layers are left.
 
 ### `build` trees
 
@@ -77,8 +99,15 @@ component set's name).
 - `w` and `h` take a number, `"fill"`, `"hug"` or a variable name. Frames hug by default.
 - `pad` is one value, `[vertical, horizontal]` or `[top, right, bottom, left]`.
 - `bind` and `props` pass anything else straight to `variable.bind` and `node.set`.
-- `mode` sets variable modes on a layer: `{ "Dynamic Type": "AX3" }`.
+- `mode` sets variable modes on a layer: `{ "Dynamic Type": "AX3" }`. A frame's mode is set once
+  its children exist: an instance made inside a frame that already has a mode keeps the default
+  mode's text sizes until the mode is set again (figcraft-cli 0.17.0).
+- `effect` applies an effect style by name.
+- `glyph` on an icon instance is the variable for its glyph's colour (the stroke of the layer named
+  `Glyph` inside it), so an icon and its colour are one node. `read --tree` prints the same word.
 - `as` names a layer; the result reports its id.
+- A top-level node can carry its own `parent` (a layer id) and `index` (its place among that
+  layer's children), so one call adds layers to several existing frames, each where it belongs.
 
 Components are built in the same step as their layers:
 
@@ -105,6 +134,12 @@ Components are built in the same step as their layers:
 - `"component": true` on a frame makes it a single component.
 - `{ "instance": { "$ref": "set" } }` is an instance of a set or component built earlier in the same
   tree, by its `as` name.
+- An instance's `properties` is `{name: value}`. An instance swap (a component id) is set in a
+  call of its own, after the variants, booleans and texts: set together with a variant, FigCraft
+  drops the colour the variant gives the swapped icon's glyph (figcraft-cli 0.17.0). In `run`,
+  write the two `instance.setProperties` commands yourself. Inside a second instance, such as a
+  row in a list group, the swapped glyph falls back to the icon's own colour whatever the order,
+  and binding it again there is not kept: do not recolour an icon that a property swaps.
 - A `section`'s children are placed by `x` and `y`.
 
 The result is the root id, the named ids and, with `shot`, the image path. An unknown variable,
@@ -125,14 +160,21 @@ that looks the ids up first:
 { "command": "node.set", "where": { "root": 42, "name": "Amount", "type": "TEXT" }, "params": { "visible": false } }
 ```
 
-`root` is a layer id or a list of ids (`page` works in its place). `name` matches exactly; `type`
-and `text` (substring) narrow it further. `component` selects instances: of a component or set
+`root` is a layer id or a list of ids (`page` works in its place). `inside` narrows the search to
+a layer under the root, by exact name: one name, or names from the outer layer to the inner one,
+each naming exactly one layer there. `{"page": "Docs", "inside": ["Accounts", "Group · Cash",
+"Row 2"], "name": "Amount"}` reaches one row's amount with no id looked up first. `name` matches
+exactly; `type` and `text` (substring) narrow it further. `component` selects instances: of a component or set
 when it names one, since FigCraft's own filter matches only the variant's name
 (`Tone=Warning`) and never the set's; any other text goes to that filter. The step's result
-reports `matched`, the number of layers reached. A selector that matches nothing fails before
+reports `matched`, the number of layers reached. A call of more than 20 commands folds equal
+results that follow each other into one, with `steps` saying how many it stands for:
+`{"ok":true,"matched":1,"steps":858}`. A selector that matches nothing fails before
 anything changes, and names its step. `expect` is the number of layers a selector must match: any
 other number fails the same way and lists the layers found, so a name that repeats inside a
-layer, hidden layers included, cannot be changed unnoticed. Selectors are looked up before the commands run, so they
+layer, hidden layers included, cannot be changed unnoticed. A command that takes one layer and no `ids`
+(`component.bindProperty`, with `layer`) gets the one layer a selector matched, and fails when the
+selector matched more: given `ids` it acted on the first only. Selectors are looked up before the commands run, so they
 cannot use `$ref`; FigCraft's own references can, including `{"$ref": "copy", "field": "ids/0"}`
 for a part of a result other than `id`.
 
@@ -151,22 +193,40 @@ starts a new import. Aliases, colours, a missing mode and any other variable com
 written, and so is everything after the first one that cannot be folded. The folded commands all
 report the import's result.
 
+### Component properties in a large file
+
+A component property costs time in proportion to the size of the document, not of the set. On a
+14 MB file each `component.addProperty`, `component.bindProperty` and `component.addVariant` took
+about 0.2 seconds (figcraft-cli 0.17.0): 32 variants with 6 properties built in 48 seconds, and in
+7 without the properties. In an empty document 64 variants with 378 bindings took 0.7 seconds in
+all. `build` binds every property in every variant, so a set of 168 variants with 14 properties
+took 381 seconds in one `build`; without properties a set of that size is projected to take about
+a minute there (64 variants took 20 seconds). `component.addVariant` copies a variant with all its
+bindings for the price of one binding: for a set that large, build one variant of each structure
+with its properties, add the others as copies and change what differs in each copy.
+
 ### Instance overrides
 
 An instance keeps what it changes inside itself (typed-over text, a fill variable, a size) by the
-id of the layer inside it. Two kinds of change to its main component give those layers new ids,
-and they show the component's default again. Nothing reports it. Measured on figcraft-cli 0.17.0:
+id of the layer inside it. Three kinds of change to its main component make the instances show
+the component's default again. Nothing reports it. Measured on figcraft-cli 0.17.0:
 
 - A change to the layer tree: a layer deleted and built again, or one layer moved into a new frame
   with `node.reparent`.
 - A change to the properties: `component.addProperty` (a boolean or a variant property, with or
   without a layer bound to it) and `component.bindProperty`.
+- A change to a layer's size or visibility with `node.set`: `width` with a fixed sizing, `sizingH`,
+  `minWidth` (a number or `null`), `maxWidth`, `minHeight`, `visible`; and a variable mode set on
+  a layer with `variable.setMode`.
 
-The reset reaches everything inside an outer instance that holds one of the component's
-instances: when the header component of a list group got a property, the rows of other components
-in that group lost their overrides too. Setting a value on a layer of the main component, renaming
-it and `component.addVariant` keep the overrides. Removing or renaming a property was not tested;
-treat it as a reset.
+The reset reaches the instances of the variant that changed and everything inside an outer
+instance that holds one of them: when the header component of a list group got a property, or
+lost a minimum width, the rows of other components in that group lost their typed-over text too.
+Instances of the set's other variants keep theirs. What keeps the overrides: `node.set` of `gap`,
+a padding, `crossAlign`, `cornerRadius`, `opacity`, `characters` (the default text), `name` or
+`fills` (also `[]`);
+`variable.bind`, binding or unbinding; and `component.addVariant`, also when the new variant's
+own layers are then rebuilt. Removing or renaming a property was not tested; treat it as a reset.
 
 ```sh
 figkit read --ids '[1250126,1232413]' --overrides   # before the change: writes a file, returns its path

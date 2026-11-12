@@ -4,7 +4,14 @@ import { mkdtemp, rm, stat } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
-import { createCatalogStore, findComponent, suggest, toCatalog } from './catalog';
+import {
+  createCatalogStore,
+  findComponent,
+  suggest,
+  toCatalog,
+  variableValues,
+  type CatalogVariable,
+} from './catalog';
 import { createHeadlessEngine } from './engine';
 import * as ops from './ops';
 import { loadConfig, resolveBin } from './settings';
@@ -29,13 +36,94 @@ describe('catalog', () => {
     ],
   ]);
 
-  test('keeps names and ids only', () => {
+  test('keeps names, ids and variable values only', () => {
     expect(catalog.variables).toEqual([
-      { id: 'VariableID:1', name: 'space/16', type: 'number', collection: 'Space' },
+      { id: 'VariableID:1', name: 'space/16', type: 'number', collection: 'Space', values: {} },
     ]);
     expect(catalog.styles).toEqual([{ id: 'S:1', name: 'Docs/Body', type: 'text' }]);
     expect(catalog.pages).toEqual([{ id: 10, name: 'Colors', index: 0 }]);
     expect(catalog.collections).toEqual([{ name: 'Space', modes: ['Compact', 'Roomy'] }]);
+  });
+
+  test("gives a variable's value in each mode and follows an alias to its value", () => {
+    const value = (type: string, of: unknown) => ({ type, value: of });
+    const tokens = toCatalog([
+      {
+        collections: [
+          { id: 'C:1', name: 'Primitives', modes: [{ id: 'C:1/m1', name: 'Value' }] },
+          {
+            id: 'C:2',
+            name: 'Color',
+            modes: [
+              { id: 'C:2/m1', name: 'Light' },
+              { id: 'C:2/m2', name: 'Dark' },
+            ],
+          },
+          {
+            id: 'C:3',
+            name: 'Dynamic Type',
+            modes: [
+              { id: 'C:3/m1', name: 'Large' },
+              { id: 'C:3/m2', name: 'AX3' },
+            ],
+          },
+          { id: 'C:4', name: 'Component', modes: [{ id: 'C:4/m1', name: 'Value' }] },
+        ],
+        variables: [
+          {
+            id: 'V:1',
+            name: 'white',
+            resolvedType: 'color',
+            collection: 'C:1',
+            values: { 'C:1/m1': value('color', { r: 1, g: 1, b: 1, a: 0.8 }) },
+          },
+          {
+            id: 'V:2',
+            name: 'gray/900',
+            resolvedType: 'color',
+            collection: 'C:1',
+            values: { 'C:1/m1': value('color', { r: 0.11, g: 0.11, b: 0.118, a: 1 }) },
+          },
+          {
+            id: 'V:3',
+            name: 'color/surface/card',
+            resolvedType: 'color',
+            collection: 'C:2',
+            // Listed out of order: the collection's own mode order wins.
+            values: { 'C:2/m2': value('alias', 'V:2'), 'C:2/m1': value('alias', 'V:1') },
+          },
+          {
+            id: 'V:4',
+            name: 'size/row-ios',
+            resolvedType: 'number',
+            collection: 'C:3',
+            values: { 'C:3/m1': value('number', 52), 'C:3/m2': value('number', 0) },
+          },
+          {
+            id: 'V:5',
+            name: 'size/row',
+            resolvedType: 'number',
+            collection: 'C:4',
+            values: { 'C:4/m1': value('alias', 'V:4') },
+          },
+        ],
+      },
+      [],
+      [],
+      [],
+    ]);
+    const values = (name: string): string =>
+      variableValues(
+        tokens,
+        tokens.variables.find((entry) => entry.name === name) as CatalogVariable,
+      );
+
+    expect(values('white')).toBe('Value #FFFFFFCC');
+    expect(values('gray/900')).toBe('Value #1C1C1E');
+    expect(values('color/surface/card')).toBe('Light #FFFFFFCC (white); Dark #1C1C1E (gray/900)');
+    expect(values('size/row-ios')).toBe('Large 52; AX3 0');
+    // Its value depends on a mode this collection does not have.
+    expect(values('size/row')).toBe('Value → size/row-ios');
   });
 
   test('prefers a component set over a variant of the same name', () => {
@@ -83,6 +171,47 @@ try {
 } catch {
   // No usable figcraft-cli on this machine: the end-to-end tests are skipped.
 }
+
+describe('singleTarget', () => {
+  test('tells a command that takes one layer from one that takes ids', () => {
+    expect(ops.singleTarget('{ids?, field (fill|stroke), variable}')).toBeNull();
+    expect(ops.singleTarget('{ids? (frames/page), collection, mode}')).toBeNull();
+    expect(ops.singleTarget('{layer?, property (null/"" unbinds), field?: visible|characters}')).toBe('layer');
+    expect(ops.singleTarget('{id? (component, set or instance)}')).toBe('id');
+    expect(ops.singleTarget('{id, property, value}')).toBe('id');
+    // Described in prose, with the word "layer" in it: it takes ids.
+    expect(ops.singleTarget("name, visible, x, y (its own box goes at the layer's x/y)")).toBeNull();
+    expect(ops.singleTarget('{name, type}')).toBeNull();
+    expect(ops.singleTarget(undefined)).toBeNull();
+  });
+});
+
+describe('foldSteps', () => {
+  test('returns a short run one result per step', () => {
+    const results = Array.from({ length: 20 }, () => ({ ok: true }));
+
+    expect(ops.foldSteps(results)).toBe(results);
+  });
+
+  test('folds equal results that follow each other in a long run', () => {
+    const results = [
+      { ok: true },
+      ...Array.from({ length: 30 }, () => ({ ok: true, matched: 1 })),
+      { ok: true, matched: 4 },
+      null,
+      null,
+      { ok: true, matched: 1 },
+    ];
+
+    expect(ops.foldSteps(results)).toEqual([
+      { ok: true },
+      { ok: true, matched: 1, steps: 30 },
+      { ok: true, matched: 4 },
+      { result: null, steps: 2 },
+      { ok: true, matched: 1 },
+    ]);
+  });
+});
 
 describe.skipIf(!hasCli)('against figcraft-cli', () => {
   let directory = '';
@@ -136,6 +265,9 @@ describe.skipIf(!hasCli)('against figcraft-cli', () => {
 
   test('looks up names without dumping the listings', async () => {
     expect(await ops.find(ctx, { kind: 'variable', name: 'space' })).toBe('space/16\tnumber\tTokens');
+    expect(await ops.find(ctx, { kind: 'variable', name: 'space', values: true })).toMatch(
+      /^space\/16\tnumber\tTokens\t.+ 16$/,
+    );
     expect(await ops.find(ctx, { kind: 'style', name: 'docs' })).toBe('Docs/Body\ttext');
     expect(await ops.find(ctx, { kind: 'component', name: 'badge' })).toMatch(/^\d+\tBadge$/);
   });
@@ -187,13 +319,26 @@ describe.skipIf(!hasCli)('against figcraft-cli', () => {
       id: number;
       parent: number | null;
       children: number[];
-      absoluteBounds: { width: number };
+      absoluteBounds: { width: number; height: number };
     }[];
 
     expect(count).toBe('3 layers');
     expect(layers[0]).toMatchObject({ id: built.root, parent: null, absoluteBounds: { width: 320 } });
     expect(layers[0]?.children).toEqual([built.ids.title as number, built.ids.badge as number]);
     expect(layers.slice(1).map((layer) => layer.parent)).toEqual([built.root, built.root]);
+
+    // The same layers as text, one line each, in the words `build` takes.
+    const tree = ((await ops.read(ctx, { id: built.root, tree: true })) as string).split('\n');
+
+    expect(tree).toHaveLength(3);
+    expect(tree[0]).toBe(
+      `${built.root} "Card" FRAME w=320 h=hug 320x${layers[0]?.absoluteBounds.height} layout=vertical ` +
+        'gap=space/16 pad=[space/16,24,space/16,24] fill=color/card',
+    );
+    expect(tree[1]).toMatch(
+      new RegExp(`^  ${built.ids.title} "Title" TEXT w=fill h=hug \\S+ style=Docs/Body text="Title"$`),
+    );
+    expect(tree[2]).toMatch(new RegExp(`^  ${built.ids.badge} "Badge" INSTANCE .* instance=\\d+ "Badge"$`));
 
     // `where` picks layers by exact name, so no script has to look the ids up.
     const changed = await ops.run(ctx, {
@@ -293,6 +438,25 @@ describe.skipIf(!hasCli)('against figcraft-cli', () => {
     });
 
     expect(hidden).toEqual([expect.objectContaining({ matched: 2 })]);
+
+    // A component name on a command that gives its ids needs no lookup. A session rejects an
+    // empty batch, which the headless engine lets through, so this engine refuses one too.
+    const strict = {
+      ...ctx,
+      engine: {
+        mode: ctx.engine.mode,
+        close: () => ctx.engine.close(),
+        run: (commands: Parameters<typeof ctx.engine.run>[0], options: { write: boolean }) =>
+          commands.length === 0
+            ? Promise.resolve({ ok: false as const, error: '`commands` is empty', failedStep: null })
+            : ctx.engine.run(commands, options),
+      },
+    };
+    const [placed] = (await ops.run(strict, {
+      commands: [{ command: 'instance.create', params: { component: 'Stat', parent: built.ids.doc } }],
+    })) as [{ id: number }];
+
+    expect(placed.id).toBeGreaterThan(0);
 
     // An id that arrives as a string is still an id.
     await ops.build(ctx, { parent: String(built.ids.doc), tree: { text: 'Caption' } });
@@ -454,6 +618,99 @@ describe.skipIf(!hasCli)('against figcraft-cli', () => {
     await expect(
       ops.run(ctx, { overrides: [{ instance: one as number, layer: 'Amount' }] }),
     ).rejects.toThrow(/nothing was changed\. override 0 sets nothing/);
+
+    // A read that found nothing to save is put back as a no-op, not as an error.
+    const [empty, none] = ((await ops.read(ctx, { id: row, overrides: true })) as string).split('\t');
+
+    expect(none).toBe('0 overrides in 0 instances');
+    expect(await ops.run(ctx, { overrides: empty })).toEqual({ set: 0, unchanged: 0 });
+    await expect(ops.run(ctx, { overrides: [] })).rejects.toThrow(/nothing was changed/);
+  }, 60_000);
+
+  test('selects inside a layer that is named, not looked up', async () => {
+    const row = (name: string) => ({
+      frame: name,
+      layout: 'horizontal' as const,
+      children: [{ text: '€0.00', name: 'Amount' }],
+    });
+    const built = (await ops.build(ctx, {
+      at: [0, 2600],
+      tree: {
+        frame: 'Cards',
+        as: 'cards',
+        children: [
+          { frame: 'Card A', children: [row('Row 1'), row('Row 2'), row('Row 10')] },
+          { frame: 'Card B', children: [row('Row 1'), row('Row 2')] },
+          { frame: 'Twins', children: [row('Row 1'), row('Row 1')] },
+        ],
+      },
+    })) as { ids: { cards: number } };
+    const cards = built.ids.cards;
+
+    // "Row 1" is also the start of "Row 10", and both cards have a "Row 2": names are exact
+    // and the path picks the card.
+    expect(
+      await ops.run(ctx, {
+        commands: [
+          {
+            command: 'node.set',
+            where: { root: cards, inside: ['Card B', 'Row 2'], name: 'Amount', expect: 1 },
+            params: { characters: '€57.00' },
+          },
+          {
+            command: 'node.set',
+            where: { root: cards, inside: ['Card A', 'Row 1'], name: 'Amount', expect: 1 },
+            params: { characters: '€81.00' },
+          },
+        ],
+      }),
+    ).toEqual([
+      { ok: true, matched: 1 },
+      { ok: true, matched: 1 },
+    ]);
+
+    const texts = (await ops.read(ctx, { id: cards, deep: true, fields: ['name', 'characters'] })) as string;
+    const layers = (await Bun.file(texts.split('\t')[0] as string).json()) as {
+      id: number;
+      name: string;
+      parent: number;
+      characters?: string;
+    }[];
+    const byId = new Map(layers.map((layer) => [layer.id, layer]));
+    const where = (amount: string): string[] =>
+      layers
+        .filter((layer) => layer.characters === amount)
+        .map((layer) => {
+          const rowLayer = byId.get(layer.parent);
+
+          return `${byId.get(rowLayer?.parent as number)?.name} > ${rowLayer?.name}`;
+        });
+
+    expect(where('€57.00')).toEqual(['Card B > Row 2']);
+    expect(where('€81.00')).toEqual(['Card A > Row 1']);
+
+    await expect(
+      ops.run(ctx, {
+        commands: [
+          {
+            command: 'node.set',
+            where: { root: cards, inside: ['Twins', 'Row 1'], name: 'Amount' },
+            params: { characters: 'x' },
+          },
+        ],
+      }),
+    ).rejects.toThrow(/nothing was changed\. step 0 \(node\.set\): "inside" needs one layer named "Row 1" in \d+, and 2 are there/);
+    await expect(
+      ops.run(ctx, {
+        commands: [
+          {
+            command: 'node.set',
+            where: { root: cards, inside: 'Card C', name: 'Amount' },
+            params: { characters: 'x' },
+          },
+        ],
+      }),
+    ).rejects.toThrow(/"inside" needs one layer named "Card C" in \d+, and 0 are there/);
   }, 60_000);
 
   test('run replaces an oversized result with a pointer to the right command', async () => {

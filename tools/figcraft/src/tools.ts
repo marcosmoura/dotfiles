@@ -33,8 +33,8 @@ export const TOOLS: Tool[] = [
     primary: 'name',
     description:
       'Find layers by name, type or text (substring, any case), or look up names with kind: ' +
-      'variable, style, component, page (with its index) or collection (with its mode names). ' +
-      'Returns one line per match: id, type, size, name.',
+      'variable (values: its value per mode), style, component, page (with its index) or ' +
+      'collection (with its mode names). One line per match: id, type, size, name.',
     inputSchema: object({
       kind: {
         enum: ['layer', 'variable', 'style', 'component', 'page', 'collection'],
@@ -46,6 +46,7 @@ export const TOOLS: Tool[] = [
       page,
       root: { type: 'integer', description: 'Search under this layer' },
       limit: { type: 'integer', default: 20 },
+      values: { type: 'boolean' },
     }),
     call: (ctx, args) => ops.find(ctx, args as ops.FindInput),
   },
@@ -54,11 +55,11 @@ export const TOOLS: Tool[] = [
     readOnly: true,
     primary: 'name',
     description:
-      'Read a layer by id or exact name, or several with ids. Returns its outline (children one level deep), or only ' +
-      'the properties named in fields, e.g. ["width","layout","fills","boundVariables"]. With deep, ' +
-      'writes the layer and every layer inside it (fields, parent, children ids) to a JSON file for ' +
-      'a script to measure, and returns the path. With overrides, writes what the instances ' +
-      'inside it override (text, fill variable, size) to a JSON file that run puts back.',
+      'Read a layer by id or exact name, or several with ids: its outline (children one level ' +
+      'deep), or the properties in fields, e.g. ["width","layout","fills","boundVariables"]. ' +
+      'tree: the layers inside as text, one line each (size, layout, bindings, style, text). ' +
+      'deep: every layer inside, to a JSON file for a script; returns the path. overrides: what ' +
+      'the instances inside override (text, fill variable, size), to a JSON file that run puts back.',
     inputSchema: object({
       id,
       ids: { type: 'array', items: { type: 'integer' } },
@@ -66,6 +67,7 @@ export const TOOLS: Tool[] = [
       page,
       fields: { type: 'array', items: { type: 'string' } },
       deep: { type: 'boolean' },
+      tree: { type: 'boolean' },
       overrides: { type: 'boolean' },
     }),
     call: (ctx, args) => ops.read(ctx, args as ops.ReadInput),
@@ -74,16 +76,17 @@ export const TOOLS: Tool[] = [
     name: 'build',
     readOnly: false,
     description:
-      'Create layers from a nested tree in one all-or-nothing step, then save. Prefer this over ' +
-      'run or scripts. Each node has exactly one of: frame (name), text (characters), instance ' +
+      'Create layers from a nested tree in one all-or-nothing step, then save. ' +
+      'Each node has exactly one of: frame (name), text (characters), instance ' +
       '(component name or id, or {"$ref": "<as>"} for a set or component built earlier in the ' +
       'tree), shape (rectangle|ellipse|line|vector), section (name), set (component set name; ' +
       'its children are the variants, frames named "Property=Value, Property=Value"). Keys: ' +
-      'name, as, x, y, w, h, fill, stroke, strokeWeight, radius, opacity, props, bind, mode ' +
-      '{collection: mode}; frames and sets: layout (vertical|horizontal|grid|null), gap, pad (n | ' +
-      '[v,h] | [t,r,b,l]), align, cross, clip, children; frame: component (true makes it a ' +
-      'component); set: properties [{name, type: boolean|text|instanceSwap, layer (layer name in ' +
-      'the variants), default?}]; text: style, textAlign; instance: properties {name: value}; ' +
+      'name, as, x, y, w, h, fill, stroke, strokeWeight, radius, opacity, effect (style), props, ' +
+      'bind, mode {collection: mode}; a top-level node: parent (layer id), index (its place ' +
+      'there); frames and sets: layout (vertical|horizontal|grid|null), gap, pad (n|' +
+      '[v,h]|[t,r,b,l]), align, cross, clip, children; frame: component (true); ' +
+      'set: properties [{name, type: boolean|text|instanceSwap, layer (layer name in ' +
+      'the variants), default?}]; text: style, textAlign; instance: properties {name: value}, glyph (icon colour); ' +
       'shape: path. A string where a number is expected is a variable name and is bound ("gap": ' +
       '"space/16"); fill and stroke take a variable name or "#hex"; w and h also take "fill" or ' +
       '"hug". Returns the root id and the id of every node with "as". Unknown names fail with ' +
@@ -104,12 +107,12 @@ export const TOOLS: Tool[] = [
     name: 'run',
     readOnly: false,
     description:
-      'Run raw FigCraft commands as one all-or-nothing step, for edits build cannot express ' +
-      '(node.set, node.reparent, component and variable commands). commands: [{command, params, ' +
+      'Run raw FigCraft commands as one all-or-nothing step. commands: [{command, params, ' +
       'as?, where?}]; a later step can use {"$ref": "<as>"} for an earlier step\'s id, or ' +
       '{"$ref": "<as>", "field": "ids/0"} for another part of its result. where picks the layers ' +
       'instead of ids, before the commands run (so no $ref in it): {root (layer id or ids) or ' +
-      'page, name (exact), type, text, component (instances of that component or set; else a ' +
+      'page, inside (name, or names outer to inner, of the one layer there to search in), ' +
+      'name (exact), type, text, component (instances of that component or set; else a ' +
       'part of the variant name, "Tone=Warning"), expect (the number of layers that must ' +
       'match)}; its result reports "matched". instance.* ' +
       'commands take a component by name. variable.create and variable.set ' +
@@ -131,7 +134,7 @@ export const TOOLS: Tool[] = [
     primary: 'name',
     description:
       'Export layers to PNG files and return their paths; open a path with your file-reading tool ' +
-      'to look at it. Never returns image data inline. mode shows them in other variable modes ' +
+      'to look at it. mode shows them in other variable modes ' +
       'for this export only, e.g. {"Color": "Dark", "Dynamic Type": "AX3"}; nothing is saved.',
     inputSchema: object({
       ids: { type: 'array', items: { type: 'integer' } },

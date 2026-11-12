@@ -126,6 +126,100 @@ describe('expandTree', () => {
     });
   });
 
+  test("colours an icon's glyph, found inside the new instance", () => {
+    const { commands, uses } = expandTree({ instance: 'Icon/Wallet', glyph: 'color/icon/secondary' }, options);
+    const find = commands.find((entry) => entry.command === 'node.find');
+    const bind = commands.findLast((entry) => entry.command === 'variable.bind');
+
+    expect(find).toEqual({
+      command: 'node.find',
+      as: 'n1-glyph',
+      params: { root: { $ref: 'n1' }, name: 'Glyph', limit: 1 },
+    });
+    expect(bind?.params).toEqual({
+      ids: [{ $ref: 'n1-glyph', field: 'ids/0' }],
+      field: 'stroke',
+      variable: 'color/icon/secondary',
+    });
+    expect([...uses.values()].flat().map((use) => use.name)).toContain('color/icon/secondary');
+  });
+
+  test("sets an instance's swaps in a call of their own, after its other properties", () => {
+    const { commands } = expandTree(
+      {
+        instance: 'Icon/Wallet',
+        properties: { Sign: 'Negative', Icon: 52925, Name: 'Car Loan', 'Show Base?': true },
+      },
+      options,
+    );
+    const sets = commands.filter((entry) => entry.command === 'instance.setProperties');
+
+    expect(sets.map((entry) => entry.params?.properties)).toEqual([
+      { Sign: 'Negative', Name: 'Car Loan', 'Show Base?': true },
+      { Icon: 52925 },
+    ]);
+  });
+
+  test('sets the properties of an instance in one call when none is a swap', () => {
+    const { commands } = expandTree(
+      { instance: 'Icon/Wallet', properties: { Sign: 'Negative', Name: 'Car Loan' } },
+      options,
+    );
+
+    expect(commands.filter((entry) => entry.command === 'instance.setProperties')).toHaveLength(1);
+  });
+
+  test("sets a frame's mode once its children exist, and before it is sized to them", () => {
+    const { commands } = expandTree(
+      {
+        frame: 'Stage',
+        mode: { 'Dynamic Type': 'AX3' },
+        children: [{ instance: 'Icon/Wallet', w: 'fill' }],
+      },
+      options,
+    );
+    const order = commands.map((entry) => entry.command);
+    const mode = order.indexOf('variable.setMode');
+    const hug = commands.findLastIndex(
+      (entry) => entry.command === 'node.set' && entry.params?.sizingH === 'hug',
+    );
+
+    expect(mode).toBeGreaterThan(order.indexOf('instance.create'));
+    expect(hug).toBeGreaterThan(mode);
+    expect(commands[mode]?.params).toEqual({
+      ids: [{ $ref: 'n1' }],
+      collection: 'Dynamic Type',
+      mode: 'AX3',
+    });
+  });
+
+  test('builds a top-level node inside its own parent, at its place there', () => {
+    const { commands } = expandTree(
+      [{ frame: 'Section', parent: 7, index: 2 }, { frame: 'Note' }],
+      { ...options, parent: 9 },
+    );
+    const created = commands.filter((entry) => entry.command === 'node.create');
+
+    expect(created.map((entry) => entry.params?.parent)).toEqual([7, 9]);
+    expect(commands.find((entry) => entry.command === 'node.reparent')?.params).toEqual({
+      ids: [{ $ref: 'n1' }],
+      parent: 7,
+      index: 2,
+    });
+    expect(() => expandTree({ frame: 'A', index: 0 }, options)).toThrow(/"index" needs a "parent"/);
+    expect(() =>
+      expandTree({ frame: 'A', children: [{ frame: 'B', parent: 7 }] }, options),
+    ).toThrow(/tree\.children\[0\]: only a top-level node takes "parent" and "index"/);
+  });
+
+  test('applies an effect style', () => {
+    const { commands, uses } = expandTree({ frame: 'Lifted', effect: 'Elevation/1' }, options);
+    const index = commands.findIndex((entry) => entry.command === 'style.apply');
+
+    expect(commands[index]?.params).toEqual({ ids: [{ $ref: 'n1' }], style: 'Elevation/1' });
+    expect(uses.get(index)).toEqual([{ kind: 'style', name: 'Elevation/1' }]);
+  });
+
   test('records the names each command uses', () => {
     const { commands, uses } = expandTree({ text: 'A', style: 'Docs/Body' }, options);
     const index = commands.findIndex((entry) => entry.command === 'style.apply');

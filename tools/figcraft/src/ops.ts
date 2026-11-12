@@ -3,11 +3,12 @@ import { mkdir } from 'node:fs/promises';
 import { join } from 'node:path';
 
 import { expandTree, UnknownName, type NameUse, type TreeNode } from './build';
-import { byteLength } from './bytes';
+import { byteLength, truncateToBytes } from './bytes';
 import {
   findComponent,
   findPage,
   suggest,
+  variableValues,
   type Catalog,
   type CatalogComponent,
   type CatalogStore,
@@ -48,6 +49,8 @@ export type FindInput = {
   page?: string | number;
   root?: number;
   limit?: number;
+  /** With kind variable: add each variable's value in every mode. */
+  values?: boolean;
 };
 
 export async function find(ctx: Context, input: FindInput): Promise<string> {
@@ -116,7 +119,11 @@ function findName(catalog: Catalog, kind: string, input: FindInput, limit: numbe
   if (kind === 'variable') {
     rows = catalog.variables
       .filter((entry) => matches(entry.name) && (!input.type || entry.type === input.type))
-      .map((entry) => `${entry.name}\t${entry.type}\t${entry.collection}`);
+      .map(
+        (entry) =>
+          `${entry.name}\t${entry.type}\t${entry.collection}` +
+          (input.values ? `\t${variableValues(catalog, entry)}` : ''),
+      );
   } else if (kind === 'style') {
     rows = catalog.styles
       .filter((entry) => matches(entry.name) && (!input.type || entry.type === input.type))
@@ -211,6 +218,8 @@ export type ReadInput = {
   deep?: boolean;
   /** Write what the instances inside the layers override to a JSON file, and return its path. */
   overrides?: boolean;
+  /** Print the layers inside as an indented list with what a copy of them needs. */
+  tree?: boolean;
 };
 
 /** The most layers one `node.find` returns. */
@@ -230,6 +239,10 @@ export async function read(ctx: Context, input: ReadInput): Promise<unknown> {
 
   if (input.deep) {
     return readDeep(ctx, ids, [...DEEP_FIELDS, ...(input.fields ?? [])]);
+  }
+
+  if (input.tree) {
+    return readTree(ctx, ids);
   }
 
   const shape = input.fields?.length ? { fields: input.fields } : { outline: true };
@@ -307,6 +320,180 @@ async function readDeep(ctx: Context, roots: number[], fields: string[]): Promis
   );
 
   return `${path}\t${layers.length} layers`;
+}
+
+const TREE_FIELDS = [
+  'name',
+  'type',
+  'visible',
+  'width',
+  'height',
+  'layout',
+  'sizing',
+  'boundVariables',
+  'styles',
+  'characters',
+  'mainComponent',
+  'mainComponentName',
+  'componentProperties',
+  'clip',
+];
+
+const PADDING_SIDES = ['paddingTop', 'paddingRight', 'paddingBottom', 'paddingLeft'];
+
+/** What a copy of the layer needs, on one line, in the words `build` takes. */
+function treeLine(layer: Record<string, unknown>, glyph?: string): string {
+  const bound = { ...((layer.boundVariables ?? {}) as Record<string, unknown>) };
+  // A bound value is shown by its variable's name, an unbound one by its number.
+  const take = (key: string): string | undefined => {
+    const name = bound[key];
+
+    delete bound[key];
+
+    return typeof name === 'string' ? name : undefined;
+  };
+  const sizing = (layer.sizing ?? {}) as { horizontal?: string; vertical?: string };
+  const size = (axis: 'width' | 'height', mode?: string): string =>
+    mode === 'fill' || mode === 'hug' ? mode : (take(axis) ?? String(layer[axis]));
+  const parts = [`${layer.id} ${JSON.stringify(layer.name)} ${layer.type}`];
+
+  if (layer.visible === false) {
+    parts.push('hidden');
+  }
+
+  parts.push(
+    `w=${size('width', sizing.horizontal)} h=${size('height', sizing.vertical)}`,
+    `${layer.width}x${layer.height}`,
+  );
+
+  const layout = (layer.layout ?? {}) as Record<string, unknown>;
+
+  if (typeof layout.mode === 'string' && layout.mode !== 'none') {
+    const grid = layout.mode === 'grid';
+
+    parts.push(`layout=${layout.mode}`);
+
+    if (layout.wrap === true) parts.push('wrap');
+    if (typeof layout.mainAlign === 'string' && layout.mainAlign !== 'min') parts.push(`align=${layout.mainAlign}`);
+    if (typeof layout.crossAlign === 'string' && layout.crossAlign !== 'min') parts.push(`cross=${layout.crossAlign}`);
+
+    const gap = take('gap') ?? (layout.gap ? String(layout.gap) : undefined);
+    const crossGap = take('crossGap') ?? (layout.crossGap ? String(layout.crossGap) : undefined);
+
+    if (gap) parts.push(`gap=${gap}`);
+    if (crossGap && (grid || layout.wrap === true)) parts.push(`crossGap=${crossGap}`);
+
+    const raw = Array.isArray(layout.padding) ? (layout.padding as number[]) : [];
+    const vertical = take('paddingVertical');
+    const horizontal = take('paddingHorizontal');
+    const pad = PADDING_SIDES.map(
+      (side, index) => take(side) ?? (index % 2 === 0 ? vertical : horizontal) ?? String(raw[index] ?? 0),
+    );
+
+    if (pad.some((value) => value !== '0' && value !== 'space/0')) parts.push(`pad=[${pad.join(',')}]`);
+
+    if (grid) {
+      parts.push(
+        `grid=${layout.gridColumns}x${layout.gridRows}`,
+        `columnTracks=${JSON.stringify(layout.columnTracks)}`,
+        `rowTracks=${JSON.stringify(layout.rowTracks)}`,
+      );
+    }
+
+    if (layout.strokesIncluded === false) parts.push('strokesIncluded=false');
+  }
+
+  // Frames clip unless told otherwise, so only the exception is said.
+  if (layer.clip === false && (layer.type === 'FRAME' || layer.type === 'COMPONENT')) parts.push('clip=false');
+
+  for (const [key, word] of [
+    ['cornerRadius', 'radius'],
+    ['fill', 'fill'],
+    ['stroke', 'stroke'],
+  ] as const) {
+    const name = take(key);
+
+    if (name) parts.push(`${word}=${name}`);
+  }
+
+  const rest = Object.entries(bound).filter(([, name]) => typeof name === 'string');
+
+  if (rest.length > 0) {
+    parts.push(`bind={${rest.map(([key, name]) => `${key}:${name}`).join(',')}}`);
+  }
+
+  const style = (layer.styles as { text?: string } | undefined)?.text;
+
+  if (style) parts.push(`style=${style}`);
+
+  if (typeof layer.characters === 'string') {
+    parts.push(`text=${JSON.stringify(truncateToBytes(layer.characters, 48))}`);
+  }
+
+  if (layer.type === 'INSTANCE') {
+    parts.push(`instance=${layer.mainComponent} ${JSON.stringify(layer.mainComponentName ?? '')}`);
+
+    const properties = (layer.componentProperties ?? {}) as Record<string, unknown>;
+
+    if (Object.keys(properties).length > 0) {
+      parts.push(`properties=${JSON.stringify(properties)}`);
+    }
+
+    // An icon's colour is the stroke of the glyph inside it.
+    if (glyph) parts.push(`glyph=${glyph}`);
+  }
+
+  return parts.join(' ');
+}
+
+/**
+ * The anatomy of a layer as text, one indented line per layer, for copying a component's
+ * structure without a script over a deep read. It stops at instances: what is inside one belongs
+ * to another component.
+ */
+async function readTree(ctx: Context, roots: number[]): Promise<string> {
+  const layers = (await withNames(ctx, await subtree(ctx, roots, TREE_FIELDS))) as SubtreeLayer[];
+  const byId = new Map(layers.map((layer) => [layer.id, layer]));
+  const lines: string[] = [];
+  const walk = (id: number, depth: number): void => {
+    const layer = byId.get(id);
+
+    if (!layer) {
+      return;
+    }
+
+    const glyph = layer.children
+      .map((child) => byId.get(child))
+      .find((child) => child?.name === 'Glyph')?.boundVariables as { stroke?: string } | undefined;
+
+    lines.push(`${'  '.repeat(depth)}${treeLine(layer, glyph?.stroke)}`);
+
+    if (layer.type !== 'INSTANCE') {
+      for (const child of layer.children) {
+        walk(child, depth + 1);
+      }
+    }
+  };
+
+  for (const root of roots) {
+    walk(root, 0);
+  }
+
+  const shown: string[] = [];
+  let bytes = 0;
+
+  for (const line of lines) {
+    bytes += byteLength(line) + 1;
+
+    if (bytes > ctx.config.maxBytes) {
+      shown.push(`… ${lines.length - shown.length} more layers: read a layer further down.`);
+      break;
+    }
+
+    shown.push(line);
+  }
+
+  return shown.join('\n');
 }
 
 /**
@@ -601,6 +788,11 @@ export type Where = {
   /** Search inside this layer or these layers, or on this page. One of the two is required. */
   root?: number | number[];
   page?: string | number;
+  /**
+   * Narrows the search to a layer inside each root, by exact name: one name, or names from the
+   * outer layer to the inner one. Each must name exactly one layer there.
+   */
+  inside?: string | string[];
   /** The exact layer name. */
   name?: string;
   type?: string;
@@ -658,7 +850,7 @@ export async function run(ctx: Context, input: RunInput): Promise<unknown> {
     }
   }
 
-  return merged.stepOf.map((index, original) => {
+  return foldSteps(merged.stepOf.map((index, original) => {
     const step = result.steps[index] ?? { command: '' };
     const pruned = prune(step.result);
     // A selector's result says how many layers it reached, so nothing has to be read back.
@@ -677,7 +869,50 @@ export async function run(ctx: Context, input: RunInput): Promise<unknown> {
       bytes,
       hint: `${step.command} returned too much. Use find (kind: variable, style, component, page) or read with fields.`,
     };
-  });
+  }));
+}
+
+/** The longest list of step results that is returned one result per step. */
+const MAX_PLAIN_STEPS = 20;
+
+/**
+ * A long run answers the same thing hundreds of times over: 858 commands returned 858 times
+ * `{"ok":true,"matched":1}`, 20 KB that say one thing. Past 20 steps, equal results that follow
+ * each other become one, with `steps` saying how many steps it stands for.
+ */
+export function foldSteps(results: unknown[]): unknown[] {
+  if (results.length <= MAX_PLAIN_STEPS) {
+    return results;
+  }
+
+  const folded: unknown[] = [];
+  let previous = '';
+  let count = 0;
+  const close = (): void => {
+    if (count > 1) {
+      const last = folded.pop();
+
+      folded.push(last && typeof last === 'object' ? { ...last, steps: count } : { result: last, steps: count });
+    }
+  };
+
+  for (const result of results) {
+    const key = JSON.stringify(result ?? null);
+
+    if (key === previous && count > 0) {
+      count += 1;
+      continue;
+    }
+
+    close();
+    folded.push(result);
+    previous = key;
+    count = 1;
+  }
+
+  close();
+
+  return folded;
 }
 
 /**
@@ -694,6 +929,11 @@ async function restoreOverrides(ctx: Context, input: string | Override[]): Promi
     entries = typeof input === 'string' ? JSON.parse(await Bun.file(input).text()) : input;
   } catch (error) {
     throw new OpError(`nothing was changed. Could not read ${input}: ${(error as Error).message}`);
+  }
+
+  // A read that found nothing to save: putting it back changes nothing.
+  if (typeof input === 'string' && Array.isArray(entries) && entries.length === 0) {
+    return { set: 0, unchanged: 0 };
   }
 
   if (!Array.isArray(entries) || entries.length === 0) {
@@ -737,19 +977,136 @@ async function restoreOverrides(ctx: Context, input: string | Override[]): Promi
 }
 
 /**
+ * Replaces each selector's `inside` by the layers it names, which become the selector's roots:
+ * under every root the one layer of the first name, under that one the next name, and so on.
+ * So a layer in "Row 2" of a card is reached by names, with no id looked up first. The lookups
+ * of all selectors are made together, two steps for each level of names.
+ */
+async function resolveInside(
+  ctx: Context,
+  commands: NonNullable<RunInput['commands']>,
+  catalog: Catalog | null,
+): Promise<NonNullable<RunInput['commands']>> {
+  const pending: { command: number; roots: number[]; path: string[] }[] = [];
+
+  for (const [index, entry] of commands.entries()) {
+    const where = entry.where;
+
+    // The checks of `where` itself come later, with their own messages.
+    if (
+      where?.inside === undefined ||
+      (where.root === undefined && where.page === undefined) ||
+      JSON.stringify(where).includes('"$ref"')
+    ) {
+      continue;
+    }
+
+    const path = Array.isArray(where.inside) ? where.inside : [where.inside];
+
+    if (path.length === 0 || path.some((name) => typeof name !== 'string' || name === '')) {
+      throw new OpError(`${label(index, entry)}: "inside" is a layer name or a list of names.`);
+    }
+
+    pending.push({
+      command: index,
+      roots:
+        where.root === undefined
+          ? [pageId(catalog as Catalog, where.page as string | number)]
+          : (Array.isArray(where.root) ? where.root : [where.root]).map(asId),
+      path,
+    });
+  }
+
+  if (pending.length === 0) {
+    return commands;
+  }
+
+  const depth = Math.max(...pending.map((each) => each.path.length));
+
+  for (let level = 0; level < depth; level += 1) {
+    const active = pending.filter((each) => each.path[level] !== undefined);
+    const lookups = new Map<string, { root: number; name: string }>();
+
+    for (const each of active) {
+      for (const root of each.roots) {
+        const name = each.path[level] as string;
+
+        lookups.set(`${root}\n${name}`, { root, name });
+      }
+    }
+
+    const list = [...lookups.values()];
+    // FigCraft matches a name as a substring, so the names are read back and compared.
+    const found = await must(
+      ctx,
+      list.map(({ root, name }) => ({ command: 'node.find', params: { root, name, limit: MAX_FOUND } })),
+    );
+    const candidates = found.map((step) => ((step.result ?? {}) as { ids?: number[] }).ids ?? []);
+    const all = [...new Set(candidates.flat())];
+    const read = await must(
+      ctx,
+      all.map((id) => ({ command: 'node.get', params: { id, fields: ['name'] } })),
+    );
+    const nameOf = new Map(
+      all.map((id, index) => [id, ((read[index]?.result ?? {}) as { name?: string }).name]),
+    );
+    const exact = new Map(
+      list.map(({ root, name }, index) => [
+        `${root}\n${name}`,
+        (candidates[index] ?? []).filter((id) => nameOf.get(id) === name),
+      ]),
+    );
+
+    for (const each of active) {
+      const name = each.path[level] as string;
+
+      each.roots = each.roots.map((root) => {
+        const ids = exact.get(`${root}\n${name}`) ?? [];
+
+        if (ids.length !== 1) {
+          const listed = ids.length > 0 ? ` (${ids.slice(0, 8).join(', ')})` : '';
+
+          throw new OpError(
+            `${label(each.command, commands[each.command] as Command)}: "inside" needs one layer ` +
+              `named "${name}" in ${root}, and ${ids.length} are there${listed}.`,
+          );
+        }
+
+        return ids[0] as number;
+      });
+    }
+  }
+
+  const roots = new Map(pending.map((each) => [each.command, each.roots]));
+
+  return commands.map((entry, index) => {
+    const narrowed = roots.get(index);
+
+    if (!narrowed || !entry.where) {
+      return entry;
+    }
+
+    const { inside: _inside, page: _page, ...rest } = entry.where;
+
+    return { ...entry, where: { ...rest, root: narrowed } };
+  });
+}
+
+/**
  * Turns each command's `where` into `ids`, so a change to every layer of a kind needs no script
  * that looks the ids up first. A selector that matches nothing fails before anything changes.
  */
 async function resolveWhere(
   ctx: Context,
-  commands: NonNullable<RunInput['commands']>,
+  given: NonNullable<RunInput['commands']>,
 ): Promise<{ commands: Command[]; matched: (number | undefined)[] }> {
-  const needsCatalog = commands.some(
+  const needsCatalog = given.some(
     (entry) =>
       usesComponentName(entry) ||
       (entry.where && (entry.where.root === undefined || entry.where.component)),
   );
   const catalog = needsCatalog ? await ctx.catalog.get() : null;
+  const commands = await resolveInside(ctx, given, catalog);
 
   // One search per root of each selector, all in one step.
   const searches: { command: number; params: Record<string, unknown> }[] = [];
@@ -852,6 +1209,9 @@ async function resolveWhere(
     }
   }
 
+  // Most commands take `ids`. A few take one layer (`component.bindProperty`), and given `ids`
+  // they act on the first only while the result would still say how many layers were matched.
+  const signatures = new Map((await loadCommands(ctx.config)).map((info) => [info.id, info.params]));
   const matched: (number | undefined)[] = [];
   const resolved = commands.map((entry, index) => {
     const { where, ...command } = entry;
@@ -910,10 +1270,41 @@ async function resolveWhere(
 
     matched.push(ids.length);
 
+    const single = singleTarget(signatures.get(command.command));
+
+    if (single) {
+      if (ids.length !== 1) {
+        throw new OpError(
+          `${label(index, entry)}: ${command.command} takes one layer ("${single}"), and "where" ` +
+            `matched ${ids.length}. Give one command for each layer.`,
+        );
+      }
+
+      return { ...command, params: { ...params, [single]: ids[0] } };
+    }
+
     return { ...command, params: { ...params, ids } };
   });
 
   return { commands: resolved, matched };
+}
+
+/**
+ * The parameter a command names its one layer with, when its parameters are a list of keys that
+ * has `layer` or `id` and no `ids`. A command described in prose (`node.set`) keeps `ids`.
+ */
+export function singleTarget(signature: string | undefined): 'layer' | 'id' | null {
+  if (!signature?.startsWith('{')) {
+    return null;
+  }
+
+  const has = (key: string): boolean => new RegExp(`(^\\{|, )${key}\\??[,} (:]`).test(signature);
+
+  if (has('ids')) {
+    return null;
+  }
+
+  return has('layer') ? 'layer' : has('id') ? 'id' : null;
 }
 
 function usesComponentName(entry: Command): boolean {
@@ -1140,6 +1531,12 @@ function assertWritable(ctx: Context): void {
 
 /** Runs read-only commands and throws on failure. */
 async function must(ctx: Context, commands: Command[]) {
+  // Nothing to look up, as for a component name on a command that gives its ids: a session
+  // rejects an empty batch.
+  if (commands.length === 0) {
+    return [];
+  }
+
   const result = await ctx.engine.run(commands, { write: false });
 
   if (!result.ok) {

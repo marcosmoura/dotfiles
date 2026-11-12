@@ -11,8 +11,20 @@ export type CatalogComponent = { id: number; name: string; set: boolean };
  * The names an agent may refer to. FigCraft's own listings are far too large to hand to a model
  * (hundreds of kilobytes on a real design system), so only names and ids are kept.
  */
+/** A variable's value in one mode: the id of the variable it points to, or the value as text. */
+export type VariableValue = { alias: string } | { value: string };
+
+export type CatalogVariable = {
+  id: string;
+  name: string;
+  type: string;
+  collection: string;
+  /** By mode name, in the collection's mode order. */
+  values: Record<string, VariableValue>;
+};
+
 export type Catalog = {
-  variables: { id: string; name: string; type: string; collection: string }[];
+  variables: CatalogVariable[];
   styles: { id: string; name: string; type: string }[];
   components: CatalogComponent[];
   /** `index` is the page's place among all pages, dividers included. */
@@ -156,7 +168,7 @@ function cacheFile(config: Config, file: string): string | null {
     const key = Bun.hash(`${file}:${stat.mtimeMs}:${stat.size}`).toString(36);
 
     // The number is the shape of the cached catalog; raise it when the shape changes.
-    return join(config.tempDir, `catalog5-${key}.json`);
+    return join(config.tempDir, `catalog6-${key}.json`);
   } catch {
     return null;
   }
@@ -168,14 +180,30 @@ export function toCatalog(listings: unknown[]): Catalog {
   const collections = new Map(
     (variables.collections ?? []).map((entry) => [String(entry.id), String(entry.name)]),
   );
+  // Mode ids in each collection's own order, so a variable's values list the default mode first.
+  const modes = new Map(
+    (variables.collections ?? []).map((entry) => [
+      String(entry.id),
+      asList(entry.modes).map((mode) => [String(mode.id), String(mode.name)] as const),
+    ]),
+  );
 
   return {
-    variables: (variables.variables ?? []).map((entry) => ({
-      id: String(entry.id),
-      name: String(entry.name),
-      type: String(entry.resolvedType ?? ''),
-      collection: collections.get(String(entry.collection)) ?? '',
-    })),
+    variables: (variables.variables ?? []).map((entry) => {
+      const raw = (entry.values ?? {}) as Record<string, unknown>;
+
+      return {
+        id: String(entry.id),
+        name: String(entry.name),
+        type: String(entry.resolvedType ?? ''),
+        collection: collections.get(String(entry.collection)) ?? '',
+        values: Object.fromEntries(
+          (modes.get(String(entry.collection)) ?? [])
+            .filter(([id]) => raw[id] !== undefined)
+            .map(([id, name]) => [name, variableValue(raw[id])]),
+        ),
+      };
+    }),
     styles: asList(styleList).map((entry) => ({
       id: String(entry.id),
       name: String(entry.name),
@@ -192,6 +220,65 @@ export function toCatalog(listings: unknown[]): Catalog {
       modes: asList(entry.modes).map((mode) => String(mode.name)),
     })),
   };
+}
+
+/** FigCraft's `{type, value}` as an alias or as short text: "#RRGGBB", "#RRGGBBAA", "52", "SF Pro". */
+function variableValue(raw: unknown): VariableValue {
+  const { type, value } = (raw ?? {}) as { type?: string; value?: unknown };
+
+  if (type === 'alias') {
+    return { alias: String(value) };
+  }
+
+  if (type === 'color' && value && typeof value === 'object') {
+    const { r = 0, g = 0, b = 0, a = 1 } = value as Record<string, number>;
+    const hex = (channel: number): string =>
+      Math.round(Math.min(1, Math.max(0, channel)) * 255)
+        .toString(16)
+        .padStart(2, '0')
+        .toUpperCase();
+
+    return { value: `#${hex(r)}${hex(g)}${hex(b)}${a < 1 ? hex(a) : ''}` };
+  }
+
+  return { value: String(value) };
+}
+
+/**
+ * A variable's value in each of its modes, as text. An alias is followed to its end where that
+ * is one value: the target has a single mode or a mode of the same name. Otherwise the value
+ * depends on a mode set elsewhere, and the target's name is given.
+ */
+export function variableValues(catalog: Catalog, variable: CatalogVariable): string {
+  const byId = new Map(catalog.variables.map((entry) => [entry.id, entry]));
+
+  return Object.entries(variable.values)
+    .map(([mode, first]) => {
+      let current = first;
+      let through = '';
+
+      for (let depth = 0; depth < 10 && 'alias' in current; depth += 1) {
+        const target = byId.get(current.alias);
+
+        if (!target) {
+          return `${mode} → ${current.alias}`;
+        }
+
+        through = through || target.name;
+
+        const names = Object.keys(target.values);
+        const next = names.length === 1 ? target.values[names[0] as string] : target.values[mode];
+
+        if (!next) {
+          return `${mode} → ${target.name}`;
+        }
+
+        current = next;
+      }
+
+      return 'value' in current ? `${mode} ${current.value}${through ? ` (${through})` : ''}` : mode;
+    })
+    .join('; ');
 }
 
 function pagesOf(pageList: unknown): Catalog['pages'] {

@@ -58,6 +58,12 @@ export type TreeNode = {
   bind?: Record<string, string>;
   /** Variable modes for this layer and what is inside it: { collection: mode }. */
   mode?: Record<string, string>;
+  /** Effect style name. */
+  effect?: string;
+  /** On a top-level node: the id of the existing layer to build inside, instead of the call's. */
+  parent?: number;
+  /** On a top-level node built inside a layer: its place among that layer's children, from 0. */
+  index?: number;
 
   // Frames
   layout?: 'vertical' | 'horizontal' | 'grid' | null;
@@ -76,6 +82,8 @@ export type TreeNode = {
 
   /** On an instance: property values. On a set: the component properties to add. */
   properties?: Record<string, unknown> | SetProperty[];
+  /** On an icon instance: the variable for the stroke of its layer named `Glyph`. */
+  glyph?: string;
 
   // Vectors
   path?: string;
@@ -145,7 +153,9 @@ const KEYS = new Set([
   'textAlign',
   'properties',
   'mode',
+  'effect',
   'path',
+  'glyph',
 ]);
 
 const PAD_SIDES = ['paddingTop', 'paddingRight', 'paddingBottom', 'paddingLeft'] as const;
@@ -166,8 +176,22 @@ export function expandTree(input: TreeNode | TreeNode[], options: ExpandOptions)
   nodes.forEach((node, index) => {
     const path = Array.isArray(input) ? `tree[${index}]` : 'tree';
     const placed = options.at ? { x: options.at[0], y: options.at[1], ...node } : node;
+    // A top-level node may name its own parent and its place in it, so one call can add layers
+    // to several existing frames, each where it belongs.
+    const { parent: own, index: place, ...rest } = placed ?? {};
+    const into = own ?? options.parent;
 
-    expansion.roots.push(builder.node(placed, options.parent, path));
+    if (place !== undefined && into === undefined) {
+      throw new TreeError(`${path}: "index" needs a "parent" to count in`);
+    }
+
+    const created = builder.node(rest, into, path);
+
+    expansion.roots.push(created);
+
+    if (place !== undefined) {
+      builder.moveTo(created, into as number, place);
+    }
   });
 
   return expansion;
@@ -192,6 +216,10 @@ class Builder {
     }
 
     for (const key of Object.keys(node)) {
+      if (key === 'parent' || key === 'index') {
+        throw new TreeError(`${path}: only a top-level node takes "parent" and "index"`);
+      }
+
       if (!KEYS.has(key)) {
         throw new TreeError(`${path}: unknown key "${key}". Valid keys: ${[...KEYS].join(', ')}`);
       }
@@ -243,10 +271,6 @@ class Builder {
       created = this.shape(node, parent, ref, self);
     }
 
-    for (const [collection, mode] of Object.entries(node.mode ?? {})) {
-      this.emit('variable.setMode', { ids: [self], collection, mode });
-    }
-
     if (node.as) {
       if (this.out.named[node.as] !== undefined) {
         throw new TreeError(`${path}: "as": "${node.as}" is used twice`);
@@ -266,6 +290,16 @@ class Builder {
       );
     }
 
+    if (node.effect) {
+      this.use(this.emit('style.apply', { ids: [self], style: node.effect }), 'style', node.effect);
+    }
+
+    // After the children: an instance made inside a frame that already has a mode keeps the
+    // default mode's text sizes until the mode is set again (figcraft-cli 0.17.0).
+    for (const [collection, mode] of Object.entries(node.mode ?? {})) {
+      this.emit('variable.setMode', { ids: [self], collection, mode });
+    }
+
     if (kind === 'frame') {
       this.refill(self, node);
     }
@@ -275,6 +309,13 @@ class Builder {
     }
 
     return created;
+  }
+
+  /** Puts a created top-level layer at its place among its parent's children. */
+  moveTo(created: number, parent: number, index: number): void {
+    const ref = this.out.commands[created]?.as as string;
+
+    this.emit('node.reparent', { ids: [{ $ref: ref }], parent, index });
   }
 
   /**
@@ -548,8 +589,21 @@ class Builder {
       throw new TreeError(`${path}: an instance's "properties" is an object of {name: value}`);
     }
 
-    if (node.properties && Object.keys(node.properties).length > 0) {
-      this.emit('instance.setProperties', { ids: [self], properties: node.properties });
+    if (node.properties) {
+      // An instance swap (a component id or a ref) goes in a call of its own, after the rest: set
+      // together with a variant, FigCraft drops the colour the variant gives the swapped glyph.
+      const entries = Object.entries(node.properties);
+      const isSwap = (value: unknown): boolean =>
+        typeof value === 'number' || (typeof value === 'object' && value !== null);
+
+      for (const part of [
+        entries.filter(([, value]) => !isSwap(value)),
+        entries.filter(([, value]) => isSwap(value)),
+      ]) {
+        if (part.length > 0) {
+          this.emit('instance.setProperties', { ids: [self], properties: Object.fromEntries(part) });
+        }
+      }
     }
 
     const props: Record<string, unknown> = {};
@@ -569,6 +623,22 @@ class Builder {
     this.set(self, { ...props, ...node.props });
     this.binds(self, binds);
     this.rawBinds(self, node.bind);
+
+    if (node.glyph) {
+      // The glyph is a layer of the icon, so it is found inside the new instance, after any swap.
+      const found = `${ref}-glyph`;
+
+      this.emit('node.find', { root: self, name: 'Glyph', limit: 1 }, found);
+      this.use(
+        this.emit('variable.bind', {
+          ids: [{ $ref: found, field: 'ids/0' }],
+          field: 'stroke',
+          variable: node.glyph,
+        }),
+        'variable',
+        node.glyph,
+      );
+    }
 
     return created;
   }
