@@ -154,9 +154,19 @@ report the import's result.
 ### Instance overrides
 
 An instance keeps what it changes inside itself (typed-over text, a fill variable, a size) by the
-id of the layer inside it. A change to the layer tree of the main component gives the layers
-inside every instance new ids, and they show the component's default again. Nothing reports it.
-Moving one layer into a new frame with `node.reparent` is enough (figcraft-cli 0.17.0).
+id of the layer inside it. Two kinds of change to its main component give those layers new ids,
+and they show the component's default again. Nothing reports it. Measured on figcraft-cli 0.17.0:
+
+- A change to the layer tree: a layer deleted and built again, or one layer moved into a new frame
+  with `node.reparent`.
+- A change to the properties: `component.addProperty` (a boolean or a variant property, with or
+  without a layer bound to it) and `component.bindProperty`.
+
+The reset reaches everything inside an outer instance that holds one of the component's
+instances: when the header component of a list group got a property, the rows of other components
+in that group lost their overrides too. Setting a value on a layer of the main component, renaming
+it and `component.addVariant` keep the overrides. Removing or renaming a property was not tested;
+treat it as a reset.
 
 ```sh
 figkit read --ids '[1250126,1232413]' --overrides   # before the change: writes a file, returns its path
