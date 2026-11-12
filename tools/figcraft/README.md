@@ -35,7 +35,7 @@ figkit find --kind variable --name space/
 figkit find "Budget overview" --page Screens
 figkit read 4                          # outline
 figkit read 4 --fields '["width","layout","boundVariables"]'
-figkit read 4 --deep                   # the whole subtree, to a JSON file for a script to measure
+figkit read 4 --deep                   # the whole subtree (up to 50,000 layers), to a JSON file for a script to measure
 figkit build @card.json                # or '<json>' or - for stdin
 figkit shot --ids '[4]'
 figkit shot --ids '[4]' --mode '{"Color":"Dark"}'   # in that mode, for this export only
@@ -130,7 +130,9 @@ and `text` (substring) narrow it further. `component` selects instances: of a co
 when it names one, since FigCraft's own filter matches only the variant's name
 (`Tone=Warning`) and never the set's; any other text goes to that filter. The step's result
 reports `matched`, the number of layers reached. A selector that matches nothing fails before
-anything changes, and names its step. Selectors are looked up before the commands run, so they
+anything changes, and names its step. `expect` is the number of layers a selector must match: any
+other number fails the same way and lists the layers found, so a name that repeats inside a
+layer, hidden layers included, cannot be changed unnoticed. Selectors are looked up before the commands run, so they
 cannot use `$ref`; FigCraft's own references can, including `{"$ref": "copy", "field": "ids/0"}`
 for a part of a result other than `id`.
 
@@ -140,13 +142,44 @@ returns bound variables and applied styles by name instead of FigCraft's ids.
 ### Variables in `run`
 
 FigCraft recomputes the whole document after each change to a variable's definition: about 20
-seconds per `variable.set` or `variable.create` on a 200,000-layer file (figcraft-cli 0.17.0). One
+seconds per `variable.set` or `variable.create` on a 200,000-layer file and about 15 on a
+123,000-layer one (figcraft-cli 0.17.0). One
 `variable.import` pays that once for any number of variables, so `run` folds the plain creates and
 sets of a call into imports (`src/variables.ts`). Plain means number, string or boolean literals, a
 `variable.create` that names every mode in `values` (or gives one `value`) and has no `as`. A rename
 starts a new import. Aliases, colours, a missing mode and any other variable command are left as
 written, and so is everything after the first one that cannot be folded. The folded commands all
 report the import's result.
+
+### Instance overrides
+
+An instance keeps what it changes inside itself (typed-over text, a fill variable, a size) by the
+id of the layer inside it. A change to the layer tree of the main component gives the layers
+inside every instance new ids, and they show the component's default again. Nothing reports it.
+Moving one layer into a new frame with `node.reparent` is enough (figcraft-cli 0.17.0).
+
+```sh
+figkit read --ids '[1250126,1232413]' --overrides   # before the change: writes a file, returns its path
+figkit run --overrides <path>                       # after it: {"set": 411, "unchanged": 397, "missing": {…}}
+```
+
+- `read` with `overrides` writes the overrides of every instance under the layers to
+  `$TMPDIR/figkit/overrides/` and returns the path, the counts and the kinds it did not save. It
+  saves text (`characters`), the fill's variable (`fill`) and a size (`width`, `height`), found
+  through the override kinds FigCraft reports on each layer. Text set through a component property
+  is not an override of a layer and stays with the instance by itself.
+- `run` with `overrides` puts them back in one all-or-nothing step. It also takes the entries
+  themselves, for a table that comes from somewhere else:
+  `[{"instance": 42, "layer": "Amount", "type": "TEXT", "index": 0, "characters": "€57.00"}]`.
+
+An override names its layer by an instance it is in, the layer's name (`layer`), `type` and
+`parent` name, and its `index` among the layers like it inside that instance. `outer` lists the
+instances around that one with the index inside each: an instance that comes from a main component
+is rebuilt with it, so the layer is looked for in the first instance that still exists. A layer
+that already has the value counts as `unchanged`. A layer that is gone counts under `missing`, and
+so does one whose parent is gone unless it is the only layer of its name: a value on the wrong
+layer is worse than a missing one. Without `parent`, as in a table written by hand, `index` counts
+every layer of that name in the instance, and a name that repeats needs one.
 
 ## Project setup
 
@@ -182,11 +215,19 @@ variables that only a text style uses, so that text stops following its frame's 
     it, and after a call that changed the document without saving. `build` and `run` take
     `{"file": "<path>"}` there, to read their input from a JSON file. Prefer this for agents.
     A write that changes a variable's definition still goes to a one-off `figcraft-cli run`:
-    FigCraft's recompute takes about twice as long in a session (45 against 25 seconds).
+    FigCraft's recompute takes about twice as long in a session (45 against 25 seconds on a
+    200,000-layer file).
 - Live (`--live`) attaches to the open FigCraft app, makes the same edits there and saves after each
   write. It launches the app when it is not running, and refuses to start when another client is
   already attached. With `figkit mcp --live` the attach happens on the first tool call, not when the
   server starts.
+
+## Call log
+
+`figkit mcp` appends one line per tool call to `$TMPDIR/figkit/calls.jsonl`: `at`, `pid`, `tool`,
+`ms`, `ok` and `bytes` (the size of the result). `ms` is the time spent in figkit. A client's
+transcript shows more for the same call, because the gap between a call and its result also holds
+the client's own work, such as a permission check. Compare the two before blaming the tool.
 
 ## figcraft-cli version
 
@@ -227,5 +268,5 @@ bun run typecheck
 
 `src/build.ts` is the tree expansion, `src/ops.ts` the six commands, `src/engine.ts` the headless
 and live backends, `src/catalog.ts` the cached names, `src/variables.ts` the folding of variable
-commands. `src/app.ts`, `src/lock.ts` and `src/prune.ts`
+commands, `src/overrides.ts` the saving and matching of instance overrides. `src/app.ts`, `src/lock.ts` and `src/prune.ts`
 came from the old proxy with their tests.

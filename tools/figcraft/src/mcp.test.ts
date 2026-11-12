@@ -196,6 +196,23 @@ describe.skipIf(!hasCli)('mcp server tool calls', () => {
     expect(second.replies[2]?.result?.isError).toBe(true);
     expect(text(second.replies[2])).toContain('nothing was changed');
 
+    // Each call leaves a line with the time figkit itself took, for whoever profiles a session.
+    const logged = (await Bun.file(join(directory, 'figkit', 'calls.jsonl')).text())
+      .trim()
+      .split('\n')
+      .map((line) => JSON.parse(line) as { tool: string; ms: number; ok: boolean; pid: number });
+
+    expect(logged.slice(-6).map((entry) => [entry.tool, entry.ok])).toEqual([
+      ['build', true],
+      ['find', true],
+      ['help', true],
+      ['read', true],
+      ['shot', true],
+      ['run', false],
+    ]);
+    expect(logged.every((entry) => entry.ms >= 0 && entry.pid > 0)).toBe(true);
+    expect(new Set(logged.slice(-6).map((entry) => entry.pid)).size).toBe(2);
+
     // The session keeps the file open, so a change that is not saved must not stay in it.
     const third = await converse([
       call(1, 'run', {

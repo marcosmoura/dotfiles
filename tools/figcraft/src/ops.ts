@@ -13,6 +13,14 @@ import {
   type CatalogStore,
 } from './catalog';
 import type { Command, Engine } from './engine';
+import {
+  anchors,
+  collectOverrides,
+  OVERRIDE_FIELDS,
+  planRestore,
+  type Layer,
+  type Override,
+} from './overrides';
 import { fit, prune } from './prune';
 import type { Project } from './project';
 import type { Config } from './settings';
@@ -201,15 +209,24 @@ export type ReadInput = {
   fields?: string[];
   /** Write the layers and every layer inside them to a JSON file, and return its path. */
   deep?: boolean;
+  /** Write what the instances inside the layers override to a JSON file, and return its path. */
+  overrides?: boolean;
 };
 
 /** The most layers one `node.find` returns. */
-const MAX_DEEP_LAYERS = 10_000;
+const MAX_FOUND = 10_000;
+
+/** The most layers one deep read takes: a page's frames, never the whole file. */
+const MAX_DEEP_LAYERS = 50_000;
 
 const DEEP_FIELDS = ['name', 'type', 'absoluteBounds'];
 
 export async function read(ctx: Context, input: ReadInput): Promise<unknown> {
   const ids = input.ids?.length ? input.ids : [await layerId(ctx, input)];
+
+  if (input.overrides) {
+    return readOverrides(ctx, ids);
+  }
 
   if (input.deep) {
     return readDeep(ctx, ids, [...DEEP_FIELDS, ...(input.fields ?? [])]);
@@ -266,45 +283,15 @@ async function withNames(ctx: Context, value: unknown): Promise<unknown> {
  * go to a file as a flat list, each with its `parent` and `children` ids.
  */
 async function readDeep(ctx: Context, roots: number[], fields: string[]): Promise<string> {
-  const found = await must(
-    ctx,
-    roots.map((root) => ({ command: 'node.find', params: { root, limit: MAX_DEEP_LAYERS } })),
-  );
-  const ids = [...roots];
+  const layers = await subtree(ctx, roots, fields);
+  const parents = new Map<number, number>();
 
-  for (const [index, step] of found.entries()) {
-    const result = (step.result ?? {}) as { ids?: number[]; total?: number };
-
-    if ((result.total ?? 0) > MAX_DEEP_LAYERS) {
-      throw new OpError(
-        `layer ${roots[index]} has ${result.total} layers inside it, and a deep read stops at ` +
-          `${MAX_DEEP_LAYERS}. Read its children instead.`,
-      );
+  for (const layer of layers) {
+    for (const child of layer.children) {
+      parents.set(child, layer.id);
     }
-
-    ids.push(...(result.ids ?? []));
   }
 
-  const unique = [...new Set(ids)];
-  const steps = await must(
-    ctx,
-    unique.map((id) => ({
-      command: 'node.get',
-      params: { id, fields: [...new Set([...fields, 'children'])] },
-    })),
-  );
-  const parents = new Map<number, number>();
-  const layers = steps.map((step, index) => {
-    const node = (step.result ?? {}) as Record<string, unknown> & { children?: { id: number }[] };
-    const id = unique[index] as number;
-    const children = (node.children ?? []).map((child) => child.id);
-
-    for (const child of children) {
-      parents.set(child, id);
-    }
-
-    return { ...node, id, children };
-  });
   const directory = join(ctx.config.tempDir, 'reads');
   const path = join(directory, `${roots[0]}-${Date.now()}.json`);
 
@@ -320,6 +307,103 @@ async function readDeep(ctx: Context, roots: number[], fields: string[]): Promis
   );
 
   return `${path}\t${layers.length} layers`;
+}
+
+/**
+ * What the instances under the roots override, as a file `run` puts back with `overrides`. Take it
+ * before the layer tree of a main component changes: the change resets the overrides.
+ */
+async function readOverrides(ctx: Context, roots: number[]): Promise<string> {
+  const layers = (await withNames(ctx, await subtree(ctx, roots, OVERRIDE_FIELDS))) as Layer[];
+  const { entries, skipped } = collectOverrides(
+    new Map(layers.map((layer) => [layer.id, layer])),
+    roots,
+  );
+  const directory = join(ctx.config.tempDir, 'overrides');
+  const path = join(directory, `${roots[0]}-${Date.now()}.json`);
+
+  await mkdir(directory, { recursive: true });
+  // One override per line, so two files can be compared.
+  await Bun.write(path, `[\n${entries.map((entry) => JSON.stringify(entry)).join(',\n')}\n]\n`);
+
+  const instances = new Set(entries.map((entry) => entry.instance)).size;
+  const left = Object.entries(skipped)
+    .map(([kind, count]) => `${kind} ${count}`)
+    .join(', ');
+
+  return (
+    `${path}\t${entries.length} overrides in ${instances} instances` +
+    (left ? `\tnot saved: ${left}` : '')
+  );
+}
+
+type SubtreeLayer = Record<string, unknown> & { id: number; children: number[] };
+
+/** The roots and every layer inside them, with the named fields and each layer's child ids. */
+async function subtree(ctx: Context, roots: number[], fields: string[]): Promise<SubtreeLayer[]> {
+  const ids = [...new Set([...roots, ...(await idsInside(ctx, roots))])];
+  const steps = await must(
+    ctx,
+    ids.map((id) => ({
+      command: 'node.get',
+      params: { id, fields: [...new Set([...fields, 'children'])] },
+    })),
+  );
+
+  return steps.map((step, index) => {
+    const node = (step.result ?? {}) as Record<string, unknown> & { children?: { id: number }[] };
+
+    return {
+      ...node,
+      id: ids[index] as number,
+      children: (node.children ?? []).map((child) => child.id),
+    };
+  });
+}
+
+/**
+ * One `node.find` returns at most 10,000 layers, so a layer with more inside it is searched child
+ * by child.
+ */
+async function idsInside(ctx: Context, roots: number[]): Promise<number[]> {
+  const found = await must(
+    ctx,
+    roots.map((root) => ({ command: 'node.find', params: { root, limit: MAX_FOUND } })),
+  );
+  const ids: number[] = [];
+  const large: number[] = [];
+
+  for (const [index, step] of found.entries()) {
+    const result = (step.result ?? {}) as { ids?: number[]; total?: number };
+    const total = result.total ?? 0;
+
+    if (total > MAX_DEEP_LAYERS) {
+      throw new OpError(
+        `layer ${roots[index]} has ${total} layers inside it, and a deep read stops at ` +
+          `${MAX_DEEP_LAYERS}. Read its children instead.`,
+      );
+    }
+
+    if (total > MAX_FOUND) {
+      large.push(roots[index] as number);
+    } else {
+      ids.push(...(result.ids ?? []));
+    }
+  }
+
+  if (large.length > 0) {
+    const parents = await must(
+      ctx,
+      large.map((id) => ({ command: 'node.get', params: { id, fields: ['children'] } })),
+    );
+    const children = parents.flatMap((step) =>
+      ((step.result ?? {}) as { children?: { id: number }[] }).children ?? [],
+    ).map((child) => child.id);
+
+    ids.push(...children, ...(await idsInside(ctx, children)));
+  }
+
+  return ids;
 }
 
 /** Resolves `id`, or a `name` that matches exactly one layer. */
@@ -502,9 +586,14 @@ function namesOfKind(catalog: Catalog, kind: NameUse['kind']): string[] {
 // ---------------------------------------------------------------------------------------------
 
 export type RunInput = {
-  commands: (Command & { where?: Where })[];
+  commands?: (Command & { where?: Where })[];
   /** Save afterwards. Defaults to true when a command changes the document. */
   write?: boolean;
+  /**
+   * In place of `commands`: instance overrides to put back, as the path of a file written by
+   * `read` with `overrides`, or as the entries themselves.
+   */
+  overrides?: string | Override[];
 };
 
 /** Picks a command's layers by what they are instead of by id; fills its `ids`. */
@@ -519,6 +608,8 @@ export type Where = {
   text?: string;
   /** Instances of the main component with this name (substring). */
   component?: string;
+  /** How many layers must match. Any other number fails the call before anything changes. */
+  expect?: number;
 };
 
 const MAX_STEP_BYTES = 4_096;
@@ -527,6 +618,17 @@ const MAX_STEP_BYTES = 4_096;
 const NAME_COMMANDS = /^(variable|style|component|page|library)\./;
 
 export async function run(ctx: Context, input: RunInput): Promise<unknown> {
+  if (input.overrides !== undefined) {
+    if (input.commands?.length) {
+      throw new OpError(
+        'give "commands" or "overrides", not both: overrides are matched to the layers as they ' +
+          'are before the call. Change the layers first, then put the overrides back.',
+      );
+    }
+
+    return restoreOverrides(ctx, input.overrides);
+  }
+
   if (!Array.isArray(input.commands) || input.commands.length === 0) {
     throw new OpError('run needs a non-empty "commands" array of {command, params, as?}.');
   }
@@ -579,12 +681,68 @@ export async function run(ctx: Context, input: RunInput): Promise<unknown> {
 }
 
 /**
+ * Puts instance overrides back in one all-or-nothing step. Each is matched to a layer by its
+ * instance, name, type and place among the layers of that name, so it finds the layer again after
+ * the main component's layer tree changed and FigCraft gave the layers inside new ids.
+ */
+async function restoreOverrides(ctx: Context, input: string | Override[]): Promise<unknown> {
+  assertWritable(ctx);
+
+  let entries: unknown;
+
+  try {
+    entries = typeof input === 'string' ? JSON.parse(await Bun.file(input).text()) : input;
+  } catch (error) {
+    throw new OpError(`nothing was changed. Could not read ${input}: ${(error as Error).message}`);
+  }
+
+  if (!Array.isArray(entries) || entries.length === 0) {
+    throw new OpError(
+      'nothing was changed. "overrides" is a file from read with overrides, or a non-empty list ' +
+        'of {instance, layer, type?, index?, characters?, fill?, width?, height?}.',
+    );
+  }
+
+  // Each override is looked for inside the first of its instances that still exists.
+  const around = (entries as Override[]).map((entry) =>
+    entry && typeof entry.instance === 'number' ? anchors(entry).map(([id]) => id) : [],
+  );
+  const instances = [...new Set(around.flat())];
+  const found = await must(
+    ctx,
+    instances.map((id) => ({ command: 'node.get', params: { id, fields: ['type'] } })),
+  );
+  const present = new Set(instances.filter((_, index) => found[index]?.result));
+  const chosen = new Set(around.flatMap((ids) => ids.find((id) => present.has(id)) ?? []));
+  const layers = (await withNames(ctx, await subtree(ctx, [...chosen], OVERRIDE_FIELDS))) as Layer[];
+  let plan;
+
+  try {
+    plan = planRestore(entries as Override[], new Map(layers.map((layer) => [layer.id, layer])));
+  } catch (error) {
+    throw new OpError(`nothing was changed. ${(error as Error).message}`);
+  }
+
+  if (plan.commands.length > 0) {
+    const result = await ctx.engine.run(plan.commands, { write: true });
+
+    if (!result.ok) {
+      throw new OpError(`nothing was changed. ${result.error}`);
+    }
+
+    await ctx.catalog.carry();
+  }
+
+  return plan.report;
+}
+
+/**
  * Turns each command's `where` into `ids`, so a change to every layer of a kind needs no script
  * that looks the ids up first. A selector that matches nothing fails before anything changes.
  */
 async function resolveWhere(
   ctx: Context,
-  commands: RunInput['commands'],
+  commands: NonNullable<RunInput['commands']>,
 ): Promise<{ commands: Command[]; matched: (number | undefined)[] }> {
   const needsCatalog = commands.some(
     (entry) =>
@@ -627,7 +785,7 @@ async function resolveWhere(
     }
 
     for (const each of roots) {
-      const params: Record<string, unknown> = { root: each, limit: MAX_DEEP_LAYERS };
+      const params: Record<string, unknown> = { root: each, limit: MAX_FOUND };
 
       if (name) params.name = name;
       if (text) params.text = text;
@@ -737,6 +895,17 @@ async function resolveWhere(
 
     if (ids.length === 0) {
       throw new OpError(`${label(index, entry)}: "where" matched no layers.`);
+    }
+
+    // A name can repeat inside a layer, hidden layers included, and a change must not reach the
+    // others unnoticed: the caller says how many layers it means.
+    if (where.expect !== undefined && ids.length !== where.expect) {
+      const listed = `${ids.slice(0, 8).join(', ')}${ids.length > 8 ? ', …' : ''}`;
+
+      throw new OpError(
+        `${label(index, entry)}: "where" matched ${ids.length} layers (${listed}), not the ` +
+          `${where.expect} it expects.`,
+      );
     }
 
     matched.push(ids.length);

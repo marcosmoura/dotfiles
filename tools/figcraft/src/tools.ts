@@ -57,7 +57,8 @@ export const TOOLS: Tool[] = [
       'Read a layer by id or exact name, or several with ids. Returns its outline (children one level deep), or only ' +
       'the properties named in fields, e.g. ["width","layout","fills","boundVariables"]. With deep, ' +
       'writes the layer and every layer inside it (fields, parent, children ids) to a JSON file for ' +
-      'a script to measure, and returns the path.',
+      'a script to measure, and returns the path. With overrides, writes what the instances ' +
+      'inside it override (text, fill variable, size) to a JSON file that run puts back.',
     inputSchema: object({
       id,
       ids: { type: 'array', items: { type: 'integer' } },
@@ -65,6 +66,7 @@ export const TOOLS: Tool[] = [
       page,
       fields: { type: 'array', items: { type: 'string' } },
       deep: { type: 'boolean' },
+      overrides: { type: 'boolean' },
     }),
     call: (ctx, args) => ops.read(ctx, args as ops.ReadInput),
   },
@@ -108,14 +110,18 @@ export const TOOLS: Tool[] = [
       '{"$ref": "<as>", "field": "ids/0"} for another part of its result. where picks the layers ' +
       'instead of ids, before the commands run (so no $ref in it): {root (layer id or ids) or ' +
       'page, name (exact), type, text, component (instances of that component or set; else a ' +
-      'part of the variant name, "Tone=Warning")}; its result reports "matched". instance.* ' +
+      'part of the variant name, "Tone=Warning"), expect (the number of layers that must ' +
+      'match)}; its result reports "matched". instance.* ' +
       'commands take a component by name. variable.create and variable.set ' +
       'with literal values are applied together. Saves when a command changes the document. Use ' +
-      "help for a command's parameters.",
+      "help for a command's parameters. overrides, in place of commands, puts instance " +
+      'overrides back by layer name: the path from read, or [{instance, layer, type?, index?, ' +
+      'characters?, fill?, width?, height?}].',
     inputSchema: object({
       commands: { type: 'array', items: { type: 'object' } },
       write: { type: 'boolean', description: 'Force saving on or off' },
       file: { type: 'string', description: 'Path of a JSON file holding this input' },
+      overrides: { type: ['string', 'array'] },
     }),
     call: (ctx, args) => ops.run(ctx, args as unknown as ops.RunInput),
   },

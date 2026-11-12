@@ -211,6 +211,25 @@ describe.skipIf(!hasCli)('against figcraft-cli', () => {
         commands: [{ command: 'node.set', where: { root: built.root, name: 'Tit' }, params: {} }],
       }),
     ).rejects.toThrow(/matched no layers/);
+
+    // `expect` stops a change that would reach more layers, or fewer, than the caller means.
+    const twins = (await ops.build(ctx, {
+      at: [0, 900],
+      tree: { frame: 'Twins', children: [{ text: 'One', name: 'Amount' }, { text: 'Two', name: 'Amount' }] },
+    })) as { root: number };
+    const amounts = { root: twins.root, name: 'Amount', type: 'TEXT' };
+
+    await expect(
+      ops.run(ctx, {
+        commands: [{ command: 'node.set', where: { ...amounts, expect: 1 }, params: { characters: 'X' } }],
+      }),
+    ).rejects.toThrow(/nothing was changed\. step 0 \(node\.set\): "where" matched 2 layers \(\d+, \d+\), not the 1 it expects/);
+    expect(await ops.find(ctx, { root: twins.root, text: 'X' })).toBe('no layers found');
+    expect(
+      await ops.run(ctx, {
+        commands: [{ command: 'node.set', where: { ...amounts, expect: 2 }, params: { opacity: 0.5 } }],
+      }),
+    ).toEqual([expect.objectContaining({ matched: 2 })]);
   }, 60_000);
 
   test('builds a component set with a property and its instances in one step', async () => {
@@ -354,6 +373,87 @@ describe.skipIf(!hasCli)('against figcraft-cli', () => {
     expect((await stat(ctx.project.file)).mtimeMs).toBe(before);
     await expect(ops.run(ctx, { commands: [{ command: 'node.set', params: { ids: [999_999_999] } }] }))
       .rejects.toThrow(/nothing was changed/);
+  }, 60_000);
+
+  test('saves what an instance overrides and puts it back after its component is rebuilt', async () => {
+    await ops.run(ctx, {
+      commands: [
+        {
+          command: 'variable.create',
+          params: { collection: 'Tokens', name: 'color/group', type: 'color', value: '#CC3366' },
+        },
+      ],
+    });
+
+    const built = (await ops.build(ctx, {
+      at: [0, 1400],
+      tree: [
+        {
+          frame: 'Row',
+          component: true,
+          as: 'row',
+          layout: 'horizontal',
+          children: [
+            { text: '€0.00', name: 'Amount', as: 'amount' },
+            { frame: 'Dot', w: 8, h: 8, fill: 'color/card' },
+            { frame: 'Solid', w: 40, h: 4, fill: 'color/card', as: 'solid' },
+          ],
+        },
+        { frame: 'Doc', as: 'doc', y: 200, children: [{ instance: { $ref: 'row' }, as: 'one' }] },
+      ],
+    })) as { ids: Record<string, number> };
+    const { row, amount, solid, doc, one } = built.ids as Record<string, number>;
+    const inside = (name: string) => ({ root: one, name, expect: 1 });
+
+    await ops.run(ctx, {
+      commands: [
+        { command: 'node.set', where: inside('Amount'), params: { characters: '€57.00' } },
+        {
+          command: 'variable.bind',
+          where: inside('Dot'),
+          params: { field: 'fill', variable: 'color/group' },
+        },
+        { command: 'node.set', where: inside('Solid'), params: { width: 20 } },
+      ],
+    });
+
+    const [path, summary] = ((await ops.read(ctx, { id: doc, overrides: true })) as string).split('\t');
+
+    expect(summary).toBe('3 overrides in 1 instances');
+    expect(await Bun.file(path as string).json()).toEqual([
+      { instance: one, layer: 'Amount', type: 'TEXT', parent: 'Row', index: 0, characters: '€57.00' },
+      { instance: one, layer: 'Dot', type: 'FRAME', parent: 'Row', index: 0, fill: 'color/group' },
+      { instance: one, layer: 'Solid', type: 'FRAME', parent: 'Row', index: 0, width: 20, height: 4 },
+    ]);
+
+    // A layer of the component that is built again gets a new id, and the instance shows its
+    // default again. A deleted layer takes its override with it.
+    await ops.run(ctx, {
+      commands: [
+        { command: 'edit.delete', params: { ids: [amount, solid] } },
+        {
+          command: 'node.create',
+          params: { type: 'text', name: 'Amount', characters: '€0.00', parent: row, index: 0 },
+        },
+      ],
+    });
+    expect(await ops.find(ctx, { root: one, text: '€57.00' })).toBe('no layers found');
+
+    expect(await ops.run(ctx, { overrides: path })).toEqual({
+      set: 1,
+      unchanged: 1,
+      missing: { 'FRAME "Solid" in "Row"': 1 },
+    });
+    expect(await ops.find(ctx, { root: one, text: '€57.00' })).toMatch(/\tAmount$/);
+
+    // Nothing is left to do the second time, so nothing is written.
+    const before = (await stat(ctx.project.file)).mtimeMs;
+
+    expect(await ops.run(ctx, { overrides: path })).toMatchObject({ set: 0, unchanged: 2 });
+    expect((await stat(ctx.project.file)).mtimeMs).toBe(before);
+    await expect(
+      ops.run(ctx, { overrides: [{ instance: one as number, layer: 'Amount' }] }),
+    ).rejects.toThrow(/nothing was changed\. override 0 sets nothing/);
   }, 60_000);
 
   test('run replaces an oversized result with a pointer to the right command', async () => {

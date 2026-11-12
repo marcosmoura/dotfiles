@@ -1,3 +1,6 @@
+import { appendFile, mkdir } from 'node:fs/promises';
+import { join } from 'node:path';
+
 import { createContext } from './context';
 import { log } from './logger';
 import type { Context } from './ops';
@@ -47,6 +50,10 @@ export async function serve(options: { live: boolean }): Promise<number> {
           throw new RpcError(-32602, `unknown tool "${params.name}"`);
         }
 
+        const started = Date.now();
+        let text: string;
+        let failed = false;
+
         try {
           // A server takes many calls, so headless work keeps the file open between them.
           state.context ??= createContext({ ...options, session: true });
@@ -58,18 +65,29 @@ export async function serve(options: { live: boolean }): Promise<number> {
               : {},
           );
 
-          return { content: [{ type: 'text', text: render(await tool.call(await state.context, args)) }] };
+          text = render(await tool.call(await state.context, args));
         } catch (error) {
           // A failed attach should be retried on the next call rather than cached.
           await state.context?.catch(() => {
             state.context = null;
           });
 
-          return {
-            isError: true,
-            content: [{ type: 'text', text: error instanceof Error ? error.message : String(error) }],
-          };
+          failed = true;
+          text = error instanceof Error ? error.message : String(error);
         }
+
+        await record(state.context, {
+          at: new Date(started).toISOString(),
+          pid: process.pid,
+          tool: tool.name,
+          ms: Date.now() - started,
+          ok: !failed,
+          bytes: text.length,
+        });
+
+        return failed
+          ? { isError: true, content: [{ type: 'text', text }] }
+          : { content: [{ type: 'text', text }] };
       }
 
       default:
@@ -139,6 +157,22 @@ async function fromFile(
     : (parsed as Record<string, unknown>);
 
   return { ...input, ...rest };
+}
+
+/**
+ * Appends one line per tool call to `calls.jsonl` in the temp folder: the time spent in figkit.
+ * A client's transcript cannot show that, because the gap between a call and its result also
+ * holds the client's own work, such as a permission check.
+ */
+async function record(context: Promise<Context> | null, entry: Record<string, unknown>): Promise<void> {
+  try {
+    const { tempDir } = ((await context) as Context).config;
+
+    await mkdir(tempDir, { recursive: true });
+    await appendFile(join(tempDir, 'calls.jsonl'), `${JSON.stringify(entry)}\n`);
+  } catch {
+    // The log is a diagnostic: a call never fails because of it.
+  }
 }
 
 class RpcError extends Error {
