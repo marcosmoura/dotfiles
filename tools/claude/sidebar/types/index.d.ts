@@ -70,8 +70,17 @@ export type Rail = { prompts: Prompt[]; reading: string | null };
 /** A prompt as it left the composer: when, and whether a turn was running, so it waits in the queue. */
 export type Typed = { text: string; at: number; isQueued: boolean };
 
-/** What a turn of the main loop came to: its requests, the tokens it wrote and the time they took, and its last request's counts. */
-export type Turn = { steps: number; output: number; ms: number; last: Tokens | null };
+/**
+ * What a turn of the main loop came to: the model that answered it, its requests, the tokens it
+ * wrote and the time they took, and its last request's counts.
+ */
+export type Turn = {
+  model: string;
+  steps: number;
+  output: number;
+  ms: number;
+  last: Tokens | null;
+};
 
 export type Status = 'running' | 'done' | 'failed' | 'stopped';
 
@@ -97,14 +106,17 @@ declare module 'claude-code' {
       rail: Shaped<Rail>;
       /** The latest prompts typed, oldest first; one is queued until the conversation takes it in. */
       typed: Typed[];
-      /** When each prompt the conversation took in was typed, by the id of its row. */
+      /** The prompts the conversation has taken in, by the stable part of each row's id, with when each was typed. */
       sent: Record<string, number>;
       /** The pasted images the draft in the prompt box names, by their numbers. */
       draft: number[];
-      /** The turn that is running, or the last to end; `isClaimed` once a footer in the thread has taken its figures. */
-      turn: Turn & { isClaimed: boolean };
+      /**
+       * The turn that is running, or the last to end: `n` counts the turns, so one is told from the
+       * next, and `isClaimed` says a footer in the thread has taken its figures.
+       */
+      turn: Shaped<Turn & { n: number; isClaimed: boolean }>;
       /** The figures under each reply's footer, by the footer row's id. */
-      footers: Record<string, Turn>;
+      footers: Shaped<Record<string, Turn>>;
       /** The weekly Fable limit used, 0 to 100, as Anthropic's usage endpoint last told it; null before it has. */
       fable: number | null;
       /** Whether the person opened the breakdown under the context bar. */

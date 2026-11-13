@@ -3,11 +3,13 @@ import { expect, mock, test } from 'claude-code/testing';
 import type { Engine } from 'claude-code/testing';
 
 import {
+  agentColor,
   agentType,
   alarm,
   breakdownOf,
   changesOf,
-  columnsOf,
+  capped,
+  clipLines,
   fableOf,
   fmtClock,
   fmtLeft,
@@ -994,7 +996,7 @@ test('with no first-party login there is nothing to ask the Fable limit with', a
 });
 
 test('the uncommitted lines are counted again after a tool that can change the tree', async ($, on) => {
-  const { world } = engine(on);
+  const { clock, world } = engine(on);
   await start($);
   world.unstaged = ' 4 files changed, 120 insertions(+), 80 deletions(-)';
   await $.tool.call({ tool: 'Read', file_path: '/work/dotfiles/install.sh' });
@@ -1008,6 +1010,8 @@ test('the uncommitted lines are counted again after a tool that can change the t
     old_string: 'a',
     new_string: 'b',
   });
+  // The count is taken once the tool's answer has gone on, not before it.
+  await clock.settle();
   const after = await $.ui.mount({ ...pane(66), surface: 'terminal' });
   expect(await after.find({ type: 'Text', text: /^\+121,-80$/ })).toBeDefined();
   await after.unmount();
@@ -1379,16 +1383,6 @@ test('a reply is split at its tables and its code fences, and a table in a fence
     { kind: 'prose', text: '\nPick one.' },
     { kind: 'code', language: undefined, source: '| a | b |\n| - | - |' },
   ]);
-  // A column is as wide as its widest cell as drawn: the markdown's own marks take no room.
-  expect(
-    columnsOf(
-      ['Option', 'Rows'],
-      [
-        ['**Card**', '2'],
-        ['`bar` | rule', '0'],
-      ],
-    ),
-  ).toEqual([10, 4]);
   // A fence in a list item loses the item's indent, and one still being written runs to the end.
   expect(piecesOf('- step\n  ```ts\n  const a = 1\n    b()\n  ```\ndone\n~~~~sh\nls')).toEqual([
     { kind: 'prose', text: '- step' },
@@ -1458,6 +1452,18 @@ test('a reply is plain markdown set in three cells, a table in it a grid fitted 
     '└─────────┴──────────────────┘',
   ]);
   expect(new Set(narrow.map((line) => line.length)).size).toBe(1);
+  // A wide character is two cells: its column is ruled as wide as it is drawn.
+  const wide = layout(
+    { ...table, head: [[{ text: '状態' }]], rows: [[[{ text: 'ok' }]]], align: ['left'] },
+    80,
+  );
+  expect(wide.map((line) => line.map((seg) => seg.text).join(''))).toEqual([
+    '┌──────┐',
+    '│ 状態 │',
+    '├──────┤',
+    '│ ok   │',
+    '└──────┘',
+  ]);
 });
 
 test('a code fence in a reply is its code, highlighted, with no frame', async ($, on) => {
@@ -1574,10 +1580,16 @@ test('a tool call is one quiet line under an icon, or a panel for a command, an 
     { path: 'docs/', kind: 'dir' },
   ]);
   expect(tilde('/Users/me/Projects/dotfiles', '/Users/me')).toBe('~/Projects/dotfiles');
+  // An agent type has one colour, the same each time.
+  expect(agentColor('Explore')).toBe(agentColor('Explore'));
+  expect(['ide', 'merged', 'success', 'warning', 'planMode', 'claude', 'bashBorder']).toContain(
+    agentColor('Plan'),
+  );
   expect(fmtTook(28_400)).toBe('28s');
   expect(fmtTook(69_000)).toBe('1m 9s');
   expect(
     footerOf({
+      model: 'claude-fable-5-2',
       steps: 5,
       output: 800,
       ms: 7500,
@@ -1588,6 +1600,10 @@ test('a tool call is one quiet line under an icon, or a panel for a command, an 
     tokens: '+ Tokens: 5 steps · latest: 3,893 new · 89,728 cached · 93,621 total',
   });
   expect(footerOf(undefined)).toEqual({ rate: '', tokens: '' });
+  // A record keeps its latest entries, and a line of a panel is cut as well as its lines are counted.
+  expect(capped({ a: 1, b: 2 }, 'a', 3, 2)).toEqual({ b: 2, a: 3 });
+  expect(capped({ a: 1, b: 2 }, 'c', 3, 2)).toEqual({ b: 2, c: 3 });
+  expect(clipLines('x'.repeat(900), 10).length).toBe(500);
 
   engine(on);
   await start($);
@@ -1781,4 +1797,67 @@ test('the MCP servers the session has tools from are listed in the pane, with ho
   expect(await ui.find({ type: 'Text', text: /^• context7$/ })).toBeUndefined();
   await ui.press({ key: 'mcp' });
   await ui.unmount();
+});
+
+test("a footer takes its turn's figures the first time it is drawn, and keeps that turn's model", async ($, on) => {
+  const { clock } = engine(on);
+  await start($);
+  await step($, clock, { turnId: 'T1', model: 'claude-fable-5-2', effort: 'max' });
+  const footer = (id: string) =>
+    $.ui.mount({
+      plugin: 'sidebar',
+      component: 'TurnDuration',
+      requestId: id,
+      surface: 'terminal',
+      props: { word: 'Baked', durationMs: 13_000 },
+    });
+  const said = async (ui: {
+    find: (query: { type: string; text: RegExp }) => Promise<{ text: string } | undefined>;
+  }) => (await ui.find({ type: 'Text', text: /^Claude · / }))?.text;
+
+  const first = await footer('d1');
+  expect(await said(first)).toMatch(/^Claude · Fable 5\.2 · 13s · [\d.]+ tok\/s$/);
+  await first.unmount();
+  await clock.settle();
+  // Another footer finds the turn's figures taken: it says only how long its own turn took.
+  const second = await footer('d2');
+  expect(await said(second)).toBe('Claude · 13s');
+  await second.unmount();
+  // The session moves to another model: the first footer still names the one that answered its turn.
+  await step($, clock, { turnId: 'T2', model: 'claude-sonnet-5-5' });
+  const again = await footer('d1');
+  expect(await said(again)).toMatch(/^Claude · Fable 5\.2 · 13s · /);
+  await again.unmount();
+});
+
+test("a one-line tool's result stays Claude Code's in the ctrl+o view, and a panel's stays in its panel", async ($, on) => {
+  engine(on);
+  on('ui.render', ($$, event) => {
+    const { Text } = $$.ui.resolve(event);
+    return <Text>engine</Text>;
+  });
+  await start($);
+  const answered = (tool: string, isExpanded: boolean) =>
+    $.ui.mount({
+      plugin: 'sidebar',
+      component: 'ToolResult',
+      requestId: 't1',
+      surface: 'terminal',
+      props: {
+        tool_use_id: 't1',
+        tool,
+        output: { stdout: 'a', stderr: '' },
+        isErrored: false,
+        isExpanded,
+      },
+    });
+  for (const [tool, isExpanded, drawn] of [
+    ['WebFetch', true, 'engine'],
+    ['WebFetch', false, undefined],
+    ['Bash', true, undefined],
+  ] as const) {
+    const ui = await answered(tool, isExpanded);
+    expect((await ui.find({ type: 'Text' }))?.text).toBe(drawn);
+    await ui.unmount();
+  }
 });

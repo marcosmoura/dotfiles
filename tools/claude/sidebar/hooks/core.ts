@@ -521,22 +521,6 @@ export const spansOf = (cell: string): Span[] => {
   return spans;
 };
 
-/** The cells a column needs for its widest cell, each character taken as one. */
-export const columnsOf = (head: readonly string[], rows: readonly (readonly string[])[]) =>
-  head.map((_, c) =>
-    Math.max(
-      1,
-      ...[head, ...rows].map(
-        (row) =>
-          [
-            ...spansOf(row[c] ?? '')
-              .map((s) => s.text)
-              .join(''),
-          ].length,
-      ),
-    ),
-  );
-
 // ---------------------------------------------------------------- pictures
 
 /** The pasted images a prompt names, by the number of each `[Image #n]` tag, once each. */
@@ -649,7 +633,7 @@ export type ToolRow =
 
 const field = (value: unknown, key: string): unknown =>
   typeof value === 'object' && value !== null ? (value as Record<string, unknown>)[key] : undefined;
-const textAt = (value: unknown, key: string) => {
+export const textAt = (value: unknown, key: string) => {
   const found = field(value, key);
   return typeof found === 'string' ? found : undefined;
 };
@@ -666,9 +650,16 @@ export const pathIn = (path: string | undefined, cwd: string) =>
       ? path.slice(cwd.length + 1)
       : path;
 
+/** The cells of a line a panel shows before it cuts it. */
+const LONGEST_LINE = 500;
+
 /** The first `max` lines of a text, and how many were left out. */
 export const clipLines = (text: string, max: number, more = '') => {
-  const lines = text.replace(/\s+$/, '').split('\n');
+  // A line is cut too: one of a minified file or a blob of JSON would fill the panel by itself.
+  const lines = text
+    .replace(/\s+$/, '')
+    .split('\n')
+    .map((line) => shorten(line, LONGEST_LINE));
   return lines.length <= max
     ? lines.join('\n')
     : `${lines.slice(0, max).join('\n')}\n… +${lines.length - max} lines${more}`;
@@ -705,6 +696,16 @@ const diffOf = (patch: unknown) =>
 const matches = (n: number | undefined) =>
   n === undefined ? '' : ` (${n} ${n === 1 ? 'match' : 'matches'})`;
 
+/** The theme colours an agent type can be told by. Claude Code has its own for each, which a plugin is not told. */
+const AGENT_COLORS = ['ide', 'merged', 'success', 'warning', 'planMode', 'claude', 'bashBorder'];
+
+/** The colour a type of agent is drawn in while one runs: the same one each time for a type. */
+export const agentColor = (type: string) => {
+  let sum = 0;
+  for (const ch of type) sum = (sum * 31 + (ch.codePointAt(0) ?? 0)) % 9973;
+  return AGENT_COLORS[sum % AGENT_COLORS.length] ?? 'ide';
+};
+
 /** An MCP server as it is named in the thread and the pane: a plugin's (`plugin_<plugin>_<server>`) by its own name. */
 export const serverName = (id: string) => /^plugin_[^_]+_(.+)$/.exec(id)?.[1] ?? id;
 
@@ -712,7 +713,11 @@ export const serverName = (id: string) => /^plugin_[^_]+_(.+)$/.exec(id)?.[1] ??
 const OWN = new Set(['ExitPlanMode', 'EnterPlanMode']);
 
 /** Whether the thread draws this tool's row itself, and so leaves no result row under it. */
-export const isDrawn = (tool: string) => !OWN.has(tool);
+const isDrawn = (tool: string) => !OWN.has(tool);
+
+/** The tools drawn as a panel, which holds what the call answered: any other is one line. */
+const PANELS = new Set(['Bash', 'Edit', 'MultiEdit', 'Write', 'TodoWrite', 'AskUserQuestion']);
+export const isPanel = (tool: string) => PANELS.has(tool);
 
 /**
  * How a tool call is drawn, from its input and, once it has one, its result; null for a tool whose
@@ -865,3 +870,16 @@ export const serversOf = (tools: readonly string[]) => {
     .map(([name, count]) => ({ name, tools: count }))
     .sort((a, b) => a.name.localeCompare(b.name));
 };
+
+// ---------------------------------------------------------------- records
+
+/** A record with one more entry, the latest written last, and no more than `max` of them. */
+export const capped = <T>(
+  record: Record<string, T>,
+  key: string,
+  value: T,
+  max: number,
+): Record<string, T> =>
+  Object.fromEntries(
+    [...Object.entries(record).filter(([k]) => k !== key), [key, value] as const].slice(-max),
+  );

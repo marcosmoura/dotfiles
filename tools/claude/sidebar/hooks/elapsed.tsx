@@ -1,9 +1,9 @@
 // A running clock, ticking on the surface's own frame clock so the pane is not redrawn every second.
-// `since`, `now` and `endAt` come from the hooks module's $.clock; between redraws it counts its own ticks.
+// `since` and `now` come from the hooks module's $.clock; between redraws it counts its own ticks.
 import type { ClientModule } from 'claude-code';
 
-type Props = { since: number; now: number; endAt: number | null; color: string };
-type Ref = { base: number; ticks: number; readAt: number; isRunning: boolean };
+type Props = { since: number; now: number; color: string };
+type Ref = { base: number; ticks: number; readAt: number };
 type State = { ref: Ref };
 
 // The same clock as core.ts draws: a surface module stands alone.
@@ -17,18 +17,16 @@ const fmt = (ms: number) => {
 
 const Elapsed: ClientModule<Props, State> = (props, surface) => {
   const { Text } = surface.elements;
-  const ref = surface.state?.ref ?? { base: 0, ticks: 0, readAt: -1, isRunning: true };
+  const ref = surface.state?.ref ?? { base: 0, ticks: 0, readAt: -1 };
   if (props.now !== ref.readAt) {
     // A fresh reading from the hooks module: count on from it.
     ref.readAt = props.now;
-    ref.base = (props.endAt ?? props.now) - props.since;
+    ref.base = props.now - props.since;
     ref.ticks = 0;
   }
-  ref.isRunning = props.endAt === null;
   if (surface.state === undefined) {
     surface.setState({ ref });
     surface.every(1000, () => {
-      if (!ref.isRunning) return;
       ref.ticks += 1;
       surface.setState({ ref });
     });

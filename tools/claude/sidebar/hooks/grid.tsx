@@ -9,7 +9,27 @@ type Align = 'left' | 'center' | 'right';
 type Props = { head: Span[][]; rows: Span[][][]; align: Align[]; rule: string; code: string };
 type Seg = { text: string; tone: 'rule' | 'plain' | 'bold' | 'code' };
 
-const widthOf = (text: string) => [...text].length;
+/**
+ * The cells a character takes: two for East Asian wide ones and emoji, none for a mark that joins
+ * the one before it, one for any other.
+ */
+const cellsOf = (ch: string) => {
+  const c = ch.codePointAt(0) ?? 0;
+  if ((c >= 0x300 && c <= 0x36f) || c === 0x200d || (c >= 0xfe00 && c <= 0xfe0f)) return 0;
+  const isWide =
+    (c >= 0x1100 && c <= 0x115f) ||
+    (c >= 0x2e80 && c <= 0xa4cf) ||
+    (c >= 0xac00 && c <= 0xd7a3) ||
+    (c >= 0xf900 && c <= 0xfaff) ||
+    (c >= 0xfe30 && c <= 0xfe4f) ||
+    (c >= 0xff00 && c <= 0xff60) ||
+    (c >= 0xffe0 && c <= 0xffe6) ||
+    c === 0x2705 ||
+    c === 0x274c ||
+    c >= 0x1f300;
+  return isWide ? 2 : 1;
+};
+const widthOf = (text: string) => [...text].reduce((n, ch) => n + cellsOf(ch), 0);
 /** A column is not narrowed past this, unless it was narrower to begin with. */
 const NARROWEST = 8;
 
@@ -34,16 +54,21 @@ const wrap = (cell: readonly Span[], width: number, isHead: boolean): Seg[][] =>
       }
       let rest = [...word];
       while (rest.length > 0) {
-        if (used > 0 && used + rest.length > width) {
+        if (used > 0 && used + widthOf(rest.join('')) > width) {
           const line = lines[lines.length - 1] ?? [];
           const last = line[line.length - 1];
           if (last !== undefined) last.text = last.text.replace(/\s+$/, '');
           lines.push([]);
           used = 0;
         }
-        const piece = rest.slice(0, Math.max(1, width - used));
-        put(piece.join(''), tone);
-        rest = rest.slice(piece.length);
+        // As many characters as fit the cells left, and one at least, so a wide one still goes in.
+        let fit = 0;
+        for (let cells = 0; fit < rest.length; fit += 1) {
+          cells += cellsOf(rest[fit] ?? '');
+          if (cells > width - used && fit > 0) break;
+        }
+        put(rest.slice(0, fit).join(''), tone);
+        rest = rest.slice(fit);
       }
     }
   }

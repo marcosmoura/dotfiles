@@ -1,22 +1,26 @@
 // The sidebar: a docked pane with the project, the session's vitals, its context window (a press
 // breaks it down by category), a rail of the person's prompts (a press scrolls the transcript to
-// one) and its subagents (a press opens their timeline, and a press on a lane opens that subagent's
-// transcript); and, under the prompt, the mode, model and effort in place of Claude Code's hint
-// row. Above the prompt it previews the images pasted into the draft. The thread is drawn after
-// OpenCode's: prompts as raised panels, replies as plain text, tool calls as quiet lines or panels,
-// and a footer under each reply. Beyond that it only watches: every event hook passes its event on.
+// one), its subagents (a press opens their timeline, and a press on a lane opens that subagent's
+// transcript) and the MCP servers it has tools from; and, under the prompt, the model, the effort,
+// the project's folder and the context's fill in place of Claude Code's hint row. Above the prompt
+// it lists the prompts waiting for the running turn and previews the images pasted into the
+// draft. The thread is drawn after OpenCode's: prompts as raised panels, replies as plain text,
+// tool calls as quiet lines or panels, and a footer under each reply. Beyond that it only watches:
+// every event hook passes its event on.
 import { atom, read, update } from 'claude-code';
 import type { ElementTable, EngineInterface, Register, RenderChildren } from 'claude-code';
 
-import type { Agent, Breakdown, Local, Main, Prompt, Rail, Status, Usage } from '../types';
+import type { Agent, Breakdown, Local, Main, Prompt, Rail, Status, Turn, Usage } from '../types';
 import type { Left, Thumb, ToolRow } from './core';
 import {
   BRANCH_ICON,
   ZERO,
   add,
+  agentColor,
   agentType,
   alarm,
   breakdownOf,
+  capped,
   changesOf,
   clean,
   clipLines,
@@ -33,6 +37,7 @@ import {
   fromBase64,
   hitRate,
   imagesIn,
+  isPanel,
   keptFable,
   lanes,
   level,
@@ -51,6 +56,7 @@ import {
   shorten,
   spansOf,
   tally,
+  textAt,
   thumbOf,
   tileOf,
   tilde,
@@ -92,6 +98,8 @@ const RIGHT = 22;
 // raised panel, and a footer under the reply naming the model and how long the turn took.
 /** The accent: the bar beside the person's prompt, the name in a reply's footer, what moves while a turn works. */
 const FRAME = 'bashBorder';
+/** The tick on something that ended well: a finished agent, a tool that answered. */
+const DONE = 'success';
 /** Quiet lettering: a tool's line, a panel's title, a table's rules. */
 const MUTED = 'inactive';
 /** The ground of a raised panel, which the theme has no key for: Catppuccin Mocha's mantle. */
@@ -101,6 +109,8 @@ const INSET = 3;
 /** The lines of a command's output, and of a written file, a panel shows before it says how many more. */
 const SHOWN_LINES = 10;
 const SHOWN_EXPANDED = 200;
+/** The lines of what a call failed with that its line shows under it. */
+const SHOWN_FAILURE = 3;
 /** The lines of a command itself a panel shows: a script written into one is long. */
 const SHOWN_COMMAND = 3;
 /** The thick bar's glyph: three eighths of a block, as this font draws the heavy line `┃` thin. */
@@ -116,13 +126,15 @@ const THUMB_COLUMNS = 80;
 const CELL_RATIO = 2.85;
 /** How often the prompt box is read for the images its draft names: a paste raises no event. */
 const DRAFT_EVERY_MS = 200;
-/** The prompts whose time is kept, the latest; and those waiting to be taken in, which are few. */
+/** The prompts the conversation took in that are kept, the latest; and the typed ones kept, which are few. */
 const KEPT_SENT = 200;
 const KEPT_TYPED = 50;
+/** The least characters of a waiting prompt that tell it apart inside a longer row. */
+const TOLD_APART = 8;
 /** The footers whose figures are kept, the latest. */
 const KEPT_FOOTERS = 200;
 /** Tools that can change the working tree: the uncommitted lines are counted again after one ran. */
-const WRITES = new Set(['Edit', 'Write', 'NotebookEdit', 'Bash']);
+const WRITES = new Set(['Edit', 'MultiEdit', 'Write', 'NotebookEdit', 'Bash']);
 
 /** A subagent on the timeline: its glyph, and the colour its kind has in the counts above. */
 const GLYPH: Record<Status, string> = { running: '◐', done: '✓', failed: '✗', stopped: '■' };
@@ -155,7 +167,15 @@ const MAIN: Main = {
   total: ZERO,
 };
 /** A turn before its first request. */
-const TURN = { steps: 0, output: 0, ms: 0, last: null, isClaimed: false };
+const TURN: Turn & { n: number; isClaimed: boolean } = {
+  n: 0,
+  model: '',
+  steps: 0,
+  output: 0,
+  ms: 0,
+  last: null,
+  isClaimed: false,
+};
 const USAGE: Usage = {
   startedAt: 0,
   tokens: null,
@@ -181,8 +201,8 @@ const rail = atom({ plugin: 'sidebar', key: 'rail' } as const, RAIL, { shape: 'r
 const typed = atom({ plugin: 'sidebar', key: 'typed' } as const, []);
 const sent = atom({ plugin: 'sidebar', key: 'sent' } as const, {});
 const draft = atom({ plugin: 'sidebar', key: 'draft' } as const, []);
-const turn = atom({ plugin: 'sidebar', key: 'turn' } as const, TURN);
-const footers = atom({ plugin: 'sidebar', key: 'footers' } as const, {});
+const turn = atom({ plugin: 'sidebar', key: 'turn' } as const, TURN, { shape: 'turn-2' });
+const footers = atom({ plugin: 'sidebar', key: 'footers' } as const, {}, { shape: 'footers-2' });
 const fable = atom({ plugin: 'sidebar', key: 'fable' } as const, null);
 const isContextOpen = atom({ plugin: 'sidebar', key: 'isContextOpen' } as const, false);
 const isRailOpen = atom({ plugin: 'sidebar', key: 'isRailOpen' } as const, false);
@@ -192,14 +212,16 @@ const isAgentsOpen = atom({ plugin: 'sidebar', key: 'isAgentsOpen' } as const, f
 /** Whether a reading moved. One that did not is not written, so nothing is redrawn for it. */
 const differs = (known: unknown, next: unknown) => JSON.stringify(known) !== JSON.stringify(next);
 
-// What the transcript says of the person's prompts while it draws them: the ones not yet on the
-// rail, the part of each that is on screen, and the last to leave it. A drawing may not write
+// What the transcript says of the person's prompts while it draws them: those drawn since the rail
+// was last written, the part of each that is on screen, and the last to leave it. A drawing may not write
 // state, so the reports are kept here and written to the rail from a timer; a reload starts them
 // over, and the transcript says them again as it redraws.
 const seen = new Map<string, string>();
 const shown = new Map<string, { first: number; last: number; of: number }>();
 let left: Left | undefined;
 let isDue = false;
+/** The rail is written by one publish at a time: a second that started on the first's reading would put its prompts out of order. */
+let publishing: Promise<void> = Promise.resolve();
 
 /**
  * Prints, of the ids it is given, those the session's transcript file holds, in the file's order:
@@ -314,6 +336,9 @@ const refreshLocal = async ($: EngineInterface) => {
     $.session.version(),
     gitChanges($),
   ]);
+  // The session's folders move with a `/cd` or a worktree, and no session.start follows.
+  rootdir = root;
+  workdir = await $.session.cwd().catch(() => workdir);
   const next = { ...whereOf(revParse, root), version: version.version, changes };
   if (differs(await read($, local), next)) await update($, local, () => next);
 };
@@ -373,7 +398,7 @@ const refreshFable = async ($: EngineInterface) => {
 
 /** Asks from a timer, off the event that noticed the limit may have moved: a request must not hold a turn up. */
 const scheduleFable = ($: EngineInterface) => {
-  $.clock.after(0, () => void refreshFable($));
+  $.clock.after(0, () => void refreshFable($).catch(() => undefined));
 };
 
 /** Everything read at a turn's edges; the window by category only where the context has just moved. */
@@ -516,6 +541,29 @@ const strip = async (
   );
 };
 
+/**
+ * A quiet line set in with the reply: a mark two cells wide, what it says, and under it, set in
+ * past the mark, anything more.
+ */
+const quiet = (
+  els: ElementTable<'terminal'>,
+  key: string,
+  mark: RenderChildren,
+  line: RenderChildren,
+  under: RenderChildren = null,
+  marginTop = 0,
+) => (
+  <els.Box key={key} flexDirection="column" paddingLeft={INSET} marginTop={marginTop}>
+    <els.Box flexDirection="row">
+      <els.Box width={2} flexShrink={0}>
+        {mark}
+      </els.Box>
+      {line}
+    </els.Box>
+    {under === null ? null : <els.Box paddingLeft={2}>{under}</els.Box>}
+  </els.Box>
+);
+
 /** A raised panel: a column for a bar (a prompt has one, a tool's is left blank) and its content. */
 const panel = (
   els: ElementTable<'terminal'>,
@@ -548,7 +596,11 @@ const panel = (
 
 const TODO: Record<string, string> = { completed: '✓', in_progress: '•', cancelled: '✗' };
 
-/** One tool call: a quiet line, or a panel. What it failed with is under it, in the error's colour. */
+/**
+ * One tool call: a quiet line, or a panel. What it failed with is under it, in the error's colour.
+ * A line given a `live` colour is one whose work is still going on: it is lettered in that colour,
+ * in bold, under a turning dot.
+ */
 const toolView = (
   els: ElementTable<'terminal'>,
   key: string,
@@ -560,37 +612,34 @@ const toolView = (
     isExpanded?: boolean;
     output?: unknown;
   },
+  live?: string,
 ) => {
   const { Box, Client, Code, Text } = els;
-  const failure =
-    call.isErrored && typeof call.output === 'string' ? clipLines(call.output, 3) : undefined;
   const tone = call.isErrored ? 'error' : MUTED;
   // The ctrl+o transcript and a verbose session ask for everything: a panel then shows far more.
   const shown = call.isExpanded === true ? SHOWN_EXPANDED : SHOWN_LINES;
   const more = call.isExpanded === true ? '' : ' · ctrl+o for more';
+  const failure =
+    call.isErrored && typeof call.output === 'string'
+      ? clipLines(call.output, call.isExpanded === true ? SHOWN_EXPANDED : SHOWN_FAILURE, more)
+      : undefined;
   if (row.kind === 'inline')
-    return (
-      <Box key={key} flexDirection="column" paddingLeft={INSET}>
-        <Box flexDirection="row">
-          <Box width={2} flexShrink={0}>
-            {call.isRunning ? (
-              <Client
-                key={`${key}-pulse`}
-                module="./pulse.tsx"
-                props={{ kind: 'dots', color: MUTED }}
-              />
-            ) : (
-              <Text color={tone}>{row.icon}</Text>
-            )}
-          </Box>
-          <Text color={tone}>{call.isInterrupted ? `${row.text} · interrupted` : row.text}</Text>
-        </Box>
-        {failure === undefined ? null : (
-          <Box paddingLeft={2}>
-            <Text color="error">{failure}</Text>
-          </Box>
-        )}
-      </Box>
+    return quiet(
+      els,
+      key,
+      call.isRunning || live !== undefined ? (
+        <Client
+          key={`${key}-pulse`}
+          module="./pulse.tsx"
+          props={{ kind: 'dots', color: live ?? MUTED }}
+        />
+      ) : (
+        <Text color={row.icon === '✓' && !call.isErrored ? DONE : tone}>{row.icon}</Text>
+      ),
+      <Text color={live ?? tone} bold={live !== undefined}>
+        {call.isInterrupted ? `${row.text} · interrupted` : row.text}
+      </Text>,
+      failure === undefined ? null : <Text color="error">{failure}</Text>,
     );
   if (row.kind === 'shell')
     return panel(els, key, undefined, [
@@ -634,6 +683,22 @@ const toolView = (
 /** The rows each prompt's panel takes, as the transcript last told them, and the width it told them at. */
 const tall = new Map<string, { rows: number; columns: number | undefined }>();
 
+/** The footers that have been drawn since their turn ended: each has had its one chance at the turn's figures. */
+const footed = new Set<string>();
+
+/**
+ * Keeps turn `n`'s figures under a footer's id, if that turn is still the last and no footer has
+ * taken them: the check is made as the claim is written, since a drawing only schedules it.
+ */
+const claim = async ($: EngineInterface, id: string, n: number, figures: Turn) => {
+  let hasWon = false;
+  await update($, turn, (t) => {
+    hasWon = t.n === n && !t.isClaimed;
+    return hasWon ? { ...t, isClaimed: true } : t;
+  });
+  if (hasWon) await update($, footers, (known) => capped(known, id, figures, KEPT_FOOTERS));
+};
+
 /** The working directory, which a tool's path is told from, and the person's home folder. */
 let workdir = '';
 let home = '';
@@ -662,7 +727,15 @@ const watchDraft = ($: EngineInterface) => {
 };
 
 /**
- * Changes one agent's card. A loop with no card (a workflow's agent, a compaction) writes nothing,
+ * Runs a reading of the session once the event that asked for it has gone on: git and the usage
+ * figures are not worth holding a prompt, a turn's end or a tool's answer for.
+ */
+const later = ($: EngineInterface, work: () => Promise<unknown>) => {
+  $.clock.after(0, () => void work().catch(() => undefined));
+};
+
+/**
+ * Changes one agent's card. A loop with no card (a compaction, an agent older than those kept) writes nothing,
  * and neither does a change that hands the card back as it was.
  */
 const patchAgent = async ($: EngineInterface, id: string, change: (a: Agent) => Agent) => {
@@ -674,7 +747,7 @@ const patchAgent = async ($: EngineInterface, id: string, change: (a: Agent) => 
 export const register: Register = (on) => {
   on('session.start', async ($, e, next) => {
     await $.command.register({ name: 'sidebar', description: 'Open the session sidebar' });
-    void $.ui.open(OPEN);
+    void $.ui.open(OPEN).catch(() => undefined);
     watchDraft($);
     workdir = e.cwd;
     rootdir = await $.session.root().catch(() => e.cwd);
@@ -692,17 +765,27 @@ export const register: Register = (on) => {
     return { text: opened.isPlaced ? 'Sidebar opened.' : `Sidebar is waiting: ${opened.reason}` };
   });
 
-  // A /clear starts a fresh conversation: its counters, its context and its subagents start over with it.
+  // A /clear starts a fresh conversation, and a resume another: its counters, its context, its
+  // prompts and its subagents start over with it.
   on('session.end', async ($, e, next) => {
-    if (e.reason === 'clear') {
+    // The process goes on under a new session id, and no session.start fires for it: what was
+    // found by the old id (the transcript file, the folder of pasted images) is looked for again.
+    if (e.reason === 'clear' || e.reason === 'resume') {
       const now = await $.clock.now();
       await update($, main, (m) => ({ ...MAIN, model: m.model, effort: m.effort, mode: m.mode }));
       await update($, usage, (u) => ({ ...u, startedAt: now, tokens: null, percent: null }));
       await update($, breakdown, (b) => ({ ...b, categories: [] }));
       await update($, agents, () => []);
+      await update($, typed, () => []);
+      await update($, turn, (t) => ({ ...TURN, n: t.n + 1 }));
       seen.clear();
       shown.clear();
+      tall.clear();
+      tiles.clear();
       left = undefined;
+      transcript = undefined;
+      folder = undefined;
+      isOrdered = false;
       await update($, rail, () => RAIL);
     }
 
@@ -727,7 +810,9 @@ export const register: Register = (on) => {
       }
       if (!isDue) {
         isDue = true;
-        $.clock.after(0, () => void publish($));
+        $.clock.after(0, () => {
+          publishing = publishing.then(() => publish($)).catch(() => undefined);
+        });
       }
       // The terminal's row is ours: a raised panel behind a thick bar, the pasted images over the
       // text and a badge under it for each file it names. One still waiting in the queue is gray.
@@ -775,35 +860,33 @@ export const register: Register = (on) => {
   );
 
   // The other rows that come in as the person's: the notice a background task ended with, and a
-  // message another agent sent. Each is a quiet line under a mark, as a tool's is; the message's
-  // text is under it where the view draws rows in full (ctrl+o).
+  // message another agent sent. Each is a quiet line under a mark, as a tool's is, with an empty
+  // row above it to set it off; the message's text is under it where the view draws rows in full
+  // (ctrl+o).
   on('ui.render', { component: 'UserMessage' }, ($, e, next) => {
     const { task, from, origin, text, isExpanded } = e.props;
     if (e.surface !== 'terminal' || origin.kind === 'composer') return next(e);
     if (origin.kind !== 'task-notification' && from === undefined) return next(e);
-    const { Box, Text } = $.ui.resolve(e);
+    const els = $.ui.resolve(e);
+    const { Text } = els;
     const isNotice = origin.kind === 'task-notification';
-    const hasFailed = isNotice && task?.status !== undefined && task.status !== 'completed';
+    // A task's status is its producer's word: only these two say it went wrong.
+    const hasFailed = isNotice && (task?.status === 'failed' || task?.status === 'killed');
     const tone = hasFailed ? 'error' : MUTED;
     const took = task?.durationMs === undefined ? '' : ` · ${fmtTook(task.durationMs)}`;
     const said = isNotice
       ? `${clean(text)}${took}`
       : `Message from ${from?.name ?? ''}${isExpanded ? '' : ' · ctrl+o to expand'}`;
 
-    return (
-      <Box key="notice" flexDirection="column" paddingLeft={INSET}>
-        <Box flexDirection="row">
-          <Box width={2} flexShrink={0}>
-            <Text color={tone}>{isNotice ? (hasFailed ? '✗' : '✓') : '›'}</Text>
-          </Box>
-          <Text color={tone}>{said}</Text>
-        </Box>
-        {isNotice || !isExpanded ? null : (
-          <Box paddingLeft={2}>
-            <Text color={MUTED}>{text.trim()}</Text>
-          </Box>
-        )}
-      </Box>
+    return quiet(
+      els,
+      'notice',
+      <Text color={isNotice && !hasFailed ? DONE : tone}>
+        {isNotice ? (hasFailed ? '✗' : '✓') : '›'}
+      </Text>,
+      <Text color={tone}>{said}</Text>,
+      isNotice || !isExpanded ? null : <Text color={MUTED}>{text.trim()}</Text>,
+      1,
     );
   });
 
@@ -835,8 +918,16 @@ export const register: Register = (on) => {
   // When a prompt leaves the composer, and whether it has to wait for the turn that is running.
   on('prompt.submit', { origin: { kind: 'composer' } }, async ($, e, next) => {
     const text = e.text.trim();
-    const entry = { text, at: await $.clock.now(), isQueued: e.turnId !== undefined };
-    await update($, typed, (list) => [...list, entry].slice(-KEPT_TYPED));
+    const isQueued = e.turnId !== undefined;
+    const entry = { text, at: await $.clock.now(), isQueued };
+    // A prompt typed while nothing runs finds an empty queue: one still marked as waiting was taken
+    // in unseen, or taken back into the box.
+    await update($, typed, (list) =>
+      [
+        ...(isQueued ? list : list.map((t) => (t.isQueued ? { ...t, isQueued: false } : t))),
+        entry,
+      ].slice(-KEPT_TYPED),
+    );
     const entered = await next(e);
     if ('drop' in entered)
       await update($, typed, (list) => list.filter((t) => t.text !== text || t.at !== entry.at));
@@ -845,7 +936,7 @@ export const register: Register = (on) => {
   });
 
   // The conversation takes a prompt in, as a turn's first row or handed to the turn that is running:
-  // its row is known by its id from here on, with the time it was typed.
+  // its row is known by its id from here on, and the prompt no longer waits.
   on('session.append', async ($, e, next) => {
     const { message } = e;
     const isPrompt = e.door === 'prompt' && message.type === 'user' && message.isMeta !== true;
@@ -854,9 +945,15 @@ export const register: Register = (on) => {
     if (e.agentId !== undefined || !(isPrompt || isHandedIn)) return next(e);
     const body = message.content
       .map((block) => (typeof block.text === 'string' ? block.text : ''))
-      .join('\n');
+      .join('\n')
+      .trim();
     const waiting = await read($, typed);
-    const match = waiting.findLast((t) => body.includes(t.text));
+    // The row is the prompt as typed, or wraps it in the engine's framing where it is handed to a
+    // running turn. Only a waiting prompt long enough to be told is looked for inside a row: a
+    // short one ("ok") is in a great many.
+    const match =
+      waiting.findLast((t) => t.text === body) ??
+      waiting.findLast((t) => t.isQueued && t.text.length >= TOLD_APART && body.includes(t.text));
     const at = match?.at ?? (isPrompt ? await $.clock.now() : undefined);
     if (match !== undefined)
       await update($, typed, (list) =>
@@ -865,11 +962,7 @@ export const register: Register = (on) => {
         ),
       );
     if (at !== undefined)
-      await update($, sent, (known) =>
-        Object.fromEntries(
-          [...Object.entries(known), [rowKey(e.uuid), at] as const].slice(-KEPT_SENT),
-        ),
-      );
+      await update($, sent, (known) => capped(known, rowKey(e.uuid), at, KEPT_SENT));
 
     return next(e);
   });
@@ -918,19 +1011,47 @@ export const register: Register = (on) => {
     if (row === null) return next(e);
     if (row.kind !== 'inline' || (e.props.tool !== 'Agent' && e.props.tool !== 'Task'))
       return toolView($.ui.resolve(e), 'tool', row, e.props);
-    // A subagent's line also says which model ran it and, once it has ended, how long it took.
-    const card = (await read($, agents)).findLast((a) => row.text.endsWith(a.title));
-    const told =
-      card === undefined
-        ? ''
-        : ` · ${prettyModel(card.model)}${card.endedAt === null ? '' : ` · ${fmtTook(card.endedAt - card.spawnedAt)}`}`;
-    return toolView($.ui.resolve(e), 'tool', { ...row, text: `${row.text}${told}` }, e.props);
+    // A subagent's line also says which model ran it and, once it has ended, how long it took. Its
+    // card is the one of the agent the call launched, which the call's answer names; a call with no
+    // answer to name it is told by its description.
+    const cards = await read($, agents);
+    const launched = textAt(e.props.output, 'agentId');
+    const card =
+      launched === undefined
+        ? cards.findLast((a) => row.text.endsWith(a.title))
+        : cards.find((a) => a.id === launched);
+    const told = [
+      card === undefined ? '' : prettyModel(card.model),
+      card === undefined || card.endedAt === null ? '' : fmtTook(card.endedAt - card.spawnedAt),
+    ]
+      .filter((part) => part !== '')
+      .map((part) => ` · ${part}`)
+      .join('');
+    // The call itself answers as soon as the subagent is launched: while the subagent still runs,
+    // its line stands out in its type's colour, and one that failed or was stopped says so.
+    const live = card?.status === 'running' ? agentColor(card.type) : undefined;
+    const hasFailed = card?.status === 'failed' || card?.status === 'stopped';
+    const els = $.ui.resolve(e);
+    // An empty row above it, running or done, so the line does not move when the subagent ends.
+    return (
+      <els.Box flexDirection="column" marginTop={1}>
+        {toolView(
+          els,
+          'tool',
+          { ...row, icon: hasFailed ? '✗' : row.icon, text: `${row.text}${told}` },
+          { ...e.props, isErrored: e.props.isErrored || hasFailed },
+          live,
+        )}
+      </els.Box>
+    );
   });
 
-  // What a call answered is in its own row or panel above, so the row under it draws nothing.
+  // What a call answered is in its panel above, so the row under it draws nothing. A one-line row
+  // holds no answer: where the view draws rows in full (ctrl+o), its result stays Claude Code's.
   on('ui.render', { component: 'ToolResult' }, ($, e, next) => {
-    if (e.surface !== 'terminal' || toolRowOf(e.props.tool, undefined, e.props.output, '') === null)
-      return next(e);
+    const { tool, output, isExpanded } = e.props;
+    if (e.surface !== 'terminal' || toolRowOf(tool, undefined, output, '') === null) return next(e);
+    if (isExpanded === true && !isPanel(tool)) return next(e);
     const { Box } = $.ui.resolve(e);
     return <Box />;
   });
@@ -944,8 +1065,9 @@ export const register: Register = (on) => {
       call,
       row: toolRowOf(call.tool, call.input, call.output, workdir),
     }));
-    if (rows.some(({ row }) => row === null)) return next(e);
-    return (
+    return rows.some(({ row }) => row === null) ? (
+      next(e)
+    ) : (
       <els.Box flexDirection="column">
         {rows.map(({ call, row }, i) =>
           row === null ? null : toolView(els, `tool-${i}`, row, call),
@@ -955,47 +1077,55 @@ export const register: Register = (on) => {
   });
 
   // The footer under a reply: who answered, with which model, how long the turn took and how fast it
-  // wrote; under it, the turn's requests and tokens. A footer takes the figures of the turn that
-  // has just ended the first time it is drawn, and keeps them under its own id.
+  // wrote; under it, the turn's requests and tokens.
+  //
+  // A footer has no figures of its own: the first time it is drawn after its turn has ended, it
+  // takes those of the turn that has just ended and keeps them under its id. Only that first
+  // drawing may: a later one would take the figures of whichever turn ended since.
   on('ui.render', { component: 'TurnDuration' }, async ($, e, next) => {
-    if (e.surface !== 'terminal') return next(e);
-    const { Box, Text } = $.ui.resolve(e);
-    // A turn that ended with agents still at work in the background says so, in the same quiet line.
     const waiting = e.props.waitingFor;
-    if (waiting !== undefined) {
-      const count = waiting.agents.length + waiting.workflows;
-      return (
-        <Box key="waiting" flexDirection="row" paddingLeft={INSET} marginTop={1}>
-          <Box width={2} flexShrink={0}>
-            <Text color={MUTED}>│</Text>
-          </Box>
-          <Text color={MUTED}>
-            {`Waiting for ${count} background ${count === 1 ? 'agent' : 'agents'} to finish`}
-          </Text>
-        </Box>
-      );
-    }
-    const { model, turnStartedAt } = await read($, main);
+    // A workflow's end is not told to the plugin, so a row that waits on one stays Claude Code's.
+    if (e.surface !== 'terminal' || (waiting !== undefined && waiting.workflows > 0))
+      return next(e);
+    const els = $.ui.resolve(e);
+    const { Box, Text } = els;
     const id = e.requestId;
-    const kept = (await read($, footers))[id];
-    const ended = await read($, turn);
-    const isFresh =
-      kept === undefined && turnStartedAt === null && !ended.isClaimed && ended.steps > 0;
-    if (isFresh)
-      $.clock.after(0, () => {
-        void (async () => {
-          const { isClaimed: _, ...figures } = ended;
-          await update($, turn, (t) => ({ ...t, isClaimed: true }));
-          await update($, footers, (known) =>
-            Object.fromEntries(
-              [...Object.entries(known), [id, figures] as const].slice(-KEPT_FOOTERS),
-            ),
-          );
-        })();
-      });
-    const { rate, tokens } = footerOf(kept ?? (isFresh ? ended : undefined));
+    let figures: Turn | undefined = (await read($, footers))[id];
+    if (figures === undefined && !footed.has(id)) {
+      const [{ turnStartedAt }, ended] = await Promise.all([read($, main), read($, turn)]);
+      // While the turn still runs there is nothing to take yet: the next drawing asks again.
+      if (turnStartedAt === null) {
+        footed.add(id);
+        if (!ended.isClaimed && ended.steps > 0) {
+          const { n, isClaimed: _, ...own } = ended;
+          figures = own;
+          $.clock.after(0, () => void claim($, id, n, own).catch(() => undefined));
+        }
+      }
+    }
+    // A turn that ended with agents still at work in the background says so, in the same quiet
+    // line. The row keeps what it waited on from when it was first drawn: once none of those
+    // agents is still running it is the turn's footer, as any other.
+    const cards = waiting === undefined ? [] : await read($, agents);
+    const pending = (waiting?.agents ?? []).filter(
+      (a) => cards.find((card) => card.id === a.id)?.status === 'running',
+    ).length;
+    if (pending > 0)
+      return quiet(
+        els,
+        'waiting',
+        <Text color={MUTED}>│</Text>,
+        <Text color={MUTED}>
+          {`Waiting for ${pending} background ${pending === 1 ? 'agent' : 'agents'} to finish`}
+        </Text>,
+        null,
+        1,
+      );
+    const { rate, tokens } = footerOf(figures);
+    // The model is the one that answered this turn, where the footer has its figures: the session's
+    // may have changed since.
     const parts = [
-      model === '' ? '' : prettyModel(model),
+      figures === undefined || figures.model === '' ? '' : prettyModel(figures.model),
       fmtTook(e.props.durationMs),
       rate,
     ].filter((part) => part !== '');
@@ -1027,7 +1157,7 @@ export const register: Register = (on) => {
           <Client
             key="took"
             module="./elapsed.tsx"
-            props={{ since: turnStartedAt, now, endAt: null, color: MUTED }}
+            props={{ since: turnStartedAt, now, color: MUTED }}
           />
         )}
         <Text color={MUTED}>esc interrupt</Text>
@@ -1053,16 +1183,15 @@ export const register: Register = (on) => {
   // A notice under the logo: one quiet line under a mark.
   on('ui.render', { component: 'InfoNotice' }, ($, e, next) => {
     if (e.surface !== 'terminal') return next(e);
-    const { Box, Text } = $.ui.resolve(e);
-    return (
-      <Box key="notice" flexDirection="row" paddingLeft={INSET}>
-        <Box width={2} flexShrink={0}>
-          <Text color={MUTED}>◈</Text>
-        </Box>
-        <Text color={MUTED}>
-          {e.props.command === null ? e.props.text : `${e.props.text} ${e.props.command}`}
-        </Text>
-      </Box>
+    const els = $.ui.resolve(e);
+    const { Text } = els;
+    return quiet(
+      els,
+      'notice',
+      <Text color={MUTED}>◈</Text>,
+      <Text color={MUTED}>
+        {e.props.command === null ? e.props.text : `${e.props.text} ${e.props.command}`}
+      </Text>,
     );
   });
 
@@ -1087,8 +1216,8 @@ export const register: Register = (on) => {
     if (id === undefined) {
       const now = await $.clock.now();
       await update($, main, (m) => ({ ...m, turnStartedAt: now }));
-      await update($, turn, () => TURN);
-      await refresh($);
+      await update($, turn, (t) => ({ ...TURN, n: t.n + 1 }));
+      later($, () => refresh($));
     } else {
       // A finished agent that was sent a message runs again.
       await patchAgent($, id, (a) =>
@@ -1125,6 +1254,7 @@ export const register: Register = (on) => {
       }));
       await update($, turn, (t) => ({
         ...t,
+        model: e.model,
         steps: t.steps + 1,
         output: t.output + spent.output,
         ms: t.ms + took,
@@ -1137,7 +1267,7 @@ export const register: Register = (on) => {
 
   on('tool.call', async ($, e, next) => {
     const ran = await next(e);
-    if (WRITES.has(String(e.tool))) await refreshChanges($);
+    if (WRITES.has(String(e.tool))) later($, () => refreshChanges($));
 
     return ran;
   });
@@ -1168,7 +1298,7 @@ export const register: Register = (on) => {
     const id = e.agentId;
     if (id === undefined) {
       await update($, main, (m) => ({ ...m, turnStartedAt: null }));
-      await refresh($, true);
+      later($, () => refresh($, true));
     } else {
       const now = await $.clock.now();
       const status: Status =
@@ -1266,18 +1396,18 @@ export const register: Register = (on) => {
       read($, rail),
       read($, fable),
       $.clock.now(),
-      $.session.turns(),
+      $.session.turns().catch(() => 0),
       read($, isMcpOpen),
       $.tool.list().catch(() => []),
     ]);
-    // One cell of padding all around the pane: the body less a column each side.
+    // The pane's padding at its sides: the body less those cells each side.
     const W = Math.max(12, e.props.bodyColumns - PAD_X * 2);
     const viewed = e.props.view.agentId;
 
     // A clock that ticks by itself where the surface runs surface modules, a reading elsewhere.
     const clock = (key: string, since: number, color: string) =>
       'Client' in els ? (
-        <els.Client key={key} module="./elapsed.tsx" props={{ since, now, endAt: null, color }} />
+        <els.Client key={key} module="./elapsed.tsx" props={{ since, now, color }} />
       ) : (
         <Text color={color}>{fmtClock(now - since)}</Text>
       );
@@ -1577,7 +1707,7 @@ export const register: Register = (on) => {
     // a lane a subagent on one time axis (its glyph, name, run and clock) over its agent type and model.
     const counts = tally(list);
     // As many as the room leaves at two rows each, so the timeline is not cut off at the bottom: the
-    // padding's two rows, the five gaps between sections, the title, the model, the sections above and
+    // padding's two rows, the five gaps between sections, the title, the model, the other sections and
     // this one's own three rows (its header, the space under it and its counts), with one more kept
     // for the count of those left out. At most a lane a digit.
     const room =
