@@ -1,8 +1,15 @@
-import { existsSync, statSync } from 'node:fs';
-import { mkdir, rm } from 'node:fs/promises';
-import { join } from 'node:path';
+import { existsSync, rmSync, statSync } from 'node:fs';
+import { mkdir, rename, rm } from 'node:fs/promises';
+import { basename, dirname, join } from 'node:path';
 
 import { ensureAppControl } from './app';
+import {
+  buildContainer,
+  requireBranchCli,
+  writeCopyFromContainer,
+  type BranchTarget,
+  type Container,
+} from './branch-copy';
 import { truncateToBytes } from './bytes';
 import { acquireAppLock, type AppLock } from './lock';
 import { log } from './logger';
@@ -44,7 +51,12 @@ export function shortError(message: string): string {
 
 let scriptCounter = 0;
 
-export function createHeadlessEngine(config: Config, file: string): Engine {
+/** `branch`: the file is a branch copy, and a write goes through a branch tab. */
+export function createHeadlessEngine(
+  config: Config,
+  file: string,
+  branch: BranchTarget | null = null,
+): Engine {
   return {
     mode: 'headless',
     close: async () => {},
@@ -52,6 +64,10 @@ export function createHeadlessEngine(config: Config, file: string): Engine {
       // A missing file starts from a new document, which only makes sense for a write.
       if (!write && !existsSync(file)) {
         return { ok: false, error: `design file not found: ${file}`, failedStep: null };
+      }
+
+      if (write && branch) {
+        return runOnBranchTab(config, file, branch, commands);
       }
 
       await mkdir(config.tempDir, { recursive: true });
@@ -87,6 +103,79 @@ export function createHeadlessEngine(config: Config, file: string): Engine {
         await rm(script, { force: true });
       }
     },
+  };
+}
+
+/**
+ * Writes a branch copy in one `figcraft-cli run`: the copy is opened as a branch tab of a
+ * container, and `--out` writes that tab as a plain design file next to the copy.
+ */
+async function runOnBranchTab(
+  config: Config,
+  file: string,
+  branch: BranchTarget,
+  commands: Command[],
+): Promise<RunResult> {
+  let container: Container;
+
+  try {
+    requireBranchCli(config);
+    container = await buildContainer(config, branch, file);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+
+    return { ok: false, error: shortError(message), failedStep: null };
+  }
+
+  scriptCounter += 1;
+
+  const script = join(config.tempDir, `script-${process.pid}-${scriptCounter}.json`);
+  // FigCraft picks the format by the extension, so the temporary file ends in .figcraft.
+  const temporary = join(dirname(file), `.${basename(file)}.${process.pid}-${scriptCounter}.figcraft`);
+
+  try {
+    await Bun.write(
+      script,
+      JSON.stringify([{ command: 'branch.open', params: { id: container.id } }, ...commands]),
+    );
+
+    const child = Bun.spawn(
+      [config.figcraftBin, 'run', '--in', container.path, '--out', temporary, script],
+      { stdout: 'pipe', stderr: 'pipe' },
+    );
+    const [stdout, stderr, code] = await Promise.all([
+      new Response(child.stdout).text(),
+      new Response(child.stderr).text(),
+      child.exited,
+    ]);
+    const result = withoutFirstStep(parseRunOutput(stdout, stderr, code));
+
+    if (result.ok) {
+      await rename(temporary, file);
+    }
+
+    return result;
+  } finally {
+    await rm(script, { force: true });
+    await rm(temporary, { force: true });
+    await rm(container.path, { force: true });
+  }
+}
+
+/** Hides the `branch.open` step in front: the caller's first command is step 0 again. */
+export function withoutFirstStep(result: RunResult): RunResult {
+  if (result.ok) {
+    return { ok: true, steps: result.steps.slice(1) };
+  }
+
+  if (result.failedStep === null || result.failedStep === 0) {
+    return { ...result, failedStep: null };
+  }
+
+  return {
+    ok: false,
+    error: result.error.replace(/step (\d+)/g, (_, step: string) => `step ${Number(step) - 1}`),
+    failedStep: result.failedStep - 1,
   };
 }
 
@@ -145,10 +234,13 @@ export function createSessionEngine(
   file: string,
   spawn: (config: Config) => LiveProcess = (settings) =>
     Bun.spawn([settings.figcraftBin, 'mcp'], { stdin: 'pipe', stdout: 'pipe', stderr: 'inherit' }),
+  branch: BranchTarget | null = null,
 ): Engine {
   let client: RpcClient | null = null;
   // The file as it was when the session read or wrote it; null before the first read.
   let loaded: string | null = null;
+  // A branch copy's container, once the session wrote: the copy is open as its branch tab.
+  let container: Container | null = null;
 
   const onDisk = (): string => {
     try {
@@ -164,18 +256,33 @@ export function createSessionEngine(
     client?.stop();
     client = null;
     loaded = null;
+
+    if (container) {
+      rmSync(container.path, { force: true });
+      container = null;
+    }
   };
 
-  /** Makes the session's document the file as it is on disk now. */
-  const sync = async (): Promise<RpcClient> => {
+  /**
+   * Makes the session's document the file as it is on disk now. `tab`: a branch copy about to be
+   * written, which the session opens as the branch tab of a container. Reads take either.
+   */
+  const sync = async (tab: boolean): Promise<RpcClient> => {
     const current = onDisk();
 
-    if (client && loaded === current) {
+    if (client && loaded === current && (!tab || container)) {
       return client;
     }
 
     // Someone else wrote the file (the app, another tool): start again from what is on disk.
     stop();
+
+    let made: Container | null = null;
+
+    if (tab && branch) {
+      requireBranchCli(config);
+      made = await buildContainer(config, branch, file);
+    }
 
     const started = new RpcClient(spawn(config), Math.max(config.requestTimeoutMs, SESSION_TIMEOUT_MS));
 
@@ -187,21 +294,30 @@ export function createSessionEngine(
       });
       started.notify('notifications/initialized');
 
-      if (current !== 'missing') {
+      if (made) {
+        await started.tool('open_file', { path: made.path });
+        await started.tool('run_command', { command: 'branch.open', params: { id: made.id } });
+      } else if (current !== 'missing') {
         await started.tool('open_file', { path: file });
       }
     } catch (error) {
       started.stop();
+
+      if (made) {
+        rmSync(made.path, { force: true });
+      }
+
       throw error;
     }
 
     client = started;
     loaded = current;
+    container = made;
 
     return started;
   };
 
-  const oneOff = createHeadlessEngine(config, file);
+  const oneOff = createHeadlessEngine(config, file, branch);
 
   return {
     mode: 'headless',
@@ -221,12 +337,24 @@ export function createSessionEngine(
       }
 
       try {
-        const session = await sync();
+        const session = await sync(write && branch !== null);
         // A failed batch is rolled back by FigCraft, so the open document stays the saved one.
         const results = await session.tool('batch', { commands, onError: 'abort' });
         const list = Array.isArray(results) ? results : [];
 
-        if (write) {
+        if (write && container) {
+          // On a branch tab save_file writes the container; the copy is written from it.
+          try {
+            await session.tool('save_file', { path: container.path });
+            await writeCopyFromContainer(container, file);
+          } catch (error) {
+            // The tab may now hold changes the copy does not: start again from the copy.
+            stop();
+            throw error;
+          }
+
+          loaded = onDisk();
+        } else if (write) {
           await session.tool('save_file', { path: file });
           loaded = onDisk();
         } else {

@@ -92,7 +92,10 @@ export function resolveBin(
   );
 }
 
-function cliVersion(bin: string): string | null {
+/** The oldest figcraft-cli whose branch tabs figkit relies on to write a branch copy. */
+export const BRANCH_CLI_VERSION = '0.17.0';
+
+export function cliVersion(bin: string): string | null {
   try {
     const result = Bun.spawnSync([bin, '--version'], { stdout: 'pipe', stderr: 'ignore' });
     const match = /(\d+\.\d+\.\d+)/.exec(new TextDecoder().decode(result.stdout));

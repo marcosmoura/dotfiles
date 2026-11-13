@@ -2,7 +2,7 @@
 
 Read and build a FigCraft design file from an agent, without tool-schema bloat and without
 hand-written scripts. One core, two front ends: a CLI (`figkit <command>`) and an MCP server
-(`figkit mcp`) with the same six commands.
+(`figkit mcp`) with the same seven commands.
 
 It replaces the two copies of the `figcraft-mcp` proxy that lived in budget and life-planner.
 
@@ -16,19 +16,23 @@ Measured over 60 agent sessions with the old proxy:
 - The proxy forwarded all 19 upstream tools (32 KB of schemas). Eleven were never called.
 - `screenshot` returned images inline (208 KB on average) and `open_file` a 16 KB summary.
 
-`figkit` exposes six tools in 4 KB, never returns image data, and has a `build` command that takes a
+`figkit` exposes seven tools in 6 KB, never returns image data, and has a `build` command that takes a
 nested tree and expands it into FigCraft commands itself.
 
 ## Commands
 
 | Command | What it does                                                                         |
 | ------- | ------------------------------------------------------------------------------------ |
+| `use`   | The checkout to work on and its copy; `--prepare` gives a branch copy its id range    |
 | `find`  | Layers by name, type or text; or names of variables, styles, components and pages    |
 | `read`  | One or more layers: an outline, or only the fields you name                          |
 | `build` | Creates layers from a nested tree in one all-or-nothing step, then saves             |
 | `run`   | Raw FigCraft commands, for edits `build` cannot express                              |
 | `shot`  | Exports layers to PNG files under `$TMPDIR/figkit/shots` and returns the paths        |
 | `help`  | Parameters of a FigCraft command, or the commands for a topic                         |
+
+`figkit check` is a shell command only: it exits 1 when the checkout's copy must not be committed
+(see [Branch copies](#branch-copies)).
 
 ```sh
 figkit find --kind variable --name space/
@@ -259,11 +263,54 @@ Add `.figkit.json` to the repository root:
 { "file": "design/Budget.figcraft" }
 ```
 
-`figkit` reads it from the **main checkout**, even when run inside a linked worktree, because a
-worktree's copy of a binary design file is a stale snapshot. It refuses to write unless the main
-checkout is on `main` (override with `"branch": "<name>"`).
+`figkit` works on the **checkout it runs in**: the main checkout or a linked worktree. It reads
+that checkout's `.figkit.json`, and the design file in that checkout is the copy it reads and
+writes. On the branch `.figkit.json` names (`"branch": "<name>"`, default `main`) that file is the
+**main copy**; on any other branch it is a **branch copy**. Writes are refused on a detached HEAD.
 
-`FIGKIT_FILE=<path>` points at a file directly, for scratch copies and tests.
+The MCP server has no default checkout: the harness may start it in the main checkout for an agent
+that should work in a worktree. The first call of a session is `use` with the absolute path of the
+checkout (`{"checkout": "/path/to/worktree"}`), and every other tool fails until then. The
+checkout must belong to the same repository as the server's working directory. A later `use` with
+another checkout closes the open document and switches. In the shell, `figkit use` reports on the
+working directory's checkout. The result is `{checkout, file, branch, copy}`, and for a branch copy
+also `client` (its id range, or `null`) and `prepared` (whether the registry gives that range to
+this branch).
+
+`FIGKIT_FILE=<path>` points at a file directly, for scratch copies and tests: plain writes, no Git,
+no `use` needed (`use` reports it as the main copy).
+
+## Branch copies
+
+Every checkout has its own copy of the design file, so design work in different worktrees runs at
+the same time. To keep the ids of two copies apart, a write to a branch copy gives every new
+layer, variable, collection, mode and style an id in the copy's **id range**
+(`client × 2^32 + n`). Ranges come from the registry in `<git-common-dir>/figkit/clients.json`,
+shared by every worktree of the clone. The main copy keeps plain ids and is written as before.
+
+- A write uses the copy's range when the registry assigns it to the current branch, and claims a
+  new one otherwise: a fresh worktree, a branch made from another branch, a copy Git replaced with
+  `main`'s file.
+- The write goes through a FigCraft branch tab: `figkit` builds a temporary container in
+  `$TMPDIR/figkit` (an empty document made once by `figcraft-cli`, with the copy as its branch),
+  runs the commands there and writes the tab back as a plain design file (no `branches/`, no
+  `versions/`). A one-off command does this with one `figcraft-cli run`; `figkit mcp` keeps the
+  container open from the first write until the session stops or the copy changes on disk.
+- Reads never claim a range and never write. A session that only reads leaves the copy and the
+  registry untouched.
+- `figkit use --prepare` gives a copy its range without other changes, before hand edits in the
+  app: the app then numbers new layers in the range. Make variables, collections, modes and styles
+  through `figkit` or on `main`: the app gives them plain ids.
+- Live mode works on the main copy only.
+
+`figkit check` checks the copy of the working directory's checkout before a commit:
+
+- The main copy must have a plain counter. A counter in a range means a branch was merged into
+  `main` without `figkit merge`.
+- On a branch copy, every id that is not in the design file of the merge base with `main` (or, during
+  a merge, of `MERGE_HEAD`) must be in a range, and when there are such ids the counter must be in
+  a range too. A failure lists up to 20 of them with their names. A copy with the same blob as the
+  merge base's passes without being read.
 
 Keep one design file. FigCraft re-applies every variable binding in a document whenever its
 variables change, so a variable edit costs more the more bound layers a file holds, and it is
@@ -301,7 +348,8 @@ the client's own work, such as a permission check. Compare the two before blamin
 
 ## figcraft-cli version
 
-`figkit` needs `figcraft-cli` 0.16.0 or newer and should match the FigCraft app. It uses the one on
+`figkit` needs `figcraft-cli` 0.16.0 or newer and should match the FigCraft app. Writing a branch
+copy needs 0.17.0 or newer (branch tabs); an older one fails there, naming the version found. It uses the one on
 `PATH`, which is the project's mise pin. If that one is older (a stale copy in `~/.local/bin`
 shadows the pin outside pinned projects), it uses the newest version mise has installed instead.
 `FIGCRAFT_BIN` overrides both.
@@ -336,12 +384,14 @@ bun test          # includes end-to-end tests against figcraft-cli on a scratch 
 bun run typecheck
 ```
 
-`src/build.ts` is the tree expansion, `src/ops.ts` the six commands, `src/engine.ts` the headless
+`src/build.ts` is the tree expansion, `src/ops.ts` the commands, `src/engine.ts` the headless
 and live backends, `src/catalog.ts` the cached names, `src/variables.ts` the folding of variable
 commands, `src/overrides.ts` the saving and matching of instance overrides. `src/archive.ts` reads and writes `.figcraft` zip
 archives over `node:zlib` the way FigCraft writes them (raw copies of entries, written to a
 temporary file and renamed), `src/document.ts` reads and moves the `next_id` counter of
 `document.json` without rewriting its other bytes and holds the id range helpers
 (`client × 2^32 + n`), and `src/clients.ts` is the id range registry in
-`<git-common-dir>/figkit/clients.json`. `src/app.ts`, `src/lock.ts` and `src/prune.ts`
+`<git-common-dir>/figkit/clients.json`. `src/project.ts` finds the checkout and its copy,
+`src/branch-copy.ts` builds containers and writes a branch copy from them, and `src/check.ts` is
+`figkit check`. `src/app.ts`, `src/lock.ts` and `src/prune.ts`
 came from the old proxy with their tests.

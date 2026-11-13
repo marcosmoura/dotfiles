@@ -1,3 +1,4 @@
+import { check } from './check';
 import { createContext } from './context';
 import { serve } from './mcp';
 import { findTool, render, TOOLS } from './tools';
@@ -6,11 +7,12 @@ const USAGE = `figkit: read and build a FigCraft design file
 
   figkit <command> ['<json>' | @file.json | - | <name or id>] [--key value …] [--live]
   figkit mcp [--live]        serve the same commands as MCP tools
+  figkit check               exit 1 when this checkout's copy must not be committed
 
 Commands:
 ${TOOLS.map((tool) => `  ${tool.name.padEnd(6)} ${firstSentence(tool.description)}`).join('\n')}
 
-The design file comes from .figkit.json in the main checkout, or FIGKIT_FILE.
+The design file is the copy in this checkout, named by its .figkit.json, or FIGKIT_FILE.
 Input is one JSON object; flags add or override its keys (--name Card --limit 5).
 --live attaches to the open FigCraft app instead of working on the file headless.
 Run "figkit <command> --help" for a command's full description and keys.`;
@@ -28,6 +30,16 @@ export async function main(argv: string[]): Promise<number> {
 
   if (command === 'mcp') {
     return serve({ live });
+  }
+
+  if (command === 'check') {
+    const result = await check(process.cwd());
+
+    for (const reason of result.reasons) {
+      process.stderr.write(`error: ${reason}\n`);
+    }
+
+    return result.ok ? 0 : 1;
   }
 
   const tool = findTool(command);
@@ -51,7 +63,10 @@ export async function main(argv: string[]): Promise<number> {
   try {
     const input = await readInput(rest, tool.primary);
 
-    context = await createContext({ live });
+    // `use` in the shell works on the working directory's checkout, or on the one it names.
+    const cwd = tool.name === 'use' && typeof input.checkout === 'string' ? input.checkout : undefined;
+
+    context = await createContext({ live, cwd });
 
     process.stdout.write(`${render(await tool.call(context, input))}\n`);
 

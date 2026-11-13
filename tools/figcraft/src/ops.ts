@@ -2,6 +2,7 @@ import { existsSync, statSync } from 'node:fs';
 import { mkdir } from 'node:fs/promises';
 import { join } from 'node:path';
 
+import { branchTarget, copyRange, prepareCopy } from './branch-copy';
 import { expandTree, UnknownName, type NameUse, type TreeNode } from './build';
 import { byteLength, truncateToBytes } from './bytes';
 import {
@@ -1517,6 +1518,53 @@ async function changesDocument(config: Config, commands: Command[]): Promise<boo
 
   // An unknown command is treated as a change, so its result is never silently dropped.
   return commands.some((entry) => known.get(entry.command) ?? true);
+}
+
+// ---------------------------------------------------------------------------------------------
+// use
+// ---------------------------------------------------------------------------------------------
+
+export type UseInput = { checkout?: string; prepare?: boolean };
+
+export type UseResult = {
+  checkout: string;
+  file: string;
+  branch: string | null;
+  copy: 'main' | 'branch';
+  client?: number | null;
+  prepared?: boolean;
+};
+
+/**
+ * Reports the checkout and its copy. The MCP server picks the checkout before this runs, and the
+ * shell uses the working directory. `prepare` gives a branch copy its id range; nothing else writes.
+ */
+export async function use(ctx: Context, input: UseInput): Promise<UseResult> {
+  const { project } = ctx;
+  const result: UseResult = {
+    checkout: project.root,
+    file: project.file,
+    branch: project.branch,
+    copy: project.copy,
+  };
+  const target = branchTarget(project);
+
+  if (!target) {
+    return result;
+  }
+
+  if (!existsSync(project.file)) {
+    throw new OpError(`design file not found: ${project.file}`);
+  }
+
+  let range = await copyRange(target, project.file);
+
+  if (input.prepare && !range.prepared) {
+    assertWritable(ctx);
+    range = await prepareCopy(target, project.file);
+  }
+
+  return { ...result, client: range.client, prepared: range.prepared };
 }
 
 // ---------------------------------------------------------------------------------------------

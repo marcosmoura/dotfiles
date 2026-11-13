@@ -226,7 +226,16 @@ describe.skipIf(!hasCli)('against figcraft-cli', () => {
 
     ctx = {
       config: settings,
-      project: { root: directory, file, writeBlocked: null },
+      project: {
+        root: directory,
+        file,
+        writeBlocked: null,
+        copy: 'main',
+        branch: null,
+        mainBranch: 'main',
+        commonDir: null,
+        mainFile: null,
+      },
       engine,
       catalog: createCatalogStore(engine, settings, file),
     };

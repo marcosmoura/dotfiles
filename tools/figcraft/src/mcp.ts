@@ -1,21 +1,63 @@
 import { appendFile, mkdir } from 'node:fs/promises';
-import { join } from 'node:path';
+import { isAbsolute, join } from 'node:path';
 
 import { createContext } from './context';
 import { log } from './logger';
 import type { Context } from './ops';
+import { gitCommonDir, resolveProject } from './project';
 import { findTool, render, TOOLS } from './tools';
 
 type Request = { jsonrpc?: string; id?: string | number; method?: string; params?: unknown };
 
 const PROTOCOL_VERSION = '2024-11-05';
 
+export const USE_FIRST = 'call use with the absolute path of the checkout you were given';
+
 /**
  * A minimal MCP server over stdio. The context is created on the first tool call, so starting the
- * server never launches or attaches to the FigCraft app by itself.
+ * server never launches or attaches to the FigCraft app by itself. Without `FIGKIT_FILE` there is
+ * no default checkout: `use` picks one, and every other tool fails until it did.
  */
 export async function serve(options: { live: boolean }): Promise<number> {
-  const state: { context: Promise<Context> | null } = { context: null };
+  const state: { context: Promise<Context> | null; checkout: string | null } = {
+    context: null,
+    checkout: null,
+  };
+  const fixedFile = Boolean(process.env.FIGKIT_FILE);
+
+  /** Sets the session's checkout, closing the open one when it is another. */
+  const choose = async (checkout: unknown): Promise<void> => {
+    if (typeof checkout !== 'string' || !isAbsolute(checkout)) {
+      throw new Error(`${USE_FIRST}: "checkout" must be an absolute path`);
+    }
+
+    const ours = gitCommonDir(process.cwd());
+    const theirs = gitCommonDir(checkout);
+
+    if (!ours || theirs !== ours) {
+      throw new Error(
+        `${checkout} is not a checkout of the repository at ${process.cwd()}; ${USE_FIRST}`,
+      );
+    }
+
+    const root = resolveProject(checkout).root;
+
+    if (state.context && state.checkout === root) {
+      return;
+    }
+
+    const previous = state.context;
+
+    state.context = null;
+    state.checkout = null;
+
+    if (previous) {
+      await (await previous.catch(() => null))?.engine.close();
+    }
+
+    state.context = createContext({ ...options, session: true, cwd: root });
+    state.checkout = root;
+  };
 
   const handle = async (request: Request): Promise<unknown> => {
     switch (request.method) {
@@ -55,8 +97,14 @@ export async function serve(options: { live: boolean }): Promise<number> {
         let failed = false;
 
         try {
-          // A server takes many calls, so headless work keeps the file open between them.
-          state.context ??= createContext({ ...options, session: true });
+          if (fixedFile) {
+            // A server takes many calls, so headless work keeps the file open between them.
+            state.context ??= createContext({ ...options, session: true });
+          } else if (tool.name === 'use') {
+            await choose((params.arguments as { checkout?: unknown } | undefined)?.checkout);
+          } else if (!state.context) {
+            throw new Error(USE_FIRST);
+          }
 
           const args = await fromFile(
             tool.name,
@@ -65,11 +113,12 @@ export async function serve(options: { live: boolean }): Promise<number> {
               : {},
           );
 
-          text = render(await tool.call(await state.context, args));
+          text = render(await tool.call(await (state.context as Promise<Context>), args));
         } catch (error) {
           // A failed attach should be retried on the next call rather than cached.
           await state.context?.catch(() => {
             state.context = null;
+            state.checkout = null;
           });
 
           failed = true;

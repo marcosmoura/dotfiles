@@ -19,3 +19,17 @@ export function testConfig(overrides: Partial<Config> = {}): Config {
     ...overrides,
   };
 }
+
+/** Runs Git in a test repository with the machine's own identity. */
+export function gitIn(cwd: string, ...args: string[]): string {
+  const result = Bun.spawnSync(['git', '-c', 'core.fsmonitor=false', '-C', cwd, ...args], {
+    stdout: 'pipe',
+    stderr: 'pipe',
+  });
+
+  if (result.exitCode !== 0) {
+    throw new Error(`git ${args.join(' ')}: ${new TextDecoder().decode(result.stderr)}`);
+  }
+
+  return new TextDecoder().decode(result.stdout).trim();
+}

@@ -5,6 +5,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
 import { loadConfig, resolveBin } from './settings';
+import { gitIn } from './testing';
 
 type Reply = {
   id: number | null;
@@ -27,12 +28,27 @@ afterAll(async () => {
 });
 
 /** Runs the server as a client would: one process, lines in, lines out. */
-async function converse(lines: (string | object)[]): Promise<{ replies: Reply[]; raw: string }> {
+async function converse(
+  lines: (string | object)[],
+  options: { cwd?: string; fixedFile?: boolean } = {},
+): Promise<{ replies: Reply[]; raw: string }> {
+  const env: Record<string, string | undefined> = {
+    ...process.env,
+    FIGKIT_FILE: file,
+    FIGKIT_LOG: '0',
+    TMPDIR: directory,
+  };
+
+  if (options.fixedFile === false) {
+    delete env.FIGKIT_FILE;
+  }
+
   const child = Bun.spawn(['bun', CLI, 'mcp'], {
+    cwd: options.cwd,
     stdin: 'pipe',
     stdout: 'pipe',
     stderr: 'ignore',
-    env: { ...process.env, FIGKIT_FILE: file, FIGKIT_LOG: '0', TMPDIR: directory },
+    env,
   });
 
   for (const line of lines) {
@@ -89,7 +105,7 @@ describe('mcp server protocol', () => {
       annotations: { readOnlyHint: boolean };
     }[];
 
-    expect(tools.map((tool) => tool.name)).toEqual(['find', 'read', 'build', 'run', 'shot', 'help']);
+    expect(tools.map((tool) => tool.name)).toEqual(['use', 'find', 'read', 'build', 'run', 'shot', 'help']);
 
     for (const tool of tools) {
       expect(tool.description.length).toBeGreaterThan(20);
@@ -98,6 +114,7 @@ describe('mcp server protocol', () => {
     }
 
     expect(tools.filter((tool) => !tool.annotations.readOnlyHint).map((tool) => tool.name)).toEqual([
+      'use',
       'build',
       'run',
     ]);
@@ -107,7 +124,7 @@ describe('mcp server protocol', () => {
     const { replies } = await converse([request(1, 'tools/list')]);
 
     // The old proxy forwarded 32 KB of schemas. This budget is what every session pays.
-    expect(JSON.stringify(replies[0]?.result?.tools).length).toBeLessThan(6_000);
+    expect(JSON.stringify(replies[0]?.result?.tools).length).toBeLessThan(6_400);
   });
 
   test('reports protocol errors without stopping', async () => {
@@ -133,6 +150,30 @@ describe('mcp server protocol', () => {
     expect(text(replies[0])).toContain('unknown key "nope"');
   });
 
+  test('without FIGKIT_FILE, needs use with an absolute path in the same repository', async () => {
+    const repo = join(directory, 'repo');
+
+    gitIn(directory, 'init', '-q', '-b', 'main', repo);
+
+    const { replies } = await converse(
+      [
+        call(1, 'find', { name: 'Card' }),
+        call(2, 'use', {}),
+        call(3, 'use', { checkout: 'repo' }),
+        call(4, 'use', { checkout: directory }),
+        call(5, 'read', { id: 1 }),
+      ],
+      { cwd: repo, fixedFile: false },
+    );
+
+    expect(replies.every((reply) => reply.result?.isError === true)).toBe(true);
+    expect(text(replies[0])).toBe('call use with the absolute path of the checkout you were given');
+    expect(text(replies[1])).toContain('must be an absolute path');
+    expect(text(replies[2])).toContain('must be an absolute path');
+    expect(text(replies[3])).toContain('is not a checkout of the repository');
+    expect(text(replies[4])).toBe('call use with the absolute path of the checkout you were given');
+  });
+
   test('writes only JSON-RPC lines to stdout', async () => {
     const { raw } = await converse([request(1, 'ping'), call(2, 'help', {})]);
 
@@ -151,6 +192,17 @@ try {
 }
 
 describe.skipIf(!hasCli)('mcp server tool calls', () => {
+  test('with FIGKIT_FILE, use reports that file as the main copy', async () => {
+    const { replies } = await converse([call(1, 'use', {})]);
+
+    expect(JSON.parse(text(replies[0]))).toEqual({
+      checkout: directory,
+      file,
+      branch: null,
+      copy: 'main',
+    });
+  });
+
   test('builds, reads back and exports through tools/call in one session', async () => {
     const { replies } = await converse([
       call(1, 'build', {

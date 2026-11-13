@@ -28,6 +28,18 @@ const object = (properties: Record<string, unknown>, required: string[] = []) =>
  */
 export const TOOLS: Tool[] = [
   {
+    name: 'use',
+    readOnly: false,
+    description:
+      'Call first: the absolute path of your checkout. Reports its file, branch and copy. ' +
+      'prepare: give a branch copy its id range.',
+    inputSchema: object({
+      checkout: { type: 'string' },
+      prepare: { type: 'boolean' },
+    }),
+    call: (ctx, args) => ops.use(ctx, args as ops.UseInput),
+  },
+  {
     name: 'find',
     readOnly: true,
     primary: 'name',
