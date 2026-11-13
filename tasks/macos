@@ -51,7 +51,7 @@ defaults write -g NSWindowShouldDragOnGesture -bool true
 
 # Rebuild the Launch Services database to drop duplicates from "Open With".
 # It takes up to a minute, so it only runs when asked for.
-if [ "${DOTFILES_REBUILD_LSDB:-0}" = "1" ]; then
+if [[ "${DOTFILES_REBUILD_LSDB:-0}" == "1" ]]; then
   /System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister \
     -r -domain local -domain system -domain user
 fi
@@ -181,7 +181,7 @@ icon_views iconSize 56
 /usr/libexec/PlistBuddy -c "Set :DesktopViewSettings:IconViewSettings:labelOnBottom false" "$finder_plist" >/dev/null 2>&1 ||
   icon_views_missing=1
 
-[ "$icon_views_missing" = 0 ] ||
+[[ "$icon_views_missing" == 0 ]] ||
   warn "Finder has not saved all its icon view settings yet; open a window in icon view and run this task again"
 
 # ---------------------------------------------------------------------------

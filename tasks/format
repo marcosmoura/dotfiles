@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+#MISE description="Format every shell file in place with shfmt"
+set -euo pipefail
+# shellcheck source=lib.sh
+source "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
+
+need shfmt
+cd "$ROOT"
+
+files=()
+for dialect in bash zsh; do
+  list="$(shell_files "$dialect")"
+  while IFS= read -r file; do files+=("$file"); done <<<"$list"
+done
+
+# Options come from .editorconfig. -l prints the files it rewrites.
+step "shfmt: ${#files[@]} files"
+shfmt -l -w "${files[@]}"
+ok "formatted"

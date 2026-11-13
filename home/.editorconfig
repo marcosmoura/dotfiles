@@ -34,3 +34,9 @@ indent_size = 2
 
 [*.sh]
 indent_size = 2
+
+# The zsh config, for shfmt: these files are zsh even where the name does not
+# say so, and the patterns of a `case` are indented.
+[{.zshrc,.zprofile,.config/zsh/**}]
+shell_variant = zsh
+switch_case_indent = true

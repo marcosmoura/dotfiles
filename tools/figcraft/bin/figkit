@@ -4,7 +4,7 @@ set -euo pipefail
 
 source="${BASH_SOURCE[0]}"
 
-while [ -L "$source" ]; do
+while [[ -L "$source" ]]; do
   directory="$(cd -P "$(dirname "$source")" && pwd)"
   source="$(readlink "$source")"
   [[ "$source" != /* ]] && source="$directory/$source"

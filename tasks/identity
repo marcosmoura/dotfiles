@@ -7,8 +7,8 @@ source "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
 
 step "Setting up secrets and git identity"
 
-# home/.config/zsh/secrets.zsh exports each file in here as an API key.
-if [ ! -d "$HOME/.secrets" ]; then
+# home/.config/zsh/rc/secrets.zsh exports each file in here as an API key.
+if [[ ! -d "$HOME/.secrets" ]]; then
   mkdir -m 700 "$HOME/.secrets"
   info "created ~/.secrets; add one file per key, holding only the value"
 fi
@@ -17,16 +17,16 @@ fi
 # at ~/.config/git/identity because ~/.config is a link to home/.config.
 identity="$ROOT/home/.config/git/identity"
 
-if [ -f "$identity" ]; then
+if [[ -f "$identity" ]]; then
   ok "git identity is already set"
   exit 0
 fi
 
-[ -t 0 ] || die "there is no git identity yet and no terminal to ask on; run 'mise run identity' yourself"
+[[ -t 0 ]] || die "there is no git identity yet and no terminal to ask on; run 'mise run identity' yourself"
 
 read -r -p "    Git name: " name
 read -r -p "    Git email: " email
-[ -n "$name" ] && [ -n "$email" ] || die "a name and an email are both needed"
+[[ -n "$name" && -n "$email" ]] || die "a name and an email are both needed"
 
 printf '[user]\n  name = %s\n  email = %s\n' "$name" "$email" >"$identity"
 ok "wrote the git identity"

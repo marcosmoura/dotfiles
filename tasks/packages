@@ -21,6 +21,10 @@ attempt() {
 
 install_node() {
   step "Node"
+  local packages dictionaries
+  packages="$(list npm)"
+  dictionaries="$(list cspell-dictionaries)"
+
   if ! command -v bun >/dev/null 2>&1; then
     info "installing bun"
     # ~/.bun/bin is on PATH (see use_runtimes), which is what makes the
@@ -30,13 +34,13 @@ install_node() {
 
   # nx and stylua-bin are the only two packages in npm.txt that have to run
   # an install script, and pnpm runs none unless they are named.
-  # shellcheck disable=SC2046
+  # shellcheck disable=SC2086
   attempt pnpm add --global --allow-build=nx --allow-build=@johnnymorganz/stylua-bin \
-    $(list npm) $(list cspell-dictionaries)
+    $packages $dictionaries
 
   # Makes cspell import each dictionary from its global install path.
-  # shellcheck disable=SC2046
-  attempt cspell link add $(list cspell-dictionaries)
+  # shellcheck disable=SC2086
+  attempt cspell link add $dictionaries
 
   # Shims for yarn
   attempt corepack enable
@@ -45,16 +49,19 @@ install_node() {
 install_python() {
   step "Python"
   need uv
-  local venv="$HOME/.local/share/venv"
-  [ -x "$venv/bin/python" ] || uv venv "$venv"
-  # shellcheck disable=SC2046
-  attempt uv pip install --python "$venv/bin/python" --upgrade $(list pip)
+  local packages venv="$HOME/.local/share/venv"
+  packages="$(list pip)"
+  [[ -x "$venv/bin/python" ]] || uv venv "$venv"
+  # shellcheck disable=SC2086
+  attempt uv pip install --python "$venv/bin/python" --upgrade $packages
 }
 
 install_ruby() {
   step "Ruby"
-  # shellcheck disable=SC2046
-  attempt gem install --conservative $(list gem)
+  local gems
+  gems="$(list gem)"
+  # shellcheck disable=SC2086
+  attempt gem install --conservative $gems
 }
 
 install_rust() {
@@ -63,23 +70,25 @@ install_rust() {
   rustup default stable
 
   # Only what is missing: upgrades are topgrade's job, and compiling takes long.
-  local installed crate
+  local crates installed crate
+  crates="$(list cargo)"
   installed="$(cargo install --list)"
   while IFS= read -r crate; do
     grep -q "^$crate " <<<"$installed" || attempt cargo install "$crate"
-  done < <(list cargo)
+  done <<<"$crates"
 }
 
 install_lua() {
   step "Lua"
   need luarocks
-  local rock
+  local rocks rock
+  rocks="$(list luarocks)"
   while IFS= read -r rock; do
     luarocks show "$rock" >/dev/null 2>&1 || attempt luarocks install "$rock"
-  done < <(list luarocks)
+  done <<<"$rocks"
 }
 
-[ -e "$HOME/.config/mise/config.toml" ] || die "the global mise config is not linked yet; run 'mise run link' first"
+[[ -e "$HOME/.config/mise/config.toml" ]] || die "the global mise config is not linked yet; run 'mise run link' first"
 
 use_runtimes
 
@@ -87,13 +96,13 @@ use_runtimes
 step "Runtimes"
 (cd "$HOME" && mise install)
 
-[ $# -gt 0 ] || set -- node python ruby rust lua
+[[ $# -gt 0 ]] || set -- node python ruby rust lua
 for ecosystem in "$@"; do
   case "$ecosystem" in
-  node | python | ruby | rust | lua) "install_$ecosystem" ;;
-  *) die "unknown ecosystem '$ecosystem' (expected node, python, ruby, rust or lua)" ;;
+    node | python | ruby | rust | lua) "install_$ecosystem" ;;
+    *) die "unknown ecosystem '$ecosystem' (expected node, python, ruby, rust or lua)" ;;
   esac
 done
 
-[ "$failures" -eq 0 ] || die "$failures step(s) failed; see the warnings above"
+[[ "$failures" -eq 0 ]] || die "$failures step(s) failed; see the warnings above"
 ok "packages are installed"

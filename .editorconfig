@@ -1,0 +1,16 @@
+# Formatting for the shell files outside home/: bootstrap.sh and tasks/.
+# shfmt reads it (`mise run lint` and `mise run format`), and so do editors
+# that format on save.
+#
+# Not marked as root: everything else falls through to ~/.editorconfig. The
+# files under home/ never get here, because home/.editorconfig is a root.
+
+[{*.sh,tasks/*}]
+indent_style = space
+indent_size = 2
+# Read by shfmt only: indent the patterns of a `case`
+switch_case_indent = true
+
+# tasks/lib.sh has no shebang to tell shfmt that it is bash
+[*.sh]
+shell_variant = bash

@@ -14,5 +14,5 @@ sheldon lock
 # path sheldon cloned it to.
 step "Applying the syntax highlighting theme"
 plugin="$(sheldon source | sed -n 's/.*source "\(.*fast-syntax-highlighting\.plugin\.zsh\)".*/\1/p' | head -n 1)"
-[ -n "$plugin" ] || die "sheldon did not load fast-syntax-highlighting"
+[[ -n "$plugin" ]] || die "sheldon did not load fast-syntax-highlighting"
 zsh -c 'source "$1" && fast-theme "$2"' zsh "$plugin" "$HOME/.config/syntax-theme/syntax-theme.ini"

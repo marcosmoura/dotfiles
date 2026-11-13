@@ -1,17 +1,42 @@
 #!/usr/bin/env bash
-#MISE description="Check bootstrap.sh and the tasks with bash -n and shellcheck"
+#MISE description="Lint every shell file: shellcheck and bash -n for bash, zsh -n for zsh, shfmt for both"
 set -euo pipefail
 # shellcheck source=lib.sh
 source "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
 
-need shellcheck
+need shellcheck shfmt zsh
 cd "$ROOT"
 
+bash_files=()
+list="$(shell_files bash)"
+while IFS= read -r file; do bash_files+=("$file"); done <<<"$list"
+
+zsh_files=()
+list="$(shell_files zsh)"
+while IFS= read -r file; do zsh_files+=("$file"); done <<<"$list"
+
+failed=0
+
+# Options come from .shellcheckrc
+step "shellcheck: ${#bash_files[@]} bash files"
+shellcheck "${bash_files[@]}" || failed=1
+
 # macOS ships bash 3.2, and that is what runs everything up to the brew task
-# on a new Mac, so the syntax check uses it.
-for file in bootstrap.sh tasks/*; do
-  /bin/bash -n "$file"
+# on a new Mac, so the syntax has to be valid there.
+step "bash 3.2 syntax"
+for file in "${bash_files[@]}"; do
+  /bin/bash -n "$file" || failed=1
 done
 
-shellcheck bootstrap.sh tasks/*
-ok "bootstrap.sh and tasks/ are clean"
+# zsh is beyond shellcheck. Its own parser at least catches syntax errors.
+step "zsh syntax: ${#zsh_files[@]} zsh files"
+for file in "${zsh_files[@]}"; do
+  zsh -n "$file" || failed=1
+done
+
+# Options come from .editorconfig. -d prints what `mise run format` would change.
+step "shfmt: formatting"
+shfmt -d "${bash_files[@]}" "${zsh_files[@]}" || failed=1
+
+[[ "$failed" -eq 0 ]] || die "lint found problems; 'mise run format' fixes the formatting ones"
+ok "${#bash_files[@]} bash and ${#zsh_files[@]} zsh files are clean"

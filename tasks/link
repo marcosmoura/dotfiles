@@ -8,11 +8,11 @@ step "Linking home/ into $HOME"
 
 # Configs under home/ and tools/ name this path outright (Claude, Codex,
 # OpenCode, Herdr, Stache), so a clone anywhere else is only half wired.
-[ "$ROOT" = "$HOME/Projects/dotfiles" ] ||
+[[ "$ROOT" == "$HOME/Projects/dotfiles" ]] ||
   warn "this repo is at $ROOT, but several configs expect ~/Projects/dotfiles"
 
 entries="$(managed)"
-[ -n "$entries" ] || die "git lists no files under home/ (is $ROOT a git checkout?)"
+[[ -n "$entries" ]] || die "git lists no files under home/ (is $ROOT a git checkout?)"
 
 stamp="$(date +%Y%m%d-%H%M%S)"
 
@@ -20,11 +20,11 @@ while IFS= read -r name; do
   src="$ROOT/home/$name"
   dst="$HOME/$name"
 
-  if [ -L "$dst" ] && [ "$(readlink "$dst")" = "$src" ]; then
-    continue
-  fi
+  # readlink prints nothing for a path that is not a link
+  current="$(readlink "$dst" 2>/dev/null || true)"
+  [[ "$current" == "$src" ]] && continue
 
-  if [ -e "$dst" ] || [ -L "$dst" ]; then
+  if [[ -e "$dst" || -L "$dst" ]]; then
     mv "$dst" "$dst.backup-$stamp"
     warn "moved the existing ~/$name to ~/$name.backup-$stamp"
   fi
@@ -36,15 +36,15 @@ done <<<"$entries"
 # Drop links in ~ that point into home/ but are not one of the entries above:
 # a file that left the repo, or one that git never tracked.
 for link in "$HOME"/.[!.]* "$HOME"/*; do
-  [ -L "$link" ] || continue
+  [[ -L "$link" ]] || continue
   target="$(readlink "$link")"
   case "$target" in
-  "$ROOT/home/"*) ;;
-  *) continue ;;
+    "$ROOT/home/"*) ;;
+    *) continue ;;
   esac
 
   name="${link##*/}"
-  if [ "$target" = "$ROOT/home/$name" ] && grep -qxF -- "$name" <<<"$entries"; then
+  if [[ "$target" == "$ROOT/home/$name" ]] && grep -qxF -- "$name" <<<"$entries"; then
     continue
   fi
 

@@ -1,2 +1,14 @@
+# shellcheck, for the bash files: bootstrap.sh, tasks/ and any script with a
+# bash shebang. `mise run lint` runs it. The zsh files are outside its reach.
+
+# Follow `source` into files next to the script (tasks/lib.sh)
 external-sources=true
 source-path=SCRIPTDIR
+
+# All the optional checks: [[ ]] over [ ], exit codes hidden inside $(...),
+# `which`, a missing default case, and so on ...
+enable=all
+
+# ... except braces around every variable. It reports $var even where ${var}
+# changes nothing, which was 133 findings here and no bugs.
+disable=SC2250

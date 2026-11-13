@@ -23,7 +23,7 @@ add() {
 }
 
 key_file="$HOME/.secrets/context7-key"
-if [ -r "$key_file" ]; then
+if [[ -r "$key_file" ]]; then
   add context7 "$(printf '{"type":"http","url":"https://mcp.context7.com/mcp","headers":{"CONTEXT7_API_KEY":"%s"}}' "$(<"$key_file")")"
 else
   warn "no key at ~/.secrets/context7-key; registering Context7 without one"

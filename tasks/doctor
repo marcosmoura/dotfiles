@@ -20,20 +20,24 @@ check() {
   fi
 }
 
-links_to() { [ -L "$1" ] && [ "$(readlink "$1")" = "$2" ]; }
-is_zsh() { case "$SHELL" in */zsh) ;; *) return 1 ;; esac }
-secrets_private() { [ "$(stat -f %Lp "$HOME/.secrets")" = 700 ]; }
+# readlink and stat print nothing when the path is missing or not a link,
+# which then simply fails the comparison.
+links_to() { [[ "$(readlink "$1" 2>/dev/null || true)" == "$2" ]]; }
+in_place() { [[ "$ROOT" == "$HOME/Projects/dotfiles" ]]; }
+has_identity() { [[ -f "$ROOT/home/.config/git/identity" ]]; }
+secrets_private() { [[ "$(stat -f %Lp "$HOME/.secrets" 2>/dev/null || true)" == 700 ]]; }
+is_zsh() { [[ "$SHELL" == */zsh ]]; }
 
 step "Links"
-check "repo is at ~/Projects/dotfiles" "move it there; configs under home/ name that path" \
-  [ "$ROOT" = "$HOME/Projects/dotfiles" ]
+check "repo is at ~/Projects/dotfiles" "move it there; configs under home/ name that path" in_place
+entries="$(managed)"
 while IFS= read -r name; do
   check "~/$name" "mise run link" links_to "$HOME/$name" "$ROOT/home/$name"
-done < <(managed)
+done <<<"$entries"
 check "~/.local/bin/figkit" "mise run tools" links_to "$HOME/.local/bin/figkit" "$ROOT/tools/figcraft/bin/figkit"
 
 step "Machine-local files"
-check "git identity" "mise run identity" [ -f "$ROOT/home/.config/git/identity" ]
+check "git identity" "mise run identity" has_identity
 check "~/.secrets is private" "mise run identity, or chmod 700 ~/.secrets" secrets_private
 
 step "Shell"
@@ -43,5 +47,5 @@ step "Homebrew"
 check "everything in the Brewfile is installed" "mise run brew" \
   env HOMEBREW_NO_AUTO_UPDATE=1 brew bundle check --no-upgrade --file "$ROOT/home/Brewfile"
 
-[ "$problems" -eq 0 ] || die "$problems check(s) failed"
+[[ "$problems" -eq 0 ]] || die "$problems check(s) failed"
 ok "all good"

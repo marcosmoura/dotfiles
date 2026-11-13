@@ -12,10 +12,14 @@ if ! xcode-select -p >/dev/null 2>&1; then
   until xcode-select -p >/dev/null 2>&1; do sleep 5; done
 fi
 
-if [ ! -x /opt/homebrew/bin/brew ]; then
-  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+# Fetched into a variable first: a failed download then stops the script,
+# where `bash -c "$(curl ...)"` would run an empty command and carry on.
+if [[ ! -x /opt/homebrew/bin/brew ]]; then
+  installer="$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+  /bin/bash -c "$installer"
 fi
-eval "$(/opt/homebrew/bin/brew shellenv)"
+shellenv="$(/opt/homebrew/bin/brew shellenv)"
+eval "$shellenv"
 
 command -v mise >/dev/null 2>&1 || brew install mise
 
