@@ -137,7 +137,7 @@
       "effortLevel": "medium"
     },
     "claude-fable-5-2": {
-      "effortLevel": "medium"
+      "effortLevel": "high"
     }
   },
   "promptSuggestionEnabled": true,
