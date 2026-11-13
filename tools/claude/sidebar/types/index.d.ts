@@ -70,6 +70,9 @@ export type Rail = { prompts: Prompt[]; reading: string | null };
 /** A prompt as it left the composer: when, and whether a turn was running, so it waits in the queue. */
 export type Typed = { text: string; at: number; isQueued: boolean };
 
+/** What a turn of the main loop came to: its requests, the tokens it wrote and the time they took, and its last request's counts. */
+export type Turn = { steps: number; output: number; ms: number; last: Tokens | null };
+
 export type Status = 'running' | 'done' | 'failed' | 'stopped';
 
 export type Agent = {
@@ -98,6 +101,10 @@ declare module 'claude-code' {
       sent: Record<string, number>;
       /** The pasted images the draft in the prompt box names, by their numbers. */
       draft: number[];
+      /** The turn that is running, or the last to end; `isClaimed` once a footer in the thread has taken its figures. */
+      turn: Turn & { isClaimed: boolean };
+      /** The figures under each reply's footer, by the footer row's id. */
+      footers: Record<string, Turn>;
       /** The weekly Fable limit used, 0 to 100, as Anthropic's usage endpoint last told it; null before it has. */
       fable: number | null;
       /** Whether the person opened the breakdown under the context bar. */

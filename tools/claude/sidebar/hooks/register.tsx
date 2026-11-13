@@ -2,14 +2,14 @@
 // breaks it down by category), a rail of the person's prompts (a press scrolls the transcript to
 // one) and its subagents (a press opens their timeline, and a press on a lane opens that subagent's
 // transcript); and, under the prompt, the mode, model and effort in place of Claude Code's hint
-// row. Above the prompt it previews the images pasted into the draft. In the transcript it draws the
-// person's prompts as cards and, in a reply, the tables as grids
-// and the code fences as cards. Beyond that it only watches: every event hook passes its event on.
+// row. Above the prompt it previews the images pasted into the draft. The thread is drawn after
+// OpenCode's: prompts as raised panels, replies as plain text, tool calls as quiet lines or panels,
+// and a footer under each reply. Beyond that it only watches: every event hook passes its event on.
 import { atom, read, update } from 'claude-code';
 import type { ElementTable, EngineInterface, Register, RenderChildren } from 'claude-code';
 
 import type { Agent, Breakdown, Local, Main, Prompt, Rail, Status, Usage } from '../types';
-import type { Align, Left, Thumb } from './core';
+import type { Align, Left, Thumb, ToolRow } from './core';
 import {
   BRANCH_ICON,
   ZERO,
@@ -19,6 +19,7 @@ import {
   breakdownOf,
   changesOf,
   clean,
+  clipLines,
   columnsOf,
   fableOf,
   filled,
@@ -26,9 +27,10 @@ import {
   fmtLeft,
   fmtPercent,
   fmtRate,
-  fmtTime,
+  fmtTook,
   fmtTokens,
   fmtUsd,
+  footerOf,
   fromBase64,
   hitRate,
   imagesIn,
@@ -51,6 +53,7 @@ import {
   thumbOf,
   tileOf,
   tokenRate,
+  toolRowOf,
   usageOf,
   whereOf,
   windowOf,
@@ -82,10 +85,23 @@ const HOVER = { color: 'inactive', backgroundColor: 'inverseText', inverse: true
 const LEFT_LABEL = 9;
 const RIGHT_LABEL = 12;
 const RIGHT = 22;
-/** The colour of the frames drawn in the transcript: the prompt's card, a table's grid. A code card's is gray. */
-const FRAME = 'ide';
-/** A grid's upright rule, as many rows as a cell could wrap to: its cell clips it to the rows it has. */
+// The thread is drawn after OpenCode's: the person's prompt a raised panel behind a thick bar, a
+// reply plain text set in three cells with no bullet, a small tool one quiet line, a large one a
+// raised panel, and a footer under the reply naming the model and how long the turn took.
+/** The accent: the bar beside the person's prompt, the name in a reply's footer, what moves while a turn works. */
+const FRAME = 'bashBorder';
+/** Quiet lettering: a tool's line, a panel's title, a table's rules. */
+const MUTED = 'inactive';
+/** The ground of a raised panel, which the theme has no key for: Catppuccin Mocha's mantle. */
+const PANEL = '#181825';
+/** Where a reply's text, a tool's line and the footer start. */
+const INSET = 3;
+/** The lines of a command's output, and of a written file, a panel shows before it says how many more. */
+const SHOWN_LINES = 10;
+const SHOWN_EXPANDED = 200;
+/** An upright rule, and a thick bar's glyph (three eighths of a block: this font draws the heavy line `┃` thin): as many rows as a row could wrap to: clipped to the rows it has. */
 const UPRIGHT = Array.from({ length: 80 }, () => '│').join('\n');
+const BAR = '▍';
 const JUSTIFY: Record<Align, 'flex-start' | 'center' | 'flex-end'> = {
   left: 'flex-start',
   center: 'center',
@@ -105,10 +121,10 @@ const DRAFT_EVERY_MS = 200;
 /** The prompts whose time is kept, the latest; and those waiting to be taken in, which are few. */
 const KEPT_SENT = 200;
 const KEPT_TYPED = 50;
+/** The footers whose figures are kept, the latest. */
+const KEPT_FOOTERS = 200;
 /** A column wider than this many cells is one that narrows when its table does not fit. */
 const WIDE = 24;
-/** Where a reply's text starts in its row: under the bullet that opens it. */
-const GUTTER = 2;
 /** Tools that can change the working tree: the uncommitted lines are counted again after one ran. */
 const WRITES = new Set(['Edit', 'Write', 'NotebookEdit', 'Bash']);
 
@@ -142,6 +158,8 @@ const MAIN: Main = {
   last: null,
   total: ZERO,
 };
+/** A turn before its first request. */
+const TURN = { steps: 0, output: 0, ms: 0, last: null, isClaimed: false };
 const USAGE: Usage = {
   startedAt: 0,
   tokens: null,
@@ -167,6 +185,8 @@ const rail = atom({ plugin: 'sidebar', key: 'rail' } as const, RAIL, { shape: 'r
 const typed = atom({ plugin: 'sidebar', key: 'typed' } as const, []);
 const sent = atom({ plugin: 'sidebar', key: 'sent' } as const, {});
 const draft = atom({ plugin: 'sidebar', key: 'draft' } as const, []);
+const turn = atom({ plugin: 'sidebar', key: 'turn' } as const, TURN);
+const footers = atom({ plugin: 'sidebar', key: 'footers' } as const, {});
 const fable = atom({ plugin: 'sidebar', key: 'fable' } as const, null);
 const isContextOpen = atom({ plugin: 'sidebar', key: 'isContextOpen' } as const, false);
 const isRailOpen = atom({ plugin: 'sidebar', key: 'isRailOpen' } as const, false);
@@ -499,6 +519,133 @@ const strip = async (
   );
 };
 
+/** A rule down the left edge of the Box it is put in, whatever rows that Box comes to. */
+const edge = ({ Box, Text }: ElementTable<'terminal'>, color: string, glyphs: string) => (
+  <Box position="absolute" top={0} bottom={0} left={0} width={1} overflow="hidden">
+    <Text color={color}>{glyphs}</Text>
+  </Box>
+);
+
+/** A raised panel: a column for a bar (a prompt has one, a tool's is left blank) and its content. */
+const panel = (
+  els: ElementTable<'terminal'>,
+  key: string,
+  bar: { color: string; rows: number } | undefined,
+  children: RenderChildren,
+) => (
+  <els.Box flexDirection="row" marginTop={1}>
+    <els.Box width={1} flexShrink={0}>
+      {bar === undefined || bar.rows < 1 ? null : (
+        <els.Text color={bar.color}>
+          {Array.from({ length: bar.rows }, () => BAR).join('\n')}
+        </els.Text>
+      )}
+    </els.Box>
+    <els.Box
+      key={key}
+      flexDirection="column"
+      flexGrow={1}
+      flexShrink={1}
+      rowGap={1}
+      paddingX={2}
+      paddingY={1}
+      backgroundColor={PANEL}
+    >
+      {children}
+    </els.Box>
+  </els.Box>
+);
+
+const TODO: Record<string, string> = { completed: '✓', in_progress: '•', cancelled: '✗' };
+
+/** One tool call: a quiet line, or a panel. What it failed with is under it, in the error's colour. */
+const toolView = (
+  els: ElementTable<'terminal'>,
+  key: string,
+  row: ToolRow,
+  call: {
+    isRunning: boolean;
+    isErrored: boolean;
+    isInterrupted: boolean;
+    isExpanded?: boolean;
+    output?: unknown;
+  },
+) => {
+  const { Box, Client, Code, Text } = els;
+  const failure =
+    call.isErrored && typeof call.output === 'string' ? clipLines(call.output, 3) : undefined;
+  const tone = call.isErrored ? 'error' : MUTED;
+  // The ctrl+o transcript and a verbose session ask for everything: a panel then shows far more.
+  const shown = call.isExpanded === true ? SHOWN_EXPANDED : SHOWN_LINES;
+  if (row.kind === 'inline')
+    return (
+      <Box key={key} flexDirection="column" paddingLeft={INSET}>
+        <Box flexDirection="row">
+          <Box width={2} flexShrink={0}>
+            {call.isRunning ? (
+              <Client
+                key={`${key}-pulse`}
+                module="./pulse.tsx"
+                props={{ kind: 'dots', color: MUTED }}
+              />
+            ) : (
+              <Text color={tone}>{row.icon}</Text>
+            )}
+          </Box>
+          <Text color={tone}>{call.isInterrupted ? `${row.text} · interrupted` : row.text}</Text>
+        </Box>
+        {failure === undefined ? null : (
+          <Box paddingLeft={2}>
+            <Text color="error">{failure}</Text>
+          </Box>
+        )}
+      </Box>
+    );
+  if (row.kind === 'shell')
+    return panel(els, key, undefined, [
+      <Text>{`$ ${row.command}`}</Text>,
+      row.output === '' ? null : <Text color={tone}>{clipLines(row.output, shown)}</Text>,
+    ]);
+  if (row.kind === 'diff')
+    return panel(els, key, undefined, [
+      <Text color={MUTED}>{`← Edit ${row.path}`}</Text>,
+      <Code source={row.diff} format="diff" path={row.path} />,
+    ]);
+  if (row.kind === 'file')
+    return panel(els, key, undefined, [
+      <Text color={MUTED}>{`# Wrote ${row.path}`}</Text>,
+      <Code source={clipLines(row.source, shown) || ' '} path={row.path} startLine={1} />,
+    ]);
+  if (row.kind === 'questions')
+    return panel(els, key, undefined, [
+      <Text color={MUTED}># Questions</Text>,
+      <Box flexDirection="column" rowGap={1}>
+        {row.items.map((item) => (
+          <Box flexDirection="column">
+            <Text>{item.question}</Text>
+            <Text color={MUTED}>{item.answer}</Text>
+          </Box>
+        ))}
+      </Box>,
+    ]);
+  return panel(els, key, undefined, [
+    <Text color={MUTED}># Todos</Text>,
+    <Box flexDirection="column">
+      {row.items.map((item) => (
+        <Text color={item.status === 'in_progress' ? 'warning' : MUTED}>
+          {`[${TODO[item.status] ?? ' '}] ${item.text}`}
+        </Text>
+      ))}
+    </Box>,
+  ]);
+};
+
+/** The rows each prompt's panel takes, as the transcript last told them, and the width it told them at. */
+const tall = new Map<string, { rows: number; columns: number | undefined }>();
+
+/** The working directory, which a tool's path is told from. */
+let workdir = '';
+
 let typedDraft = '';
 let watching: { cancel: () => void } | undefined;
 
@@ -535,6 +682,7 @@ export const register: Register = (on) => {
     await $.command.register({ name: 'sidebar', description: 'Open the session sidebar' });
     void $.ui.open(OPEN);
     watchDraft($);
+    workdir = e.cwd;
     const model = await $.session.model();
     await update($, main, (m) => ({ ...m, model }));
     await refresh($, true);
@@ -585,48 +733,61 @@ export const register: Register = (on) => {
         isDue = true;
         $.clock.after(0, () => void publish($));
       }
-      // The terminal's row is ours: a rounded card, an empty row above it (the row under it is the
-      // one the reply that follows opens with). Its top border is labelled, which a Box cannot do
-      // itself, so the label is laid over it: `you`, and when the prompt was typed once that is known.
-      // One still waiting in the queue is gray, frame and text.
+      // The terminal's row is ours: a raised panel behind a thick bar, the pasted images over the
+      // text. One still waiting in the queue is gray, bar and text.
+      //
+      // The bar is as many glyphs as the panel has rows, which the transcript tells once it has
+      // drawn the row (`onScreen.of`, the row above the panel among them). A rule laid over the
+      // panel and clipped to it needs no count, but is drawn out of place while the transcript's
+      // top edge cuts the row. A width the count was not taken at starts it over.
       if (e.surface !== 'terminal') return next(e);
       const els = $.ui.resolve(e);
-      const { Box, Text } = els;
+      const columns = e.viewport?.columns;
+      if (part) tall.set(id, { rows: part.of - 1, columns });
+      const measured = tall.get(id);
       const pasted = imagesIn(e.props.text);
       const taken = (await read($, sent))[rowKey(id)];
       const entry = (await read($, typed)).findLast((t) => t.text === e.props.text.trim());
-      const at = taken ?? entry?.at;
       const isQueued = taken === undefined && entry?.isQueued === true;
-      const frame = isQueued ? 'inactive' : FRAME;
 
-      return (
-        <Box flexDirection="column" marginTop={1}>
-          <Box
-            key="prompt-card"
-            flexDirection="column"
-            borderStyle="round"
-            borderColor={frame}
-            paddingX={1}
-          >
-            <Text color={isQueued ? 'inactive' : 'text'}>{e.props.text}</Text>
-            {pasted.length === 0 ? null : <Box marginTop={1}>{await strip($, els, pasted)}</Box>}
-          </Box>
-          <Box position="absolute" top={0} left={2}>
-            <Text color={frame}>{at === undefined ? ' you ' : ` you - ${fmtTime(at)} `}</Text>
-          </Box>
-        </Box>
+      return panel(
+        els,
+        'prompt-card',
+        {
+          color: isQueued ? MUTED : FRAME,
+          rows: measured !== undefined && measured.columns === columns ? measured.rows : 0,
+        },
+        [
+          pasted.length === 0 ? null : await strip($, els, pasted),
+          <els.Text color={isQueued ? MUTED : 'text'}>{e.props.text}</els.Text>,
+        ],
       );
     },
   );
 
-  // The band above the prompt: the images pasted into the draft, before it is sent.
+  // The band above the prompt: the prompts waiting for the turn that is running, and the images
+  // pasted into the draft before it is sent.
   on('ui.render', { component: 'AbovePrompt' }, async ($, e, next) => {
     if (e.surface !== 'terminal' || e.props.hasSurvey) return next(e);
     const pasted = await read($, draft);
-    if (pasted.length === 0) return next(e);
+    const queued = e.props.isWorking ? (await read($, typed)).filter((t) => t.isQueued) : [];
+    if (pasted.length === 0 && queued.length === 0) return next(e);
     const els = $.ui.resolve(e);
+    const { Box, Text } = els;
 
-    return <els.Box paddingX={1}>{await strip($, els, pasted)}</els.Box>;
+    return (
+      <Box flexDirection="column" paddingLeft={INSET} rowGap={1}>
+        {queued.length === 0 ? null : (
+          <Box key="queued" flexDirection="column">
+            <Text color={MUTED}>Queued prompts</Text>
+            {queued.map((t) => (
+              <Text color={MUTED} wrap="truncate-end">{`· ${clean(t.text)}`}</Text>
+            ))}
+          </Box>
+        )}
+        {pasted.length === 0 ? null : await strip($, els, pasted)}
+      </Box>
+    );
   });
 
   // When a prompt leaves the composer, and whether it has to wait for the turn that is running.
@@ -646,7 +807,8 @@ export const register: Register = (on) => {
   on('session.append', async ($, e, next) => {
     const { message } = e;
     const isPrompt = e.door === 'prompt' && message.type === 'user' && message.isMeta !== true;
-    const isHandedIn = message.type === 'attachment' && message.name === 'queued_command';
+    const isHandedIn =
+      (message.type === 'attachment' && message.name === 'queued_command') || e.door === 'command';
     if (e.agentId !== undefined || !(isPrompt || isHandedIn)) return next(e);
     const body = message.content
       .map((block) => (typeof block.text === 'string' ? block.text : ''))
@@ -670,23 +832,21 @@ export const register: Register = (on) => {
     return next(e);
   });
 
-  // A reply with a table or a code fence in it: the prose stays the engine's own drawing, piece by
-  // piece. A table is a rounded grid: its cells are flex boxes of the columns' widths, so one wider
-  // than the transcript narrows every row alike and its cells wrap, the rules clipped to what is
-  // left. A fence is a rounded card, its language on the top border and its lines numbered.
-  on('ui.render', { component: 'AssistantMessage' }, async ($, e, next) => {
-    if (e.surface !== 'terminal') return next(e);
-    const pieces = piecesOf(e.props.text);
-    if (pieces.every((p) => p.kind === 'prose')) return next(e);
-    const { Box, Code, Text } = $.ui.resolve(e);
-    const isFirst = e.props.isFirstOfReply;
-
-    const uprightIn = (color: string) => (
-      <Box position="absolute" top={0} bottom={0} left={0} width={1} overflow="hidden">
-        <Text color={color}>{UPRIGHT}</Text>
-      </Box>
-    );
-    const upright = uprightIn(FRAME);
+  // A reply: its text plain markdown set in three cells, with no bullet. A table in it is a grid, a
+  // rule between every two rows (a cell that wraps would otherwise run into the row under it):
+  // its cells are flex boxes of the columns' widths, so one wider than the transcript narrows
+  // every row alike and its cells wrap, the rules clipped to what is left. A code fence is its
+  // code, highlighted. A summary of a reply stays Claude Code's row, which marks it as one.
+  on('ui.render', { component: 'AssistantMessage' }, ($, e, next) => {
+    if (e.surface !== 'terminal' || e.props.isSummary === true || e.props.text.trim() === '')
+      return next(e);
+    const els = $.ui.resolve(e);
+    const { Box, Code, Markdown, Text } = els;
+    const upright = edge(els, MUTED, UPRIGHT);
+    // A table too wide for the transcript narrows its wide columns only: a short one keeps its
+    // width, so a word in it is not broken. Where every column is short, they all give way.
+    const shrinkOf = (widths: readonly number[], c: number) =>
+      (widths[c] ?? 0) > WIDE || widths.every((w) => w <= WIDE) ? 1 : 0;
     const rule = (
       widths: readonly number[],
       [left, mid, right]: readonly [string, string, string],
@@ -694,16 +854,12 @@ export const register: Register = (on) => {
       <Box flexDirection="row">
         {widths.map((w, c) => (
           <Box width={w + 3} flexShrink={shrinkOf(widths, c)} height={1} overflow="hidden">
-            <Text color={FRAME}>{(c === 0 ? left : mid) + '─'.repeat(w + 2)}</Text>
+            <Text color={MUTED}>{(c === 0 ? left : mid) + '─'.repeat(w + 2)}</Text>
           </Box>
         ))}
-        <Text color={FRAME}>{right}</Text>
+        <Text color={MUTED}>{right}</Text>
       </Box>
     );
-    // A table too wide for the transcript narrows its wide columns only: a short one keeps its
-    // width, so a word in it is not broken. Where every column is short, they all give way.
-    const shrinkOf = (widths: readonly number[], c: number) =>
-      (widths[c] ?? 0) > WIDE || widths.every((w) => w <= WIDE) ? 1 : 0;
     const row = (
       cells: readonly string[],
       widths: readonly number[],
@@ -739,87 +895,163 @@ export const register: Register = (on) => {
       </Box>
     );
 
-    const drawn: RenderChildren[] = [];
-    for (const [i, piece] of pieces.entries()) {
-      if (piece.kind === 'prose') {
-        drawn.push(
-          await next({
-            ...e,
-            props: { ...e.props, text: piece.text, isFirstOfReply: isFirst && i === 0 },
-          }),
-        );
-        continue;
-      }
-      const bullet = (
-        <Box width={GUTTER} flexShrink={0}>
-          <Text>{isFirst && i === 0 ? '⏺' : ''}</Text>
-        </Box>
-      );
-      if (piece.kind === 'code') {
-        // A line a row: its number, a rule, its code. A long line wraps beside its own number, at
-        // the cost of the highlighter reading each line alone. A fence of one line has no numbers.
-        const lines = piece.source.split('\n');
-        drawn.push(
-          <Box flexDirection="row" marginY={i === 0 ? 0 : 1}>
-            {bullet}
-            <Box flexDirection="column" flexGrow={1} flexShrink={1}>
-              <Box
-                key={`code-${i}`}
-                flexDirection="column"
-                borderStyle="round"
-                borderColor="subtle"
-                paddingX={1}
-              >
-                {lines.length === 1 ? (
-                  <Code
-                    source={piece.source === '' ? ' ' : piece.source}
-                    language={piece.language}
-                  />
-                ) : null}
-                {(lines.length === 1 ? [] : lines).map((line, n) => (
-                  <Box flexDirection="row">
-                    <Box
-                      width={String(lines.length).length}
-                      flexShrink={0}
-                      justifyContent="flex-end"
-                    >
-                      <Text color="subtle">{String(n + 1)}</Text>
-                    </Box>
-                    <Box width={1} marginX={1} flexShrink={0}>
-                      {uprightIn('subtle')}
-                    </Box>
-                    <Box flexGrow={1} flexShrink={1}>
-                      <Code source={line === '' ? ' ' : line} language={piece.language} />
-                    </Box>
-                  </Box>
-                ))}
+    return (
+      <Box flexDirection="column" paddingLeft={INSET} marginTop={1} rowGap={1}>
+        {piecesOf(e.props.text).map((piece, i) => {
+          if (piece.kind === 'prose') return <Markdown text={piece.text.trim()} />;
+          if (piece.kind === 'code')
+            return (
+              <Box key={`code-${i}`}>
+                <Code source={piece.source === '' ? ' ' : piece.source} language={piece.language} />
               </Box>
-              {piece.language === undefined ? null : (
-                <Box position="absolute" top={0} left={2}>
-                  <Text color="subtle">{` ${piece.language} `}</Text>
-                </Box>
-              )}
+            );
+          const widths = columnsOf(piece.head, piece.rows);
+          return (
+            <Box key={`table-${i}`} flexDirection="column" flexShrink={1}>
+              {rule(widths, ['┌', '┬', '┐'])}
+              {row(piece.head, widths, piece.align, true)}
+              {rule(widths, ['├', '┼', '┤'])}
+              {piece.rows.map((cells, r) => [
+                r === 0 ? null : rule(widths, ['├', '┼', '┤']),
+                row(cells, widths, piece.align, false),
+              ])}
+              {rule(widths, ['└', '┴', '┘'])}
             </Box>
-          </Box>,
-        );
-        continue;
-      }
-      const widths = columnsOf(piece.head, piece.rows);
-      drawn.push(
-        <Box flexDirection="row" marginY={i === 0 ? 0 : 1}>
-          {bullet}
-          <Box key={`table-${i}`} flexDirection="column" flexShrink={1}>
-            {rule(widths, ['╭', '┬', '╮'])}
-            {row(piece.head, widths, piece.align, true)}
-            {rule(widths, ['├', '┼', '┤'])}
-            {piece.rows.map((cells) => row(cells, widths, piece.align, false))}
-            {rule(widths, ['╰', '┴', '╯'])}
-          </Box>
-        </Box>,
-      );
-    }
+          );
+        })}
+      </Box>
+    );
+  });
 
-    return <Box flexDirection="column">{drawn}</Box>;
+  // A tool call, in the ctrl+o transcript and a verbose session too: there its panel shows more.
+  on('ui.render', { component: 'ToolUse' }, ($, e, next) => {
+    if (e.surface !== 'terminal') return next(e);
+    const row = toolRowOf(e.props.tool, e.props.input, e.props.output, workdir);
+    return row === null ? next(e) : toolView($.ui.resolve(e), 'tool', row, e.props);
+  });
+
+  // What a call answered is in its own row or panel above, so the row under it draws nothing.
+  on('ui.render', { component: 'ToolResult' }, ($, e, next) => {
+    if (e.surface !== 'terminal' || toolRowOf(e.props.tool, undefined, e.props.output, '') === null)
+      return next(e);
+    const { Box } = $.ui.resolve(e);
+    return <Box />;
+  });
+
+  // A run of calls Claude Code folds into one count line: each is its own line here, as above.
+  on('ui.render', { component: 'ToolGroup' }, ($, e, next) => {
+    if (e.surface !== 'terminal' || e.props.isExpanded || e.props.isCallsOnly !== true)
+      return next(e);
+    const els = $.ui.resolve(e);
+    const rows = e.props.calls.map((call) => ({
+      call,
+      row: toolRowOf(call.tool, call.input, call.output, workdir),
+    }));
+    if (rows.some(({ row }) => row === null)) return next(e);
+    return (
+      <els.Box flexDirection="column">
+        {rows.map(({ call, row }, i) =>
+          row === null ? null : toolView(els, `tool-${i}`, row, call),
+        )}
+      </els.Box>
+    );
+  });
+
+  // The footer under a reply: who answered, with which model, how long the turn took and how fast it
+  // wrote; under it, the turn's requests and tokens. A footer takes the figures of the turn that
+  // has just ended the first time it is drawn, and keeps them under its own id.
+  on('ui.render', { component: 'TurnDuration' }, async ($, e, next) => {
+    if (e.surface !== 'terminal' || e.props.waitingFor !== undefined) return next(e);
+    const { Box, Text } = $.ui.resolve(e);
+    const { model, turnStartedAt } = await read($, main);
+    const id = e.requestId;
+    const kept = (await read($, footers))[id];
+    const ended = await read($, turn);
+    const isFresh =
+      kept === undefined && turnStartedAt === null && !ended.isClaimed && ended.steps > 0;
+    if (isFresh)
+      $.clock.after(0, () => {
+        void (async () => {
+          const { isClaimed: _, ...figures } = ended;
+          await update($, turn, (t) => ({ ...t, isClaimed: true }));
+          await update($, footers, (known) =>
+            Object.fromEntries(
+              [...Object.entries(known), [id, figures] as const].slice(-KEPT_FOOTERS),
+            ),
+          );
+        })();
+      });
+    const { rate, tokens } = footerOf(kept ?? (isFresh ? ended : undefined));
+    const parts = [
+      model === '' ? '' : prettyModel(model),
+      fmtTook(e.props.durationMs),
+      rate,
+    ].filter((part) => part !== '');
+    return (
+      <Box key="footer" flexDirection="column" paddingLeft={INSET} marginTop={1} rowGap={1}>
+        <Text color={MUTED}>
+          <Text color={FRAME} bold>
+            Claude
+          </Text>
+          {` · ${parts.join(' · ')}`}
+        </Text>
+        {tokens === '' ? null : <Text color={MUTED}>{tokens}</Text>}
+      </Box>
+    );
+  });
+
+  // The line that moves while a turn works: a block running along its track, what the turn is doing,
+  // how long it has been at it, and the key that stops it.
+  on('ui.render', { component: 'Spinner' }, async ($, e, next) => {
+    if (e.surface !== 'terminal') return next(e);
+    const { Box, Client, Text } = $.ui.resolve(e);
+    const { turnStartedAt } = await read($, main);
+    const now = await $.clock.now();
+    return (
+      <Box key="working" flexDirection="row" paddingLeft={INSET} columnGap={2} marginTop={1}>
+        <Client key="pulse" module="./pulse.tsx" props={{ kind: 'bar', color: FRAME }} />
+        <Text color={MUTED}>{`${e.props.message ?? e.props.word}${e.props.suffix}`}</Text>
+        {turnStartedAt === null ? null : (
+          <Client
+            key="took"
+            module="./elapsed.tsx"
+            props={{ since: turnStartedAt, now, endAt: null, color: MUTED }}
+          />
+        )}
+        <Text color={MUTED}>esc interrupt</Text>
+      </Box>
+    );
+  });
+
+  // What a slash command printed: quiet text set in with the reply, an error in the error's colour.
+  on('ui.render', { component: 'CommandOutput' }, ($, e, next) => {
+    if (e.surface !== 'terminal' || e.props.text.trim() === '') return next(e);
+    const { Box, Markdown, Text } = $.ui.resolve(e);
+    return (
+      <Box key="command" paddingLeft={INSET}>
+        {e.props.isErrored ? (
+          <Text color="error">{e.props.text.trim()}</Text>
+        ) : (
+          <Markdown text={e.props.text.trim()} dimColor />
+        )}
+      </Box>
+    );
+  });
+
+  // A notice under the logo: one quiet line under a mark.
+  on('ui.render', { component: 'InfoNotice' }, ($, e, next) => {
+    if (e.surface !== 'terminal') return next(e);
+    const { Box, Text } = $.ui.resolve(e);
+    return (
+      <Box key="notice" flexDirection="row" paddingLeft={INSET}>
+        <Box width={2} flexShrink={0}>
+          <Text color={MUTED}>◈</Text>
+        </Box>
+        <Text color={MUTED}>
+          {e.props.command === null ? e.props.text : `${e.props.text} ${e.props.command}`}
+        </Text>
+      </Box>
+    );
   });
 
   on('classic.UserPromptSubmit', async ($, e, next) => {
@@ -843,6 +1075,7 @@ export const register: Register = (on) => {
     if (id === undefined) {
       const now = await $.clock.now();
       await update($, main, (m) => ({ ...m, turnStartedAt: now }));
+      await update($, turn, () => TURN);
       await refresh($);
     } else {
       // A finished agent that was sent a message runs again.
@@ -877,6 +1110,13 @@ export const register: Register = (on) => {
         last: spent,
         total: add(m.total, spent),
         requestMs: m.requestMs + took,
+      }));
+      await update($, turn, (t) => ({
+        ...t,
+        steps: t.steps + 1,
+        output: t.output + spent.output,
+        ms: t.ms + took,
+        last: spent,
       }));
     }
 

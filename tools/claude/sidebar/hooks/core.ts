@@ -10,6 +10,7 @@ import type {
   Sandbox,
   Status,
   Tokens,
+  Turn,
   Usage,
 } from '../types';
 
@@ -76,10 +77,13 @@ export const fmtClock = (ms: number) => {
   return h > 0 ? `${h}:${mm.padStart(2, '0')}:${ss}` : `${mm}:${ss}`;
 };
 
-/** A moment as the time of day it was here: `14:37`. */
-export const fmtTime = (ms: number) => {
-  const d = new Date(ms);
-  return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+/** How long a turn took, as a reply's footer says it: `840ms`, `28s`, `1m 9s`, `1h 2m`. */
+export const fmtTook = (ms: number) => {
+  if (ms < 1000) return `${Math.max(0, Math.round(ms))}ms`;
+  const s = Math.round(ms / 1000);
+  if (s < 60) return `${s}s`;
+  if (s < 3600) return `${Math.floor(s / 60)}m ${s % 60}s`;
+  return `${Math.floor(s / 3600)}h ${Math.floor((s % 3600) / 60)}m`;
 };
 
 /** The time left until a reset: `<1m`, `25m`, `2h 10m`, `1d 13h`. */
@@ -627,4 +631,199 @@ export const tileOf = (
   return columns <= maxColumns
     ? { columns, rows: maxRows }
     : { columns: maxColumns, rows: Math.max(1, Math.round((maxColumns * height) / width / ratio)) };
+};
+
+// ---------------------------------------------------------------- tools
+
+/**
+ * A tool call as the thread draws it, after OpenCode: a small tool is one quiet line under an icon,
+ * a shell command, an edit, a written file and a list of todos are panels.
+ */
+export type ToolRow =
+  | { kind: 'inline'; icon: string; text: string }
+  | { kind: 'shell'; command: string; output: string }
+  | { kind: 'diff'; path: string; diff: string }
+  | { kind: 'file'; path: string; source: string }
+  | { kind: 'todos'; items: { text: string; status: string }[] }
+  | { kind: 'questions'; items: { question: string; answer: string }[] };
+
+const field = (value: unknown, key: string): unknown =>
+  typeof value === 'object' && value !== null ? (value as Record<string, unknown>)[key] : undefined;
+const textAt = (value: unknown, key: string) => {
+  const found = field(value, key);
+  return typeof found === 'string' ? found : undefined;
+};
+const numberAt = (value: unknown, key: string) => {
+  const found = field(value, key);
+  return typeof found === 'number' && Number.isFinite(found) ? found : undefined;
+};
+
+/** A path as the thread names it: from the working directory where it is under it. */
+export const pathIn = (path: string | undefined, cwd: string) =>
+  path === undefined
+    ? ''
+    : cwd !== '' && path.startsWith(`${cwd}/`)
+      ? path.slice(cwd.length + 1)
+      : path;
+
+/** The first `max` lines of a text, and how many were left out. */
+export const clipLines = (text: string, max: number) => {
+  const lines = text.replace(/\s+$/, '').split('\n');
+  return lines.length <= max
+    ? lines.join('\n')
+    : `${lines.slice(0, max).join('\n')}\n… +${lines.length - max} lines`;
+};
+
+/** An edit's stored patch as unified-diff hunks, which is what the highlighter draws; '' for none. */
+const diffOf = (patch: unknown) =>
+  (Array.isArray(patch) ? patch : [])
+    .map((hunk: unknown) => {
+      const lines = field(hunk, 'lines');
+      const at = (key: string) => numberAt(hunk, key) ?? 0;
+      return `@@ -${at('oldStart')},${at('oldLines')} +${at('newStart')},${at('newLines')} @@\n${(Array.isArray(lines) ? lines : []).join('\n')}`;
+    })
+    .join('\n');
+
+const matches = (n: number | undefined) =>
+  n === undefined ? '' : ` (${n} ${n === 1 ? 'match' : 'matches'})`;
+
+/** The tools whose rows stay Claude Code's own: each is a dialog more than a row. A question is one until it is answered. */
+const OWN = new Set(['ExitPlanMode', 'EnterPlanMode']);
+
+/** Whether the thread draws this tool's row itself, and so leaves no result row under it. */
+export const isDrawn = (tool: string) => !OWN.has(tool);
+
+/**
+ * How a tool call is drawn, from its input and, once it has one, its result; null for a tool whose
+ * row stays Claude Code's.
+ */
+export const toolRowOf = (
+  tool: string,
+  input: unknown,
+  output: unknown,
+  cwd: string,
+): ToolRow | null => {
+  if (!isDrawn(tool)) return null;
+  const path = pathIn(
+    textAt(input, 'file_path') ?? textAt(input, 'path') ?? textAt(input, 'notebook_path'),
+    cwd,
+  );
+  const inline = (icon: string, text: string): ToolRow => ({
+    kind: 'inline',
+    icon,
+    text: clean(text),
+  });
+  const within =
+    textAt(input, 'path') === undefined ? '' : ` in ${pathIn(textAt(input, 'path'), cwd)}`;
+  switch (tool) {
+    case 'Bash':
+      return {
+        kind: 'shell',
+        command: textAt(input, 'command') ?? '',
+        output:
+          typeof output === 'string'
+            ? output
+            : [textAt(output, 'stdout'), textAt(output, 'stderr')]
+                .filter((part) => part !== undefined && part.trim() !== '')
+                .join('\n'),
+      };
+    case 'Read': {
+      const offset = numberAt(input, 'offset');
+      const limit = numberAt(input, 'limit');
+      const range =
+        offset === undefined && limit === undefined
+          ? ''
+          : `:${offset ?? 1}-${limit === undefined ? '' : (offset ?? 1) + limit - 1}`;
+      return inline('→', `Read ${path}${range}`);
+    }
+    case 'Edit':
+    case 'MultiEdit': {
+      const diff = diffOf(field(output, 'structuredPatch'));
+      return diff === '' ? inline('←', `Edit ${path}`) : { kind: 'diff', path, diff };
+    }
+    case 'Write': {
+      const source = textAt(input, 'content');
+      return output === undefined || typeof output === 'string' || source === undefined
+        ? inline('←', `Write ${path}`)
+        : { kind: 'file', path, source };
+    }
+    case 'Glob':
+      return inline(
+        '✱',
+        `Glob "${textAt(input, 'pattern') ?? ''}"${within}${matches(numberAt(output, 'numFiles'))}`,
+      );
+    case 'Grep':
+      return inline(
+        '✱',
+        `Grep "${textAt(input, 'pattern') ?? ''}"${within}${matches(numberAt(output, 'numMatches') ?? numberAt(output, 'numFiles'))}`,
+      );
+    case 'WebFetch':
+      return inline('%', `WebFetch ${textAt(input, 'url') ?? ''}`);
+    case 'WebSearch':
+      return inline('◈', `Web Search "${textAt(input, 'query') ?? ''}"`);
+    case 'Skill':
+      return inline('→', `Skill "${textAt(input, 'skill') ?? ''}"`);
+    case 'Agent':
+    case 'Task': {
+      const type = textAt(input, 'subagent_type') ?? 'general';
+      return inline(
+        output === undefined ? '│' : '✓',
+        `${type.charAt(0).toUpperCase()}${type.slice(1)} Task ${textAt(input, 'description') ?? ''}`,
+      );
+    }
+    case 'AskUserQuestion': {
+      const answers = field(output, 'answers');
+      const asked = field(input, 'questions');
+      if (typeof answers !== 'object' || answers === null) return null;
+      return {
+        kind: 'questions',
+        items: (Array.isArray(asked) ? asked : []).map((q: unknown) => {
+          const question = textAt(q, 'question') ?? '';
+          const answer = (answers as Record<string, unknown>)[question];
+          return { question, answer: typeof answer === 'string' ? answer : '' };
+        }),
+      };
+    }
+    case 'TodoWrite': {
+      const todos = field(input, 'todos');
+      return {
+        kind: 'todos',
+        items: (Array.isArray(todos) ? todos : []).map((todo: unknown) => ({
+          text: textAt(todo, 'content') ?? '',
+          status: textAt(todo, 'status') ?? 'pending',
+        })),
+      };
+    }
+    default: {
+      // Any other tool, an MCP server's among them: its name and what it was told, `[key=value, …]`.
+      const told = Object.entries(typeof input === 'object' && input !== null ? input : {})
+        .filter(([, value]) => ['string', 'number', 'boolean'].includes(typeof value))
+        .map(([key, value]) => `${key}=${String(value)}`)
+        .join(', ');
+      return inline(
+        '⚙',
+        shorten(
+          `${tool.replace(/^mcp__/, '').replaceAll('__', ' ')}${told === '' ? '' : ` [${told}]`}`,
+          160,
+        ),
+      );
+    }
+  }
+};
+
+/** A whole number with its thousands apart: `89,728`. */
+const grouped = (n: number) => String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+
+/**
+ * What a reply's footer says of its turn after the model and the time: how fast it wrote, and under
+ * that its requests and the last one's tokens. Empty where the turn made no request that was heard.
+ */
+export const footerOf = (turn: Turn | undefined) => {
+  if (turn === undefined || turn.steps === 0) return { rate: '', tokens: '' };
+  const fresh = (turn.last?.input ?? 0) + (turn.last?.cacheWrite ?? 0);
+  const cached = turn.last?.cacheRead ?? 0;
+  return {
+    rate: turn.ms > 0 ? `${fmtRate(turn.output / (turn.ms / 1000))} tok/s` : '',
+    tokens: `+ Tokens: ${turn.steps} ${turn.steps === 1 ? 'step' : 'steps'} · latest: ${grouped(fresh)} new · ${grouped(cached)} cached · ${grouped(fresh + cached + (turn.last?.output ?? 0))} total`,
+  };
 };
