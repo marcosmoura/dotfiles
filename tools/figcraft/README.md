@@ -359,9 +359,37 @@ yours.
   branch's, in both directions. Every conflict needs a resolution; an unknown key or another value
   is refused. A variable or style that both copies added with the same id (one was made outside
   `figkit`) cannot be resolved: delete it on the branch and make it again through `figkit`.
-- The result is built next to the working file under a hidden name, opened once with
-  `figcraft-cli info`, then renamed over the working file. The container and every temporary file
-  go in one folder under `$TMPDIR/figkit`, removed after every run.
+- The result is built next to the working file under a hidden name, checked and repaired (three-way
+  merges only, below), opened once with `figcraft-cli info`, then renamed over the working file.
+  The container and every temporary file go in one folder under `$TMPDIR/figkit`, removed after
+  every run.
+- **Check.** In a three-way merge (both directions; the fast paths run none of this), every layer
+  of ours or theirs must be in the result, unless one side deleted it or one of its ancestors (in
+  the base, missing from ours or theirs; a frame deleted on one side takes along what the other
+  added inside it) or it is inside an instance. Otherwise the merge stops with exit 2, writes
+  nothing and names up to 20 such layers with their side.
+- **Text style repair.** FigCraft unlinks text that only `main` has from a text style the branch
+  redefined (it keeps the old values). Every such text, linked to the style in `main`'s copy and
+  absent from or unchanged on the branch, gets the style again with one `style.apply` per style on
+  the result. The counter and the `versions/` entries must stay as they were, and each layer must
+  then be linked, or the merge stops with exit 2.
+- **Report.** After the summary it prints the number of layers in the result and how many are
+  _untouched_ (same in the base, both sides and the result), _from the other side_ (only theirs
+  changed or added it, and the result has theirs), _from this side_ (the same for ours), _merged_
+  (both sides changed it) and _side effects_ (everything else: a layer no side changed that
+  differs from the base, a layer one side changed that differs from that side's, or a layer only
+  the result has). Side effects are grouped by page and top-level frame, largest first (20 groups,
+  five layers each), with a reason: `instance` (an instance or inside one: it followed its
+  component), `style restored` (the repair), `created` (only the result has it) or `changed`. Then
+  each repaired text style with its layer count, and the path of a JSON file in `$TMPDIR/figkit`
+  that is kept, shaped as below. Pass the frame ids to `figkit shot` to look at them. Side effects
+  do not change the exit status.
+
+  ```text
+  {"classes": {"untouched", "fromOther", "fromThis", "merged", "sideEffect"},
+   "groups": [{"page", "frame": {"id", "name"}, "layers": [{"id", "name", "type", "reason"}]}],
+   "restored": [{"style", "layers": [ids]}]}
+  ```
 - **Receipt.** When Git cannot merge the file it keeps ours in the working tree, and a file staged
   as one side is not in the staged diff, so nothing would object to a merge that kept one side.
   After it writes the working file (and for the fast path from `main`), `figkit merge` writes
@@ -457,5 +485,6 @@ temporary file and renamed), `src/document.ts` reads and moves the `next_id` cou
 (`client × 2^32 + n`), and `src/clients.ts` is the id range registry in
 `<git-common-dir>/figkit/clients.json`. `src/project.ts` finds the checkout and its copy,
 `src/branch-copy.ts` builds containers and writes a branch copy from them, `src/check.ts` is
-`figkit check`, and `src/merge.ts` is `figkit merge`. `src/app.ts`, `src/lock.ts` and `src/prune.ts`
+`figkit check`, `src/merge.ts` is `figkit merge` and `src/merge-report.ts` its check, classes and
+report. `src/app.ts`, `src/lock.ts` and `src/prune.ts`
 came from the old proxy with their tests.

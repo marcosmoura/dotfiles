@@ -21,6 +21,18 @@ import {
   type FigDocument,
 } from './document';
 import { parseRunOutput, type Command, type RunResult } from './engine';
+import {
+  classify,
+  fingerprint,
+  groupSideEffects,
+  layersToRepair,
+  lostLayers,
+  lostMessage,
+  reportLines,
+  stillUnlinked,
+  type Report,
+  type Restored,
+} from './merge-report';
 import { gitBytes, resolveProject, type Project } from './project';
 import {
   BRANCH_CLI_VERSION,
@@ -62,9 +74,9 @@ type ReviewSide = {
 export type Review = { branch?: ReviewSide; main?: ReviewSide; conflicts?: Conflict[] };
 
 /**
- * What the step between "the result archive is built and opens" and "the working file is written"
- * gets (part 04: the layer check, the report of side effects, the text style repair). It may
- * rewrite the archive at `resultPath`; throw a `MergeError` to stop the merge with nothing written.
+ * What the step between "the result archive is built" and "it is opened and written" gets in a
+ * three-way merge: the layer check, the text style repair and the report. It may rewrite the
+ * archive at `resultPath`; a `MergeError` stops the merge with nothing written.
  */
 export type MergeResult = {
   direction: Direction;
@@ -74,7 +86,7 @@ export type MergeResult = {
   /** The hidden archive next to the working file that is renamed over it afterwards. */
   resultPath: string;
   result: Archive;
-  /** A parsed `document.json` of one of the four archives, parsed once. */
+  /** `document.json` of one of the four archives, parsed on each call: keep one at a time. */
   document(which: 'base' | 'ours' | 'theirs' | 'result'): FigDocument;
 };
 
@@ -87,7 +99,6 @@ export type MergeDeps = {
   run(input: string, commands: Command[], out: string | null, dir: string): Promise<RunResult>;
   /** `figcraft-cli info`: null when it opens the file, else why not. */
   info(path: string): Promise<string | null>;
-  beforeWrite(result: MergeResult): Promise<void>;
   tempDir: string;
   print(line: string): void;
   printError(line: string): void;
@@ -129,7 +140,6 @@ export async function mergeCommand(
       cliVersion: () => cliVersion(bin),
       run: (input, commands, out, dir) => runCli(bin, input, commands, out, dir),
       info: (path) => infoCli(bin, path),
-      beforeWrite: async () => {},
       tempDir: config.tempDir,
       print: (line) => process.stdout.write(`${line}\n`),
       printError: (line) => process.stderr.write(`error: ${line}\n`),
@@ -548,14 +558,23 @@ async function mergeSteps(
     const base = readBlob(inputs.blobs.base, 'base');
     const bytes = plainCounter(ours, entryBytes(theirs, 'document.json'));
 
-    await finish(project, inputs, deps, { base, ours, theirs }, bytes, (images) => [
-      { name: 'document.json', data: bytes, method: document.method },
-      ...images,
-      ...(thumbnail ? [{ entry: thumbnail }] : []),
-      ...ours.entries
-        .filter((entry) => !isReplaced(entry.name))
-        .map((entry): NewEntry => ({ entry })),
-    ]);
+    // A fast path: FigCraft merged nothing, so there is nothing to check or report.
+    await finish(
+      project,
+      inputs,
+      deps,
+      { base, ours, theirs },
+      bytes,
+      (images) => [
+        { name: 'document.json', data: bytes, method: document.method },
+        ...images,
+        ...(thumbnail ? [{ entry: thumbnail }] : []),
+        ...ours.entries
+          .filter((entry) => !isReplaced(entry.name))
+          .map((entry): NewEntry => ({ entry })),
+      ],
+      null,
+    );
 
     return;
   }
@@ -637,17 +656,24 @@ async function mergeSteps(
       ? plainCounter(ours, entryBytes(saved, 'document.json'))
       : entryBytes(saved, 'document.json');
 
-  await finish(project, inputs, deps, { base, ours, theirs, saved }, bytes, (images) =>
-    direction === 'into-main'
-      ? [
-          { name: 'document.json', data: bytes, method: savedDocument.method },
-          ...images,
-          ...(thumbnail ? [{ entry: thumbnail }] : []),
-          ...ours.entries
-            .filter((entry) => !isReplaced(entry.name))
-            .map((entry): NewEntry => ({ entry })),
-        ]
-      : [{ entry: savedDocument }, ...images, ...(thumbnail ? [{ entry: thumbnail }] : [])],
+  await finish(
+    project,
+    inputs,
+    deps,
+    { base, ours, theirs, saved },
+    bytes,
+    (images) =>
+      direction === 'into-main'
+        ? [
+            { name: 'document.json', data: bytes, method: savedDocument.method },
+            ...images,
+            ...(thumbnail ? [{ entry: thumbnail }] : []),
+            ...ours.entries
+              .filter((entry) => !isReplaced(entry.name))
+              .map((entry): NewEntry => ({ entry })),
+          ]
+        : [{ entry: savedDocument }, ...images, ...(thumbnail ? [{ entry: thumbnail }] : [])],
+    (result) => checkResult(result, deps, runDir),
   );
 }
 
@@ -761,8 +787,9 @@ export function imagesFor(document: FigDocument, archives: Archive[]): NewEntry[
 }
 
 /**
- * Steps 6 to 8: the result archive next to the working file, opened once by figcraft-cli, then
- * part 04's step, then the rename over the working file.
+ * Steps 6 to 8: the result archive next to the working file, then for a three-way merge the
+ * check, the repair and the report, then one `figcraft-cli info` on the final archive, then the
+ * rename over the working file.
  */
 async function finish(
   project: Project,
@@ -771,23 +798,9 @@ async function finish(
   archives: { base: Archive; ours: Archive; theirs: Archive; saved?: Archive },
   resultDocument: Uint8Array,
   entries: (images: NewEntry[]) => NewEntry[],
+  check: ((result: MergeResult) => Promise<void>) | null,
 ): Promise<void> {
-  const parsed = new Map<string, FigDocument>();
-  const documentOf = (key: string, archive: Archive): FigDocument => {
-    let document = parsed.get(key);
-
-    if (!document) {
-      document = parseDocument(entryBytes(archive, 'document.json'));
-      parsed.set(key, document);
-    }
-
-    return document;
-  };
-  const result = parseDocument(resultDocument);
-
-  parsed.set('result', result);
-
-  const images = imagesFor(result, [
+  const images = imagesFor(parseDocument(resultDocument), [
     ...(archives.saved ? [archives.saved] : []),
     archives.ours,
     archives.theirs,
@@ -801,27 +814,33 @@ async function finish(
   try {
     await writeFile(resultPath, buildArchive(resultPath, entries(images)));
 
+    if (check) {
+      const archive = parseArchive(
+        resultPath,
+        new Uint8Array(await Bun.file(resultPath).arrayBuffer()),
+      );
+
+      // The check, the repair and the report: they may rewrite the archive at resultPath.
+      await check({
+        direction: inputs.direction,
+        base: archives.base,
+        ours: archives.ours,
+        theirs: archives.theirs,
+        resultPath,
+        result: archive,
+        document: (which) =>
+          parseDocument(
+            entryBytes(which === 'result' ? archive : archives[which], 'document.json'),
+          ),
+      });
+    }
+
+    // The archive figcraft-cli opens is the one that replaces the working file.
     const failure = await deps.info(resultPath);
 
     if (failure !== null) {
       throw new MergeError(2, `figcraft-cli cannot open the merged file: ${failure}`);
     }
-
-    const archive = parseArchive(
-      resultPath,
-      new Uint8Array(await Bun.file(resultPath).arrayBuffer()),
-    );
-
-    // Part 04 plugs in here: the check, the repair and the report, before the file is replaced.
-    await deps.beforeWrite({
-      direction: inputs.direction,
-      base: archives.base,
-      ours: archives.ours,
-      theirs: archives.theirs,
-      resultPath,
-      result: archive,
-      document: (which) => documentOf(which, which === 'result' ? archive : archives[which]),
-    });
 
     await rename(resultPath, project.file);
   } finally {
@@ -830,6 +849,103 @@ async function finish(
 
   await writeReceipt(project, inputs, deps);
   deps.print(`wrote ${inputs.path}; stage it with: git add ${inputs.path}`);
+}
+
+/**
+ * Part 04: no layer of either side may be lost, text that lost a text style the branch redefined
+ * links to it again, and the report of side effects is printed and written as JSON.
+ */
+async function checkResult(result: MergeResult, deps: MergeDeps, runDir: string): Promise<void> {
+  // One parsed document at a time: each is reduced to fingerprints and dropped.
+  const base = fingerprint(result.document('base'));
+  const ours = fingerprint(result.document('ours'));
+  const theirs = fingerprint(result.document('theirs'));
+  let merged = fingerprint(result.document('result'));
+  const lost = lostLayers(base, ours, theirs, merged);
+
+  if (lost.length > 0) {
+    throw new MergeError(2, lostMessage(lost));
+  }
+
+  const figMain = result.direction === 'into-main' ? ours : theirs;
+  const figBranch = result.direction === 'into-main' ? theirs : ours;
+  const repairs = layersToRepair(base, figMain, figBranch, merged);
+  const restored: Restored[] = [];
+
+  if (repairs.size > 0) {
+    const before = result.result;
+    const run = await deps.run(
+      result.resultPath,
+      [...repairs].map(([style, ids]) => ({ command: 'style.apply', params: { ids, style } })),
+      result.resultPath,
+      runDir,
+    );
+
+    if (!run.ok) {
+      throw new MergeError(2, `figcraft-cli could not apply the text styles again: ${run.error}`);
+    }
+
+    const after = parseArchive(
+      result.resultPath,
+      new Uint8Array(await Bun.file(result.resultPath).arrayBuffer()),
+    );
+
+    if (!sameCounterAndVersions(before, after)) {
+      throw new MergeError(
+        2,
+        'applying the text styles again changed the counter or the versions of the merged file',
+      );
+    }
+
+    merged = fingerprint(parseDocument(entryBytes(after, 'document.json')));
+
+    const unlinked = stillUnlinked(repairs, merged);
+
+    if (unlinked.length > 0) {
+      throw new MergeError(
+        2,
+        `layers ${unlinked.join(', ')} still lack their text style after it was applied again`,
+      );
+    }
+
+    for (const [style, ids] of repairs) {
+      restored.push({ style: figBranch.textStyles.get(style)?.name ?? style, layers: ids });
+    }
+  }
+
+  const { classes, sideEffects } = classify(
+    base,
+    ours,
+    theirs,
+    merged,
+    new Set(restored.flatMap((item) => item.layers)),
+  );
+  const report: Report = { classes, groups: groupSideEffects(merged, sideEffects), restored };
+  const jsonPath = join(deps.tempDir, `merge-report-${randomUUID()}.json`);
+
+  await mkdir(deps.tempDir, { recursive: true });
+  await writeFile(jsonPath, `${JSON.stringify(report, null, 2)}\n`);
+
+  for (const line of reportLines(report, merged.layers.size, jsonPath)) {
+    deps.print(line);
+  }
+}
+
+/** The repair must leave the counter and every `versions/` entry as they were. */
+function sameCounterAndVersions(before: Archive, after: Archive): boolean {
+  const versions = (archive: Archive): string[] =>
+    archive.entries
+      .filter((entry) => entry.name.startsWith('versions/'))
+      .map((entry) => entry.name)
+      .sort();
+  const names = versions(before);
+
+  return (
+    readNextId(entryBytes(before, 'document.json')) ===
+      readNextId(entryBytes(after, 'document.json')) &&
+    JSON.stringify(names) === JSON.stringify(versions(after)) &&
+    names.every((name) => Buffer.from(entryBytes(before, name)).equals(entryBytes(after, name)))
+  );
 }
 
 /**

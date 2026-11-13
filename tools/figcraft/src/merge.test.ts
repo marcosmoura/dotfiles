@@ -1,6 +1,6 @@
 import { afterAll, beforeAll, describe, expect, test } from 'bun:test';
 import { chmodSync, existsSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
-import { mkdtemp, readFile, realpath, rm, writeFile } from 'node:fs/promises';
+import { mkdir, mkdtemp, readFile, realpath, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
@@ -24,8 +24,10 @@ import {
   type Review,
 } from './merge';
 import { mergingCommit, receiptReason, RECEIPT_NAME } from './check';
-import type { Project } from './project';
-import { loadConfig, resolveBin } from './settings';
+import { parseRunOutput, type Command, type RunResult } from './engine';
+import type { Report } from './merge-report';
+import { gitBytes, resolveProject, type Project } from './project';
+import { cliVersion, loadConfig, resolveBin } from './settings';
 import { gitIn } from './testing';
 
 const CLI = join(import.meta.dir, 'cli.ts');
@@ -308,7 +310,6 @@ describe('merge decisions', () => {
         return { ok: false, error: 'not here', failedStep: null };
       },
       info: async () => null,
-      beforeWrite: async () => {},
       tempDir: temp,
       print: () => {},
       printError: (line) => errors.push(line),
@@ -696,7 +697,7 @@ function info(file: string): { images: number } {
 function expectClean(repo: Repo, checkout: string): void {
   const figkitTemp = join(repo.temp, 'figkit');
   const left = existsSync(figkitTemp)
-    ? readdirSync(figkitTemp).filter((name) => !/^(stub|commands)-/.test(name))
+    ? readdirSync(figkitTemp).filter((name) => !/^(stub|commands|merge-report)-/.test(name))
     : [];
 
   expect(left).toEqual([]);
@@ -1034,7 +1035,9 @@ describe.skipIf(!hasCli)('figkit merge against figcraft-cli', () => {
 
     expect(rangeBefore).toBeGreaterThan(0);
     expect(gitMerge(repo.worktree, 'main', '--no-edit')).toBe(true);
-    ok(figkit(repo, repo.worktree, ['merge', 'main']));
+
+    const fromMain = ok(figkit(repo, repo.worktree, ['merge', 'main']));
+
     expectClean(repo, repo.worktree);
 
     const updated = await readArchive(branchFile);
@@ -1081,10 +1084,38 @@ describe.skipIf(!hasCli)('figkit merge against figcraft-cli', () => {
     commit(repo.main, 'm2');
 
     expect(gitMerge(repo.main, '--squash', 'feat/x')).toBe(true);
-    ok(figkit(repo, repo.main, ['merge', 'feat/x']));
+
+    const intoMain = ok(figkit(repo, repo.main, ['merge', 'feat/x']));
+
     expectClean(repo, repo.main);
 
     const final = await documentOf(mainFile);
+
+    // The report of each merge: the story's edits, Card (both sides added to it) and no side
+    // effect. The counts add up to the layers of the result.
+    const fromMainReport = await reportOf(fromMain);
+    const intoMainReport = await reportOf(intoMain);
+
+    // From main: main's M1 and its page, the branch's B1, Card.
+    expect(fromMainReport.classes).toMatchObject({
+      fromOther: 2,
+      fromThis: 1,
+      merged: 1,
+      sideEffect: 0,
+    });
+    // Into main: the branch's B1 and B3, main's M2, Card.
+    expect(intoMainReport.classes).toMatchObject({
+      fromOther: 2,
+      fromThis: 1,
+      merged: 1,
+      sideEffect: 0,
+    });
+    expect(intoMainReport.groups).toEqual([]);
+    expect(intoMain).toContain('side effects: none');
+    expect(Object.values(intoMainReport.classes).reduce((sum, count) => sum + count, 0)).toBe(
+      Object.keys(final.nodes).length,
+    );
+    expect(intoMain).toContain(`layers in the result: ${Object.keys(final.nodes).length};`);
 
     for (const name of ['B1', 'B3', 'M1', 'M2']) {
       expect(named(final, name)).toHaveLength(1);
@@ -1129,6 +1160,8 @@ describe.skipIf(!hasCli)('figkit merge against figcraft-cli', () => {
     const result = ok(figkit(repo, repo.main, ['merge', 'feat/x']));
 
     expect(result).toContain('fast path');
+    expect(result).not.toContain('layers in the result');
+    expect(result).not.toContain('report:');
     expect(cliCalls(repo).filter((call) => call === 'run')).toEqual([]);
 
     const merged = await readArchive(mainFile);
@@ -1425,5 +1458,330 @@ describe.skipIf(!hasCli)('figkit merge against figcraft-cli', () => {
     gitMerge(both.main, '--squash', 'feat/x');
     expect(figkit(both, both.main, ['merge', 'feat/x', '--review']).code).toBe(0);
     expect(receipt(both.main)).toBe(false);
+  }, 180_000);
+});
+
+type Hooks = {
+  /** Before a figcraft-cli run, with its input file. */
+  before?(input: string, commands: Command[]): Promise<void>;
+  /** After a figcraft-cli run that succeeded, with its output file. */
+  after?(commands: Command[], out: string | null): Promise<void>;
+};
+
+/** `figkit merge` in-process with the real figcraft-cli, with hooks around each run. */
+async function mergeIn(
+  repo: Repo,
+  cwd: string,
+  ref: string,
+  hooks: Hooks = {},
+  resolve: Record<string, unknown> | null = null,
+): Promise<{ code: number; out: string[]; errors: string[] }> {
+  const project = resolveProject(cwd, { ...process.env, FIGKIT_FILE: undefined });
+  const out: string[] = [];
+  const errors: string[] = [];
+  const run = async (
+    input: string,
+    commands: Command[],
+    output: string | null,
+    dir: string,
+  ): Promise<RunResult> => {
+    await hooks.before?.(input, commands);
+    await mkdir(dir, { recursive: true });
+
+    const script = join(dir, `script-${Math.random()}.json`);
+
+    await Bun.write(script, JSON.stringify(commands));
+
+    const child = Bun.spawnSync(
+      [bin, 'run', '--in', input, ...(output ? ['--out', output] : []), script],
+      { stdout: 'pipe', stderr: 'pipe' },
+    );
+    const result = parseRunOutput(
+      child.stdout.toString(),
+      child.stderr.toString(),
+      child.exitCode ?? 1,
+    );
+
+    if (result.ok) {
+      await hooks.after?.(commands, output);
+    }
+
+    return result;
+  };
+  const code = await merge(
+    project,
+    { ref, review: false, resolve },
+    {
+      git: (args) => gitBytes(project.root, args),
+      cliVersion: () => cliVersion(bin),
+      run,
+      info: async (path) =>
+        Bun.spawnSync([bin, 'info', path], { stdout: 'pipe', stderr: 'pipe' }).exitCode === 0
+          ? null
+          : 'cannot open',
+      tempDir: join(repo.temp, 'figkit'),
+      print: (line) => out.push(line),
+      printError: (line) => errors.push(line),
+    },
+  );
+
+  return { code, out, errors };
+}
+
+/** The JSON file the report names. */
+async function reportOf(stdout: string): Promise<Report> {
+  const path = /^report: (.+)$/m.exec(stdout)?.[1];
+
+  expect(path).toBeDefined();
+
+  return JSON.parse(await readFile(path as string, 'utf8')) as Report;
+}
+
+type Linked = Node & { styles?: { text?: string | null } | null };
+
+const textStyleOf = (document: FigDocument, name: string): string | null =>
+  (named(document, name)[0] as Linked | undefined)?.styles?.text ?? null;
+
+const fontSizeOf = (document: FigDocument, name: string): number | undefined =>
+  (named(document, name)[0] as Node | undefined)?.style?.font_size;
+
+const bodyId = (document: FigDocument): string | undefined =>
+  document.styles?.find((style) => style.name === 'Body')?.id;
+
+/** Branch: Body gets font size 20. Main: a new text "Fresh" with Body. */
+function restyleOnBranch(repo: Repo): void {
+  edit(repo, repo.worktree, [
+    { command: 'style.update', params: { style: 'Body', value: { fontSize: 20 } } },
+  ]);
+  commit(repo.worktree, 'branch restyles Body');
+  edit(repo, repo.main, [
+    {
+      command: 'node.create',
+      params: {
+        type: 'text',
+        name: 'Fresh',
+        characters: 'Fresh',
+        parent: repo.ids.Card,
+        x: 10,
+        y: 240,
+      },
+      as: 'f',
+    },
+    { command: 'style.apply', params: { ids: [{ $ref: 'f' }], style: 'Body' } },
+  ]);
+  commit(repo.main, 'main adds Fresh');
+}
+
+describe.skipIf(!hasCli)('figkit merge: check, report and text style repair', () => {
+  test('a component edited on the branch and an instance added on main: an instance side effect', async () => {
+    const repo = await makeRepo();
+    const { ids } = repo;
+
+    edit(repo, repo.worktree, [
+      { command: 'text.set', params: { id: ids.ChipLabel, characters: 'Chip edited' } },
+    ]);
+    commit(repo.worktree, 'branch edits Chip');
+    edit(repo, repo.main, [
+      {
+        command: 'instance.create',
+        params: { component: ids.Chip, parent: ids.Card, x: 150, y: 60 },
+      },
+    ]);
+    commit(repo.main, 'main adds a Chip');
+    gitMerge(repo.main, '--squash', 'feat/x');
+
+    const merged = ok(figkit(repo, repo.main, ['merge', 'feat/x']));
+    const report = await reportOf(merged);
+    const effects = report.groups.flatMap((group) => group.layers);
+
+    expect(effects.length).toBeGreaterThan(0);
+    expect(effects.every((layer) => layer.reason === 'instance')).toBe(true);
+    expect(report.groups.map((group) => [group.page, group.frame])).toEqual([
+      ['Page 1', { id: ids.Card as number, name: 'Card' }],
+    ]);
+    expect(merged).toContain(`page "Page 1", frame ${ids.Card} "Card"`);
+    expect(merged).toMatch(/^ {4}\d+ "ChipLabel" instance$/m);
+    expect(report.restored).toEqual([]);
+    expect(merged.indexOf('layers in the result')).toBeLessThan(merged.indexOf('wrote '));
+    expectClean(repo, repo.main);
+  }, 180_000);
+
+  test('into main: a text style redefined on the branch, a text with it added on main', async () => {
+    const repo = await makeRepo();
+    const file = join(repo.main, DESIGN);
+    const unrepaired = join(repo.base, 'unrepaired.figcraft');
+
+    restyleOnBranch(repo);
+
+    const oursArchive = await readArchive(file);
+
+    gitMerge(repo.main, '--squash', 'feat/x');
+
+    const merged = await mergeIn(repo, repo.main, 'feat/x', {
+      before: async (input, commands) => {
+        if (commands[0]?.command === 'style.apply') {
+          await writeFile(unrepaired, await readFile(input));
+        }
+      },
+    });
+
+    expect(merged.errors).toEqual([]);
+    expect(merged.code).toBe(0);
+
+    // FigCraft's own result: the text lost its link and kept the old size.
+    const before = await documentOf(unrepaired);
+
+    expect(textStyleOf(before, 'Fresh')).toBeNull();
+    expect(fontSizeOf(before, 'Fresh')).toBe(12);
+
+    // After the repair: linked, with the style's new values.
+    const archive = await readArchive(file);
+    const document = parseDocument(entryBytes(archive, 'document.json'));
+
+    expect(textStyleOf(document, 'Fresh')).toBe(bodyId(document) as string);
+    expect(fontSizeOf(document, 'Fresh')).toBe(20);
+    expect(fontSizeOf(document, 'Title')).toBe(20);
+    // The repair leaves the counter and the versions as they were.
+    expect(readNextId(entryBytes(archive, 'document.json'))).toBe(
+      readNextId(entryBytes(await readArchive(unrepaired), 'document.json')),
+    );
+    expect(clientOf(document.next_id)).toBe(0);
+    expect(versionsOf(archive).length).toBeGreaterThan(0);
+
+    for (const name of versionsOf(oursArchive)) {
+      expect(entryBytes(archive, name)).toEqual(entryBytes(oursArchive, name));
+    }
+
+    const stdout = merged.out.join('\n');
+    const report = await reportOf(stdout);
+
+    expect(stdout).toContain('text style restored: "Body", 1 layer(s)');
+    const fresh = nodes(document).find(([, node]) => node.name === 'Fresh')?.[0];
+
+    expect(report.restored).toEqual([{ style: 'Body', layers: [fresh as number] }]);
+    expect(
+      report.groups.flatMap((group) => group.layers).find((layer) => layer.name === 'Fresh')
+        ?.reason,
+    ).toBe('style restored');
+    expectClean(repo, repo.main);
+  }, 180_000);
+
+  test('from main: the same arrangement is repaired in the branch copy, and the later merge into main keeps it', async () => {
+    const repo = await makeRepo();
+    const branchFile = join(repo.worktree, DESIGN);
+    const mainFile = join(repo.main, DESIGN);
+
+    restyleOnBranch(repo);
+
+    const range = clientOf(readNextId(entryBytes(await readArchive(branchFile), 'document.json')));
+
+    expect(range).toBeGreaterThan(0);
+    expect(gitMerge(repo.worktree, 'main', '--no-edit')).toBe(true);
+
+    const merged = ok(figkit(repo, repo.worktree, ['merge', 'main']));
+    const updated = await documentOf(branchFile);
+
+    expect(merged).toContain('layers in the result');
+    expect(merged).toContain('text style restored: "Body", 1 layer(s)');
+    expect((await reportOf(merged)).restored.map((item) => item.style)).toEqual(['Body']);
+    expect(textStyleOf(updated, 'Fresh')).toBe(bodyId(updated) as string);
+    expect(fontSizeOf(updated, 'Fresh')).toBe(20);
+    expect(clientOf(updated.next_id)).toBe(range);
+    expectClean(repo, repo.worktree);
+    gitIn(repo.worktree, 'add', DESIGN);
+    gitIn(repo.worktree, 'commit', '-q', '--no-edit');
+    expect(figkit(repo, repo.worktree, ['check']).code).toBe(0);
+
+    // Something else on each side, then into main.
+    edit(repo, repo.worktree, [{ command: 'page.add', params: { name: 'B' } }]);
+    commit(repo.worktree, 'branch page');
+    edit(repo, repo.main, [{ command: 'page.add', params: { name: 'M' } }]);
+    commit(repo.main, 'main page');
+    gitMerge(repo.main, '--squash', 'feat/x');
+
+    const final = ok(figkit(repo, repo.main, ['merge', 'feat/x']));
+    const document = await documentOf(mainFile);
+
+    expect(final).toContain('layers in the result');
+    expect(textStyleOf(document, 'Fresh')).toBe(bodyId(document) as string);
+    expect(fontSizeOf(document, 'Fresh')).toBe(20);
+  }, 240_000);
+
+  test('a lost layer fails with exit 2 and names it; the working file is unchanged', async () => {
+    const repo = await makeRepo();
+    const file = join(repo.main, DESIGN);
+
+    edit(repo, repo.worktree, [
+      {
+        command: 'node.create',
+        params: { type: 'rectangle', name: 'Kept', parent: repo.ids.Card, width: 5, height: 5 },
+      },
+    ]);
+    commit(repo.worktree, 'branch adds Kept');
+    edit(repo, repo.main, [{ command: 'page.add', params: { name: 'M' } }]);
+    commit(repo.main, 'main');
+    gitMerge(repo.main, '--squash', 'feat/x');
+
+    const kept = Number(
+      Object.entries((await documentOf(join(repo.worktree, DESIGN))).nodes).find(
+        ([, node]) => node.name === 'Kept',
+      )?.[0],
+    );
+    const before = await readFile(file);
+    // FigCraft's result loses the layer: delete it from the merged output.
+    const merged = await mergeIn(repo, repo.main, 'feat/x', {
+      after: async (commands, out) => {
+        if (out && commands.some((item) => item.command === 'branch.merge')) {
+          const script = join(repo.base, 'lose.json');
+
+          await Bun.write(
+            script,
+            JSON.stringify([{ command: 'edit.delete', params: { ids: [kept] } }]),
+          );
+          expect(
+            Bun.spawnSync([bin, 'run', '--in', out, '--out', out, script], {
+              stdout: 'pipe',
+              stderr: 'pipe',
+            }).exitCode,
+          ).toBe(0);
+        }
+      },
+    });
+
+    expect(merged.code).toBe(2);
+    expect(merged.errors.join('\n')).toContain(`${kept} "Kept" (the other side)`);
+    expect(await readFile(file)).toEqual(before);
+    expectClean(repo, repo.main);
+  }, 180_000);
+
+  test('not lost: a frame main deleted with a layer the branch added inside it', async () => {
+    const repo = await makeRepo();
+    const { ids } = repo;
+
+    edit(repo, repo.worktree, [
+      {
+        command: 'node.create',
+        params: { type: 'rectangle', name: 'Inside', parent: ids.Card, width: 5, height: 5 },
+      },
+    ]);
+    commit(repo.worktree, 'branch adds Inside');
+    edit(repo, repo.main, [{ command: 'edit.delete', params: { ids: [ids.Card] } }]);
+    commit(repo.main, 'main deletes Card');
+    gitMerge(repo.main, '--squash', 'feat/x');
+
+    const merged = ok(
+      figkit(repo, repo.main, [
+        'merge',
+        'feat/x',
+        '--resolve',
+        JSON.stringify({ [`${ids.Card}/layer`]: 'main' }),
+      ]),
+    );
+    const document = await documentOf(join(repo.main, DESIGN));
+
+    expect(merged).toContain('layers in the result');
+    expect(named(document, 'Card')).toEqual([]);
+    expect(named(document, 'Inside')).toEqual([]);
+    expectClean(repo, repo.main);
   }, 180_000);
 });
