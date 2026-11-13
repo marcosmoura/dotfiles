@@ -774,6 +774,39 @@ export const register: Register = (on) => {
     },
   );
 
+  // The other rows that come in as the person's: the notice a background task ended with, and a
+  // message another agent sent. Each is a quiet line under a mark, as a tool's is; the message's
+  // text is under it where the view draws rows in full (ctrl+o).
+  on('ui.render', { component: 'UserMessage' }, ($, e, next) => {
+    const { task, from, origin, text, isExpanded } = e.props;
+    if (e.surface !== 'terminal' || origin.kind === 'composer') return next(e);
+    if (origin.kind !== 'task-notification' && from === undefined) return next(e);
+    const { Box, Text } = $.ui.resolve(e);
+    const isNotice = origin.kind === 'task-notification';
+    const hasFailed = isNotice && task?.status !== undefined && task.status !== 'completed';
+    const tone = hasFailed ? 'error' : MUTED;
+    const took = task?.durationMs === undefined ? '' : ` · ${fmtTook(task.durationMs)}`;
+    const said = isNotice
+      ? `${clean(text)}${took}`
+      : `Message from ${from?.name ?? ''}${isExpanded ? '' : ' · ctrl+o to expand'}`;
+
+    return (
+      <Box key="notice" flexDirection="column" paddingLeft={INSET}>
+        <Box flexDirection="row">
+          <Box width={2} flexShrink={0}>
+            <Text color={tone}>{isNotice ? (hasFailed ? '✗' : '✓') : '›'}</Text>
+          </Box>
+          <Text color={tone}>{said}</Text>
+        </Box>
+        {isNotice || !isExpanded ? null : (
+          <Box paddingLeft={2}>
+            <Text color={MUTED}>{text.trim()}</Text>
+          </Box>
+        )}
+      </Box>
+    );
+  });
+
   // The band above the prompt: the prompts waiting for the turn that is running, and the images
   // pasted into the draft before it is sent.
   on('ui.render', { component: 'AbovePrompt' }, async ($, e, next) => {
@@ -925,8 +958,23 @@ export const register: Register = (on) => {
   // wrote; under it, the turn's requests and tokens. A footer takes the figures of the turn that
   // has just ended the first time it is drawn, and keeps them under its own id.
   on('ui.render', { component: 'TurnDuration' }, async ($, e, next) => {
-    if (e.surface !== 'terminal' || e.props.waitingFor !== undefined) return next(e);
+    if (e.surface !== 'terminal') return next(e);
     const { Box, Text } = $.ui.resolve(e);
+    // A turn that ended with agents still at work in the background says so, in the same quiet line.
+    const waiting = e.props.waitingFor;
+    if (waiting !== undefined) {
+      const count = waiting.agents.length + waiting.workflows;
+      return (
+        <Box key="waiting" flexDirection="row" paddingLeft={INSET} marginTop={1}>
+          <Box width={2} flexShrink={0}>
+            <Text color={MUTED}>│</Text>
+          </Box>
+          <Text color={MUTED}>
+            {`Waiting for ${count} background ${count === 1 ? 'agent' : 'agents'} to finish`}
+          </Text>
+        </Box>
+      );
+    }
     const { model, turnStartedAt } = await read($, main);
     const id = e.requestId;
     const kept = (await read($, footers))[id];

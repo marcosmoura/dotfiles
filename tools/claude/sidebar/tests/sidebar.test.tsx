@@ -1089,6 +1089,13 @@ test('the prompts the transcript draws make a rail: a thick tick on the one bein
       onScreen: { first: 0, last: 1, of: 2 },
     },
   });
+  // It is drawn as a quiet line under a tick, as a tool's line is.
+  expect(await notice.find({ type: 'Text', text: /^Agent "Ping 1" finished$/ })).toMatchObject({
+    props: { color: 'inactive' },
+  });
+  expect((await notice.find({ type: 'Box', key: 'notice' }))?.props).toMatchObject({
+    paddingLeft: 3,
+  });
   // A drawing writes nothing: the rail is brought up to date right after it.
   await clock.settle();
 
