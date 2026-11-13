@@ -320,6 +320,23 @@ shared by every worktree of the clone. The main copy keeps plain ids and is writ
   fails with `the staged <path> is not the file in the working tree: run "git add <path>"`. A path
   with no staged copy (unmerged) is left to Git, which refuses to commit it. The other rules read
   the working file.
+- During a cherry-pick or a revert (`CHERRY_PICK_HEAD` or `REVERT_HEAD`), on either copy: when
+  the commit changes the design file and `HEAD`'s design file is not the version the change starts
+  from (the commit's first parent for a cherry-pick, the commit itself for a revert), it fails.
+  Git cannot merge that file, so abort and make the change again. A replay onto the same version
+  passes, and a commit without a parent is skipped.
+
+`figkit check --rebase <upstream> [<branch>]` is for a `pre-rebase` hook, which Git calls with the
+same arguments (`git rebase --continue` runs no `pre-commit` hook). It exits 1 when a commit in
+`<upstream>..<branch>` (`<branch>` defaults to `HEAD`) changes the design file and `<upstream>`'s
+design file is not the one of their merge base: the rebase would stop at a conflict that loses
+work, so merge instead. It compares blob ids only, and exits 0 in every other case, including a
+rebase onto an ancestor, no merge base, and a checkout without `.figkit.json` or outside Git.
+
+```sh
+# .git/hooks/pre-rebase
+exec figkit check --rebase "$@"
+```
 
 ## Merging
 

@@ -18,6 +18,106 @@ export async function check(
   cwd: string,
   env: NodeJS.ProcessEnv = process.env,
 ): Promise<CheckResult> {
+  const result = await checkCopy(cwd, env);
+  const replay = replayReason(cwd, env);
+
+  return replay ? { ok: false, reasons: [replay, ...result.reasons] } : result;
+}
+
+/**
+ * Why `git rebase <upstream> [<branch>]` must not start, or null: a `pre-rebase` hook. A commit of
+ * the branch that changes the design file, replayed onto another version of it, stops at a
+ * conflict Git cannot merge. Null too when there is no project: a hook must not block a rebase
+ * because the tool found nothing to check.
+ */
+export function rebaseReason(
+  cwd: string,
+  upstream: string,
+  branch = 'HEAD',
+  env: NodeJS.ProcessEnv = process.env,
+): string | null {
+  let project;
+
+  try {
+    project = resolveProject(cwd, { ...env, FIGKIT_FILE: undefined });
+  } catch {
+    return null;
+  }
+
+  const { root } = project;
+  const path = relative(root, project.file);
+  const base = git(root, ['merge-base', upstream, branch]);
+
+  if (!base || blobAt(root, upstream, path) === blobAt(root, base, path)) {
+    return null;
+  }
+
+  const count = Number(git(root, ['rev-list', '--count', `${upstream}..${branch}`, '--', path]));
+
+  if (!count) {
+    return null;
+  }
+
+  return (
+    `rebasing would replay ${count} design commit(s) onto another version of ${path}. Git ` +
+    'cannot merge that file, and every way out of the conflict loses work. Merge instead: ' +
+    `git merge ${project.mainBranch}, then figkit merge ${project.mainBranch}`
+  );
+}
+
+/**
+ * Why the cherry-pick or revert in progress must not be committed, or null. A design commit
+ * replayed onto another version of the file than the one its change starts from (the first
+ * parent for a cherry-pick, the commit itself for a revert) is a conflict Git cannot merge.
+ */
+function replayReason(cwd: string, env: NodeJS.ProcessEnv): string | null {
+  let project;
+
+  try {
+    project = resolveProject(cwd, { ...env, FIGKIT_FILE: undefined });
+  } catch {
+    return null;
+  }
+
+  const { root } = project;
+  const gitDir = git(root, ['rev-parse', '--absolute-git-dir']);
+
+  if (!gitDir) {
+    return null;
+  }
+
+  const picked = readText(join(gitDir, 'CHERRY_PICK_HEAD'))?.trim().split('\n')[0]?.trim();
+  const reverted = readText(join(gitDir, 'REVERT_HEAD'))?.trim().split('\n')[0]?.trim();
+  const replayed = picked || reverted;
+  const commit = replayed
+    ? git(root, ['rev-parse', '-q', '--verify', `${replayed}^{commit}`])
+    : null;
+  const parent = commit ? git(root, ['rev-parse', '-q', '--verify', `${commit}^1`]) : null;
+
+  if (!commit || !parent) {
+    return null;
+  }
+
+  const path = relative(root, project.file);
+  const before = blobAt(root, parent, path);
+  const after = blobAt(root, commit, path);
+  const start = picked ? before : after;
+
+  if (before === after || blobAt(root, 'HEAD', path) === start) {
+    return null;
+  }
+
+  return (
+    `a design commit cannot be cherry-picked or reverted onto another version of ${path}: Git ` +
+    'cannot merge that file. Abort it and make the change again with a designer'
+  );
+}
+
+function blobAt(root: string, rev: string, path: string): string | null {
+  return git(root, ['rev-parse', '-q', '--verify', `${rev}:${path}`]);
+}
+
+async function checkCopy(cwd: string, env: NodeJS.ProcessEnv): Promise<CheckResult> {
   let project;
 
   try {

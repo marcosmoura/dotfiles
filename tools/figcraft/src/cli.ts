@@ -1,4 +1,4 @@
-import { check } from './check';
+import { check, rebaseReason } from './check';
 import { createContext } from './context';
 import { serve } from './mcp';
 import { mergeCommand } from './merge';
@@ -9,6 +9,8 @@ const USAGE = `figkit: read and build a FigCraft design file
   figkit <command> ['<json>' | @file.json | - | <name or id>] [--key value …] [--live]
   figkit mcp [--live]        serve the same commands as MCP tools
   figkit check               exit 1 when this checkout's copy must not be committed
+  figkit check --rebase <upstream> [<branch>]
+                             exit 1 when the rebase would replay design commits (pre-rebase hook)
   figkit merge <ref> [--review] [--resolve '{"<key>": "branch" | "main"}']
                              bring the design of <ref> into this checkout's copy after git merge
 
@@ -33,6 +35,24 @@ export async function main(argv: string[]): Promise<number> {
 
   if (command === 'mcp') {
     return serve({ live });
+  }
+
+  if (command === 'check' && rest[0] === '--rebase') {
+    const [, upstream, branch] = rest;
+
+    if (!upstream) {
+      process.stderr.write('error: usage: figkit check --rebase <upstream> [<branch>]\n');
+
+      return 1;
+    }
+
+    const reason = rebaseReason(process.cwd(), upstream, branch);
+
+    if (reason) {
+      process.stderr.write(`error: ${reason}\n`);
+    }
+
+    return reason ? 1 : 0;
   }
 
   if (command === 'check') {
@@ -71,7 +91,8 @@ export async function main(argv: string[]): Promise<number> {
     const input = await readInput(rest, tool.primary);
 
     // `use` in the shell works on the working directory's checkout, or on the one it names.
-    const cwd = tool.name === 'use' && typeof input.checkout === 'string' ? input.checkout : undefined;
+    const cwd =
+      tool.name === 'use' && typeof input.checkout === 'string' ? input.checkout : undefined;
 
     context = await createContext({ live, cwd });
 
