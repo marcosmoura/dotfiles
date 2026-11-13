@@ -420,12 +420,12 @@ test("the cards follow the engine's own list of agents", () => {
 
 const NOW = 1_800_000_000_000;
 /**
- * The bar's coloured parts for the window above, a colour a category: at 41% used they share 26 of
- * the bar's 64 cells, and the other 38 are what is left of the window.
+ * The bar's coloured parts for the window above, a colour a category: at 41% used they share 25 of
+ * the bar's 60 cells, and the other 35 are what is left of the window.
  */
 const STACKED = [
   ['merged', 3],
-  ['ide', 6],
+  ['ide', 5],
   ['success', 1],
   ['error', 16],
 ];
@@ -689,10 +689,13 @@ test('the sections share one header: the same chip, the same hover, the same spa
   }
 });
 
-test('the whole pane has one cell of padding all around', async ($, on) => {
+test('the whole pane has three cells of padding at its sides and one above and below', async ($, on) => {
   engine(on);
   const ui = await $.ui.mount({ ...pane(66), surface: 'terminal' });
-  expect(await ui.drawn()).toMatchObject({ type: 'Box', props: { padding: 1, width: 66 } });
+  expect(await ui.drawn()).toMatchObject({
+    type: 'Box',
+    props: { paddingX: 3, paddingY: 1, width: 66 },
+  });
   await ui.unmount();
 });
 
@@ -714,7 +717,7 @@ test('the closed context is its header, its figures and the bar by category, wit
   // What is used fills its share of the bar; the rest of the window is left empty.
   expect(await barOf(ui)).toEqual(STACKED);
   expect((await ui.find({ type: 'Text', text: /^░+$/ }))?.props.color).toBe('subtle');
-  expect((await ui.find({ type: 'Text', text: /^░+$/ }))?.text.length).toBe(38);
+  expect((await ui.find({ type: 'Text', text: /^░+$/ }))?.text.length).toBe(35);
   expect(await ui.find({ type: 'Text', text: /^System prompt$/ })).toBeUndefined();
   // The figures sit right under the header.
   expect(await ui.find({ type: 'Box', text: /^41% \/ 92%82K \/ 200K$/ })).toMatchObject({
@@ -733,11 +736,11 @@ test('the context figures turn orange past 65% and red past 85%', async ($, on) 
       changed: ['context'],
     });
   for (const [percent, color, cells] of [
-    [41, 'bashBorder', 26],
-    [65, 'bashBorder', 42],
-    [66, 'claude', 42],
-    [85, 'claude', 54],
-    [86, 'error', 55],
+    [41, 'bashBorder', 25],
+    [65, 'bashBorder', 39],
+    [66, 'claude', 40],
+    [85, 'claude', 51],
+    [86, 'error', 52],
   ] as const) {
     await measure(percent);
     const ui = await $.ui.mount({ ...pane(66), surface: 'terminal' });
@@ -746,11 +749,11 @@ test('the context figures turn orange past 65% and red past 85%', async ($, on) 
     ).toMatchObject({ color, bold: true });
     expect((await ui.find({ type: 'Text', text: /^ \/ 92%$/ }))?.props.color).toBe(color);
     expect((await ui.find({ type: 'Text', text: /K \/ 200K$/ }))?.props.color).toBe(color);
-    // The bar keeps its categories' colours and grows with the fill: that share of its 64 cells.
+    // The bar keeps its categories' colours and grows with the fill: that share of its 60 cells.
     const bar = await barOf(ui);
     expect(bar.map((part) => part[0])).toEqual(STACKED.map((part) => part[0]));
     expect(bar.reduce((sum, part) => sum + Number(part[1]), 0)).toBe(cells);
-    expect((await ui.find({ type: 'Text', text: /^░+$/ }))?.text.length).toBe(64 - cells);
+    expect((await ui.find({ type: 'Text', text: /^░+$/ }))?.text.length).toBe(60 - cells);
     await ui.unmount();
   }
 });
@@ -765,8 +768,8 @@ test('until the window has been broken down, the bar is how full it is', async (
     changed: ['context'],
   });
   const ui = await $.ui.mount({ ...pane(66), surface: 'terminal' });
-  expect(await barOf(ui)).toEqual([['claude', 45]]);
-  expect((await ui.find({ type: 'Text', text: /^░+$/ }))?.text.length).toBe(19);
+  expect(await barOf(ui)).toEqual([['claude', 42]]);
+  expect((await ui.find({ type: 'Text', text: /^░+$/ }))?.text.length).toBe(18);
   // No reading of where auto-compaction starts either: the percentage stands alone.
   expect(await ui.find({ type: 'Text', text: /^ \/ / })).toBeUndefined();
   await ui.unmount();
@@ -1225,7 +1228,7 @@ test('the subagents are counted, and once opened, drawn as a timeline with their
     // its label column: 19 of the body's 64 cells, less the number's three.
     expect((await ui.find({ key: 'lane-a1' }))?.props).toMatchObject({
       hotkey: '1',
-      label: 'Inventory AX ro…',
+      label: 'Inventory AX r…',
     });
     expect((await ui.find({ key: 'lane-a2' }))?.props).toMatchObject({
       hotkey: '2',
@@ -1239,8 +1242,8 @@ test('the subagents are counted, and once opened, drawn as a timeline with their
       (run) => run.props.color !== undefined,
     );
     expect(runs.map((run) => [run.props.color, run.text.length])).toEqual([
-      ['success', 34],
-      ['warning', 17],
+      ['success', 31],
+      ['warning', 16],
     ]);
     expect(await ui.find({ type: 'Text', text: /^2:00$/ })).toBeDefined();
     // Under each name: the agent type and the model.

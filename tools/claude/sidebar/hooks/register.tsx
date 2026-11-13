@@ -58,6 +58,8 @@ import {
 
 const PANE = 'sidebar';
 const OPEN = { id: PANE, title: 'Sidebar', columns: 64 };
+/** The cells the pane keeps clear at its left and right edges. */
+const PAD_X = 3;
 /** Cards kept: the pane draws the latest few, and a long session should not grow its state. */
 const KEPT = 40;
 /** Room for a clock up to `9:59:59`. */
@@ -976,7 +978,7 @@ export const register: Register = (on) => {
         $.session.turns(),
       ]);
     // One cell of padding all around the pane: the body less a column each side.
-    const W = Math.max(12, e.props.bodyColumns - 2);
+    const W = Math.max(12, e.props.bodyColumns - PAD_X * 2);
     const viewed = e.props.view.agentId;
 
     // A clock that ticks by itself where the surface runs surface modules, a reading elsewhere.
@@ -1333,7 +1335,13 @@ export const register: Register = (on) => {
     );
 
     return (
-      <Box flexDirection="column" padding={1} rowGap={1} width={e.props.bodyColumns}>
+      <Box
+        flexDirection="column"
+        paddingX={PAD_X}
+        paddingY={1}
+        rowGap={1}
+        width={e.props.bodyColumns}
+      >
         {title}
         {model}
         {context}
