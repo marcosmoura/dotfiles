@@ -816,7 +816,7 @@ export const register: Register = (on) => {
             <Text color="subtle">{' · '}</Text>
             <Text color={TONE.done}>{`✓ ${counts.done} done`}</Text>
             <Text color="subtle">{' · '}</Text>
-            <Text color={TONE.failed}>{`✕ ${counts.err} err`}</Text>
+            <Text color={TONE.failed}>{`✕ ${counts.err} errors`}</Text>
           </Text>
         </Box>
         {isListed && list.length === 0 ? <Text color="subtle">no subagents yet</Text> : null}

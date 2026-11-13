@@ -567,7 +567,7 @@ test('a fresh session draws the header, the context, the grid and the subagents 
       for (const [count, color] of [
         ['● 0 run', 'warning'],
         ['✓ 0 done', 'success'],
-        ['✕ 0 err', 'error'],
+        ['✕ 0 errors', 'error'],
       ] as const) {
         expect((await ui.find({ type: 'Text', text: new RegExp(`^${count}$`) }))?.props.color).toBe(
           color,
@@ -603,7 +603,7 @@ test('the sections share one header: the same chip, the same hover, the same spa
       Promise.all(['context', 'subagents'].map(async (key) => (await ui.find({ key }))?.children));
     const gaps = async () =>
       Promise.all(
-        [/^41% \/ 92%82K \/ 200K$/, /^● 0 run · ✓ 0 done · ✕ 0 err$/].map(
+        [/^41% \/ 92%82K \/ 200K$/, /^● 0 run · ✓ 0 done · ✕ 0 errors$/].map(
           async (text) => (await ui.find({ type: 'Box', text }))?.props.marginTop,
         ),
       );
@@ -1156,7 +1156,7 @@ test('the subagents are counted, and once opened, drawn as a timeline with their
 
   // Closed: the counts alone.
   const closed = await $.ui.mount({ ...pane(66), surface: 'terminal' });
-  for (const count of ['● 1 run', '✓ 1 done', '✕ 0 err'])
+  for (const count of ['● 1 run', '✓ 1 done', '✕ 0 errors'])
     expect(await closed.find({ type: 'Text', text: new RegExp(`^${count}$`) })).toBeDefined();
   expect(await closed.find({ key: 'lane-a1' })).toBeUndefined();
   await closed.press({ key: 'subagents' });
