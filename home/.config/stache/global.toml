@@ -10,3 +10,6 @@ debug = false
 
 # Minimum severity the host writes.
 level = "debug"
+
+[ui]
+appearance = "dark"
