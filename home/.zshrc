@@ -1,36 +1,33 @@
-# ╔══════════════════════════════════════════════════════════════╗
-# ║  .zshrc — Interactive shell configuration                   ║
-# ║  Loaded for every interactive session (after .zprofile)     ║
-# ╚══════════════════════════════════════════════════════════════╝
+# .zshrc: interactive shells.
+#
+# Only what the first prompt needs loads here. Completion, tool integrations
+# and plugins load right after the prompt is on screen, in the order that
+# ~/.config/sheldon/plugins.toml lists them.
 
-ZSH_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/zsh"
+ZSH_DIR=${XDG_CONFIG_HOME:-$HOME/.config}/zsh
 
-# History
-source "$ZSH_DIR/history.zsh"
+source $ZSH_DIR/lib/cache.zsh # `cached`: keeps the code that tools generate on disk
+source $ZSH_DIR/lib/print.zsh # print-* helpers
 
-# Secrets (API keys from ~/.secrets/)
-source "$ZSH_DIR/secrets.zsh"
+source $ZSH_DIR/rc/options.zsh
+source $ZSH_DIR/rc/history.zsh
+source $ZSH_DIR/rc/secrets.zsh # API keys from ~/.secrets
+source $ZSH_DIR/rc/aliases.zsh
+source $ZSH_DIR/rc/herdr.zsh   # pane titles inside Herdr
+source $ZSH_DIR/rc/prompt.zsh  # starship
+source $ZSH_DIR/rc/plugins.zsh # key bindings now, everything else deferred
 
-# Zsh autosuggestions style
-export ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=#888"
+# Each file in functions/ is a command that loads the first time it runs
+fpath=($ZSH_DIR/functions $fpath)
+autoload -Uz $ZSH_DIR/functions/*(N.:t)
 
-# You Should Use
-export YSU_MODE=ALL
-
-# Plugin manager (sheldon)
-eval "$(sheldon source)"
-
-# Prompt (starship)
-export STARSHIP_CONFIG="${XDG_CONFIG_HOME:-$HOME/.config}/starship/starship.toml"
-export STARSHIP_EMOJI=$("${XDG_CONFIG_HOME:-$HOME/.config}/starship/scripts/emoji.sh")
-export STARSHIP_CLOCK=$("${XDG_CONFIG_HOME:-$HOME/.config}/starship/scripts/clock.sh")
-eval "$(starship init zsh)"
-
-# Welcome screen on login shells
+# Welcome screen in login shells, which is what a new terminal tab starts
 if [[ -o login ]]; then
-  clear
-  command -v systeminfo &>/dev/null && systeminfo
+  print -n '\e[H\e[2J\e[3J' # clear the screen and the scrollback
+  system-info
 fi
 
 # bun completions
-[ -s "/Users/marcosmoura/.bun/_bun" ] && source "/Users/marcosmoura/.bun/_bun"
+# Loaded on the first tab, by ~/.config/zsh/completions/_bun. The line above
+# has to stay as it is: `bun upgrade` looks for it, and appends its own loader
+# to this file when it is missing.

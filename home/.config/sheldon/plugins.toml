@@ -1,52 +1,89 @@
 shell = "zsh"
 
+# What an interactive shell loads on top of ~/.zshrc, in this order.
+#
+# ~/.zshrc loads what the first prompt needs, then runs the code that
+# `sheldon source` makes from this file (it keeps a copy in
+# ~/.cache/zsh/plugins.zsh). Entries without `apply` load on the spot. Entries
+# with the `defer` template load once the prompt is on screen. The local
+# entries are the deferred half of ~/.config/zsh.
+
+[templates]
+# zsh-defer runs a command as soon as the line editor is idle. By default it
+# also runs every precmd hook and redraws the prompt after each command, which
+# costs more than the plugins do. -m and -p turn that off; the `settle` entry
+# at the end runs the hooks once for all of them.
+defer = "{% for file in files %}zsh-defer -mp source \"{{ file }}\"\n{% endfor %}"
+
 # ==============================================================================
-# DEFER SETUP
+# BEFORE THE FIRST PROMPT
 # ==============================================================================
-# Template for deferred loading to improve shell startup time
 
 [plugins.zsh-defer]
 github = "romkatv/zsh-defer"
 
-[templates]
-defer = "{{ hooks?.pre | nl }}{% for file in files %}zsh-defer -p source \"{{ file }}\"\n{% endfor %}{{ hooks?.post | nl }}"
-
-# ==============================================================================
-# CORE SYSTEM MODULES
-# ==============================================================================
-# Essential functionality that needs to load early
-
-[plugins.core-system]
-local = "~/.config/zsh/plugins"
-use = ["{compinit,macOS}.plugin.sh"]
-
-# ==============================================================================
-# OH-MY-ZSH FOUNDATION
-# ==============================================================================
-# Core zsh functionality from oh-my-zsh
-
-[plugins.ohmyzsh-lib]
+# Key bindings have to be there for the first key press
+[plugins.ohmyzsh-key-bindings]
 github = "ohmyzsh/ohmyzsh"
 dir = "lib"
-use = ["{compfix,completion,git,grep,history,key-bindings}.zsh"]
+use = ["key-bindings.zsh"]
+
+# Extra completion definitions. Only put on fpath, for compinit to find.
+[plugins.zsh-completions]
+github = "zsh-users/zsh-completions"
+dir = "src"
+apply = ["fpath"]
+
+# ==============================================================================
+# COMPLETION
+# ==============================================================================
+
+# compinit. Everything below that defines a completion needs it first.
+[plugins.completion]
+local = "~/.config/zsh/deferred"
+use = ["completion.zsh"]
+apply = ["defer"]
+
+# Completion options and styles: menu selection, case-insensitive matching
+[plugins.ohmyzsh-completion]
+github = "ohmyzsh/ohmyzsh"
+dir = "lib"
+use = ["completion.zsh"]
+apply = ["defer"]
+
+[plugins.yarn-completion]
+github = "chrisands/zsh-yarn-completions"
+apply = ["defer"]
+
+[plugins.nx-completion]
+github = "jscutlery/nx-completion"
+apply = ["defer"]
+
+# ==============================================================================
+# TOOLS
+# ==============================================================================
+
+# fzf, atuin, zoxide, direnv, luarocks, mise. Before the plugins below, so that
+# syntax highlighting sees the widgets that fzf and atuin define.
+[plugins.tools]
+local = "~/.config/zsh/deferred"
+use = ["tools.zsh"]
+apply = ["defer"]
+
+# After the tools: it looks up its helper binary, pnpm-shell-completion, when
+# it loads, and that is a mise tool (see ~/.config/mise/config.toml).
+[plugins.pnpm-completion]
+github = "g-plane/pnpm-shell-completion"
+apply = ["defer"]
+
+# ==============================================================================
+# PLUGINS
+# ==============================================================================
 
 [plugins.ohmyzsh-plugins]
 github = "ohmyzsh/ohmyzsh"
 dir = "plugins"
-use = ["{aliases,cp,dircycle,github,zoxide}/*.plugin.zsh"]
-apply = ["defer"]
-
-# ==============================================================================
-# SHELL ENHANCEMENTS
-# ==============================================================================
-# Visual and interactive improvements
-
-[plugins.256color]
-github = "chrissicool/zsh-256color"
-apply = ["defer"]
-
-[plugins.syntax-highlight]
-github = "marcosmoura/fast-syntax-highlighting"
+use = ["{aliases,cp,dircycle}/*.plugin.zsh"]
 apply = ["defer"]
 
 [plugins.zsh-autosuggestions]
@@ -58,53 +95,16 @@ apply = ["defer"]
 github = "MichaelAquilina/zsh-you-should-use"
 apply = ["defer"]
 
-# ==============================================================================
-# COMPLETION SYSTEM
-# ==============================================================================
-# Tab completion for various tools and commands
-
-[plugins.zsh-completions]
-github = "zsh-users/zsh-completions"
-apply = ["defer"]
-
-# Custom env from dotfiles
-[plugins.dotfiles-env]
-local = "~/.config/zsh/plugins"
-use = ["env.plugin.sh"]
-apply = ["defer"]
-
-# Custom completion from dotfiles
-[plugins.dotfiles-completions]
-local = "~/.config/zsh/plugins"
-use = ["completions.plugin.sh"]
-
-# Node.js ecosystem completions
-[plugins.yarn-completion]
-github = "chrisands/zsh-yarn-completions"
-apply = ["defer"]
-
-[plugins.nx-completion]
-github = "jscutlery/nx-completion"
-
-[plugins.pnpm-completion]
-github = "g-plane/pnpm-shell-completion"
+# Last of the plugins: it wraps the widgets that exist when it loads
+[plugins.syntax-highlight]
+github = "marcosmoura/fast-syntax-highlighting"
 apply = ["defer"]
 
 # ==============================================================================
-# NAVIGATION & UTILITIES
+# SETTLE
 # ==============================================================================
-# Tools for better directory navigation and file management
 
-[plugins.zoxide]
-github = "ajeetdsouza/zoxide"
-apply = ["defer"]
-
-# ==============================================================================
-# CUSTOM DOTFILES MODULES
-# ==============================================================================
-# Personal shell configuration modules
-
-[plugins.dotfiles-plugins]
-local = "~/.config/zsh/plugins"
-use = ["*.plugin.sh", "*.plugin.zsh", "!{compinit,completions,env,macOS}/*.plugin.sh"]
-apply = ["defer"]
+# Run the precmd hooks once, now that everything is loaded. This is what
+# applies direnv to the first prompt and starts autosuggestions on it.
+[plugins.settle]
+inline = "zsh-defer -p -c :"

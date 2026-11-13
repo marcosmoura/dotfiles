@@ -1,0 +1,27 @@
+# node-versions: print the versions of node and the tools around it
+
+local nx_global="$(nx --version | grep Global | sed 's/- Global: v//')"
+local nx_local="$(nx --version | grep Local | sed 's/- Local: v//')"
+
+print-info "Node ENV versions:\n"
+
+local -A versions=(
+  node "$(node -v)"
+  npm "$(npm -v)"
+  yarn "$(yarn -v)"
+  pnpm "$(pnpm -v)"
+  bun "$(bun -v)"
+  tsc "$(tsc -v | sed 's/Version //')"
+)
+
+# Outside a workspace nx reports no global version; show the local one then
+if [[ $nx_global == *"Not found"* ]]; then
+  versions[nx]="$nx_local (using local version)"
+else
+  versions[nx]="$nx_global (using global version)"
+fi
+
+local name
+for name in node npm yarn pnpm bun tsc nx; do
+  printf "$TEXT_YELLOW%s: $TEXT_RESET%s\n" $name $versions[$name]
+done

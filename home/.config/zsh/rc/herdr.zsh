@@ -3,12 +3,12 @@
 
 autoload -Uz add-zsh-hook
 
-function _herdr_autorename_refresh() {
+function _herdr-autorename-refresh() {
   [[ ${HERDR_ENV:-} == 1 ]] || return
-  "${HERDR_BIN_PATH:-herdr}" plugin action invoke marcosmoura.autorename.refresh >/dev/null 2>&1 &!
+  "${HERDR_BIN_PATH:-herdr}" plugin action invoke marcosmoura.autorename.refresh >/dev/null 2>&1 &|
 }
 
-function _herdr_autorename_title() {
+function _herdr-autorename-title() {
   [[ ${HERDR_ENV:-} == 1 ]] || return
 
   local -a words
@@ -17,14 +17,14 @@ function _herdr_autorename_title() {
   [[ -n $command ]] || return
   command=${command:t}
   printf '\e]2;%s\a' "$command"
-  _herdr_autorename_refresh
+  _herdr-autorename-refresh
 }
 
-function _herdr_autorename_clear_title() {
+function _herdr-autorename-clear-title() {
   [[ ${HERDR_ENV:-} == 1 ]] || return
   printf '\e]2;\a'
-  _herdr_autorename_refresh
+  _herdr-autorename-refresh
 }
 
-add-zsh-hook preexec _herdr_autorename_title
-add-zsh-hook precmd _herdr_autorename_clear_title
+add-zsh-hook preexec _herdr-autorename-title
+add-zsh-hook precmd _herdr-autorename-clear-title

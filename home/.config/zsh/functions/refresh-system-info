@@ -1,0 +1,27 @@
+# refresh-system-info: rebuild the line that system-info prints, for example
+#   Apple MacBook Pro 14" / M1 Pro / 32 GB RAM / 494GB
+
+local hardware="$(system_profiler SPHardwareDataType 2>/dev/null)"
+local model="$(awk -F': ' '/^ *Model Name:/ {print $2; exit}' <<<$hardware)"
+local chip="$(awk -F': ' '/^ *Chip:/ {print $2; exit}' <<<$hardware)"
+local memory="$(awk -F': ' '/^ *Memory:/ {print $2; exit}' <<<$hardware)"
+
+# system_profiler does not report the screen size. Tell it from the width of
+# the built-in display's resolution.
+local width="$(system_profiler SPDisplaysDataType 2>/dev/null |
+  awk '/Built-in/,/Resolution:/' | awk -F': ' '/Resolution:/ {print $2; exit}' | awk '{print $1}')"
+case $width in
+  3456) model+=' 16"' ;;
+  3024) model+=' 14"' ;;
+  2880) model+=' 15"' ;;
+  2560) model+=' 13"' ;;
+  2304) model+=' 12"' ;;
+esac
+
+# Size of the startup disk as df rounds it: 494G, or 1.8T on a bigger one
+local size="$(df -H / | awk 'NR==2 {print $2}')"
+local disk="${${size%?}%.*}${size[-1]}B"
+[[ $size == *G ]] && ((${size%G} >= 990)) && disk=1TB
+
+print -r -- "Apple $model / ${chip#Apple } / $memory RAM / $disk" >|$ZSH_CACHE/systeminfo
+echo "System info cache refreshed!"

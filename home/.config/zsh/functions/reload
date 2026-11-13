@@ -1,0 +1,3 @@
+# reload: replace this shell with a fresh login shell
+
+exec $SHELL -l

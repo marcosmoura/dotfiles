@@ -1,0 +1,32 @@
+# update-system: update everything with topgrade
+
+clear
+print-green "💻 Updating system tools\n"
+
+print-text "🔑 Authenticating"
+if ! sudo -v; then
+  print-error "Failed to acquire sudo credentials"
+  return 1
+fi
+
+# topgrade runs longer than sudo remembers a password. Renew it every minute
+# for as long as this shell lives and sudo still accepts it, and stop when
+# this function returns, however it returns.
+local shell_pid=$$
+(
+  while kill -0 $shell_pid 2>/dev/null && sudo -n true 2>/dev/null; do
+    sleep 60
+  done
+) &|
+setopt local_options local_traps
+trap "kill $! 2>/dev/null" EXIT
+
+clear
+print-green "💻 Updating system tools\n"
+
+topgrade
+
+# topgrade updates the syntax highlighting plugin, which resets its theme
+fast-theme $XDG_CONFIG_HOME/syntax-theme/syntax-theme.ini >/dev/null 2>&1
+
+print-success "💻 Updated! \n"

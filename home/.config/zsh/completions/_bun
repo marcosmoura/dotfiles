@@ -1,0 +1,7 @@
+#compdef bun
+
+# bun writes its completion to ~/.bun/_bun and asks for it to be sourced from
+# .zshrc, which costs about 7 ms on every start. This loads it on the first
+# tab instead: the file redefines _bun, which then does the completing.
+
+source ${BUN_INSTALL:-$HOME/.bun}/_bun && _bun "$@"

@@ -3,6 +3,7 @@ ruby = "latest"
 node = "latest"
 python = "latest"
 pnpm = "latest"
+"github:g-plane/pnpm-shell-completion" = "latest"
 
 [settings]
 experimental = true

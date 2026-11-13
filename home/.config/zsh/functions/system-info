@@ -1,0 +1,14 @@
+# system-info: the welcome screen. One line about this Mac, then fastfetch.
+#
+# The line comes from system_profiler, which takes about a second, and it
+# never changes on a given machine. refresh-system-info writes it to a file once.
+
+(($+commands[system_profiler])) || return
+
+local line cache=$ZSH_CACHE/systeminfo
+[[ -s $cache ]] || refresh-system-info >/dev/null
+IFS= read -r line <$cache
+
+print-yellow "\n  💻 $line\n"
+
+fastfetch

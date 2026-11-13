@@ -16,7 +16,7 @@ The plugin never replaces a label you set manually. It only updates blank/defaul
 herdr plugin link /path/to/dotfiles/tools/herdr/autorename --enabled
 ```
 
-The companion Zsh hook at `home/.config/zsh/plugins/herdr-autorename.plugin.zsh`
+The companion Zsh hook at `home/.config/zsh/rc/herdr.zsh`
 sets an OSC title for commands that do not set one themselves. It is active only
 inside Herdr.
 

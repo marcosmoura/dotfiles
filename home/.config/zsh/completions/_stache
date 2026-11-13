@@ -1,0 +1,7 @@
+#compdef stache
+
+# Nothing installs a completion file for stache, and asking it for one takes
+# about 50 ms. So it is asked on the first tab: the code it prints redefines
+# _stache, which then does the completing.
+
+eval "$(stache completions --shell zsh)" && _stache "$@"

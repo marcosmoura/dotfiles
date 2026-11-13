@@ -1,0 +1,26 @@
+# targz <path>...: create <first path>.tar.gz, compressed with zopfli, pigz or gzip
+
+if (($# == 0)); then
+  echo "Usage: targz <path> [path ...]" >&2
+  return 1
+fi
+
+local tmpFile="${1%/}.tar"
+tar -cvf "${tmpFile}" --exclude=".DS_Store" "${@}" || return 1
+
+local size=$(stat -f"%z" "${tmpFile}")
+
+# zopfli compresses best but is slow, so it only gets archives under 50 MB
+local cmd
+if ((size < 52428800)) && (($+commands[zopfli])); then
+  cmd="zopfli"
+elif (($+commands[pigz])); then
+  cmd="pigz"
+else
+  cmd="gzip"
+fi
+
+echo "Compressing .tar using \`${cmd}\`…"
+"${cmd}" -v "${tmpFile}" || return 1
+[ -f "${tmpFile}" ] && rm "${tmpFile}"
+echo "${tmpFile}.gz created successfully."

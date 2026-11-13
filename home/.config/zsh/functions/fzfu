@@ -1,0 +1,3 @@
+# fzfu: fzf over stdin with duplicate lines removed, keeping the first of each
+
+awk '!x[$0]++' | fzf
