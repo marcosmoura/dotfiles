@@ -3,6 +3,8 @@
 My macOS setup: the configs in `home/`, a few tools of my own in `tools/`, and the
 [mise](https://mise.jdx.dev) tasks that install it all on an Apple Silicon Mac.
 
+![The desktop: a status bar across the top and OpenCode running in a Ghostty window](screenshot.png)
+
 ## Install
 
 ```bash
@@ -27,12 +29,12 @@ order and stops at the first one that fails.
 | `link`     | Links `home/` into `~`. Anything in the way is moved to `<name>.backup-<time>`.     |
 | `identity` | Creates `~/.secrets` and asks for the git name and email.                           |
 | `macos`    | Applies macOS defaults. Needs sudo, restarts Finder and the Dock, cannot be undone. |
-| `brew`     | Installs `home/Brewfile` and lists what is installed beyond it. Removes nothing.    |
+| `brew`     | Installs `home/Brewfile` and lists what else is installed, without removing it.     |
 | `shell`    | Installs the zsh plugins and applies the syntax highlighting theme.                 |
 | `packages` | Installs the language runtimes and the global packages in `packages/`.              |
 | `tools`    | Installs dependencies for `tools/` and wires them into their host apps.             |
 | `agents`   | Registers the MCP servers Claude Code keeps outside its tracked config.             |
-| `doctor`   | Checks that this Mac matches the repo. Changes nothing.                             |
+| `doctor`   | Checks that this Mac matches the repo, without changing anything.                   |
 | `lint`     | Checks every shell file: shellcheck, `bash -n`, `zsh -n` and shfmt.                 |
 | `format`   | Formats every shell file in place with shfmt.                                       |
 
@@ -78,11 +80,12 @@ a file under `home/`.
   `cargo`, `pip`, `gem` and `luarocks`.
 - Runtime versions (Node, pnpm, Python, Ruby) are set in `home/.config/mise/config.toml`.
 
-Upgrades are not a task. `update-system` in the shell runs topgrade for that.
+To upgrade everything, run `update-system` in the shell. It runs topgrade, and there is no task
+for it.
 
 ## Secrets and git identity
 
-Neither is in git. API keys live in `~/.secrets`, one file per key holding only the value;
-`home/.config/zsh/rc/secrets.zsh` exports them. The git name and email live in
+API keys are never committed. They live in `~/.secrets`, one file per key holding only the value,
+and `home/.config/zsh/rc/secrets.zsh` exports them. The git name and email live in
 `home/.config/git/identity`, which is gitignored and included by `home/.config/git/config`.
 `mise run identity` creates both.
