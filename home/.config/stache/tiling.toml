@@ -18,7 +18,6 @@ ignore = [
   { app_id = "com.apple.systempreferences" },
   { app_id = "com.apple.weather.menu" },
   { app_id = "com.tinycast.app" },
-  { app_id = "com.trongduong.snapzy" },
   { app_id = "com.wulkano.kap" },
 ]
 
@@ -98,6 +97,7 @@ default_position = "center"
 # Y position; ignored when `center` is true.
 presets = [
   { center = true, height = 1080, name = "centered", width = 1920 },
+  { center = true, height = 900, name = "centered-small", width = 1600 },
   { center = true, height = "100%", name = "full", width = "100%" },
   { height = "100%", name = "aligned-left", width = "50%", x = 0, y = 0 },
   { height = "100%", name = "aligned-right", width = "50%", x = "50%", y = 0 },

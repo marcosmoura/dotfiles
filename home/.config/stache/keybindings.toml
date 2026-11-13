@@ -38,6 +38,7 @@ enabled = true
 "Control+Option+Command+right" = "stache tiling window --resize width 50"
 "Control+Option+Command+up" = "stache tiling window --resize height 50"
 "Control+Option+down" = "stache tiling window --preset centered"
+"Control+Option+Shift+down" = "stache tiling window --preset centered-small"
 "Control+Option+left" = "stache tiling window --preset aligned-left"
 "Control+Option+right" = "stache tiling window --preset aligned-right"
 "Control+Option+up" = "stache tiling window --preset full"
