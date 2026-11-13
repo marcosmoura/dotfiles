@@ -2,9 +2,15 @@ allowBuilds:
   msgpackr-extract: false
   protobufjs: false
 minimumReleaseAgeExclude:
-  - "@opencode/ai@2.0.3"
-  - "@opencode/client@2.0.3"
-  - "@opencode/plugin@2.0.3"
-  - "@opencode/protocol@2.0.3"
-  - "@opencode/schema@2.0.3"
-  - "@opencode/util@2.0.3"
+  - "@opencode/ai@2.3.0"
+  - "@opencode/client@2.3.0"
+  - "@opencode/plugin@2.3.0"
+  - "@opencode/protocol@2.3.0"
+  - "@opencode/schema@2.3.0"
+  - "@opencode/util@2.3.0"
+# Patched versions for packages that a dependency still pins below the fix.
+# Written by `pnpm audit --fix`. Drop an entry once `pnpm audit` is clean
+# without it.
+overrides:
+  glob@>=9.0.0 <=14.0.1: ^14.0.2
+  minimatch@>=7.0.0 <11.0.1: ^11.0.1

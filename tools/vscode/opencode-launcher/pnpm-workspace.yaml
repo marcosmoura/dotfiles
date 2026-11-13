@@ -3,3 +3,20 @@ allowBuilds:
   node-pty: false
   keytar: false
   "@vscode/vsce-sign": false
+minimumReleaseAgeExclude:
+  - "@vscode/vsce@4.1.1"
+  - "@vscode/vsce-sign-alpine-arm64@2.0.8"
+  - "@vscode/vsce-sign-alpine-x64@2.0.8"
+  - "@vscode/vsce-sign-darwin-arm64@2.0.8"
+  - "@vscode/vsce-sign-darwin-x64@2.0.8"
+  - "@vscode/vsce-sign-linux-arm64@2.0.8"
+  - "@vscode/vsce-sign-linux-arm@2.0.8"
+  - "@vscode/vsce-sign-linux-x64@2.0.8"
+  - "@vscode/vsce-sign-win32-arm64@2.0.8"
+  - "@vscode/vsce-sign-win32-x64@2.0.8"
+  - "@vscode/vsce-sign@2.1.1"
+# Patched versions for packages that a dependency still pins below the fix.
+# Written by `pnpm audit --fix`. Drop an entry once `pnpm audit` is clean
+# without it.
+overrides:
+  minimatch@>=7.0.0 <11.0.1: ^11.0.1

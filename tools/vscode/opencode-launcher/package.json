@@ -20,10 +20,10 @@
     "node-pty": "^1.1.0"
   },
   "devDependencies": {
-    "@types/node": "^26.6.5",
-    "@types/vscode": "^1.140.0",
-    "@vscode/vsce": "^4.0.0",
-    "tsdown": "^0.23.1",
+    "@types/node": "^26.6.6",
+    "@types/vscode": "^1.146.0",
+    "@vscode/vsce": "^4.1.1",
+    "tsdown": "^0.23.7",
     "typescript": "^7.0.2"
   },
   "contributes": {
@@ -60,7 +60,7 @@
     }
   },
   "engines": {
-    "vscode": "^1.114.0"
+    "vscode": "^1.146.0"
   },
-  "packageManager": "pnpm@12.4.1"
+  "packageManager": "pnpm@12.18.0"
 }
