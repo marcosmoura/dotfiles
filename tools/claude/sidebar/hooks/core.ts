@@ -283,6 +283,15 @@ export const whereOf = (
 /** The rail keeps the latest prompts: a long session should not grow its state. */
 const KEPT_PROMPTS = 200;
 
+/** The id a row has while the conversation has not given it one. */
+const NO_ID = 'placeholder';
+
+/**
+ * What tells a row of the conversation, whichever way it is named: the transcript draws a typed
+ * prompt under its stored id with the last group zeroed, so only what comes before is compared.
+ */
+export const rowKey = (id: string) => id.slice(0, 23);
+
 /** The last prompt that left the screen: which one, and whether it went off the bottom edge. */
 export type Left = { id: string; isBelow: boolean };
 
@@ -293,20 +302,40 @@ export type Left = { id: string; isBelow: boolean };
  * The prompt being read is the topmost one on screen. With none on screen it is the one that last
  * left, or the one before it when that one went off the bottom (the reader scrolled up past it).
  * Until the transcript has said anything it is the latest.
+ *
+ * Rows are drawn as they scroll into view, which is not the order they were typed in: `order` is
+ * the ids as the conversation keeps them, and the rail follows it. One it does not hold yet is a
+ * prompt just typed, and stays last. A row drawn before the conversation gave it an id is no prompt
+ * to jump to.
  */
 export const railOf = (
   known: Rail,
   seen: readonly (readonly [string, string])[],
   shown: readonly string[],
   left: Left | undefined,
+  order?: readonly string[],
 ): Rail => {
   const texts = new Map(seen);
-  const prompts = [
+  const at = new Map(order?.map((id, i) => [rowKey(id), i]));
+  const drawn = [
     ...known.prompts.map((p) => ({ id: p.id, text: texts.get(p.id) ?? p.text })),
     ...seen
       .filter(([id]) => !known.prompts.some((p) => p.id === id))
       .map(([id, text]) => ({ id, text })),
-  ].slice(-KEPT_PROMPTS);
+  ].filter((p) => p.id !== NO_ID);
+  // A prompt typed over a running turn is drawn under other ids before the conversation gives it
+  // its own: once a prompt of that text is in the conversation, those earlier rows are not kept,
+  // and of several still waiting under one text only the latest is.
+  const stored = drawn
+    .filter((p) => at.has(rowKey(p.id)))
+    .sort((a, b) => (at.get(rowKey(a.id)) ?? 0) - (at.get(rowKey(b.id)) ?? 0));
+  const waiting = drawn.filter(
+    (p, i) =>
+      !at.has(rowKey(p.id)) &&
+      !stored.some((k) => k.text === p.text) &&
+      !drawn.some((later, l) => l > i && !at.has(rowKey(later.id)) && later.text === p.text),
+  );
+  const prompts = (order === undefined ? drawn : [...stored, ...waiting]).slice(-KEPT_PROMPTS);
   const onScreen = prompts.find((p) => shown.includes(p.id));
   const leftAt = prompts.findIndex((p) => p.id === left?.id);
   const offScreen = leftAt < 0 ? undefined : prompts[Math.max(0, leftAt - (left?.isBelow ? 1 : 0))];

@@ -42,6 +42,7 @@ import {
   piecesOf,
   prettyModel,
   railOf,
+  rowKey,
   sandboxOf,
   segments,
   shorten,
@@ -181,14 +182,54 @@ const shown = new Map<string, { first: number; last: number; of: number }>();
 let left: Left | undefined;
 let isDue = false;
 
+/**
+ * Prints, of the ids it is given, those the session's transcript file holds, in the file's order:
+ * the order the conversation took its rows in. An id is told by its first 23 characters (`rowKey`).
+ */
+const ORDER_AWK =
+  'BEGIN { n = split(ids, a, ","); for (i = 1; i <= n; i++) want[substr(a[i], 1, 23)] = 1 } ' +
+  '{ s = $0; while (match(s, /"uuid":"[0-9a-f-]+"/)) { u = substr(s, RSTART + 8, 23); ' +
+  'if ((u in want) && !(u in seen)) { seen[u] = 1; print u } s = substr(s, RSTART + RLENGTH) } }';
+let transcript: string | undefined;
+let isOrdered = false;
+
+/** The prompts' ids in the order they were typed; undefined where the transcript cannot be read. */
+const orderOf = async ($: EngineInterface, ids: readonly string[]) => {
+  try {
+    transcript ??=
+      (await sh(
+        $,
+        'ls "$HOME"/.claude/projects/*/"$0".jsonl 2>/dev/null | head -1',
+        await $.session.id(),
+      )) || undefined;
+    if (transcript === undefined || ids.length === 0) return undefined;
+    const ran = await $.process.run(['awk', '-v', `ids=${ids.join(',')}`, ORDER_AWK, transcript], {
+      timeoutMs: 10_000,
+    });
+    return ran.exitCode === 0 ? ran.stdout.split('\n').filter((id) => id !== '') : undefined;
+  } catch {
+    return undefined;
+  }
+};
+
 const publish = async ($: EngineInterface) => {
   isDue = false;
   const batch = [...seen];
   seen.clear();
   const onScreen = [...shown.keys()];
   const known = await read($, rail);
-  if (differs(known, railOf(known, batch, onScreen, left)))
-    await update($, rail, (r) => railOf(r, batch, onScreen, left));
+  // The order is asked again when a prompt is new to the rail, and once after a load, which puts
+  // right a rail kept from before in the order its rows were drawn.
+  const isNew = batch.some(([id]) => !known.prompts.some((p) => p.id === id));
+  const order =
+    isNew || !isOrdered
+      ? await orderOf($, [
+          ...new Set([...known.prompts.map((p) => p.id), ...batch.map(([id]) => id)]),
+        ])
+      : undefined;
+  if (order !== undefined) isOrdered = true;
+  if (differs(known, railOf(known, batch, onScreen, left, order)))
+    await update($, rail, (r) => railOf(r, batch, onScreen, left, order));
 };
 
 /**
@@ -550,7 +591,7 @@ export const register: Register = (on) => {
       const els = $.ui.resolve(e);
       const { Box, Text } = els;
       const pasted = imagesIn(e.props.text);
-      const taken = (await read($, sent))[id];
+      const taken = (await read($, sent))[rowKey(id)];
       const entry = (await read($, typed)).findLast((t) => t.text === e.props.text.trim());
       const at = taken ?? entry?.at;
       const isQueued = taken === undefined && entry?.isQueued === true;
@@ -619,7 +660,9 @@ export const register: Register = (on) => {
       );
     if (at !== undefined)
       await update($, sent, (known) =>
-        Object.fromEntries([...Object.entries(known), [e.uuid, at] as const].slice(-KEPT_SENT)),
+        Object.fromEntries(
+          [...Object.entries(known), [rowKey(e.uuid), at] as const].slice(-KEPT_SENT),
+        ),
       );
 
     return next(e);

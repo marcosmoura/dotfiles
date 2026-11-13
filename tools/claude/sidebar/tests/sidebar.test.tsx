@@ -182,6 +182,49 @@ test('the rail keeps the prompts in the order the transcript drew them, and tell
   expect(
     railOf({ ...drawn, reading: 'p1' }, [['p1', 'Explain a debounce']], [], undefined),
   ).toEqual({ ...drawn, reading: 'p1' });
+  // Rows are drawn as they scroll into view. The rail follows the conversation's own order, a prompt
+  // it does not hold yet staying last; a row with no id yet is left out.
+  const scrolled = railOf(
+    { prompts: [], reading: null },
+    [
+      ['p3', 'third'],
+      ['new', 'just typed'],
+      ['placeholder', '/clear'],
+      ['p1', 'first'],
+      ['p2', 'second'],
+    ],
+    [],
+    undefined,
+    ['p1', 'x', 'p2', 'p3'],
+  );
+  expect(scrolled.prompts.map((p) => p.id)).toEqual(['p1', 'p2', 'p3', 'new']);
+  // A prompt typed over a running turn is drawn under a queue's id, then under its own: one row.
+  const queued = railOf(
+    { prompts: [], reading: null },
+    [
+      ['q-a', 'and run the tests'],
+      ['p1', 'first'],
+      ['q-b', 'and run the tests'],
+    ],
+    [],
+    undefined,
+    ['p1'],
+  );
+  expect(queued.prompts.map((p) => p.id)).toEqual(['p1', 'q-b']);
+  const taken = railOf(queued, [['p2', 'and run the tests']], [], undefined, ['p1', 'p2']);
+  expect(taken.prompts.map((p) => p.id)).toEqual(['p1', 'p2']);
+  // The transcript draws a typed prompt under its stored id with the last group zeroed: the same row.
+  const zeroed = railOf(
+    { prompts: [], reading: null },
+    [
+      ['76a28725-649b-482a-a19f-a3444aa54ad0', 'second'],
+      ['556d401b-8e17-467d-9d3a-000000000000', 'first'],
+    ],
+    [],
+    undefined,
+    ['556d401b-8e17-467d-9d3a-8e8244448a86', '76a28725-649b-482a-a19f-a3444aa54ad0'],
+  );
+  expect(zeroed.prompts.map((p) => p.text)).toEqual(['first', 'second']);
 });
 
 test('the opened rail is a window of rows around the prompt being read', () => {
