@@ -19,16 +19,19 @@ export async function check(
   env: NodeJS.ProcessEnv = process.env,
 ): Promise<CheckResult> {
   const result = await checkCopy(cwd, env);
-  const replay = replayReason(cwd, env);
+  const replay = [replayReason(cwd, env), unmergedPickReason(cwd, env)].filter(
+    (reason): reason is string => reason !== null,
+  );
 
-  return replay ? { ok: false, reasons: [replay, ...result.reasons] } : result;
+  return replay.length > 0 ? { ok: false, reasons: [...replay, ...result.reasons] } : result;
 }
 
 /**
  * Why `git rebase <upstream> [<branch>]` must not start, or null: a `pre-rebase` hook. A commit of
  * the branch that changes the design file, replayed onto another version of it, stops at a
- * conflict Git cannot merge. Null too when there is no project: a hook must not block a rebase
- * because the tool found nothing to check.
+ * conflict Git cannot merge. Git gives the hook the upstream, never the target of `--onto`, so
+ * every replay of a design commit is refused. Null too when there is no project: a hook must not
+ * block a rebase because the tool found nothing to check.
  */
 export function rebaseReason(
   cwd: string,
@@ -46,12 +49,6 @@ export function rebaseReason(
 
   const { root } = project;
   const path = relative(root, project.file);
-  const base = git(root, ['merge-base', upstream, branch]);
-
-  if (!base || blobAt(root, upstream, path) === blobAt(root, base, path)) {
-    return null;
-  }
-
   const count = Number(git(root, ['rev-list', '--count', `${upstream}..${branch}`, '--', path]));
 
   if (!count) {
@@ -59,9 +56,8 @@ export function rebaseReason(
   }
 
   return (
-    `rebasing would replay ${count} design commit(s) onto another version of ${path}. Git ` +
-    'cannot merge that file, and every way out of the conflict loses work. Merge instead: ' +
-    `git merge ${project.mainBranch}, then figkit merge ${project.mainBranch}`
+    `rebasing would replay ${count} design commit(s). Git cannot merge ${path}, and a replay ` +
+    `onto another version of it loses work. Merge instead: git merge ${project.mainBranch}, then figkit merge ${project.mainBranch}`
   );
 }
 
@@ -111,6 +107,71 @@ function replayReason(cwd: string, env: NodeJS.ProcessEnv): string | null {
     `a design commit cannot be cherry-picked or reverted onto another version of ${path}: Git ` +
     'cannot merge that file. Abort it and make the change again with a designer'
   );
+}
+
+/**
+ * Why the result of `git cherry-pick -n` must not be committed, or null. It writes no
+ * `CHERRY_PICK_HEAD`, only a `MERGE_MSG` whose conflict list names the design file: a staged copy
+ * other than `HEAD`'s is then one side of a conflict Git cannot merge.
+ */
+function unmergedPickReason(cwd: string, env: NodeJS.ProcessEnv): string | null {
+  let project;
+
+  try {
+    project = resolveProject(cwd, { ...env, FIGKIT_FILE: undefined });
+  } catch {
+    return null;
+  }
+
+  const { root } = project;
+  const gitDir = git(root, ['rev-parse', '--absolute-git-dir']);
+  const message = gitDir ? readText(join(gitDir, 'MERGE_MSG')) : null;
+
+  if (
+    !gitDir ||
+    message === null ||
+    ['MERGE_HEAD', 'SQUASH_MSG', 'CHERRY_PICK_HEAD', 'REVERT_HEAD'].some((name) =>
+      existsSync(join(gitDir, name)),
+    )
+  ) {
+    return null;
+  }
+
+  const path = relative(root, project.file);
+  const staged = git(root, ['rev-parse', '-q', '--verify', `:${path}`]);
+
+  if (!conflictPaths(message).includes(path) || staged === blobAt(root, 'HEAD', path)) {
+    return null;
+  }
+
+  return (
+    `${path} was in a conflict that figkit did not merge, and the staged copy is one side of it. ` +
+    `Restore it (git checkout HEAD -- ${path}) and make the change again with a designer`
+  );
+}
+
+/** The paths of the `# Conflicts:` list Git writes at the end of `MERGE_MSG`. */
+export function conflictPaths(message: string): string[] {
+  const lines = message.split('\n');
+  const start = lines.findIndex((line) => line.trim() === '# Conflicts:');
+
+  if (start === -1) {
+    return [];
+  }
+
+  const paths: string[] = [];
+
+  for (const line of lines.slice(start + 1)) {
+    const match = /^#\t(.+)$/.exec(line);
+
+    if (!match) {
+      break;
+    }
+
+    paths.push(match[1]!);
+  }
+
+  return paths;
 }
 
 function blobAt(root: string, rev: string, path: string): string | null {

@@ -4,18 +4,21 @@ import { mkdtemp, realpath, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
+import { conflictPaths } from './check';
 import { loadConfig, resolveBin } from './settings';
 import { gitIn } from './testing';
 
 const CLI = join(import.meta.dir, 'cli.ts');
 const DESIGN = join('design', 'test.figcraft');
 const REBASE_MESSAGE =
-  `error: rebasing would replay 1 design commit(s) onto another version of ${DESIGN}. Git ` +
-  'cannot merge that file, and every way out of the conflict loses work. Merge instead: ' +
-  'git merge main, then figkit merge main';
+  `error: rebasing would replay 1 design commit(s). Git cannot merge ${DESIGN}, and a replay ` +
+  'onto another version of it loses work. Merge instead: git merge main, then figkit merge main';
 const REPLAY_MESSAGE =
   `a design commit cannot be cherry-picked or reverted onto another version of ${DESIGN}: Git ` +
   'cannot merge that file. Abort it and make the change again with a designer';
+const PICK_MESSAGE =
+  `${DESIGN} was in a conflict that figkit did not merge, and the staged copy is one side of it. ` +
+  `Restore it (git checkout HEAD -- ${DESIGN}) and make the change again with a designer`;
 
 let bin = '';
 
@@ -123,21 +126,16 @@ describe('figkit check --rebase', () => {
     });
   });
 
-  test('passes without a design commit, without a change on main, and onto an ancestor', async () => {
+  test('refuses a design commit whether or not main changed the design file', async () => {
     const repo = await makeRepo((file) => Bun.write(file, new Uint8Array([0, 1])).then(() => {}));
-    const pass = (args: string[]): void =>
+    const refuse = (args: string[], count = 1): void =>
       expect(figkit(repo, ['check', '--rebase', ...args])).toEqual({
-        code: 0,
+        code: 1,
         stdout: '',
-        stderr: '',
+        stderr: REBASE_MESSAGE.replace('replay 1 ', `replay ${count} `),
       });
 
-    // A branch without design commits, main changed the design file.
-    gitIn(repo, 'checkout', '-q', '-b', 'feat/code');
-    await Bun.write(join(repo, 'code.txt'), 'code');
-    commit(repo, 'code');
-    // A branch with a design commit, main did not change the design file.
-    gitIn(repo, 'checkout', '-q', '-b', 'feat/design', 'main');
+    gitIn(repo, 'checkout', '-q', '-b', 'feat/design');
     await standIn(repo, [2]);
     commit(repo, 'branch design');
     await standIn(repo, [4]);
@@ -146,19 +144,46 @@ describe('figkit check --rebase', () => {
     await Bun.write(join(repo, 'main.txt'), 'main');
     commit(repo, 'main code');
 
-    pass(['main', 'feat/design']);
+    // Main did not change the design file.
+    refuse(['main', 'feat/design'], 2);
 
     await standIn(repo, [3]);
     commit(repo, 'main design');
-
-    pass(['main', 'feat/code']);
-    // An interactive rebase of the branch's own commits: onto an ancestor of the branch.
     gitIn(repo, 'checkout', '-q', 'feat/design');
+
+    // Main changed it.
+    refuse(['main'], 2);
+    // `git rebase --onto main <fork point>`: the hook gets the fork point as the upstream.
+    refuse([gitIn(repo, 'merge-base', 'main', 'HEAD').trim()], 2);
+    // Onto an ancestor whose next commit is a design commit.
+    refuse(['HEAD~1']);
+  });
+
+  test('passes when no commit in the range changes the design file', async () => {
+    const repo = await makeRepo((file) => Bun.write(file, new Uint8Array([0, 1])).then(() => {}));
+    const pass = (args: string[]): void =>
+      expect(figkit(repo, ['check', '--rebase', ...args])).toEqual({
+        code: 0,
+        stdout: '',
+        stderr: '',
+      });
+
+    gitIn(repo, 'checkout', '-q', '-b', 'feat/code');
+    await Bun.write(join(repo, 'code.txt'), 'code');
+    commit(repo, 'code');
+    gitIn(repo, 'checkout', '-q', 'main');
+    await standIn(repo, [3]);
+    commit(repo, 'main design');
+
+    // A branch without design commits, main changed the design file.
+    pass(['main', 'feat/code']);
+    // A design commit before the upstream: outside the range.
+    gitIn(repo, 'checkout', '-q', 'feat/code');
+    await standIn(repo, [5]);
+    commit(repo, 'branch design');
+    await Bun.write(join(repo, 'code.txt'), 'more code');
+    commit(repo, 'more code');
     pass(['HEAD~1']);
-    // An unrelated history: no merge base.
-    gitIn(repo, 'checkout', '-q', '--orphan', 'lone');
-    commit(repo, 'lone');
-    pass(['main']);
   });
 
   test('passes outside a checkout and without .figkit.json', async () => {
@@ -170,6 +195,16 @@ describe('figkit check --rebase', () => {
     for (const cwd of [outside, bare]) {
       expect(figkit(cwd, ['check', '--rebase', 'x'])).toEqual({ code: 0, stdout: '', stderr: '' });
     }
+  });
+});
+
+describe('conflictPaths', () => {
+  const message = (list: string): string => `Side design\n\n${list}`;
+
+  test('reads the conflict list of MERGE_MSG', () => {
+    expect(conflictPaths(message(`# Conflicts:\n#\t${DESIGN}\n`))).toEqual([DESIGN]);
+    expect(conflictPaths(message('# Conflicts:\n#\tother.txt\n'))).toEqual(['other.txt']);
+    expect(conflictPaths(message(''))).toEqual([]);
   });
 });
 
@@ -241,6 +276,30 @@ describe.skipIf(!hasCli)('figkit check during a cherry-pick or a revert', () => 
     // Reverting the last design commit applies cleanly.
     gitIn(repo, 'revert', '--no-commit', 'HEAD');
     expect(existsSync(join(repo, '.git', 'REVERT_HEAD'))).toBe(true);
+    expect(figkit(repo, ['check'])).toEqual({ code: 0, stdout: '', stderr: '' });
+  }, 60_000);
+
+  test('a cherry-pick -n of a design commit that took one side fails until restored', async () => {
+    const repo = await makeRepo((file) => addFrame(file, 'Base'));
+
+    gitIn(repo, 'checkout', '-q', '-b', 'side');
+    await addFrame(join(repo, DESIGN), 'Side');
+    commit(repo, 'side design');
+    gitIn(repo, 'checkout', '-q', 'main');
+    await addFrame(join(repo, DESIGN), 'Main');
+    commit(repo, 'main design');
+
+    expect(stops(repo, 'cherry-pick', '-n', 'side')).toBe(true);
+    expect(existsSync(join(repo, '.git', 'CHERRY_PICK_HEAD'))).toBe(false);
+    gitIn(repo, 'checkout', '--theirs', '--', DESIGN);
+    gitIn(repo, 'add', DESIGN);
+
+    const refused = figkit(repo, ['check']);
+
+    expect(refused.code).toBe(1);
+    expect(refused.stderr).toContain(`error: ${PICK_MESSAGE}`);
+
+    gitIn(repo, 'checkout', 'HEAD', '--', DESIGN);
     expect(figkit(repo, ['check'])).toEqual({ code: 0, stdout: '', stderr: '' });
   }, 60_000);
 });

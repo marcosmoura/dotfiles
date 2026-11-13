@@ -325,13 +325,21 @@ shared by every worktree of the clone. The main copy keeps plain ids and is writ
   from (the commit's first parent for a cherry-pick, the commit itself for a revert), it fails.
   Git cannot merge that file, so abort and make the change again. A replay onto the same version
   passes, and a commit without a parent is skipped.
+- After `git cherry-pick -n`, which writes no `CHERRY_PICK_HEAD`, on either copy: when `MERGE_MSG`
+  is left without `MERGE_HEAD`, `SQUASH_MSG`, `CHERRY_PICK_HEAD` or `REVERT_HEAD`, its
+  `# Conflicts:` list names the design file and the staged design file is not `HEAD`'s, the staged
+  copy is one side of a conflict, so it fails. Restore it (`git checkout HEAD -- <path>`) and make
+  the change again.
 
 `figkit check --rebase <upstream> [<branch>]` is for a `pre-rebase` hook, which Git calls with the
-same arguments (`git rebase --continue` runs no `pre-commit` hook). It exits 1 when a commit in
-`<upstream>..<branch>` (`<branch>` defaults to `HEAD`) changes the design file and `<upstream>`'s
-design file is not the one of their merge base: the rebase would stop at a conflict that loses
-work, so merge instead. It compares blob ids only, and exits 0 in every other case, including a
-rebase onto an ancestor, no merge base, and a checkout without `.figkit.json` or outside Git.
+same arguments (`git rebase --continue` runs no `pre-commit` hook). It exits 1 whenever a commit in
+`<upstream>..<branch>` (`<branch>` defaults to `HEAD`) changes the design file: Git gives the hook
+the upstream and never the target of `--onto`, so the guard cannot know whether the replay lands
+on the same version of the file, and a replay onto another version stops at a conflict that loses
+work. Merge instead. It reads the commit range only, and exits 0 for a branch without design
+commits and for a checkout without `.figkit.json` or outside Git. A person who knows the replay is
+harmless (for example an interactive rebase that keeps the branch on its fork point) can skip the
+hook with `git rebase --no-verify`.
 
 ```sh
 # .git/hooks/pre-rebase
