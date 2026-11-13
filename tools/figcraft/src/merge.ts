@@ -842,6 +842,14 @@ async function finish(
       throw new MergeError(2, `figcraft-cli cannot open the merged file: ${failure}`);
     }
 
+    // A second look: the state guard accepted ours' blob, or theirs' on the fast path into main.
+    const accepted = fastPath(inputs) === 'theirs-only' ? inputs.blobs.theirs : inputs.blobs.ours;
+    const working = deps.git(['hash-object', '--', project.file]);
+
+    if ((working ? new TextDecoder().decode(working).trim() : null) !== accepted) {
+      throw new MergeError(2, 'the design file changed while the merge ran; nothing was written');
+    }
+
     await rename(resultPath, project.file);
   } finally {
     await rm(resultPath, { force: true });

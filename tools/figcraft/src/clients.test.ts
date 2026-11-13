@@ -144,4 +144,51 @@ describe('registry', () => {
     outputs[0]!.forEach((client) => expect(registry?.owners[String(client)]).toBe('feat/a'));
     outputs[1]!.forEach((client) => expect(registry?.owners[String(client)]).toBe('feat/b'));
   });
+
+  test('processes that find the same dead lock take it over one at a time', async () => {
+    const dead = Bun.spawn([process.execPath, '-e', ''], { stdout: 'ignore', stderr: 'ignore' });
+
+    await dead.exited;
+
+    const script = join(directory, 'claim-stale.ts');
+
+    await writeFile(
+      script,
+      `import { claimClient } from ${JSON.stringify(join(import.meta.dir, 'clients.ts'))};\n` +
+        `const [dir, branch] = process.argv.slice(2);\n` +
+        `console.log(JSON.stringify(await claimClient({ commonDir: dir!, mainDesignFile: null }, branch!)));\n`,
+    );
+
+    const count = 8;
+
+    for (let round = 0; round < 5; round += 1) {
+      const common = join(directory, `stale-${round}`);
+
+      await mkdir(join(common, 'figkit'), { recursive: true });
+      await writeFile(`${registryPath(common)}.lock`, `${dead.pid}:stale\n`);
+
+      const branches = Array.from({ length: count }, (_, index) => `feat/${index}`);
+      const numbers = await Promise.all(
+        branches.map(async (branch) => {
+          const child = Bun.spawn([process.execPath, script, common, branch], {
+            stdout: 'pipe',
+            stderr: 'inherit',
+          });
+
+          expect(await child.exited).toBe(0);
+
+          return JSON.parse(await new Response(child.stdout).text()) as number;
+        }),
+      );
+
+      expect(new Set(numbers).size).toBe(count);
+
+      const registry = await readRegistry(common);
+
+      expect(registry?.next).toBe(1024 + count);
+      branches.forEach((branch, index) =>
+        expect(registry?.owners[String(numbers[index])]).toBe(branch),
+      );
+    }
+  }, 60_000);
 });

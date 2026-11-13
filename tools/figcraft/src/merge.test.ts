@@ -1388,10 +1388,19 @@ describe.skipIf(!hasCli)('figkit merge against figcraft-cli', () => {
     expect(
       existsSync(join(gitIn(repo.worktree, 'rev-parse', '--absolute-git-dir'), RECEIPT_NAME)),
     ).toBe(true);
-    expect(check(repo.worktree).code).toBe(0);
+
+    // The index still holds ours: a commit now would take it.
+    const unstaged = check(repo.worktree);
+
+    expect(unstaged.code).toBe(1);
+    expect(unstaged.stderr).toContain(
+      `the staged ${DESIGN} is not the file in the working tree: run "git add ${DESIGN}"`,
+    );
     gitIn(repo.worktree, 'add', DESIGN);
     expect(check(repo.worktree).code).toBe(0);
     edit(repo, repo.worktree, [{ command: 'page.add', params: { name: 'After' } }]);
+    expect(check(repo.worktree).stderr).toContain(`the staged ${DESIGN} is not the file`);
+    gitIn(repo.worktree, 'add', DESIGN);
     expect(check(repo.worktree).stderr).toContain(message);
   }, 180_000);
 
@@ -1419,8 +1428,36 @@ describe.skipIf(!hasCli)('figkit merge against figcraft-cli', () => {
     expect(staged.code).toBe(1);
     expect(staged.stderr).toContain(`run "figkit merge ${short}"`);
     ok(figkit(repo, repo.main, ['merge', 'feat/x']));
+
+    const unstaged = figkit(repo, repo.main, ['check']);
+
+    expect(unstaged.code).toBe(1);
+    expect(unstaged.stderr).toContain(
+      `the staged ${DESIGN} is not the file in the working tree: run "git add ${DESIGN}"`,
+    );
     gitIn(repo.main, 'add', DESIGN);
     expect(figkit(repo, repo.main, ['check']).code).toBe(0);
+  }, 180_000);
+
+  test('outside a merge: a staged design file changed again fails until it is staged again', async () => {
+    const repo = await makeRepo();
+    const message = `the staged ${DESIGN} is not the file in the working tree`;
+
+    for (const cwd of [repo.main, repo.worktree]) {
+      // Not staged at all: checked as it is in the working tree.
+      edit(repo, cwd, [{ command: 'page.add', params: { name: 'One' } }]);
+      expect(figkit(repo, cwd, ['check']).code).toBe(0);
+      gitIn(cwd, 'add', DESIGN);
+      expect(figkit(repo, cwd, ['check']).code).toBe(0);
+      edit(repo, cwd, [{ command: 'page.add', params: { name: 'Two' } }]);
+
+      const changed = figkit(repo, cwd, ['check']);
+
+      expect(changed.code).toBe(1);
+      expect(changed.stderr).toContain(message);
+      gitIn(cwd, 'add', DESIGN);
+      expect(figkit(repo, cwd, ['check']).code).toBe(0);
+    }
   }, 180_000);
 
   test('one side changed needs no receipt, both directions; --review writes none', async () => {
@@ -1751,6 +1788,41 @@ describe.skipIf(!hasCli)('figkit merge: check, report and text style repair', ()
     expect(merged.code).toBe(2);
     expect(merged.errors.join('\n')).toContain(`${kept} "Kept" (the other side)`);
     expect(await readFile(file)).toEqual(before);
+    expectClean(repo, repo.main);
+  }, 180_000);
+
+  test('the design file changes while FigCraft merges: exit 2, the change is kept, no receipt', async () => {
+    const repo = await makeRepo();
+    const file = join(repo.main, DESIGN);
+
+    edit(repo, repo.worktree, [{ command: 'page.add', params: { name: 'B' } }]);
+    commit(repo.worktree, 'branch');
+    edit(repo, repo.main, [{ command: 'page.add', params: { name: 'M' } }]);
+    commit(repo.main, 'main');
+    gitMerge(repo.main, '--squash', 'feat/x');
+
+    let saved: Buffer | null = null;
+    // A save from the FigCraft app while figcraft-cli merges.
+    const merged = await mergeIn(repo, repo.main, 'feat/x', {
+      after: async (commands) => {
+        if (!saved && commands.some((item) => item.command === 'branch.merge')) {
+          edit(repo, repo.main, [{ command: 'page.add', params: { name: 'Saved' } }]);
+          saved = await readFile(file);
+        }
+      },
+    });
+
+    expect(merged.code).toBe(2);
+    expect(merged.errors.join('\n')).toContain(
+      'the design file changed while the merge ran; nothing was written',
+    );
+    expect(saved).not.toBeNull();
+    expect((await readFile(file)).toString('hex')).toBe(
+      (saved as Buffer | null)?.toString('hex') ?? '',
+    );
+    expect(
+      existsSync(join(gitIn(repo.main, 'rev-parse', '--absolute-git-dir'), RECEIPT_NAME)),
+    ).toBe(false);
     expectClean(repo, repo.main);
   }, 180_000);
 

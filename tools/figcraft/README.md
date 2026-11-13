@@ -315,6 +315,11 @@ shared by every worktree of the clone. The main copy keeps plain ids and is writ
 - During a merge (`MERGE_HEAD`, or the `SQUASH_MSG` that `git merge --squash` leaves), on either
   copy: when the merge base, `HEAD` and the other commit hold three different design files, the
   working file must be the one `figkit merge` wrote, as its receipt says (see [Merging](#merging)).
+- A commit takes the index, so on either copy, when the staged design file is not the working
+  file and is part of the next commit (it differs from `HEAD`'s, or a merge is in progress), it
+  fails with `the staged <path> is not the file in the working tree: run "git add <path>"`. A path
+  with no staged copy (unmerged) is left to Git, which refuses to commit it. The other rules read
+  the working file.
 
 ## Merging
 
@@ -361,6 +366,10 @@ yours.
   `figkit`) cannot be resolved: delete it on the branch and make it again through `figkit`.
 - The result is built next to the working file under a hidden name, checked and repaired (three-way
   merges only, below), opened once with `figcraft-cli info`, then renamed over the working file.
+  Just before the rename it reads the working file's blob id again: when it is no longer the one
+  the state check accepted (ours, or theirs on the fast path into `main`), a save during the merge
+  changed it, and the merge stops with exit 2 and
+  `the design file changed while the merge ran; nothing was written`.
   The container and every temporary file go in one folder under `$TMPDIR/figkit`, removed after
   every run.
 - **Check.** In a three-way merge (both directions; the fast paths run none of this), every layer

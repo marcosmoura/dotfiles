@@ -41,6 +41,20 @@ export async function check(
   const path = relative(root, file);
   const gitDir = git(root, ['rev-parse', '--absolute-git-dir']);
   const other = gitDir ? mergeInProgress(gitDir) : null;
+  // A commit takes the index. A path with no staged copy is unmerged, and Git refuses to commit it.
+  const staged = git(root, ['rev-parse', '-q', '--verify', `:${path}`]);
+
+  if (
+    staged &&
+    staged !== git(root, ['hash-object', '--', file]) &&
+    (other || staged !== git(root, ['rev-parse', '-q', '--verify', `HEAD:${path}`]))
+  ) {
+    return {
+      ok: false,
+      reasons: [`the staged ${path} is not the file in the working tree: run "git add ${path}"`],
+    };
+  }
+
   const receiptFailure =
     gitDir && other
       ? receiptReason(

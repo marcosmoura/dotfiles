@@ -165,11 +165,7 @@ async function lock(path: string, timeoutMs: number): Promise<() => Promise<void
     const owner = await readOwner(path);
 
     if (owner !== null && !isAlive(owner)) {
-      try {
-        await unlink(path);
-      } catch {
-        // Another process took it over first.
-      }
+      await takeOver(path, owner, token);
 
       continue;
     }
@@ -179,6 +175,47 @@ async function lock(path: string, timeoutMs: number): Promise<() => Promise<void
     }
 
     await Bun.sleep(10);
+  }
+}
+
+/**
+ * Removes the lock of a dead owner, one process at a time: the holder of an exclusive takeover
+ * marker reads the owner again, so a process that found the same dead lock late cannot remove the
+ * fresh lock of the process that took it over first. A marker whose own owner died is removed.
+ */
+async function takeOver(path: string, dead: number, token: string): Promise<void> {
+  const marker = `${path}.takeover`;
+
+  try {
+    const handle = await open(marker, 'wx');
+
+    try {
+      await handle.writeFile(`${token}\n`);
+    } finally {
+      await handle.close();
+    }
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code !== 'EEXIST') {
+      throw error;
+    }
+
+    const markerOwner = await readOwner(marker);
+
+    if (markerOwner !== null && !isAlive(markerOwner)) {
+      await unlink(marker).catch(() => {});
+    } else {
+      await Bun.sleep(10);
+    }
+
+    return;
+  }
+
+  try {
+    if ((await readOwner(path)) === dead) {
+      await unlink(path).catch(() => {});
+    }
+  } finally {
+    await unlink(marker).catch(() => {});
   }
 }
 
