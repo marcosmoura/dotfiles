@@ -1,6 +1,7 @@
 import { check } from './check';
 import { createContext } from './context';
 import { serve } from './mcp';
+import { mergeCommand } from './merge';
 import { findTool, render, TOOLS } from './tools';
 
 const USAGE = `figkit: read and build a FigCraft design file
@@ -8,6 +9,8 @@ const USAGE = `figkit: read and build a FigCraft design file
   figkit <command> ['<json>' | @file.json | - | <name or id>] [--key value …] [--live]
   figkit mcp [--live]        serve the same commands as MCP tools
   figkit check               exit 1 when this checkout's copy must not be committed
+  figkit merge <ref> [--review] [--resolve '{"<key>": "branch" | "main"}']
+                             bring the design of <ref> into this checkout's copy after git merge
 
 Commands:
 ${TOOLS.map((tool) => `  ${tool.name.padEnd(6)} ${firstSentence(tool.description)}`).join('\n')}
@@ -40,6 +43,10 @@ export async function main(argv: string[]): Promise<number> {
     }
 
     return result.ok ? 0 : 1;
+  }
+
+  if (command === 'merge') {
+    return mergeCommand(process.cwd(), rest);
   }
 
   const tool = findTool(command);

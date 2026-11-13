@@ -1,4 +1,5 @@
-import { relative } from 'node:path';
+import { existsSync, readFileSync } from 'node:fs';
+import { join, relative } from 'node:path';
 
 import { entryBytes, parseArchive, readArchive } from './archive';
 import { clientOf, idNumbers, parseDocument, readNextId, type FigDocument } from './document';
@@ -37,19 +38,41 @@ export async function check(
     };
   }
 
+  const path = relative(root, file);
+  const gitDir = git(root, ['rev-parse', '--absolute-git-dir']);
+  const other = gitDir ? mergeInProgress(gitDir) : null;
+  const receiptFailure =
+    gitDir && other
+      ? receiptReason(
+          root,
+          gitDir,
+          path,
+          file,
+          other,
+          project.copy === 'main' ? null : project.mainBranch,
+        )
+      : null;
+
   if (project.copy === 'main') {
-    return clientOf(readNextId(entryBytes(copy, 'document.json'))) === 0
-      ? { ok: true, reasons: [] }
-      : {
-          ok: false,
-          reasons: [
+    const reasons =
+      clientOf(readNextId(entryBytes(copy, 'document.json'))) === 0
+        ? []
+        : [
             'the main copy still has a branch\'s counter: run "figkit merge <branch>" before ' +
               'committing this merge',
-          ],
-        };
+          ];
+
+    if (receiptFailure) {
+      reasons.push(receiptFailure);
+    }
+
+    return { ok: reasons.length === 0, reasons };
   }
 
-  const path = relative(root, file);
+  if (receiptFailure) {
+    return { ok: false, reasons: [receiptFailure] };
+  }
+
   const base = git(root, ['merge-base', 'HEAD', project.mainBranch]);
 
   if (!base) {
@@ -65,10 +88,9 @@ export async function check(
   }
 
   const known = knownIds(root, base, path);
-  const merging = git(root, ['rev-parse', '-q', '--verify', 'MERGE_HEAD']);
 
-  if (merging) {
-    for (const id of knownIds(root, merging, path)) {
+  if (other) {
+    for (const id of knownIds(root, other, path)) {
       known.add(id);
     }
   }
@@ -101,6 +123,89 @@ export async function check(
   }
 
   return { ok: reasons.length === 0, reasons };
+}
+
+/** What `figkit merge` leaves in the checkout's Git directory after it wrote the working file. */
+export type Receipt = { theirs: string; blob: string };
+
+export const RECEIPT_NAME = 'figkit-merge.json';
+
+/**
+ * The other commit of a merge in progress: `MERGE_HEAD`, or the first `commit <id>` line of
+ * `SQUASH_MSG`, which `git merge --squash` leaves until the commit (it writes no `MERGE_HEAD`).
+ */
+export function mergingCommit(
+  mergeHead: string | null,
+  squashMessage: string | null,
+): string | null {
+  const head = mergeHead?.trim().split('\n')[0]?.trim();
+
+  if (head) {
+    return head;
+  }
+
+  return squashMessage ? (/^commit ([0-9a-f]{7,64})\s*$/m.exec(squashMessage)?.[1] ?? null) : null;
+}
+
+/**
+ * Why the merge must not be committed yet, or null. When the base, HEAD and the other commit hold
+ * three different blobs, Git kept one side, so the working file must be the one `figkit merge`
+ * wrote for that commit. `mainBranch` is null on the main copy.
+ */
+export function receiptReason(
+  root: string,
+  gitDir: string,
+  path: string,
+  file: string,
+  other: string,
+  mainBranch: string | null,
+): string | null {
+  const blob = (rev: string | null): string | null =>
+    rev ? git(root, ['rev-parse', '-q', '--verify', `${rev}:${path}`]) : null;
+  const theirs = git(root, ['rev-parse', '-q', '--verify', `${other}^{commit}`]);
+  const ours = blob('HEAD');
+  const otherBlob = blob(theirs);
+  const base = blob(theirs ? git(root, ['merge-base', 'HEAD', theirs]) : null);
+
+  if (!theirs || ours === otherBlob || base === ours || base === otherBlob) {
+    return null;
+  }
+
+  let receipt: Partial<Receipt> | null = null;
+
+  try {
+    receipt = JSON.parse(readFileSync(join(gitDir, RECEIPT_NAME), 'utf8')) as Partial<Receipt>;
+  } catch {
+    // No receipt, or not one figkit wrote.
+  }
+
+  if (
+    receipt?.theirs === theirs &&
+    receipt.blob &&
+    receipt.blob === git(root, ['hash-object', '--', file])
+  ) {
+    return null;
+  }
+
+  const ref = mainBranch ?? theirs.slice(0, 7);
+
+  return (
+    `both sides changed ${path}: run "figkit merge ${ref}" and stage the file it writes before ` +
+    'committing this merge'
+  );
+}
+
+/** The other commit of the merge in progress in this Git directory, or null. */
+export function mergeInProgress(gitDir: string): string | null {
+  return mergingCommit(readText(join(gitDir, 'MERGE_HEAD')), readText(join(gitDir, 'SQUASH_MSG')));
+}
+
+function readText(path: string): string | null {
+  try {
+    return existsSync(path) ? readFileSync(path, 'utf8') : null;
+  } catch {
+    return null;
+  }
 }
 
 type AddedId = { id: string; kind: string; name: string; inRange: boolean };

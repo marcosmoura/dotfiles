@@ -31,8 +31,9 @@ nested tree and expands it into FigCraft commands itself.
 | `shot`  | Exports layers to PNG files under `$TMPDIR/figkit/shots` and returns the paths        |
 | `help`  | Parameters of a FigCraft command, or the commands for a topic                         |
 
-`figkit check` is a shell command only: it exits 1 when the checkout's copy must not be committed
-(see [Branch copies](#branch-copies)).
+`figkit check` and `figkit merge` are shell commands only: `check` exits 1 when the checkout's
+copy must not be committed (see [Branch copies](#branch-copies)), and `merge` brings the design of
+another commit into the checkout's copy after `git merge` (see [Merging](#merging)).
 
 ```sh
 figkit find --kind variable --name space/
@@ -311,6 +312,69 @@ shared by every worktree of the clone. The main copy keeps plain ids and is writ
   a merge, of `MERGE_HEAD`) must be in a range, and when there are such ids the counter must be in
   a range too. A failure lists up to 20 of them with their names. A copy with the same blob as the
   merge base's passes without being read.
+- During a merge (`MERGE_HEAD`, or the `SQUASH_MSG` that `git merge --squash` leaves), on either
+  copy: when the merge base, `HEAD` and the other commit hold three different design files, the
+  working file must be the one `figkit merge` wrote, as its receipt says (see [Merging](#merging)).
+
+## Merging
+
+Git cannot merge two changed copies of the design file. `figkit merge` does it with FigCraft's
+three-way merge, after `git merge` has stopped at the conflict:
+
+```sh
+git merge --squash feat/x && figkit merge feat/x && git add design/Budget.figcraft   # on main
+git merge main; figkit merge main && git add design/Budget.figcraft                   # on the design branch
+figkit merge feat/x --review                                    # the changes and conflicts, writes nothing
+figkit merge feat/x --resolve '{"4/kind": "branch", "5/layer": "main"}'
+```
+
+```text
+figkit merge <ref> [--review] [--resolve '{"<key>": "branch" | "main"}']
+```
+
+Ours is `HEAD`'s copy, theirs is `<ref>`'s and the base is the copy in `git merge-base HEAD <ref>`.
+It reads those commits, writes only the working file and never touches the index: staging is
+yours.
+
+- **Into `main`**: run on the main branch. FigCraft merges the design branch into `main`'s file;
+  the result keeps `main`'s other entries (`versions/` too) and gets a plain counter back.
+- **From `main`**: run on a design branch, with `<ref>` the main branch or one of its ancestors.
+  The copy takes `main`'s changes and keeps its counter in its own range. Any other `<ref>` is
+  refused: a design branch merges only with `main`.
+- **A branch merges into `main` once.** After a squash merge the branch's layers are in `main`
+  with the same ids, so a second merge fails (`node … already exists`). Start a new branch from
+  `main` instead.
+- Before writing, the state must be as Git left it: with both sides changed, a merge with `<ref>`
+  in progress (`MERGE_HEAD`, or the first commit of `SQUASH_MSG` after `git merge --squash`) and
+  the working file equal to `HEAD`'s, staged or not; with only the other side changed, the
+  working file equal to `<ref>`'s. Otherwise it stops with `run "git merge <ref>" first` or
+  `the design file has changes that are not committed`. `--review` skips this check and works
+  before `git merge`.
+- Fast paths compare blob ids and start no FigCraft run: theirs equal to the base or to ours
+  prints `nothing to merge`; only the design branch changed (into `main`) writes its document with
+  `main`'s counter and other entries; only `main` changed (from `main`) leaves the working file,
+  already `main`'s copy.
+- Conflicts are listed with their key, layer, property and both values, and an example
+  `--resolve`. In `--resolve`, `"main"` keeps the main branch's value and `"branch"` the design
+  branch's, in both directions. Every conflict needs a resolution; an unknown key or another value
+  is refused. A variable or style that both copies added with the same id (one was made outside
+  `figkit`) cannot be resolved: delete it on the branch and make it again through `figkit`.
+- The result is built next to the working file under a hidden name, opened once with
+  `figcraft-cli info`, then renamed over the working file. The container and every temporary file
+  go in one folder under `$TMPDIR/figkit`, removed after every run.
+- **Receipt.** When Git cannot merge the file it keeps ours in the working tree, and a file staged
+  as one side is not in the staged diff, so nothing would object to a merge that kept one side.
+  After it writes the working file (and for the fast path from `main`), `figkit merge` writes
+  `figkit-merge.json` in the checkout's Git directory (`git rev-parse --absolute-git-dir`) with
+  `{"theirs": "<commit of <ref>>", "blob": "<blob id of the working file>"}`. `figkit check`
+  asks for it while a merge is in progress. `--review` and `nothing to merge` write none.
+- Needs figcraft-cli 0.17.0 or newer.
+
+| Exit | Meaning                                                                                |
+| ---- | -------------------------------------------------------------------------------------- |
+| 0    | The working file holds the result, or nothing needed merging (`--review`: no conflict) |
+| 1    | Conflicts need a resolution; nothing was written                                       |
+| 2    | The merge cannot be done; nothing was written                                          |
 
 Keep one design file. FigCraft re-applies every variable binding in a document whenever its
 variables change, so a variable edit costs more the more bound layers a file holds, and it is
@@ -392,6 +456,6 @@ temporary file and renamed), `src/document.ts` reads and moves the `next_id` cou
 `document.json` without rewriting its other bytes and holds the id range helpers
 (`client × 2^32 + n`), and `src/clients.ts` is the id range registry in
 `<git-common-dir>/figkit/clients.json`. `src/project.ts` finds the checkout and its copy,
-`src/branch-copy.ts` builds containers and writes a branch copy from them, and `src/check.ts` is
-`figkit check`. `src/app.ts`, `src/lock.ts` and `src/prune.ts`
+`src/branch-copy.ts` builds containers and writes a branch copy from them, `src/check.ts` is
+`figkit check`, and `src/merge.ts` is `figkit merge`. `src/app.ts`, `src/lock.ts` and `src/prune.ts`
 came from the old proxy with their tests.
