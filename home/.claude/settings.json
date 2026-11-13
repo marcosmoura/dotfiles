@@ -105,8 +105,8 @@
     "swift-lsp@claude-plugins-official": true,
     "typescript-lsp@claude-plugins-official": true,
     "humanizer@humanizer": true,
-    "image-view@claude-image-view": true,
-    "prismantis@prismantis": true,
+    "image-view@claude-image-view": false,
+    "prismantis@prismantis": false,
     "sidebar@dotfiles": true
   },
   "extraKnownMarketplaces": {
@@ -114,18 +114,6 @@
       "source": {
         "source": "github",
         "repo": "blader/humanizer"
-      }
-    },
-    "claude-image-view": {
-      "source": {
-        "source": "github",
-        "repo": "jarrodwatts/claude-image-view"
-      }
-    },
-    "prismantis": {
-      "source": {
-        "source": "github",
-        "repo": "NahumLitvin/prismantis"
       }
     },
     "dotfiles": {
@@ -152,27 +140,6 @@
     }
   },
   "promptSuggestionEnabled": true,
-  "pluginConfigs": {
-    "prismantis@prismantis": {
-      "options": {
-        "theme": "catppuccin-mocha",
-        "tableStyle": "box",
-        "taskStyle": "progress",
-        "listMarker": "dots",
-        "headingStyle": "banner",
-        "copyButtonStyle": "inline",
-        "promptStyle": "wide",
-        "replyStyle": "auto",
-        "bubbleLabels": "small",
-        "clock": "24h",
-        "toolStyle": "tree-dim",
-        "toolOutput": "full",
-        "diffStyle": "card",
-        "codeStyle": "framed",
-        "pieStyle": "bars"
-      }
-    }
-  },
   "tui": "default",
   "timeFormat": "24-hour",
   "theme": "custom:catppuccin-mocha",
