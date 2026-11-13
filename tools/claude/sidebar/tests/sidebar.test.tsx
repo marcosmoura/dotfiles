@@ -14,6 +14,8 @@ import {
   fmtPercent,
   fmtRate,
   fmtTime,
+  fromBase64,
+  imagesIn,
   fmtTokens,
   hitRate,
   keptFable,
@@ -23,6 +25,9 @@ import {
   modeLabel,
   newAgent,
   piecesOf,
+  thumbOf,
+  tileOf,
+  toBase64,
   prettyModel,
   railOf,
   sandboxOf,
@@ -1410,4 +1415,43 @@ test('a prompt typed over a running turn is a gray card until the conversation t
   });
   expect(await taken.find({ type: 'Text', text: ` you - ${fmtTime(NOW)} ` })).toBeDefined();
   await taken.unmount();
+});
+
+test('a pasted image is found by its tag, and its thumbnail is the BMP in half blocks', () => {
+  expect(imagesIn('compare [Image #2] with [Image #11], then [Image #2] again')).toEqual([2, 11]);
+  expect(imagesIn('no image here')).toEqual([]);
+  expect([...fromBase64(toBase64(Uint8Array.of(1, 2, 3, 4, 250)))]).toEqual([1, 2, 3, 4, 250]);
+
+  // Two pixels wide and three tall, 24 bits a pixel, stored bottom-up with each row padded to 4 bytes.
+  const header = new Uint8Array(54);
+  const view = new DataView(header.buffer);
+  header.set([0x42, 0x4d]);
+  view.setUint32(10, 54, true);
+  view.setInt32(18, 2, true);
+  view.setInt32(22, 3, true);
+  view.setUint16(28, 24, true);
+  const row = (a: number[], b: number[]) => [...a, ...b, 0, 0];
+  const red = [0, 0, 255];
+  const green = [0, 255, 0];
+  const blue = [255, 0, 0];
+  const white = [255, 255, 255];
+  const bmp = Uint8Array.of(
+    ...header,
+    ...row(blue, blue),
+    ...row(green, white),
+    ...row(red, white),
+  );
+  const thumb = thumbOf(bmp);
+  expect(thumb).toMatchObject({ columns: 2, rows: 2 });
+  // A cell is the pixel above as ink and the one below as ground; a row with no pixel below has no ground.
+  expect([...new Uint32Array(fromBase64(thumb?.cells ?? '').buffer)]).toEqual([
+    0x2580, 0xff0000, 0x00ff00, 0x2580, 0xffffff, 0xffffff, 0x2580, 0x0000ff, 0x01000000, 0x2580,
+    0x0000ff, 0x01000000,
+  ]);
+  expect(thumbOf(Uint8Array.of(1, 2, 3))).toBeNull();
+  // A picture keeps its shape in cells twice as tall as wide; a very wide one is held to the width.
+  expect(tileOf(1160, 554, 8, 80)).toEqual({ columns: 34, rows: 8 });
+  expect(tileOf(362, 45, 8, 80)).toEqual({ columns: 80, rows: 5 });
+  // A taller cell needs more columns for the same shape.
+  expect(tileOf(100, 100, 8, 80, 3)).toEqual({ columns: 24, rows: 8 });
 });

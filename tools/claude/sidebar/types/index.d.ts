@@ -96,6 +96,8 @@ declare module 'claude-code' {
       typed: Typed[];
       /** When each prompt the conversation took in was typed, by the id of its row. */
       sent: Record<string, number>;
+      /** The pasted images the draft in the prompt box names, by their numbers. */
+      draft: number[];
       /** The weekly Fable limit used, 0 to 100, as Anthropic's usage endpoint last told it; null before it has. */
       fable: number | null;
       /** Whether the person opened the breakdown under the context bar. */

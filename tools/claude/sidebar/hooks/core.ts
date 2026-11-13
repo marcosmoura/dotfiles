@@ -503,3 +503,99 @@ export const columnsOf = (head: readonly string[], rows: readonly (readonly stri
       ),
     ),
   );
+
+// ---------------------------------------------------------------- pictures
+
+/** The pasted images a prompt names, by the number of each `[Image #n]` tag, once each. */
+export const imagesIn = (text: string) => [
+  ...new Set([...text.matchAll(/\[Image #(\d+)\]/g)].map((m) => Number(m[1]))),
+];
+
+/** A picture as cells: each an upper half block, its ink the pixel above and its ground the one below. */
+export type Thumb = { columns: number; rows: number; cells: string };
+
+const BASE64 = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
+
+/** Bytes as standard padded base64. */
+export const toBase64 = (bytes: Uint8Array) => {
+  let out = '';
+  for (let i = 0; i < bytes.length; i += 3) {
+    const n = ((bytes[i] ?? 0) << 16) | ((bytes[i + 1] ?? 0) << 8) | (bytes[i + 2] ?? 0);
+    out +=
+      (BASE64[n >> 18] ?? '') +
+      (BASE64[(n >> 12) & 63] ?? '') +
+      (i + 1 < bytes.length ? (BASE64[(n >> 6) & 63] ?? '') : '=') +
+      (i + 2 < bytes.length ? (BASE64[n & 63] ?? '') : '=');
+  }
+  return out;
+};
+
+/** The bytes a standard base64 string holds. */
+export const fromBase64 = (text: string) => {
+  const clean = text.replace(/[^A-Za-z0-9+/]/g, '');
+  const bytes = new Uint8Array(Math.floor((clean.length * 3) / 4));
+  for (let i = 0, o = 0; i < clean.length; i += 4) {
+    const n = [0, 1, 2, 3].reduce(
+      (acc, k) => (acc << 6) | Math.max(0, BASE64.indexOf(clean[i + k] ?? 'A')),
+      0,
+    );
+    for (const shift of [16, 8, 0]) if (o < bytes.length) bytes[o++] = (n >> shift) & 255;
+  }
+  return bytes;
+};
+
+const HALF_BLOCK = 0x2580;
+const NO_COLOR = 0x01000000;
+
+/**
+ * A small uncompressed BMP (24 or 32 bits a pixel) as the cells of a Raster, a column a pixel and a
+ * row two; null for anything else. A BMP needs no inflating, which is why the thumbnails are made as one.
+ */
+export const thumbOf = (bmp: Uint8Array): Thumb | null => {
+  if (bmp.length < 54 || bmp[0] !== 0x42 || bmp[1] !== 0x4d) return null;
+  const view = new DataView(bmp.buffer, bmp.byteOffset, bmp.byteLength);
+  const offset = view.getUint32(10, true);
+  const width = view.getInt32(18, true);
+  const signed = view.getInt32(22, true);
+  const bytes = view.getUint16(28, true) / 8;
+  const height = Math.abs(signed);
+  const stride = Math.ceil((width * bytes) / 4) * 4;
+  if (
+    (bytes !== 3 && bytes !== 4) ||
+    width < 1 ||
+    height < 1 ||
+    offset + stride * height > bmp.length
+  )
+    return null;
+  // Rows are stored bottom-up unless the height is negative, and a pixel as blue, green, red.
+  const at = (x: number, y: number) => {
+    const i = offset + (signed > 0 ? height - 1 - y : y) * stride + x * bytes;
+    return ((bmp[i + 2] ?? 0) << 16) | ((bmp[i + 1] ?? 0) << 8) | (bmp[i] ?? 0);
+  };
+  const rows = Math.ceil(height / 2);
+  const words = new Uint32Array(width * rows * 3);
+  for (let r = 0; r < rows; r += 1)
+    for (let x = 0; x < width; x += 1)
+      words.set(
+        [HALF_BLOCK, at(x, r * 2), r * 2 + 1 < height ? at(x, r * 2 + 1) : NO_COLOR],
+        (r * width + x) * 3,
+      );
+  return { columns: width, rows, cells: toBase64(new Uint8Array(words.buffer)) };
+};
+
+/**
+ * The cells a picture of `width` by `height` pixels takes where a cell is `ratio` times as tall as
+ * it is wide: `maxRows` tall, or as tall as `maxColumns` leaves a wide one.
+ */
+export const tileOf = (
+  width: number,
+  height: number,
+  maxRows: number,
+  maxColumns: number,
+  ratio = 2,
+) => {
+  const columns = Math.max(1, Math.round((maxRows * ratio * width) / height));
+  return columns <= maxColumns
+    ? { columns, rows: maxRows }
+    : { columns: maxColumns, rows: Math.max(1, Math.round((maxColumns * height) / width / ratio)) };
+};

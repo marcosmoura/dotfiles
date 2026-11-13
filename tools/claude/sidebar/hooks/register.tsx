@@ -2,13 +2,14 @@
 // breaks it down by category), a rail of the person's prompts (a press scrolls the transcript to
 // one) and its subagents (a press opens their timeline, and a press on a lane opens that subagent's
 // transcript); and, under the prompt, the mode, model and effort in place of Claude Code's hint
-// row. In the transcript it draws the person's prompts as cards and, in a reply, the tables as grids
+// row. Above the prompt it previews the images pasted into the draft. In the transcript it draws the
+// person's prompts as cards and, in a reply, the tables as grids
 // and the code fences as cards. Beyond that it only watches: every event hook passes its event on.
 import { atom, read, update } from 'claude-code';
-import type { EngineInterface, Register, RenderChildren } from 'claude-code';
+import type { ElementTable, EngineInterface, Register, RenderChildren } from 'claude-code';
 
 import type { Agent, Breakdown, Local, Main, Prompt, Rail, Status, Usage } from '../types';
-import type { Align, Left } from './core';
+import type { Align, Left, Thumb } from './core';
 import {
   BRANCH_ICON,
   ZERO,
@@ -28,7 +29,9 @@ import {
   fmtTime,
   fmtTokens,
   fmtUsd,
+  fromBase64,
   hitRate,
+  imagesIn,
   keptFable,
   lanes,
   level,
@@ -44,6 +47,8 @@ import {
   shorten,
   spansOf,
   tally,
+  thumbOf,
+  tileOf,
   tokenRate,
   usageOf,
   whereOf,
@@ -83,6 +88,17 @@ const JUSTIFY: Record<Align, 'flex-start' | 'center' | 'flex-end'> = {
   center: 'center',
   right: 'flex-end',
 };
+/** A thumbnail of a pasted image: this many rows of cells, and no wider than this many columns. */
+const THUMB_ROWS = 8;
+const THUMB_COLUMNS = 80;
+/**
+ * How many times taller than wide a cell is on screen, which the terminal does not tell: measured
+ * off this setup's font and line height (about 9 by 26 pixels). A picture is stretched to its
+ * box of cells, so its shape on screen is only right when this is.
+ */
+const CELL_RATIO = 2.85;
+/** How often the prompt box is read for the images its draft names: a paste raises no event. */
+const DRAFT_EVERY_MS = 200;
 /** The prompts whose time is kept, the latest; and those waiting to be taken in, which are few. */
 const KEPT_SENT = 200;
 const KEPT_TYPED = 50;
@@ -147,6 +163,7 @@ const agents = atom({ plugin: 'sidebar', key: 'agents' } as const, [], { shape: 
 const rail = atom({ plugin: 'sidebar', key: 'rail' } as const, RAIL, { shape: 'rail-1' });
 const typed = atom({ plugin: 'sidebar', key: 'typed' } as const, []);
 const sent = atom({ plugin: 'sidebar', key: 'sent' } as const, {});
+const draft = atom({ plugin: 'sidebar', key: 'draft' } as const, []);
 const fable = atom({ plugin: 'sidebar', key: 'fable' } as const, null);
 const isContextOpen = atom({ plugin: 'sidebar', key: 'isContextOpen' } as const, false);
 const isRailOpen = atom({ plugin: 'sidebar', key: 'isRailOpen' } as const, false);
@@ -310,6 +327,156 @@ const refresh = ($: EngineInterface, isBrokenDown = false) => {
   ]);
 };
 
+// The pasted images. Claude Code keeps each in the session's temporary folder as `images/<n>.<ext>`
+// from the moment it is pasted. Where the terminal draws pictures, a tile is that file itself (as a
+// PNG, which is all the terminal reads from a file). Elsewhere it is the file scaled down by `sips`
+// into a small BMP beside the folder, read back and drawn in half blocks.
+type Tile =
+  | { kind: 'picture'; file: string; columns: number; rows: number }
+  | { kind: 'blocks'; thumb: Thumb };
+
+let folder: string | undefined;
+let pictures: Promise<boolean> | undefined;
+const tiles = new Map<number, Promise<Tile | null>>();
+
+const sh = async ($: EngineInterface, script: string, ...args: string[]) => {
+  const ran = await $.process.run(['sh', '-c', script, ...args], { timeoutMs: 5000 });
+  return ran.exitCode === 0 ? ran.stdout.trim() : '';
+};
+
+/**
+ * Whether Claude Code draws pictures in this terminal: Ghostty and kitty outside tmux, or any the
+ * person vouches for with `CLAUDE_CODE_FORCE_TERMINAL_IMAGES` (Herdr, which it does not know by name).
+ */
+const drawsPictures = ($: EngineInterface) =>
+  (pictures ??= (async () => {
+    try {
+      const forced = await $.env.get('CLAUDE_CODE_FORCE_TERMINAL_IMAGES');
+      if (forced !== undefined && forced !== '' && forced !== '0') return true;
+      if ((await $.env.get('TMUX')) !== undefined) return false;
+      const program = (await $.env.get('TERM_PROGRAM'))?.toLowerCase();
+      return program === 'ghostty' || program === 'kitty';
+    } catch {
+      return false;
+    }
+  })());
+
+const makeTile = async ($: EngineInterface, n: number): Promise<Tile | null> => {
+  try {
+    folder ??=
+      (await sh(
+        $,
+        'ls -d /private/tmp/claude-*/*/"$0" /tmp/claude-*/*/"$0" 2>/dev/null | head -1',
+        await $.session.id(),
+      )) || undefined;
+    if (folder === undefined) return null;
+    const source = await sh($, 'ls "$0"/images/"$1".* 2>/dev/null | head -1', folder, String(n));
+    if (source === '') return null;
+    const sips = (...args: string[]) => $.process.run(['sips', ...args], { timeoutMs: 10_000 });
+
+    if (await drawsPictures($)) {
+      const size = (await sips('-g', 'pixelWidth', '-g', 'pixelHeight', source)).stdout;
+      const width = Number(/pixelWidth: (\d+)/.exec(size)?.[1]);
+      const height = Number(/pixelHeight: (\d+)/.exec(size)?.[1]);
+      if (!(width > 0 && height > 0)) return null;
+      let file = source;
+      if (!/\.png$/i.test(source)) {
+        file = `${folder}/sidebar-thumb-${n}.png`;
+        await sips('-s', 'format', 'png', source, '--out', file);
+      }
+      return {
+        kind: 'picture',
+        file,
+        ...tileOf(width, height, THUMB_ROWS, THUMB_COLUMNS, CELL_RATIO),
+      };
+    }
+
+    const out = `${folder}/sidebar-thumb-${n}.bmp`;
+    const scaled = async (...size: string[]) => {
+      await sips(...size, '-s', 'format', 'bmp', source, '--out', out);
+      return thumbOf(fromBase64((await $.fs.read(out, { as: 'bytes' })).base64));
+    };
+    const tall = await scaled('--resampleHeight', String(THUMB_ROWS * 2));
+    const thumb =
+      tall !== null && tall.columns > THUMB_COLUMNS
+        ? await scaled('--resampleWidth', String(THUMB_COLUMNS))
+        : tall;
+    return thumb === null ? null : { kind: 'blocks', thumb };
+  } catch {
+    return null;
+  }
+};
+
+/** The tile of pasted image `n`, made once; one that could not be made is tried again when next drawn. */
+const tileFor = ($: EngineInterface, n: number) => {
+  const known = tiles.get(n);
+  if (known !== undefined) return known;
+  const made = makeTile($, n).then((tile) => {
+    if (tile === null) tiles.delete(n);
+    return tile;
+  });
+  tiles.set(n, made);
+  return made;
+};
+
+/** The pasted images of a prompt side by side, each over its number. */
+const strip = async (
+  $: EngineInterface,
+  { Box, Image, Raster, Text }: ElementTable<'terminal'>,
+  numbers: readonly number[],
+) => {
+  const drawn = await Promise.all(numbers.map(async (n) => ({ n, tile: await tileFor($, n) })));
+
+  return (
+    <Box flexDirection="row" flexWrap="wrap" columnGap={2}>
+      {drawn.map(({ n, tile }) => (
+        <Box flexDirection="column">
+          {tile === null ? (
+            <Text color="subtle">no preview</Text>
+          ) : tile.kind === 'picture' ? (
+            <Image
+              key={`image-${n}`}
+              source={{ file: tile.file, format: 'png' }}
+              columns={tile.columns}
+              rows={tile.rows}
+              alt={`[Image #${n}]`}
+            />
+          ) : (
+            <Raster
+              key={`image-${n}`}
+              columns={tile.thumb.columns}
+              rows={tile.thumb.rows}
+              cells={tile.thumb.cells}
+            />
+          )}
+          <Text color="subtle">{`#${n}`}</Text>
+        </Box>
+      ))}
+    </Box>
+  );
+};
+
+let typedDraft = '';
+let watching: { cancel: () => void } | undefined;
+
+/** Reads the prompt box for the images its draft names, and tells the band above it when they changed. */
+const watchDraft = ($: EngineInterface) => {
+  watching?.cancel();
+  watching = $.clock.every(DRAFT_EVERY_MS, () => {
+    void (async () => {
+      try {
+        const { text } = await $.prompt.read();
+        if (text === typedDraft) return;
+        typedDraft = text;
+        const found = imagesIn(text);
+        if (differs(await read($, draft), found)) await update($, draft, () => found);
+      } catch {
+        // No prompt box to read: nothing to preview.
+      }
+    })();
+  });
+};
+
 /**
  * Changes one agent's card. A loop with no card (a workflow's agent, a compaction) writes nothing,
  * and neither does a change that hands the card back as it was.
@@ -324,6 +491,7 @@ export const register: Register = (on) => {
   on('session.start', async ($, e, next) => {
     await $.command.register({ name: 'sidebar', description: 'Open the session sidebar' });
     void $.ui.open(OPEN);
+    watchDraft($);
     const model = await $.session.model();
     await update($, main, (m) => ({ ...m, model }));
     await refresh($, true);
@@ -379,7 +547,9 @@ export const register: Register = (on) => {
       // itself, so the label is laid over it: `you`, and when the prompt was typed once that is known.
       // One still waiting in the queue is gray, frame and text.
       if (e.surface !== 'terminal') return next(e);
-      const { Box, Text } = $.ui.resolve(e);
+      const els = $.ui.resolve(e);
+      const { Box, Text } = els;
+      const pasted = imagesIn(e.props.text);
       const taken = (await read($, sent))[id];
       const entry = (await read($, typed)).findLast((t) => t.text === e.props.text.trim());
       const at = taken ?? entry?.at;
@@ -388,8 +558,15 @@ export const register: Register = (on) => {
 
       return (
         <Box flexDirection="column" marginTop={1}>
-          <Box key="prompt-card" borderStyle="round" borderColor={frame} paddingX={1}>
+          <Box
+            key="prompt-card"
+            flexDirection="column"
+            borderStyle="round"
+            borderColor={frame}
+            paddingX={1}
+          >
             <Text color={isQueued ? 'inactive' : 'text'}>{e.props.text}</Text>
+            {pasted.length === 0 ? null : <Box marginTop={1}>{await strip($, els, pasted)}</Box>}
           </Box>
           <Box position="absolute" top={0} left={2}>
             <Text color={frame}>{at === undefined ? ' you ' : ` you - ${fmtTime(at)} `}</Text>
@@ -398,6 +575,16 @@ export const register: Register = (on) => {
       );
     },
   );
+
+  // The band above the prompt: the images pasted into the draft, before it is sent.
+  on('ui.render', { component: 'AbovePrompt' }, async ($, e, next) => {
+    if (e.surface !== 'terminal' || e.props.hasSurvey) return next(e);
+    const pasted = await read($, draft);
+    if (pasted.length === 0) return next(e);
+    const els = $.ui.resolve(e);
+
+    return <els.Box paddingX={1}>{await strip($, els, pasted)}</els.Box>;
+  });
 
   // When a prompt leaves the composer, and whether it has to wait for the turn that is running.
   on('prompt.submit', { origin: { kind: 'composer' } }, async ($, e, next) => {
