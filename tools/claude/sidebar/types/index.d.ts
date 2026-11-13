@@ -67,6 +67,9 @@ export type Prompt = { id: string; text: string };
 /** The prompts the transcript has drawn, oldest first, and the one being read (null before any). */
 export type Rail = { prompts: Prompt[]; reading: string | null };
 
+/** A prompt as it left the composer: when, and whether a turn was running, so it waits in the queue. */
+export type Typed = { text: string; at: number; isQueued: boolean };
+
 export type Status = 'running' | 'done' | 'failed' | 'stopped';
 
 export type Agent = {
@@ -89,6 +92,10 @@ declare module 'claude-code' {
       sandbox: Shaped<Sandbox | null>;
       agents: Shaped<Agent[]>;
       rail: Shaped<Rail>;
+      /** The latest prompts typed, oldest first; one is queued until the conversation takes it in. */
+      typed: Typed[];
+      /** When each prompt the conversation took in was typed, by the id of its row. */
+      sent: Record<string, number>;
       /** The weekly Fable limit used, 0 to 100, as Anthropic's usage endpoint last told it; null before it has. */
       fable: number | null;
       /** Whether the person opened the breakdown under the context bar. */

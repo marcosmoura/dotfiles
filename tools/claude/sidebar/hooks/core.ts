@@ -76,6 +76,12 @@ export const fmtClock = (ms: number) => {
   return h > 0 ? `${h}:${mm.padStart(2, '0')}:${ss}` : `${mm}:${ss}`;
 };
 
+/** A moment as the time of day it was here: `14:37`. */
+export const fmtTime = (ms: number) => {
+  const d = new Date(ms);
+  return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+};
+
 /** The time left until a reset: `<1m`, `25m`, `2h 10m`, `1d 13h`. */
 export const fmtLeft = (ms: number) => {
   const m = Math.floor(Math.max(0, ms) / 60_000);

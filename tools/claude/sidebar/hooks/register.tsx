@@ -25,6 +25,7 @@ import {
   fmtLeft,
   fmtPercent,
   fmtRate,
+  fmtTime,
   fmtTokens,
   fmtUsd,
   hitRate,
@@ -82,6 +83,9 @@ const JUSTIFY: Record<Align, 'flex-start' | 'center' | 'flex-end'> = {
   center: 'center',
   right: 'flex-end',
 };
+/** The prompts whose time is kept, the latest; and those waiting to be taken in, which are few. */
+const KEPT_SENT = 200;
+const KEPT_TYPED = 50;
 /** A column wider than this many cells is one that narrows when its table does not fit. */
 const WIDE = 24;
 /** Where a reply's text starts in its row: under the bullet that opens it. */
@@ -141,6 +145,8 @@ const local = atom({ plugin: 'sidebar', key: 'local' } as const, LOCAL, { shape:
 const sandbox = atom({ plugin: 'sidebar', key: 'sandbox' } as const, null, { shape: 'sandbox-2' });
 const agents = atom({ plugin: 'sidebar', key: 'agents' } as const, [], { shape: 'agents-4' });
 const rail = atom({ plugin: 'sidebar', key: 'rail' } as const, RAIL, { shape: 'rail-1' });
+const typed = atom({ plugin: 'sidebar', key: 'typed' } as const, []);
+const sent = atom({ plugin: 'sidebar', key: 'sent' } as const, {});
 const fable = atom({ plugin: 'sidebar', key: 'fable' } as const, null);
 const isContextOpen = atom({ plugin: 'sidebar', key: 'isContextOpen' } as const, false);
 const isRailOpen = atom({ plugin: 'sidebar', key: 'isRailOpen' } as const, false);
@@ -353,7 +359,7 @@ export const register: Register = (on) => {
   on(
     'ui.render',
     { component: 'UserMessage', props: { origin: { kind: 'composer' } } },
-    ($, e, next) => {
+    async ($, e, next) => {
       const id = e.requestId;
       const part = e.props.onScreen;
       seen.set(id, e.props.text);
@@ -368,24 +374,69 @@ export const register: Register = (on) => {
         isDue = true;
         $.clock.after(0, () => void publish($));
       }
-      // The terminal's row is ours: a rounded card labelled on its top border, an empty row above
-      // it; the row under it is the one the reply that follows opens with. The label is laid over
-      // the border, which a Box cannot title itself.
+      // The terminal's row is ours: a rounded card, an empty row above it (the row under it is the
+      // one the reply that follows opens with). Its top border is labelled, which a Box cannot do
+      // itself, so the label is laid over it: `you`, and when the prompt was typed once that is known.
+      // One still waiting in the queue is gray, frame and text.
       if (e.surface !== 'terminal') return next(e);
       const { Box, Text } = $.ui.resolve(e);
+      const taken = (await read($, sent))[id];
+      const entry = (await read($, typed)).findLast((t) => t.text === e.props.text.trim());
+      const at = taken ?? entry?.at;
+      const isQueued = taken === undefined && entry?.isQueued === true;
+      const frame = isQueued ? 'inactive' : FRAME;
 
       return (
         <Box flexDirection="column" marginTop={1}>
-          <Box key="prompt-card" borderStyle="round" borderColor={FRAME} paddingX={1}>
-            <Text>{e.props.text}</Text>
+          <Box key="prompt-card" borderStyle="round" borderColor={frame} paddingX={1}>
+            <Text color={isQueued ? 'inactive' : 'text'}>{e.props.text}</Text>
           </Box>
           <Box position="absolute" top={0} left={2}>
-            <Text color={FRAME}> you </Text>
+            <Text color={frame}>{at === undefined ? ' you ' : ` you - ${fmtTime(at)} `}</Text>
           </Box>
         </Box>
       );
     },
   );
+
+  // When a prompt leaves the composer, and whether it has to wait for the turn that is running.
+  on('prompt.submit', { origin: { kind: 'composer' } }, async ($, e, next) => {
+    const text = e.text.trim();
+    const entry = { text, at: await $.clock.now(), isQueued: e.turnId !== undefined };
+    await update($, typed, (list) => [...list, entry].slice(-KEPT_TYPED));
+    const entered = await next(e);
+    if ('drop' in entered)
+      await update($, typed, (list) => list.filter((t) => t.text !== text || t.at !== entry.at));
+
+    return entered;
+  });
+
+  // The conversation takes a prompt in, as a turn's first row or handed to the turn that is running:
+  // its row is known by its id from here on, with the time it was typed.
+  on('session.append', async ($, e, next) => {
+    const { message } = e;
+    const isPrompt = e.door === 'prompt' && message.type === 'user' && message.isMeta !== true;
+    const isHandedIn = message.type === 'attachment' && message.name === 'queued_command';
+    if (e.agentId !== undefined || !(isPrompt || isHandedIn)) return next(e);
+    const body = message.content
+      .map((block) => (typeof block.text === 'string' ? block.text : ''))
+      .join('\n');
+    const waiting = await read($, typed);
+    const match = waiting.findLast((t) => body.includes(t.text));
+    const at = match?.at ?? (isPrompt ? await $.clock.now() : undefined);
+    if (match !== undefined)
+      await update($, typed, (list) =>
+        list.map((t) =>
+          t.text === match.text && t.at === match.at ? { ...t, isQueued: false } : t,
+        ),
+      );
+    if (at !== undefined)
+      await update($, sent, (known) =>
+        Object.fromEntries([...Object.entries(known), [e.uuid, at] as const].slice(-KEPT_SENT)),
+      );
+
+    return next(e);
+  });
 
   // A reply with a table or a code fence in it: the prose stays the engine's own drawing, piece by
   // piece. A table is a rounded grid: its cells are flex boxes of the columns' widths, so one wider

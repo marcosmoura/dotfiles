@@ -13,6 +13,7 @@ import {
   fmtLeft,
   fmtPercent,
   fmtRate,
+  fmtTime,
   fmtTokens,
   hitRate,
   keptFable,
@@ -1371,4 +1372,42 @@ test('a reply with a code fence draws it as a rounded card, its language on the 
   expect(await ui.find({ type: 'Text', text: /^2$/ })).toBeDefined();
   expect(await ui.find({ type: 'Text', text: /^ bash $/ })).toBeDefined();
   await ui.unmount();
+});
+
+test('a prompt typed over a running turn is a gray card until the conversation takes it in, then blue with its time', async ($, on) => {
+  engine(on);
+  on('prompt.submit', (_, e) => ({ text: e.text }));
+  await start($);
+  await $.prompt.submit({
+    text: 'and run the tests',
+    turnId: 't1',
+    wait: false,
+    origin: { kind: 'composer' },
+  });
+  const part = { first: 0, last: 2, of: 3 };
+  const queued = await $.ui.mount({
+    ...message('q1', 'and run the tests', part),
+    surface: 'terminal',
+  });
+  expect(await queued.find({ type: 'Box', key: 'prompt-card' })).toMatchObject({
+    props: { borderColor: 'inactive' },
+  });
+  expect(await queued.find({ type: 'Text', text: ` you - ${fmtTime(NOW)} ` })).toBeDefined();
+  await queued.unmount();
+
+  await $.session.append({
+    message: { type: 'user', content: [{ type: 'text', text: 'and run the tests' }] },
+    door: 'prompt',
+    origin: { kind: 'composer' },
+    uuid: 'q1',
+  });
+  const taken = await $.ui.mount({
+    ...message('q1', 'and run the tests', part),
+    surface: 'terminal',
+  });
+  expect(await taken.find({ type: 'Box', key: 'prompt-card' })).toMatchObject({
+    props: { borderColor: 'ide' },
+  });
+  expect(await taken.find({ type: 'Text', text: ` you - ${fmtTime(NOW)} ` })).toBeDefined();
+  await taken.unmount();
 });
