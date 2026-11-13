@@ -338,5 +338,10 @@ bun run typecheck
 
 `src/build.ts` is the tree expansion, `src/ops.ts` the six commands, `src/engine.ts` the headless
 and live backends, `src/catalog.ts` the cached names, `src/variables.ts` the folding of variable
-commands, `src/overrides.ts` the saving and matching of instance overrides. `src/app.ts`, `src/lock.ts` and `src/prune.ts`
+commands, `src/overrides.ts` the saving and matching of instance overrides. `src/archive.ts` reads and writes `.figcraft` zip
+archives over `node:zlib` the way FigCraft writes them (raw copies of entries, written to a
+temporary file and renamed), `src/document.ts` reads and moves the `next_id` counter of
+`document.json` without rewriting its other bytes and holds the id range helpers
+(`client × 2^32 + n`), and `src/clients.ts` is the id range registry in
+`<git-common-dir>/figkit/clients.json`. `src/app.ts`, `src/lock.ts` and `src/prune.ts`
 came from the old proxy with their tests.
