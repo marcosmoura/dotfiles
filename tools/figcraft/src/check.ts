@@ -146,7 +146,7 @@ function unmergedPickReason(cwd: string, env: NodeJS.ProcessEnv): string | null 
 
   return (
     `${path} was in a conflict that figkit did not merge, and the staged copy is one side of it. ` +
-    `Restore it (git checkout HEAD -- ${path}) and make the change again with a designer`
+    'Abort it (git reset --merge) and make the change again with a designer'
   );
 }
 

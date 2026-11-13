@@ -18,7 +18,7 @@ const REPLAY_MESSAGE =
   'cannot merge that file. Abort it and make the change again with a designer';
 const PICK_MESSAGE =
   `${DESIGN} was in a conflict that figkit did not merge, and the staged copy is one side of it. ` +
-  `Restore it (git checkout HEAD -- ${DESIGN}) and make the change again with a designer`;
+  'Abort it (git reset --merge) and make the change again with a designer';
 
 let bin = '';
 
@@ -299,7 +299,14 @@ describe.skipIf(!hasCli)('figkit check during a cherry-pick or a revert', () => 
     expect(refused.code).toBe(1);
     expect(refused.stderr).toContain(`error: ${PICK_MESSAGE}`);
 
-    gitIn(repo, 'checkout', 'HEAD', '--', DESIGN);
+    // Restoring the file alone leaves MERGE_MSG and its conflict list behind: the change made
+    // again would be refused as well. The abort the message names clears it.
+    gitIn(repo, 'reset', '--merge');
+    expect(existsSync(join(repo, '.git', 'MERGE_MSG'))).toBe(false);
+    expect(figkit(repo, ['check'])).toEqual({ code: 0, stdout: '', stderr: '' });
+
+    await addFrame(join(repo, DESIGN), 'Again');
+    gitIn(repo, 'add', DESIGN);
     expect(figkit(repo, ['check'])).toEqual({ code: 0, stdout: '', stderr: '' });
   }, 60_000);
 });

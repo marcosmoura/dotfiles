@@ -328,8 +328,9 @@ shared by every worktree of the clone. The main copy keeps plain ids and is writ
 - After `git cherry-pick -n`, which writes no `CHERRY_PICK_HEAD`, on either copy: when `MERGE_MSG`
   is left without `MERGE_HEAD`, `SQUASH_MSG`, `CHERRY_PICK_HEAD` or `REVERT_HEAD`, its
   `# Conflicts:` list names the design file and the staged design file is not `HEAD`'s, the staged
-  copy is one side of a conflict, so it fails. Restore it (`git checkout HEAD -- <path>`) and make
-  the change again.
+  copy is one side of a conflict, so it fails. Abort it (`git reset --merge`, which also clears
+  `MERGE_MSG`) and make the change again. Restoring the file alone is not enough: the conflict list
+  stays until a commit or a reset.
 
 `figkit check --rebase <upstream> [<branch>]` is for a `pre-rebase` hook, which Git calls with the
 same arguments (`git rebase --continue` runs no `pre-commit` hook). It exits 1 whenever a commit in
