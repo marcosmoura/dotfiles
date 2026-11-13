@@ -7,6 +7,7 @@ import {
   alarm,
   breakdownOf,
   changesOf,
+  columnsOf,
   fableOf,
   fmtClock,
   fmtLeft,
@@ -20,6 +21,7 @@ import {
   modeIn,
   modeLabel,
   newAgent,
+  piecesOf,
   prettyModel,
   railOf,
   sandboxOf,
@@ -1001,6 +1003,11 @@ test('the prompts the transcript draws make a rail: a thick tick on the one bein
     ...message('p3', 'Add a leading-edge option', { first: 0, last: 2, of: 3 }),
     surface: 'terminal',
   });
+  // On the terminal a prompt is a rounded card labelled on its top border, an empty row either side.
+  expect(await p2.find({ type: 'Box', key: 'prompt-card' })).toMatchObject({
+    props: { borderStyle: 'round' },
+  });
+  expect(await p2.find({ type: 'Text', text: /^ you $/ })).toBeDefined();
   // A background task's notification is a user row too, and no prompt.
   const notice = await $.ui.mount({
     plugin: 'sidebar',
@@ -1266,4 +1273,102 @@ test('the opened timeline draws as many lanes as the pane has room for, the late
   expect(await drawnIn(33)).toEqual([5, 'lane-a10', '1', 'lane-a14', '5', '+9 earlier']);
   // and none under three: the pane scrolls.
   expect(await drawnIn(20)).toEqual([3, 'lane-a12', '1', 'lane-a14', '3', '+11 earlier']);
+});
+
+test('a reply is split at its tables and its code fences, and a table in a fence is its code', () => {
+  const reply = [
+    'Two options:',
+    '',
+    '| Option | Rows |',
+    '| :-- | --: |',
+    '| **Card** | 2 |',
+    '| `bar` \\| rule | 0 |',
+    '',
+    'Pick one.',
+    '```',
+    '| a | b |',
+    '| - | - |',
+    '```',
+  ].join('\n');
+  expect(piecesOf(reply)).toEqual([
+    { kind: 'prose', text: 'Two options:\n' },
+    {
+      kind: 'table',
+      head: ['Option', 'Rows'],
+      align: ['left', 'right'],
+      rows: [
+        ['**Card**', '2'],
+        ['`bar` | rule', '0'],
+      ],
+    },
+    { kind: 'prose', text: '\nPick one.' },
+    { kind: 'code', language: undefined, source: '| a | b |\n| - | - |' },
+  ]);
+  // A column is as wide as its widest cell as drawn: the markdown's own marks take no room.
+  expect(
+    columnsOf(
+      ['Option', 'Rows'],
+      [
+        ['**Card**', '2'],
+        ['`bar` | rule', '0'],
+      ],
+    ),
+  ).toEqual([10, 4]);
+  // A fence in a list item loses the item's indent, and one still being written runs to the end.
+  expect(piecesOf('- step\n  ```ts\n  const a = 1\n    b()\n  ```\ndone\n~~~~sh\nls')).toEqual([
+    { kind: 'prose', text: '- step' },
+    { kind: 'code', language: 'ts', source: 'const a = 1\n  b()' },
+    { kind: 'prose', text: 'done' },
+    { kind: 'code', language: 'sh', source: 'ls' },
+  ]);
+  expect(piecesOf('No table here, a | b')).toEqual([
+    { kind: 'prose', text: 'No table here, a | b' },
+  ]);
+});
+
+test("a reply with a table draws it as a rounded grid between the engine's own prose", async ($, on) => {
+  engine(on);
+  await start($);
+  const ui = await $.ui.mount({
+    plugin: 'sidebar',
+    component: 'AssistantMessage',
+    requestId: 'a1',
+    surface: 'terminal',
+    props: {
+      text: 'Before\n\n| Name | Size |\n| --- | --- |\n| `core.ts` | 306 |\n\nAfter',
+      isFirstOfReply: true,
+    },
+  });
+  const grid = await ui.find({ type: 'Box', key: 'table-1' });
+  expect(grid?.children).toHaveLength(5);
+  expect(await ui.find({ type: 'Text', text: /^╭─{9}$/ })).toBeDefined();
+  expect(await ui.find({ type: 'Text', text: /^core\.ts$/ })).toBeDefined();
+  await ui.unmount();
+});
+
+test('a reply with a code fence draws it as a rounded card, its language on the border and its lines numbered', async ($, on) => {
+  engine(on);
+  await start($);
+  const ui = await $.ui.mount({
+    plugin: 'sidebar',
+    component: 'AssistantMessage',
+    requestId: 'a2',
+    surface: 'terminal',
+    props: { text: 'Run it:\n\n```bash\nclaude plugin test .\n```', isFirstOfReply: true },
+  });
+  expect(await ui.find({ type: 'Box', key: 'code-1' })).toMatchObject({
+    props: { borderStyle: 'round' },
+  });
+  expect(await ui.find({ type: 'Code' })).toMatchObject({
+    props: { source: 'claude plugin test .', language: 'bash' },
+  });
+  // One line: no numbers. Two: each has its own.
+  expect(await ui.find({ type: 'Text', text: /^1$/ })).toBeUndefined();
+  await ui.redraw({
+    text: 'Run it:\n\n```bash\ncd sidebar\nclaude plugin test .\n```',
+    isFirstOfReply: true,
+  });
+  expect(await ui.find({ type: 'Text', text: /^2$/ })).toBeDefined();
+  expect(await ui.find({ type: 'Text', text: /^ bash $/ })).toBeDefined();
+  await ui.unmount();
 });

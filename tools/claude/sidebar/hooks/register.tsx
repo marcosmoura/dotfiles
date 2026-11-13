@@ -2,12 +2,13 @@
 // breaks it down by category), a rail of the person's prompts (a press scrolls the transcript to
 // one) and its subagents (a press opens their timeline, and a press on a lane opens that subagent's
 // transcript); and, under the prompt, the mode, model and effort in place of Claude Code's hint
-// row. It only watches: every event hook passes its event on.
+// row. In the transcript it draws the person's prompts as cards and, in a reply, the tables as grids
+// and the code fences as cards. Beyond that it only watches: every event hook passes its event on.
 import { atom, read, update } from 'claude-code';
 import type { EngineInterface, Register, RenderChildren } from 'claude-code';
 
 import type { Agent, Breakdown, Local, Main, Prompt, Rail, Status, Usage } from '../types';
-import type { Left } from './core';
+import type { Align, Left } from './core';
 import {
   BRANCH_ICON,
   ZERO,
@@ -17,6 +18,7 @@ import {
   breakdownOf,
   changesOf,
   clean,
+  columnsOf,
   fableOf,
   filled,
   fmtClock,
@@ -33,11 +35,13 @@ import {
   modeIn,
   modeLabel,
   newAgent,
+  piecesOf,
   prettyModel,
   railOf,
   sandboxOf,
   segments,
   shorten,
+  spansOf,
   tally,
   tokenRate,
   usageOf,
@@ -69,6 +73,19 @@ const HOVER = { color: 'inactive', backgroundColor: 'inverseText', inverse: true
 const LEFT_LABEL = 9;
 const RIGHT_LABEL = 12;
 const RIGHT = 22;
+/** The colour of the frames drawn in the transcript: the prompt's card, a table's grid. A code card's is gray. */
+const FRAME = 'ide';
+/** A grid's upright rule, as many rows as a cell could wrap to: its cell clips it to the rows it has. */
+const UPRIGHT = Array.from({ length: 80 }, () => '│').join('\n');
+const JUSTIFY: Record<Align, 'flex-start' | 'center' | 'flex-end'> = {
+  left: 'flex-start',
+  center: 'center',
+  right: 'flex-end',
+};
+/** A column wider than this many cells is one that narrows when its table does not fit. */
+const WIDE = 24;
+/** Where a reply's text starts in its row: under the bullet that opens it. */
+const GUTTER = 2;
 /** Tools that can change the working tree: the uncommitted lines are counted again after one ran. */
 const WRITES = new Set(['Edit', 'Write', 'NotebookEdit', 'Bash']);
 
@@ -332,7 +349,7 @@ export const register: Register = (on) => {
   });
 
   // The person's prompts as the transcript draws them: each row tells its id and its text, and
-  // which part of it is on screen. The row itself stays Claude Code's.
+  // which part of it is on screen.
   on(
     'ui.render',
     { component: 'UserMessage', props: { origin: { kind: 'composer' } } },
@@ -351,10 +368,176 @@ export const register: Register = (on) => {
         isDue = true;
         $.clock.after(0, () => void publish($));
       }
+      // The terminal's row is ours: a rounded card labelled on its top border, an empty row above
+      // it; the row under it is the one the reply that follows opens with. The label is laid over
+      // the border, which a Box cannot title itself.
+      if (e.surface !== 'terminal') return next(e);
+      const { Box, Text } = $.ui.resolve(e);
 
-      return next(e);
+      return (
+        <Box flexDirection="column" marginTop={1}>
+          <Box key="prompt-card" borderStyle="round" borderColor={FRAME} paddingX={1}>
+            <Text>{e.props.text}</Text>
+          </Box>
+          <Box position="absolute" top={0} left={2}>
+            <Text color={FRAME}> you </Text>
+          </Box>
+        </Box>
+      );
     },
   );
+
+  // A reply with a table or a code fence in it: the prose stays the engine's own drawing, piece by
+  // piece. A table is a rounded grid: its cells are flex boxes of the columns' widths, so one wider
+  // than the transcript narrows every row alike and its cells wrap, the rules clipped to what is
+  // left. A fence is a rounded card, its language on the top border and its lines numbered.
+  on('ui.render', { component: 'AssistantMessage' }, async ($, e, next) => {
+    if (e.surface !== 'terminal') return next(e);
+    const pieces = piecesOf(e.props.text);
+    if (pieces.every((p) => p.kind === 'prose')) return next(e);
+    const { Box, Code, Text } = $.ui.resolve(e);
+    const isFirst = e.props.isFirstOfReply;
+
+    const uprightIn = (color: string) => (
+      <Box position="absolute" top={0} bottom={0} left={0} width={1} overflow="hidden">
+        <Text color={color}>{UPRIGHT}</Text>
+      </Box>
+    );
+    const upright = uprightIn(FRAME);
+    const rule = (
+      widths: readonly number[],
+      [left, mid, right]: readonly [string, string, string],
+    ) => (
+      <Box flexDirection="row">
+        {widths.map((w, c) => (
+          <Box width={w + 3} flexShrink={shrinkOf(widths, c)} height={1} overflow="hidden">
+            <Text color={FRAME}>{(c === 0 ? left : mid) + '─'.repeat(w + 2)}</Text>
+          </Box>
+        ))}
+        <Text color={FRAME}>{right}</Text>
+      </Box>
+    );
+    // A table too wide for the transcript narrows its wide columns only: a short one keeps its
+    // width, so a word in it is not broken. Where every column is short, they all give way.
+    const shrinkOf = (widths: readonly number[], c: number) =>
+      (widths[c] ?? 0) > WIDE || widths.every((w) => w <= WIDE) ? 1 : 0;
+    const row = (
+      cells: readonly string[],
+      widths: readonly number[],
+      align: readonly Align[],
+      isHead: boolean,
+    ) => (
+      <Box flexDirection="row">
+        {widths.map((w, c) => (
+          <Box
+            width={w + 3}
+            flexShrink={shrinkOf(widths, c)}
+            paddingLeft={2}
+            paddingRight={1}
+            justifyContent={JUSTIFY[align[c] ?? 'left']}
+          >
+            {upright}
+            <Text bold={isHead}>
+              {spansOf(cells[c] ?? '').map((s) =>
+                s.isCode ? (
+                  <Text color="permission">{s.text}</Text>
+                ) : s.isBold ? (
+                  <Text bold>{s.text}</Text>
+                ) : (
+                  s.text
+                ),
+              )}
+            </Text>
+          </Box>
+        ))}
+        <Box width={1} flexShrink={0}>
+          {upright}
+        </Box>
+      </Box>
+    );
+
+    const drawn: RenderChildren[] = [];
+    for (const [i, piece] of pieces.entries()) {
+      if (piece.kind === 'prose') {
+        drawn.push(
+          await next({
+            ...e,
+            props: { ...e.props, text: piece.text, isFirstOfReply: isFirst && i === 0 },
+          }),
+        );
+        continue;
+      }
+      const bullet = (
+        <Box width={GUTTER} flexShrink={0}>
+          <Text>{isFirst && i === 0 ? '⏺' : ''}</Text>
+        </Box>
+      );
+      if (piece.kind === 'code') {
+        // A line a row: its number, a rule, its code. A long line wraps beside its own number, at
+        // the cost of the highlighter reading each line alone. A fence of one line has no numbers.
+        const lines = piece.source.split('\n');
+        drawn.push(
+          <Box flexDirection="row" marginY={i === 0 ? 0 : 1}>
+            {bullet}
+            <Box flexDirection="column" flexGrow={1} flexShrink={1}>
+              <Box
+                key={`code-${i}`}
+                flexDirection="column"
+                borderStyle="round"
+                borderColor="subtle"
+                paddingX={1}
+              >
+                {lines.length === 1 ? (
+                  <Code
+                    source={piece.source === '' ? ' ' : piece.source}
+                    language={piece.language}
+                  />
+                ) : null}
+                {(lines.length === 1 ? [] : lines).map((line, n) => (
+                  <Box flexDirection="row">
+                    <Box
+                      width={String(lines.length).length}
+                      flexShrink={0}
+                      justifyContent="flex-end"
+                    >
+                      <Text color="subtle">{String(n + 1)}</Text>
+                    </Box>
+                    <Box width={1} marginX={1} flexShrink={0}>
+                      {uprightIn('subtle')}
+                    </Box>
+                    <Box flexGrow={1} flexShrink={1}>
+                      <Code source={line === '' ? ' ' : line} language={piece.language} />
+                    </Box>
+                  </Box>
+                ))}
+              </Box>
+              {piece.language === undefined ? null : (
+                <Box position="absolute" top={0} left={2}>
+                  <Text color="subtle">{` ${piece.language} `}</Text>
+                </Box>
+              )}
+            </Box>
+          </Box>,
+        );
+        continue;
+      }
+      const widths = columnsOf(piece.head, piece.rows);
+      drawn.push(
+        <Box flexDirection="row" marginY={i === 0 ? 0 : 1}>
+          {bullet}
+          <Box key={`table-${i}`} flexDirection="column" flexShrink={1}>
+            {rule(widths, ['╭', '┬', '╮'])}
+            {row(piece.head, widths, piece.align, true)}
+            {rule(widths, ['├', '┼', '┤'])}
+            {piece.rows.map((cells) => row(cells, widths, piece.align, false))}
+            {rule(widths, ['╰', '┴', '╯'])}
+          </Box>
+        </Box>,
+      );
+    }
+
+    return <Box flexDirection="column">{drawn}</Box>;
+  });
 
   on('classic.UserPromptSubmit', async ($, e, next) => {
     const mode = e.permission_mode;

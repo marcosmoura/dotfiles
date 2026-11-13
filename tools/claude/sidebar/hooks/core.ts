@@ -365,3 +365,135 @@ export const merge = (cards: Agent[], listed: readonly AgentInfo[], now: number)
   }
   return hasChanged ? next : cards;
 };
+
+// ---------------------------------------------------------------- replies
+
+export type Align = 'left' | 'center' | 'right';
+
+/** A stretch of a cell's text and how it is lettered. */
+export type Span = { text: string; isBold?: true; isCode?: true };
+
+/** A reply in the pieces it is drawn in: its prose, as markdown, each of its tables and each of its code fences. */
+export type Piece =
+  | { kind: 'prose'; text: string }
+  | { kind: 'table'; head: string[]; align: Align[]; rows: string[][] }
+  | { kind: 'code'; language: string | undefined; source: string };
+
+/** A fence's opening line: its indent, its run of marks and the language named after them. */
+const FENCE = /^(\s*)(`{3,}|~{3,})\s*([^\s`]*)/;
+const DIVIDER = /^\s*\|?\s*:?-+:?\s*(\|\s*:?-+:?\s*)*\|?\s*$/;
+
+/** A table row's cells: split at the bars that are neither escaped nor inside a code span. */
+const cellsOf = (line: string) => {
+  const cells: string[] = [];
+  let cell = '';
+  let isCode = false;
+  const row = line.trim().replace(/^\|/, '');
+  for (let i = 0; i < row.length; i += 1) {
+    const ch = row[i];
+    if (ch === '\\' && row[i + 1] === '|') {
+      cell += '|';
+      i += 1;
+    } else if (ch === '|' && !isCode) {
+      cells.push(cell.trim());
+      cell = '';
+    } else {
+      if (ch === '`') isCode = !isCode;
+      cell += ch;
+    }
+  }
+  if (cell.trim() !== '') cells.push(cell.trim());
+  return cells;
+};
+
+const alignOf = (mark: string): Align =>
+  mark.endsWith(':') ? (mark.startsWith(':') ? 'center' : 'right') : 'left';
+
+/**
+ * Splits a reply's markdown at its tables and its code fences. A table is a row of cells, a divider
+ * under it, and the rows that follow; a fence runs to the line that closes it, or to the end of a
+ * reply still being written, and what looks like a table inside one is its code.
+ */
+export const piecesOf = (markdown: string): Piece[] => {
+  const lines = markdown.split('\n');
+  const pieces: Piece[] = [];
+  let prose: string[] = [];
+  const flush = () => {
+    if (prose.join('\n').trim() !== '') pieces.push({ kind: 'prose', text: prose.join('\n') });
+    prose = [];
+  };
+  for (let i = 0; i < lines.length; i += 1) {
+    const line = lines[i] ?? '';
+    const fence = FENCE.exec(line);
+    if (fence !== null) {
+      const [, indent = '', marks = '', language = ''] = fence;
+      const isClosing = (l: string) =>
+        l.trim().startsWith(marks) && l.trim().replaceAll(marks[0] ?? '', '') === '';
+      const code: string[] = [];
+      for (i += 1; i < lines.length && !isClosing(lines[i] ?? ''); i += 1) {
+        const l = lines[i] ?? '';
+        code.push(l.startsWith(indent) ? l.slice(indent.length) : l.trimStart());
+      }
+      flush();
+      pieces.push({
+        kind: 'code',
+        language: language === '' ? undefined : language,
+        source: code.join('\n'),
+      });
+      continue;
+    }
+    const divider = lines[i + 1] ?? '';
+    if (!line.includes('|') || !divider.includes('-') || !DIVIDER.test(divider)) {
+      prose.push(line);
+      continue;
+    }
+    const head = cellsOf(line);
+    const align = cellsOf(divider).map(alignOf);
+    if (head.length === 0 || head.length !== align.length) {
+      prose.push(line);
+      continue;
+    }
+    const rows: string[][] = [];
+    i += 2;
+    for (; i < lines.length && (lines[i] ?? '').includes('|'); i += 1) {
+      const cells = cellsOf(lines[i] ?? '');
+      rows.push(head.map((_, c) => cells[c] ?? ''));
+    }
+    i -= 1;
+    flush();
+    pieces.push({ kind: 'table', head, align, rows });
+  }
+  flush();
+  return pieces;
+};
+
+/** A cell's inline markdown as lettered stretches: bold, code, and a link by its label. */
+export const spansOf = (cell: string): Span[] => {
+  const spans: Span[] = [];
+  let at = 0;
+  for (const m of cell.matchAll(/\*\*(.+?)\*\*|`([^`]+)`|\[([^\]]+)\]\([^)]*\)/g)) {
+    if (m.index > at) spans.push({ text: cell.slice(at, m.index) });
+    if (m[1] !== undefined) spans.push({ text: m[1], isBold: true });
+    else if (m[2] !== undefined) spans.push({ text: m[2], isCode: true });
+    else spans.push({ text: m[3] ?? '' });
+    at = m.index + m[0].length;
+  }
+  if (at < cell.length) spans.push({ text: cell.slice(at) });
+  return spans;
+};
+
+/** The cells a column needs for its widest cell, each character taken as one. */
+export const columnsOf = (head: readonly string[], rows: readonly (readonly string[])[]) =>
+  head.map((_, c) =>
+    Math.max(
+      1,
+      ...[head, ...rows].map(
+        (row) =>
+          [
+            ...spansOf(row[c] ?? '')
+              .map((s) => s.text)
+              .join(''),
+          ].length,
+      ),
+    ),
+  );
