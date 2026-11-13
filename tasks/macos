@@ -1,0 +1,254 @@
+#!/usr/bin/env bash
+#MISE description="Apply macOS defaults (asks for sudo, restarts Finder and the Dock, cannot be undone)"
+#MISE raw=true
+set -euo pipefail
+# shellcheck source=lib.sh
+source "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
+
+step "Applying macOS defaults"
+sudo -v
+
+# An open System Settings window writes its own values back over these.
+osascript -e 'tell application "System Settings" to quit' >/dev/null 2>&1 || true
+
+# ---------------------------------------------------------------------------
+# General interface
+# ---------------------------------------------------------------------------
+
+# Mute the startup chime
+sudo nvram StartupMute=%01 2>/dev/null || warn "could not mute the startup chime"
+
+# Small sidebar icons, scrollbars always visible
+defaults write NSGlobalDomain NSTableViewDefaultSizeMode -int 1
+defaults write NSGlobalDomain AppleShowScrollBars -string "Always"
+
+# Expanded save and print panels
+defaults write NSGlobalDomain NSNavPanelExpandedStateForSaveMode -bool true
+defaults write NSGlobalDomain NSNavPanelExpandedStateForSaveMode2 -bool true
+defaults write NSGlobalDomain PMPrintingExpandedStateForPrint -bool true
+defaults write NSGlobalDomain PMPrintingExpandedStateForPrint2 -bool true
+
+# Save to disk, not to iCloud, by default
+defaults write NSGlobalDomain NSDocumentSaveNewDocumentsToCloud -bool false
+
+# Quit the printer app once the print jobs complete
+defaults write com.apple.print.PrintingPrefs "Quit When Finished" -bool true
+
+# Show ASCII control characters in caret notation in standard text views
+defaults write NSGlobalDomain NSTextShowsControlCharacters -bool true
+
+# Do not reopen windows when an app is relaunched
+defaults write com.apple.systempreferences NSQuitAlwaysKeepsWindows -bool false
+
+# Clicking the clock in the login window shows the host name, IP and OS version
+sudo defaults write /Library/Preferences/com.apple.loginwindow AdminHostInfo HostName
+
+# No icons in menu items, no window open and close animations, and drag a
+# window from anywhere with ctrl+cmd
+defaults write -g NSMenuEnableActionImages -bool false
+defaults write -g NSAutomaticWindowAnimationsEnabled -bool false
+defaults write -g NSWindowShouldDragOnGesture -bool true
+
+# Rebuild the Launch Services database to drop duplicates from "Open With".
+# It takes up to a minute, so it only runs when asked for.
+if [ "${DOTFILES_REBUILD_LSDB:-0}" = "1" ]; then
+  /System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister \
+    -r -domain local -domain system -domain user
+fi
+
+# ---------------------------------------------------------------------------
+# Typing
+# ---------------------------------------------------------------------------
+
+# No capitalization, smart dashes, periods, smart quotes, spelling correction
+# or text replacement: they all get in the way of code
+defaults write NSGlobalDomain NSAutomaticCapitalizationEnabled -bool false
+defaults write NSGlobalDomain NSAutomaticDashSubstitutionEnabled -bool false
+defaults write NSGlobalDomain NSAutomaticPeriodSubstitutionEnabled -bool false
+defaults write NSGlobalDomain NSAutomaticQuoteSubstitutionEnabled -bool false
+defaults write NSGlobalDomain NSAutomaticSpellingCorrectionEnabled -bool false
+defaults write -g WebAutomaticTextReplacementEnabled -bool false
+
+# Tab reaches every control, including the ones in dialogs
+defaults write NSGlobalDomain AppleKeyboardUIMode -int 3
+
+# Holding a key repeats it, and fast
+defaults write -g ApplePressAndHoldEnabled -bool false
+defaults write NSGlobalDomain KeyRepeat -int 1
+defaults write NSGlobalDomain InitialKeyRepeat -int 10
+
+# ---------------------------------------------------------------------------
+# Power, time and screen
+# ---------------------------------------------------------------------------
+
+# Sleep to RAM only. Waking is faster, but a drained battery loses the session.
+sudo pmset -a hibernatemode 0
+
+# `systemsetup -listtimezones` prints the valid names. systemsetup is
+# deprecated and can fail, in which case the zone file is linked directly.
+timezone="${DOTFILES_TIMEZONE:-Europe/Prague}"
+sudo systemsetup -settimezone "$timezone" >/dev/null 2>&1 ||
+  sudo ln -sf "/usr/share/zoneinfo/$timezone" /etc/localtime
+
+# Ask for the password as soon as sleep or the screen saver begins
+defaults write com.apple.screensaver askForPassword -int 1
+defaults write com.apple.screensaver askForPasswordDelay -int 0
+
+# Screenshots as PNG, without the window shadow
+defaults write com.apple.screencapture type -string "png"
+defaults write com.apple.screencapture disable-shadow -bool true
+
+# ---------------------------------------------------------------------------
+# Finder
+# ---------------------------------------------------------------------------
+
+# Show hidden files, all filename extensions and ~/Library
+defaults write com.apple.finder AppleShowAllFiles -bool true
+defaults write NSGlobalDomain AppleShowAllExtensions -bool true
+chflags nohidden ~/Library
+
+# Allow quitting Finder with cmd+Q, which also hides the desktop icons
+defaults write com.apple.finder QuitMenuItem -bool true
+
+# Desktop icons for external disks, servers and removable media, not for the
+# internal disk
+defaults write com.apple.finder ShowExternalHardDrivesOnDesktop -bool true
+defaults write com.apple.finder ShowHardDrivesOnDesktop -bool false
+defaults write com.apple.finder ShowMountedServersOnDesktop -bool true
+defaults write com.apple.finder ShowRemovableMediaOnDesktop -bool true
+
+# No path bar; the window title shows the full POSIX path instead
+defaults write com.apple.finder ShowPathbar -bool false
+defaults write com.apple.finder _FXShowPosixPathInTitle -bool true
+
+# List view by default, folders first, search scoped to the current folder
+defaults write com.apple.finder FXPreferredViewStyle -string "Nlsv"
+defaults write com.apple.finder _FXSortFoldersFirst -bool true
+defaults write com.apple.finder FXDefaultSearchScope -string "SCcf"
+
+# No warning when changing an extension or emptying the Trash
+defaults write com.apple.finder FXEnableExtensionChangeWarning -bool false
+defaults write com.apple.finder WarnOnEmptyTrash -bool false
+
+# Spring-loaded folders, without the delay
+defaults write NSGlobalDomain com.apple.springing.enabled -bool true
+defaults write NSGlobalDomain com.apple.springing.delay -float 0
+
+# No .DS_Store files on network or USB volumes
+defaults write com.apple.desktopservices DSDontWriteNetworkStores -bool true
+defaults write com.apple.desktopservices DSDontWriteUSBStores -bool true
+
+# Skip disk image verification. Recent macOS versions may ignore these keys.
+defaults write com.apple.frameworks.diskimages skip-verify -bool true
+defaults write com.apple.frameworks.diskimages skip-verify-locked -bool true
+defaults write com.apple.frameworks.diskimages skip-verify-remote -bool true
+
+# Open a Finder window when a volume is mounted
+defaults write com.apple.frameworks.diskimages auto-open-ro-root -bool true
+defaults write com.apple.frameworks.diskimages auto-open-rw-root -bool true
+defaults write com.apple.finder OpenWindowForNewRemovableDisk -bool true
+
+# In Get Info, expand General, Open With and Sharing & Permissions
+defaults write com.apple.finder FXInfoPanesExpanded -dict \
+  General -bool true \
+  OpenWith -bool true \
+  Privileges -bool true
+
+# The folder open animation fights with tiling window managers
+defaults write com.apple.finder DisableAllAnimations -bool true
+
+# Icon views (the desktop and both kinds of Finder window): show item info,
+# snap to a grid, and use larger icons with more room between them. Finder
+# creates these keys the first time it shows each view, and PlistBuddy can
+# only change a key that exists.
+finder_plist="$HOME/Library/Preferences/com.apple.finder.plist"
+icon_views_missing=0
+
+icon_views() {
+  local view
+  for view in DesktopViewSettings FK_StandardViewSettings StandardViewSettings; do
+    /usr/libexec/PlistBuddy -c "Set :$view:IconViewSettings:$1 $2" "$finder_plist" >/dev/null 2>&1 ||
+      icon_views_missing=1
+  done
+}
+
+icon_views showItemInfo true
+icon_views arrangeBy grid
+icon_views gridSpacing 72
+icon_views iconSize 56
+
+# On the desktop, put the item info beside the icon instead of below it
+/usr/libexec/PlistBuddy -c "Set :DesktopViewSettings:IconViewSettings:labelOnBottom false" "$finder_plist" >/dev/null 2>&1 ||
+  icon_views_missing=1
+
+[ "$icon_views_missing" = 0 ] ||
+  warn "Finder has not saved all its icon view settings yet; open a window in icon view and run this task again"
+
+# ---------------------------------------------------------------------------
+# Dock and Mission Control
+# ---------------------------------------------------------------------------
+
+# 38 pixel icons, lights under open apps, hidden apps shown translucent
+defaults write com.apple.dock tilesize -int 38
+defaults write com.apple.dock show-process-indicators -bool true
+defaults write com.apple.dock showhidden -bool true
+
+# Always visible, and no delay if hiding is ever turned on
+defaults write com.apple.dock autohide -bool false
+defaults write com.apple.dock autohide-delay -float 0
+
+# No recent apps, and no pinned apps either. This empties the Dock on every
+# run.
+defaults write com.apple.dock show-recents -bool false
+defaults write com.apple.dock persistent-apps -array ""
+
+# Minimize into the app icon with the scale effect; no launch animation
+defaults write com.apple.dock mineffect -string "scale"
+defaults write com.apple.dock minimize-to-application -bool true
+defaults write com.apple.dock launchanim -bool false
+
+# Spring loading on every Dock item, hover highlight in stack grids
+defaults write com.apple.dock enable-spring-load-actions-on-all-items -bool true
+defaults write com.apple.dock mouse-over-hilite-stack -bool true
+
+# Mission Control: fast, grouped by app, and Spaces keep their order
+defaults write com.apple.dock expose-animation-duration -float 0.1
+defaults write com.apple.dock expose-group-by-app -bool true
+defaults write com.apple.dock mru-spaces -bool false
+
+# One set of Spaces across all displays. Check System Settings > Desktop &
+# Dock > "Displays have separate Spaces" if this key stops being honored.
+defaults write com.apple.spaces spans-displays -bool true
+
+# ---------------------------------------------------------------------------
+# Apps
+# ---------------------------------------------------------------------------
+
+# Terminal: UTF-8 only
+defaults write com.apple.terminal StringEncodings -array 4
+
+# Time Machine: do not offer every new disk as a backup volume
+defaults write com.apple.TimeMachine DoNotOfferNewDisksForBackup -bool true
+
+# Activity Monitor: open the main window, show all processes sorted by CPU,
+# and graph CPU usage in the Dock icon
+defaults write com.apple.ActivityMonitor OpenMainWindow -bool true
+defaults write com.apple.ActivityMonitor IconType -int 5
+defaults write com.apple.ActivityMonitor ShowCategory -int 0
+defaults write com.apple.ActivityMonitor SortColumn -string "CPUUsage"
+defaults write com.apple.ActivityMonitor SortDirection -int 0
+
+# TextEdit: plain text, UTF-8
+defaults write com.apple.TextEdit RichText -int 0
+defaults write com.apple.TextEdit PlainTextEncoding -int 4
+defaults write com.apple.TextEdit PlainTextEncodingForWrite -int 4
+
+# ---------------------------------------------------------------------------
+# Restart what reads these settings
+# ---------------------------------------------------------------------------
+
+for app in "Activity Monitor" cfprefsd Dock Finder SystemUIServer; do
+  killall "$app" >/dev/null 2>&1 || true
+done
+
+ok "macOS defaults applied; a few only take effect after logging out"

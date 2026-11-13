@@ -1,92 +1,87 @@
 # Dotfiles
 
-Personal macOS dotfiles managed with modular install scripts.
+My macOS setup: the configs in `home/`, a few tools of my own in `tools/`, and the
+[mise](https://mise.jdx.dev) tasks that install it all on an Apple Silicon Mac.
 
-## Quick Start
+## Install
 
 ```bash
-# Clone for your machine
-git clone -b personal git@github.com:marcosmoura/dotfiles.git ./dotfiles
-
-# Run full installation
-cd ./dotfiles
-./install.sh --all
+git clone git@github.com:marcosmoura/dotfiles.git ~/Projects/dotfiles
+cd ~/Projects/dotfiles
+./bootstrap.sh
 ```
 
-## Architecture
+`bootstrap.sh` installs the Xcode Command Line Tools, Homebrew and mise, then runs
+`mise run install`. On a Mac that already has mise, run `mise run install` directly. Every task is
+safe to run again.
+
+Clone to `~/Projects/dotfiles`. Several configs under `home/` name that path outright.
+
+## Tasks
+
+`mise tasks` lists them and `mise run <name>` runs one. `install` runs the first eight in this
+order and stops at the first one that fails.
+
+| Task       | What it does                                                                        |
+| ---------- | ----------------------------------------------------------------------------------- |
+| `link`     | Links `home/` into `~`. Anything in the way is moved to `<name>.backup-<time>`.     |
+| `identity` | Creates `~/.secrets` and asks for the git name and email.                           |
+| `macos`    | Applies macOS defaults. Needs sudo, restarts Finder and the Dock, cannot be undone. |
+| `brew`     | Installs `home/Brewfile` and lists what is installed beyond it. Removes nothing.    |
+| `shell`    | Installs the zsh plugins and applies the syntax highlighting theme.                 |
+| `packages` | Installs the language runtimes and the global packages in `packages/`.              |
+| `tools`    | Installs dependencies for `tools/` and wires them into their host apps.             |
+| `agents`   | Registers the MCP servers Claude Code keeps outside its tracked config.             |
+| `doctor`   | Checks that this Mac matches the repo. Changes nothing.                             |
+| `lint`     | Runs `bash -n` and shellcheck over `bootstrap.sh` and `tasks/`.                     |
+
+`packages` takes ecosystems as arguments, for example `mise run packages rust lua`. Without
+arguments it does `node`, `python`, `ruby`, `rust` and `lua`.
+
+`macos` reads two environment variables: `DOTFILES_TIMEZONE` (default `Europe/Prague`) and
+`DOTFILES_REBUILD_LSDB=1`, which also rebuilds the Launch Services database.
+
+## Layout
 
 ```text
-dotfiles/
-├── install.sh              # Entry point (--all, --core, --module)
-├── packages/               # Declarative package lists
-│   ├── Brewfile            # Declarative Homebrew packages (brew bundle)
-│   ├── node-globals.txt
-│   ├── cspell-dictionaries.txt
-│   ├── cargo-binaries.txt
-│   ├── pip-packages.txt
-│   ├── gems.txt
-│   └── luarocks.txt
-├── installation/
-│   ├── core/               # Always runs (in order)
-│   │   ├── preinstall.sh   # Sudo auth, Xcode CLI tools
-│   │   ├── symlinks.sh     # Symlinks + stale link cleanup
-│   │   ├── macos.sh        # macOS system defaults
-│   │   └── postinstall.sh  # Cleanup + summary
-│   ├── modules/            # Opt-in, runnable individually
-│   │   ├── brew.sh         # Homebrew + brew bundle
-│   │   ├── zsh.sh          # Shell setup + sheldon plugins
-│   │   ├── node.sh         # Node.js, Bun, pnpm, globals
-│   │   ├── lua.sh          # Luarocks packages
-│   │   ├── python.sh       # Python, uv, pip packages
-│   │   ├── ruby.sh         # Ruby, gems
-│   │   └── rust.sh         # Rust toolchain, cargo binaries
-│   └── lib/
-│       └── utils.sh        # Shared utilities (logging, retry, etc.)
-├── home/                   # Symlinked to ~/
-│   ├── .zprofile           # Login shell: PATH, env vars
-│   ├── .zshrc              # Interactive shell: plugins, prompt
-│   └── .config/            # XDG configs (git, nvim, zsh, etc.)
-└── static/                 # Assets (keyboard layouts)
+bootstrap.sh    first run on a new Mac
+mise.toml       where the tasks live, and the order `install` runs them in
+tasks/          one executable file per task, plus lib.sh with the shared helpers
+packages/       global packages, one list per package manager
+home/           linked into ~
+tools/          my own tools, loaded by their host apps from this repo
 ```
 
-## Usage
+## Linking
 
-```bash
-# Full installation (core + all modules)
-./install.sh --all
+Each top-level entry of `home/` that git tracks becomes one link in `~`:
 
-# Core only (symlinks, macOS settings)
-./install.sh --core
-
-# Specific modules
-./install.sh --module node rust
+```text
+~/.config        ->  home/.config
+~/.claude        ->  home/.claude
+~/.codex         ->  home/.codex
+~/.zshrc         ->  home/.zshrc
+~/.zprofile      ->  home/.zprofile
+~/.editorconfig  ->  home/.editorconfig
+~/Brewfile       ->  home/Brewfile
 ```
 
-> Note: the installer replaces an existing `~/.config` directory with the repo symlink.
+`~/.config`, `~/.claude` and `~/.codex` are whole directories, so apps write their state and
+tokens into this repo's folder. `.gitignore` keeps all of that out of git; check it before adding
+a file under `home/`.
 
-## Branch Strategy
+## Packages
 
-This repository uses **separate branches per machine**:
+- Homebrew formulae, casks and taps go in `home/Brewfile`.
+- Everything else goes in `packages/<manager>.txt`, one name per line: `npm`, `cspell-dictionaries`,
+  `cargo`, `pip`, `gem` and `luarocks`.
+- Runtime versions (Node, pnpm, Python, Ruby) are set in `home/.config/mise/config.toml`.
 
-- **`personal`** — Full personal development setup
-- **`work`** — Work machine (limited scope)
+Upgrades are not a task. `updateSystem` in the shell runs topgrade for that.
 
-Each machine clones its own branch directly:
+## Secrets and git identity
 
-```bash
-git clone -b <branch> git@github.com:marcosmoura/dotfiles.git ~/Projects/dotfiles
-```
-
-> **Note:** Git worktrees (`.worktrees/`) are for development only — not for deployment.
-> To develop across branches simultaneously, use worktrees locally.
-
-## Secrets
-
-Secrets are stored outside the repository in `~/.secrets/`.
-The install script creates this directory. Populate it manually after installation.
-
-## Git Identity
-
-On first install, `install.sh` prompts for your Git name and email,
-creating `~/.config/git/identity` (not tracked by git).
-On subsequent installs, the existing identity is preserved.
+Neither is in git. API keys live in `~/.secrets`, one file per key holding only the value;
+`home/.config/zsh/secrets.zsh` exports them. The git name and email live in
+`home/.config/git/identity`, which is gitignored and included by `home/.config/git/config`.
+`mise run identity` creates both.

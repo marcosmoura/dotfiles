@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+#MISE description="Install the zsh plugins and apply the syntax highlighting theme"
+set -euo pipefail
+# shellcheck source=lib.sh
+source "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
+
+need sheldon zsh
+
+step "Installing zsh plugins"
+sheldon lock
+
+# The theme is stored by fast-syntax-highlighting's own `fast-theme` command.
+# .zshrc loads that plugin deferred, so it is sourced by hand here, from the
+# path sheldon cloned it to.
+step "Applying the syntax highlighting theme"
+plugin="$(sheldon source | sed -n 's/.*source "\(.*fast-syntax-highlighting\.plugin\.zsh\)".*/\1/p' | head -n 1)"
+[ -n "$plugin" ] || die "sheldon did not load fast-syntax-highlighting"
+zsh -c 'source "$1" && fast-theme "$2"' zsh "$plugin" "$HOME/.config/syntax-theme/syntax-theme.ini"

@@ -1,0 +1,47 @@
+#!/usr/bin/env bash
+#MISE description="Check that this Mac matches the repo, without changing anything"
+# The "~/..." strings below are labels to print, not paths to expand.
+# shellcheck disable=SC2088
+set -euo pipefail
+# shellcheck source=lib.sh
+source "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
+
+problems=0
+
+# check <what> <fix> <command>...: run the command, report what and how to fix it.
+check() {
+  local what="$1" fix="$2"
+  shift 2
+  if "$@" >/dev/null 2>&1; then
+    ok "$what"
+  else
+    warn "$what: no (fix: $fix)"
+    problems=$((problems + 1))
+  fi
+}
+
+links_to() { [ -L "$1" ] && [ "$(readlink "$1")" = "$2" ]; }
+is_zsh() { case "$SHELL" in */zsh) ;; *) return 1 ;; esac }
+secrets_private() { [ "$(stat -f %Lp "$HOME/.secrets")" = 700 ]; }
+
+step "Links"
+check "repo is at ~/Projects/dotfiles" "move it there; configs under home/ name that path" \
+  [ "$ROOT" = "$HOME/Projects/dotfiles" ]
+while IFS= read -r name; do
+  check "~/$name" "mise run link" links_to "$HOME/$name" "$ROOT/home/$name"
+done < <(managed)
+check "~/.local/bin/figkit" "mise run tools" links_to "$HOME/.local/bin/figkit" "$ROOT/tools/figcraft/bin/figkit"
+
+step "Machine-local files"
+check "git identity" "mise run identity" [ -f "$ROOT/home/.config/git/identity" ]
+check "~/.secrets is private" "mise run identity, or chmod 700 ~/.secrets" secrets_private
+
+step "Shell"
+check "login shell is zsh" "chsh -s /bin/zsh" is_zsh
+
+step "Homebrew"
+check "everything in the Brewfile is installed" "mise run brew" \
+  env HOMEBREW_NO_AUTO_UPDATE=1 brew bundle check --no-upgrade --file "$ROOT/home/Brewfile"
+
+[ "$problems" -eq 0 ] || die "$problems check(s) failed"
+ok "all good"

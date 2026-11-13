@@ -44,7 +44,7 @@ home/.config/yazi/plugins/
 home/.config/zed/prompts/
 .cortexkit/
 
-# Git identity (machine-specific, created by install.sh)
+# Git identity (machine-specific, created by `mise run identity`)
 home/.config/git/identity
 
 # macOS

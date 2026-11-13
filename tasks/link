@@ -1,0 +1,55 @@
+#!/usr/bin/env bash
+#MISE description="Link home/ into ~ (anything in the way is moved aside, never deleted)"
+set -euo pipefail
+# shellcheck source=lib.sh
+source "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
+
+step "Linking home/ into $HOME"
+
+# Configs under home/ and tools/ name this path outright (Claude, Codex,
+# OpenCode, Herdr, Stache), so a clone anywhere else is only half wired.
+[ "$ROOT" = "$HOME/Projects/dotfiles" ] ||
+  warn "this repo is at $ROOT, but several configs expect ~/Projects/dotfiles"
+
+entries="$(managed)"
+[ -n "$entries" ] || die "git lists no files under home/ (is $ROOT a git checkout?)"
+
+stamp="$(date +%Y%m%d-%H%M%S)"
+
+while IFS= read -r name; do
+  src="$ROOT/home/$name"
+  dst="$HOME/$name"
+
+  if [ -L "$dst" ] && [ "$(readlink "$dst")" = "$src" ]; then
+    continue
+  fi
+
+  if [ -e "$dst" ] || [ -L "$dst" ]; then
+    mv "$dst" "$dst.backup-$stamp"
+    warn "moved the existing ~/$name to ~/$name.backup-$stamp"
+  fi
+
+  ln -s "$src" "$dst"
+  info "linked ~/$name"
+done <<<"$entries"
+
+# Drop links in ~ that point into home/ but are not one of the entries above:
+# a file that left the repo, or one that git never tracked.
+for link in "$HOME"/.[!.]* "$HOME"/*; do
+  [ -L "$link" ] || continue
+  target="$(readlink "$link")"
+  case "$target" in
+  "$ROOT/home/"*) ;;
+  *) continue ;;
+  esac
+
+  name="${link##*/}"
+  if [ "$target" = "$ROOT/home/$name" ] && grep -qxF -- "$name" <<<"$entries"; then
+    continue
+  fi
+
+  rm "$link"
+  info "removed ~/$name, a link the repo no longer manages"
+done
+
+ok "home/ is linked"

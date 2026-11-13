@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+#MISE description="Register the MCP servers Claude Code keeps outside its tracked config"
+set -euo pipefail
+# shellcheck source=lib.sh
+source "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
+
+# Codex and OpenCode read their MCP servers from tracked files. Claude Code
+# stores user-scope servers in ~/.claude.json, which is not tracked, so they
+# are registered here. Keep this list in step with home/.codex/config.toml and
+# home/.config/opencode/opencode.jsonc.
+need claude
+
+step "Registering Claude Code MCP servers"
+
+# add <name> <json>
+add() {
+  if claude mcp get "$1" >/dev/null 2>&1; then
+    ok "$1 is already registered"
+    return
+  fi
+  claude mcp add-json --scope user "$1" "$2" >/dev/null
+  info "registered $1"
+}
+
+key_file="$HOME/.secrets/context7-key"
+if [ -r "$key_file" ]; then
+  add context7 "$(printf '{"type":"http","url":"https://mcp.context7.com/mcp","headers":{"CONTEXT7_API_KEY":"%s"}}' "$(<"$key_file")")"
+else
+  warn "no key at ~/.secrets/context7-key; registering Context7 without one"
+  add context7 '{"type":"http","url":"https://mcp.context7.com/mcp"}'
+fi
+
+add grep '{"type":"http","url":"https://mcp.grep.app"}'
+add deepwiki '{"type":"http","url":"https://mcp.deepwiki.com/mcp"}'

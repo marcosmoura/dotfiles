@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+#MISE description="Install everything in home/Brewfile and list what is installed beyond it"
+#MISE raw=true
+set -euo pipefail
+# shellcheck source=lib.sh
+source "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
+
+need brew
+brewfile="$ROOT/home/Brewfile"
+
+step "Installing from the Brewfile"
+brew bundle --file "$brewfile"
+brew cleanup
+
+# Report, do not remove. This prints the formulae, casks and taps that are
+# installed but not in the Brewfile, and exits non-zero when there are any.
+step "Installed but not in the Brewfile"
+if brew bundle cleanup --file "$brewfile"; then
+  ok "nothing extra is installed"
+else
+  info "to remove them: brew bundle cleanup --file ~/Brewfile --force"
+fi

@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+#MISE description="Install dependencies for the tools in tools/ and put them where their host apps look"
+set -euo pipefail
+# shellcheck source=lib.sh
+source "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
+
+use_runtimes
+need bun pnpm code
+
+# tools/claude/sidebar and tools/herdr/autorename need nothing here beyond
+# dependencies: home/.claude/settings.json and home/.config/herdr/plugins.json
+# load them from this repo by path. The same goes for the OpenCode plugin and
+# home/.config/opencode/opencode.jsonc.
+
+step "figkit"
+(cd "$ROOT/tools/figcraft" && bun install --frozen-lockfile)
+mkdir -p "$HOME/.local/bin"
+ln -sfn "$ROOT/tools/figcraft/bin/figkit" "$HOME/.local/bin/figkit"
+info "linked ~/.local/bin/figkit"
+
+step "Herdr autorename plugin"
+(cd "$ROOT/tools/herdr/autorename" && pnpm install --frozen-lockfile)
+
+step "OpenCode model-profiles plugin"
+(cd "$ROOT/tools/opencode/model-profiles" && pnpm install --frozen-lockfile)
+
+step "VS Code extension: Launch OpenCode"
+(
+  cd "$ROOT/tools/vscode/opencode-launcher"
+  pnpm install --frozen-lockfile
+  pnpm run package
+  version="$(node -p 'require("./package.json").version')"
+  code --install-extension "dist/opencode-launcher-$version.vsix" --force
+)
+
+ok "tools are installed"

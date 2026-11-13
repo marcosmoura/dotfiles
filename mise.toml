@@ -1,3 +1,18 @@
-[tools]
-node = "latest"
-pnpm = "latest"
+# Every setup step is a mise task: one executable file per step in tasks/.
+# `mise tasks` lists them, `mise run <name>` runs one.
+
+[task_config]
+includes = ["tasks"]
+
+[tasks.install]
+description = "Set up this Mac from top to bottom (safe to run again)"
+run = [
+  { task = "link" },
+  { task = "identity" },
+  { task = "macos" },
+  { task = "brew" },
+  { task = "shell" },
+  { task = "packages" },
+  { task = "tools" },
+  { task = "agents" },
+]

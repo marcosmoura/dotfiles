@@ -2,6 +2,7 @@
 @johnnymorganz/stylua-bin
 @vscode/codicons
 corepack
+cspell
 nx
 prettier
 stylelint

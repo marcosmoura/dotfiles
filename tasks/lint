@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+#MISE description="Check bootstrap.sh and the tasks with bash -n and shellcheck"
+set -euo pipefail
+# shellcheck source=lib.sh
+source "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
+
+need shellcheck
+cd "$ROOT"
+
+# macOS ships bash 3.2, and that is what runs everything up to the brew task
+# on a new Mac, so the syntax check uses it.
+for file in bootstrap.sh tasks/*; do
+  /bin/bash -n "$file"
+done
+
+shellcheck bootstrap.sh tasks/*
+ok "bootstrap.sh and tasks/ are clean"
