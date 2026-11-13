@@ -33,7 +33,8 @@ order and stops at the first one that fails.
 | `tools`    | Installs dependencies for `tools/` and wires them into their host apps.             |
 | `agents`   | Registers the MCP servers Claude Code keeps outside its tracked config.             |
 | `doctor`   | Checks that this Mac matches the repo. Changes nothing.                             |
-| `lint`     | Runs `bash -n` and shellcheck over `bootstrap.sh` and `tasks/`.                     |
+| `lint`     | Checks every shell file: shellcheck, `bash -n`, `zsh -n` and shfmt.                 |
+| `format`   | Formats every shell file in place with shfmt.                                       |
 
 `packages` takes ecosystems as arguments, for example `mise run packages rust lua`. Without
 arguments it does `node`, `python`, `ruby`, `rust` and `lua`.
@@ -77,11 +78,11 @@ a file under `home/`.
   `cargo`, `pip`, `gem` and `luarocks`.
 - Runtime versions (Node, pnpm, Python, Ruby) are set in `home/.config/mise/config.toml`.
 
-Upgrades are not a task. `updateSystem` in the shell runs topgrade for that.
+Upgrades are not a task. `update-system` in the shell runs topgrade for that.
 
 ## Secrets and git identity
 
 Neither is in git. API keys live in `~/.secrets`, one file per key holding only the value;
-`home/.config/zsh/secrets.zsh` exports them. The git name and email live in
+`home/.config/zsh/rc/secrets.zsh` exports them. The git name and email live in
 `home/.config/git/identity`, which is gitignored and included by `home/.config/git/config`.
 `mise run identity` creates both.

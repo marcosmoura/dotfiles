@@ -20,7 +20,7 @@ The repo must live at `~/Projects/dotfiles`: configs under `home/` hard-code tha
 
 Run with `mise run <name>`; `mise tasks` lists them. `install` runs `link`, `identity`, `macos`,
 `brew`, `shell`, `packages`, `tools` and `agents` in that order (see `mise.toml`) and stops at the
-first failure. `doctor` and `lint` change nothing.
+first failure. `doctor` and `lint` change nothing; `format` rewrites shell files in place.
 
 Every file in `tasks/` except `lib.sh` must:
 
@@ -33,6 +33,10 @@ Every file in `tasks/` except `lib.sh` must:
 - Set `#MISE raw=true` if it prompts (sudo, `read`), so it gets the terminal
 - Run on bash 3.2. macOS ships it, and it runs everything before the `brew` task on a new Mac.
   No associative arrays, no `mapfile`, no `${var,,}`
+- Test with `[[ ]]`, not `[ ]`
+- Put a command substitution whose failure matters in an assignment of its own
+  (`list="$(cmd)"`, then use `$list`). Inside another command's arguments, `set -e` does not see
+  it fail
 - Stay ASCII. Multi-byte characters have caused bash parse errors here
 
 `lib.sh` has no execute bit; that is what keeps mise from listing it as a task.
@@ -44,9 +48,27 @@ relied on.
 ## Validation
 
 ```bash
-mise run lint     # bash -n (with /bin/bash 3.2) and shellcheck on bootstrap.sh and tasks/
+mise run lint     # every shell file in the repo, see below
+mise run format   # shfmt, in place
 mise run doctor   # links, git identity, ~/.secrets, login shell, Brewfile
 ```
+
+`lint` finds the shell files itself (`shell_files` in `tasks/lib.sh`): bash by shebang or a `.sh`
+name, zsh by living in `home/.config/zsh` or being `.zshrc`/`.zprofile`. It runs:
+
+| Check          | On   | Configured in                                                                     |
+| -------------- | ---- | --------------------------------------------------------------------------------- |
+| shellcheck     | bash | `.shellcheckrc`: every optional check except braces on all variables              |
+| `/bin/bash -n` | bash | nothing; it is bash 3.2, which runs `bootstrap.sh` on a new Mac                   |
+| `zsh -n`       | zsh  | nothing; shellcheck cannot read zsh                                               |
+| `shfmt -d`     | both | `.editorconfig` for `bootstrap.sh` and `tasks/`, `home/.editorconfig` for `home/` |
+
+`home/.editorconfig` is a root (it is `~/.editorconfig`), so the repo's own `.editorconfig` never
+applies under `home/`. shfmt settings for the zsh config live in the former. shfmt writes zsh's
+`&!` as `&|`; they mean the same.
+
+Silence a shellcheck finding with a `# shellcheck disable=SCxxxx` line right above it and a
+comment saying why, never in `.shellcheckrc`.
 
 Don't run `mise run macos` or `mise run install` to test a change: `macos` rewrites system
 settings and cannot be undone. Test a task with `HOME` pointed at a scratch directory and stub
@@ -73,14 +95,44 @@ them (like `git/identity`) still live in the repo directory on disk.
 
 ## Zsh architecture
 
-| File                              | Purpose                                          | When loaded         |
-| --------------------------------- | ------------------------------------------------ | ------------------- |
-| `.zprofile`                       | PATH, Homebrew, XDG, EDITOR, LANG                | Login shells (once) |
-| `.zshrc`                          | Thin loader: history, secrets, sheldon, starship | Interactive shells  |
-| `.config/zsh/history.zsh`         | HISTSIZE, setopt history options                 | Sourced by .zshrc   |
-| `.config/zsh/secrets.zsh`         | Loads `~/.secrets/*` into env                    | Sourced by .zshrc   |
-| `.config/zsh/plugins/*.plugin.sh` | Aliases, functions, completions                  | Loaded by sheldon   |
-| `.config/zsh/utils.sh`            | Runtime color printing                           | Sourced by plugins  |
+Startup is split in two. What the first prompt needs loads before it; everything else loads right
+after the prompt is on screen, through zsh-defer.
+
+| File                           | Purpose                                                    | When loaded                 |
+| ------------------------------ | ---------------------------------------------------------- | --------------------------- |
+| `.zprofile`                    | Environment: PATH, Homebrew, XDG, tool settings            | Login shells (once per tab) |
+| `.zshrc`                       | Ordered list of what loads before the first prompt         | Interactive shells          |
+| `.config/zsh/lib/`             | `cached` (cache.zsh) and the `print-*` helpers (print.zsh) | Sourced by .zshrc           |
+| `.config/zsh/rc/`              | Options, history, secrets, aliases, prompt, plugin loader  | Sourced by .zshrc           |
+| `.config/zsh/deferred/`        | compinit and tool integrations (fzf, atuin, mise, direnv)  | After the first prompt      |
+| `.config/zsh/functions/`       | One command per file                                       | Autoloaded on first call    |
+| `.config/zsh/completions/`     | Completions for bun and stache, loaded on the first tab    | Autoloaded on first tab     |
+| `.config/zsh/git/`             | Scripts behind the git aliases in `.config/git/config`     | Run by git with `zsh`       |
+| `.config/sheldon/plugins.toml` | Plugins and the files in `deferred/`, in load order        | Read by `sheldon source`    |
+
+Rules that keep it fast, measured at about 45 ms to the first prompt:
+
+- Nothing in `.zprofile` or before the prompt in `.zshrc` may fork. Not `$(tool init)`, not
+  `brew shellenv`, not `tput`
+- A tool's init code goes through `cached <tool> <command>` (see `lib/cache.zsh`). It is rebuilt
+  when the tool's binary changes; `rm -rf ~/.cache/zsh` rebuilds everything
+- Anything not needed for the first prompt belongs in `deferred/` or in `plugins.toml` with
+  `apply = ["defer"]`. Order there matters: compinit first, syntax highlighting last
+- `setopt` only works in `rc/options.zsh`. Deferred code runs inside a function that restores the
+  options when it returns
+- Don't read `$commands` before the prompt. The first read builds the table of every command on
+  PATH, which takes 4 ms
+- Exported variables go in `.zprofile`, not in `rc/`
+- A new file in `completions/` is picked up on the next shell start; any other new completion
+  within a day, or after `rm ~/.cache/zsh/zcompdump`
+
+zsh's own `_git` is loaded instead of the one Homebrew's git installs (see
+`deferred/completion.zsh`), because the custom git commands are completed through its
+`user-commands` style and `_git-<command>` functions. pnpm's completion plugin needs a helper
+binary, which is a mise tool in `home/.config/mise/config.toml`.
+
+Naming: functions are kebab-case (`update-system`, `print-error`), private ones start with an
+underscore (`_load-secret`). Variables are `UPPER_SNAKE` when global and `lower_snake` when local.
 
 ## Adding packages
 
