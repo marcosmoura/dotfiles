@@ -162,16 +162,19 @@ async function lock(path: string, timeoutMs: number): Promise<() => Promise<void
       }
     }
 
+    // Checked on every round, so a takeover that never ends cannot keep a claim waiting forever.
+    if (Date.now() > deadline) {
+      throw new Error(
+        `timed out waiting for ${path}; when no figkit is running, remove it and ${path}.takeover`,
+      );
+    }
+
     const owner = await readOwner(path);
 
     if (owner !== null && !isAlive(owner)) {
       await takeOver(path, owner, token);
 
       continue;
-    }
-
-    if (Date.now() > deadline) {
-      throw new Error(`timed out waiting for ${path}; remove it when no figkit is running`);
     }
 
     await Bun.sleep(10);

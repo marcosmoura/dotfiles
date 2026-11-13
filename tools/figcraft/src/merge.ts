@@ -526,7 +526,8 @@ async function mergeSteps(
     );
 
     if (!options.review) {
-      await writeReceipt(project, inputs, deps);
+      // The working file is the main branch's copy, which the state guard just compared.
+      await writeReceipt(inputs, deps, inputs.blobs.theirs);
     }
 
     return;
@@ -810,6 +811,7 @@ async function finish(
     dirname(project.file),
     `.${basename(project.file, '.figcraft')}.merge-${randomUUID()}.figcraft`,
   );
+  let resultBlob: string | null = null;
 
   try {
     await writeFile(resultPath, buildArchive(resultPath, entries(images)));
@@ -850,12 +852,16 @@ async function finish(
       throw new MergeError(2, 'the design file changed while the merge ran; nothing was written');
     }
 
+    // The receipt names the file that was written, not what is there a moment after the rename.
+    const written = deps.git(['hash-object', '--', resultPath]);
+
+    resultBlob = written ? new TextDecoder().decode(written).trim() || null : null;
     await rename(resultPath, project.file);
   } finally {
     await rm(resultPath, { force: true });
   }
 
-  await writeReceipt(project, inputs, deps);
+  await writeReceipt(inputs, deps, resultBlob);
   deps.print(`wrote ${inputs.path}; stage it with: git add ${inputs.path}`);
 }
 
@@ -960,11 +966,9 @@ function sameCounterAndVersions(before: Archive, after: Archive): boolean {
  * Tells `figkit check` that the working file is this merge's result: a conflicted file staged as
  * one side is not in the staged diff, so nothing else would notice a merge that kept one side.
  */
-async function writeReceipt(project: Project, inputs: Inputs, deps: MergeDeps): Promise<void> {
-  const decode = (bytes: Uint8Array | null): string | null =>
-    bytes ? new TextDecoder().decode(bytes).trim() || null : null;
-  const gitDir = decode(deps.git(['rev-parse', '--absolute-git-dir']));
-  const blob = decode(deps.git(['hash-object', '--', project.file]));
+async function writeReceipt(inputs: Inputs, deps: MergeDeps, blob: string | null): Promise<void> {
+  const found = deps.git(['rev-parse', '--absolute-git-dir']);
+  const gitDir = found ? new TextDecoder().decode(found).trim() || null : null;
 
   if (!gitDir || !blob) {
     throw new MergeError(2, 'cannot write the merge receipt: no Git directory or blob id');

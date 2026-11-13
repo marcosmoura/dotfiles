@@ -93,6 +93,20 @@ describe('registry', () => {
     expect((await readRegistry(directory))?.next).toBe(1025);
   });
 
+  test('a takeover that cannot finish still ends at the timeout', async () => {
+    // A process died between making the takeover marker and writing its owner into it.
+    const lock = `${registryPath(directory)}.lock`;
+    const child = Bun.spawn([process.execPath, '-e', ''], { stdout: 'ignore', stderr: 'ignore' });
+
+    await child.exited;
+    await mkdir(join(directory, 'figkit'));
+    await writeFile(lock, `${child.pid}:stale\n`);
+    await writeFile(`${lock}.takeover`, '');
+    await expect(
+      claimClient({ commonDir: directory, mainDesignFile: null, timeoutMs: 200 }, 'feat/a'),
+    ).rejects.toThrow('timed out');
+  });
+
   test('two processes claiming at once get different numbers', async () => {
     const repository = join(directory, 'repo');
 
