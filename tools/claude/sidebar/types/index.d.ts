@@ -1,102 +1,102 @@
 /** Token counts as the API reports them: one response's, or several summed. */
-export type Tokens = { input: number; output: number; cacheRead: number; cacheWrite: number }
+export type Tokens = { input: number; output: number; cacheRead: number; cacheWrite: number };
 
 /** What the main loop did since the sidebar loaded, or since the last /clear. */
 export type Main = {
-  model: string
+  model: string;
   /** '' until a main-loop request names one. */
-  effort: string
+  effort: string;
   /** The permission mode; '' until a prompt reports one. */
-  mode: string
+  mode: string;
   /** When the running turn started; null between turns. */
-  turnStartedAt: number | null
+  turnStartedAt: number | null;
   /** How long the requests took in all, which the token rate is measured over. */
-  requestMs: number
+  requestMs: number;
   /** The last response's counts, and every response's summed. */
-  last: Tokens | null
-  total: Tokens
-}
+  last: Tokens | null;
+  total: Tokens;
+};
 
 /** One rate-limit window; `resetsAt` in milliseconds since the epoch. */
-export type Limit = { kind: string; percent: number; resetsAt: number | null }
+export type Limit = { kind: string; percent: number; resetsAt: number | null };
 
 /** The engine's own figures for the session: its start, context fill, cost and limits. */
 export type Usage = {
-  startedAt: number
-  tokens: number | null
-  window: number
-  percent: number | null
-  costUsd: number | null
-  limits: Limit[]
-}
+  startedAt: number;
+  tokens: number | null;
+  window: number;
+  percent: number | null;
+  costUsd: number | null;
+  limits: Limit[];
+};
 
 /** One kind of content in the context window, as /context names it. */
-export type Category = { name: string; tokens: number }
+export type Category = { name: string; tokens: number };
 
 /** The context window by category, and the token count auto-compaction runs at (null when it is off). */
-export type Breakdown = { categories: Category[]; compactAt: number | null }
+export type Breakdown = { categories: Category[]; compactAt: number | null };
 
 /** Uncommitted lines in the working tree, staged and not. */
-export type Changes = { added: number; removed: number }
+export type Changes = { added: number; removed: number };
 
 /** What the sidebar reads off this machine, not from the session's figures. */
 export type Local = {
   /** The project's name: the repository's folder, or the session's own outside one. */
-  project: string
+  project: string;
   /** The linked worktree the session is in, by its folder's name; '' in the main tree. */
-  worktree: string
+  worktree: string;
   /** The branch checked out; '' on a detached HEAD and outside a repository. */
-  branch: string
+  branch: string;
   /** Claude Code's version. */
-  version: string
+  version: string;
   /** Null outside a git repository. */
-  changes: Changes | null
-}
+  changes: Changes | null;
+};
 
 /** The Bash sandbox as the merged settings configure it. */
 export type Sandbox = {
-  isEnabled: boolean
-  autoAllowBash: boolean
+  isEnabled: boolean;
+  autoAllowBash: boolean;
   /** Whether a command may be retried outside the sandbox. */
-  allowUnsandboxed: boolean
-}
+  allowUnsandboxed: boolean;
+};
 
 /** One of the person's prompts, by the id its transcript row is drawn under. */
-export type Prompt = { id: string; text: string }
+export type Prompt = { id: string; text: string };
 
 /** The prompts the transcript has drawn, oldest first, and the one being read (null before any). */
-export type Rail = { prompts: Prompt[]; reading: string | null }
+export type Rail = { prompts: Prompt[]; reading: string | null };
 
-export type Status = 'running' | 'done' | 'failed' | 'stopped'
+export type Status = 'running' | 'done' | 'failed' | 'stopped';
 
 export type Agent = {
-  id: string
-  title: string
-  type: string
-  model: string
-  status: Status
-  spawnedAt: number
-  endedAt: number | null
-}
+  id: string;
+  title: string;
+  type: string;
+  model: string;
+  status: Status;
+  spawnedAt: number;
+  endedAt: number | null;
+};
 
 declare module 'claude-code' {
   interface PluginState {
     sidebar: {
-      main: Shaped<Main>
-      usage: Shaped<Usage>
-      breakdown: Shaped<Breakdown>
-      local: Shaped<Local>
-      sandbox: Shaped<Sandbox | null>
-      agents: Shaped<Agent[]>
-      rail: Shaped<Rail>
+      main: Shaped<Main>;
+      usage: Shaped<Usage>;
+      breakdown: Shaped<Breakdown>;
+      local: Shaped<Local>;
+      sandbox: Shaped<Sandbox | null>;
+      agents: Shaped<Agent[]>;
+      rail: Shaped<Rail>;
       /** The weekly Fable limit used, 0 to 100, as Anthropic's usage endpoint last told it; null before it has. */
-      fable: number | null
+      fable: number | null;
       /** Whether the person opened the breakdown under the context bar. */
-      isContextOpen: boolean
+      isContextOpen: boolean;
       /** Whether the person opened the rail of prompts. */
-      isRailOpen: boolean
+      isRailOpen: boolean;
       /** Whether the person opened the list of subagents. */
-      isAgentsOpen: boolean
-    }
+      isAgentsOpen: boolean;
+    };
   }
 }
