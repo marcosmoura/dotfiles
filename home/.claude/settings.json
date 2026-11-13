@@ -144,7 +144,7 @@
   "tui": "default",
   "timeFormat": "24-hour",
   "theme": "custom:catppuccin-mocha",
-  "verbose": true,
+  "verbose": false,
   "preferredNotifChannel": "ghostty",
   "idleCompaction": false,
   "showTurnDuration": true,
