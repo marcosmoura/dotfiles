@@ -111,6 +111,8 @@ declare module 'claude-code' {
       isContextOpen: boolean;
       /** Whether the person opened the rail of prompts. */
       isRailOpen: boolean;
+      /** Whether the person keeps the list of MCP servers open. */
+      isMcpOpen: boolean;
       /** Whether the person opened the list of subagents. */
       isAgentsOpen: boolean;
     };

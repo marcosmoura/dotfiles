@@ -24,22 +24,26 @@ import {
   merge,
   modeIn,
   modeLabel,
+  mentionsIn,
   newAgent,
   piecesOf,
   thumbOf,
   tileOf,
+  tilde,
   toBase64,
   toolRowOf,
   prettyModel,
   railOf,
   sandboxOf,
   segments,
+  serversOf,
   shorten,
   tally,
   tokenRate,
   whereOf,
   windowOf,
 } from '../hooks/core';
+import { layout } from '../hooks/grid';
 import type { Agent, Status } from '../types';
 
 // ---------------------------------------------------------------- pure behaviour
@@ -871,10 +875,13 @@ test("the row under the prompt is the mode, the model and the effort, in place o
   await untold.unmount();
 
   await start($);
+  // On the terminal the row goes on to name the project's folder with its branch, and the context's fill.
+  const where = (surface: string) =>
+    surface === 'terminal' ? ' · /work/dotfiles:personal · 82K (41%)' : '';
   for (const surface of ['terminal', 'desktop'] as const) {
     // Before the first prompt only the model is known.
     const ui = await $.ui.mount({ ...hintRow('? for shortcuts'), surface });
-    expect((await ui.find({ type: 'Text' }))?.text).toBe('Fable 5.2');
+    expect((await ui.find({ type: 'Text' }))?.text).toBe(`Fable 5.2 Anthropic${where(surface)}`);
     await ui.unmount();
   }
 
@@ -882,8 +889,11 @@ test("the row under the prompt is the mode, the model and the effort, in place o
   await step($, clock, { turnId: 'T1', model: 'claude-fable-5-2', effort: 'max' });
   for (const surface of ['terminal', 'desktop'] as const) {
     const ui = await $.ui.mount({ ...hintRow('? for shortcuts'), surface });
-    expect((await ui.find({ type: 'Text' }))?.text).toBe('auto · Fable 5.2 · max');
-    expect((await ui.find({ type: 'Text', text: /^auto$/ }))?.props.color).toBe('bashBorder');
+    // The mode is on Claude Code's own pill in front of the row, so the row does not say it.
+    expect((await ui.find({ type: 'Text' }))?.text).toBe(
+      `Fable 5.2 Anthropic · max${where(surface)}`,
+    );
+    expect((await ui.find({ type: 'Text', text: /^Anthropic$/ }))?.props.color).toBe('inactive');
     expect((await ui.find({ type: 'Text', text: /^Fable 5\.2$/ }))?.props.color).toBe('text');
     expect((await ui.find({ type: 'Text', text: /^max$/ }))?.props).toMatchObject({
       color: 'warning',
@@ -891,17 +901,19 @@ test("the row under the prompt is the mode, the model and the effort, in place o
     });
     expect(
       (await ui.findAll({ type: 'Text', text: /^ · $/ })).map((dot) => dot.props.color),
-    ).toEqual(['subtle', 'subtle']);
+    ).toEqual(surface === 'terminal' ? ['subtle', 'subtle', 'subtle'] : ['subtle']);
     expect(await ui.find({ type: 'Text', text: /shortcuts|engine/ })).toBeUndefined();
     await ui.unmount();
   }
 
-  // A shift+tab changes the mode before any prompt reports it: Claude Code's line names the new one.
+  // Claude Code's own pill names a mode a shift+tab changed it to: the row does not say it twice.
   const cycled = await $.ui.mount({
     ...hintRow('⏸ plan mode on (shift+tab to cycle)'),
     surface: 'terminal',
   });
-  expect((await cycled.find({ type: 'Text' }))?.text).toBe('plan · Fable 5.2 · max');
+  expect((await cycled.find({ type: 'Text' }))?.text).toBe(
+    `Fable 5.2 Anthropic · max${where('terminal')}`,
+  );
   await cycled.unmount();
 });
 
@@ -1382,7 +1394,7 @@ test('a reply is split at its tables and its code fences, and a table in a fence
   ]);
 });
 
-test('a reply is plain markdown set in three cells, a table in it a grid', async ($, on) => {
+test('a reply is plain markdown set in three cells, a table in it a grid fitted to the width it has', async ($, on) => {
   engine(on);
   await start($);
   const ui = await $.ui.mount({
@@ -1391,16 +1403,54 @@ test('a reply is plain markdown set in three cells, a table in it a grid', async
     requestId: 'a1',
     surface: 'terminal',
     props: {
-      text: 'Before\n\n| Name | Size |\n| --- | --- |\n| `core.ts` | 306 |\n\nAfter',
+      text: 'Before\n\n| Name | Size |\n| --- | --: |\n| `core.ts` | 306 |\n\nAfter',
       isFirstOfReply: true,
     },
   });
-  const grid = await ui.find({ type: 'Box', key: 'table-1' });
-  expect(grid?.children).toHaveLength(5);
-  expect(await ui.find({ type: 'Text', text: /^┌─{9}$/ })).toBeDefined();
   expect(await ui.find({ type: 'Markdown' })).toMatchObject({ props: { text: 'Before' } });
-  expect(await ui.find({ type: 'Text', text: /^core\.ts$/ })).toBeDefined();
+  // The grid is drawn by a surface module, which is handed the cells as lettered stretches.
+  expect(await ui.find({ type: 'Client' })).toMatchObject({
+    props: {
+      module: 'hooks/grid.tsx',
+      props: {
+        head: [[{ text: 'Name' }], [{ text: 'Size' }]],
+        rows: [[[{ text: 'core.ts', isCode: true }], [{ text: '306' }]]],
+        align: ['left', 'right'],
+      },
+    },
+  });
   await ui.unmount();
+
+  const table = {
+    head: [[{ text: 'Name' }], [{ text: 'What it holds' }]],
+    rows: [
+      [[{ text: 'core.ts', isCode: true as const }], [{ text: 'Pure helpers for the sidebar' }]],
+    ],
+    align: ['left' as const, 'right' as const],
+    rule: 'inactive',
+    code: 'permission',
+  };
+  const drawn = (columns: number) =>
+    layout(table, columns).map((line) => line.map((seg) => seg.text).join(''));
+  // With room to spare it is as wide as its cells, the second column set to the right.
+  expect(drawn(80)).toEqual([
+    '┌─────────┬──────────────────────────────┐',
+    '│ Name    │                What it holds │',
+    '├─────────┼──────────────────────────────┤',
+    '│ core.ts │ Pure helpers for the sidebar │',
+    '└─────────┴──────────────────────────────┘',
+  ]);
+  // Too wide for the room, its widest column gives way and its cells wrap; every row is as wide.
+  const narrow = drawn(30);
+  expect(narrow).toEqual([
+    '┌─────────┬──────────────────┐',
+    '│ Name    │    What it holds │',
+    '├─────────┼──────────────────┤',
+    '│ core.ts │ Pure helpers for │',
+    '│         │      the sidebar │',
+    '└─────────┴──────────────────┘',
+  ]);
+  expect(new Set(narrow.map((line) => line.length)).size).toBe(1);
 });
 
 test('a code fence in a reply is its code, highlighted, with no frame', async ($, on) => {
@@ -1477,7 +1527,7 @@ test('a tool call is one quiet line under an icon, or a panel for a command, an 
   });
   expect(toolRowOf('mcp__context7__query-docs', { query: 'hooks' }, undefined, cwd)).toEqual({
     kind: 'inline',
-    icon: '⚙',
+    icon: '›',
     text: 'context7 query-docs [query=hooks]',
   });
   expect(toolRowOf('Bash', { command: 'ls' }, { stdout: 'a\nb', stderr: '' }, cwd)).toEqual({
@@ -1512,6 +1562,11 @@ test('a tool call is one quiet line under an icon, or a panel for a command, an 
     ),
   ).toEqual({ kind: 'questions', items: [{ question: 'Which?', answer: 'A' }] });
   expect(toolRowOf('AskUserQuestion', {}, undefined, cwd)).toBeNull();
+  expect(mentionsIn('compare @src/a.ts with @docs/ and @src/a.ts, mail me@x.io')).toEqual([
+    { path: 'src/a.ts', kind: 'file' },
+    { path: 'docs/', kind: 'dir' },
+  ]);
+  expect(tilde('/Users/me/Projects/dotfiles', '/Users/me')).toBe('~/Projects/dotfiles');
   expect(fmtTook(28_400)).toBe('28s');
   expect(fmtTook(69_000)).toBe('1m 9s');
   expect(
@@ -1559,13 +1614,26 @@ test('a tool call is one quiet line under an icon, or a panel for a command, an 
   // A verbose session marks every row expanded: it is still drawn here, with more of its output.
   const long = Array.from({ length: 30 }, (_, i) => `line ${i}`).join('\n');
   const verbose = await $.ui.mount(row('Bash', { command: 'seq' }, { stdout: long, stderr: '' }));
-  expect(await verbose.find({ type: 'Text', text: /… \+20 lines$/ })).toBeDefined();
+  expect(
+    await verbose.find({ type: 'Text', text: /… \+20 lines · ctrl\+o for more$/ }),
+  ).toBeDefined();
   await verbose.redraw({
     ...row('Bash', { command: 'seq' }, { stdout: long, stderr: '' }).props,
     isExpanded: true,
   });
   expect(await verbose.find({ type: 'Text', text: /line 29$/ })).toBeDefined();
   await verbose.unmount();
+  // A script written into a command is cut to its first lines.
+  const script = await $.ui.mount(
+    row('Bash', { command: 'python3 - <<EOF\na\nb\nc\nd\nEOF' }, { stdout: '', stderr: '' }),
+  );
+  expect(
+    await script.find({
+      type: 'Text',
+      text: /^\$ python3 - <<EOF\na\nb\n… \+3 lines · ctrl\+o for more$/,
+    }),
+  ).toBeDefined();
+  await script.unmount();
   // What the call answered is in the panel, so the result row under it is empty.
   const result = await $.ui.mount({
     plugin: 'sidebar',
@@ -1665,4 +1733,45 @@ test("the working line, the footer and a command's output are drawn in the threa
     props: { text: 'Total cost: $1.20', dimColor: true },
   });
   await output.unmount();
+});
+
+test('the MCP servers the session has tools from are listed in the pane, with how many each', async ($, on) => {
+  expect(
+    serversOf([
+      'Read',
+      'mcp__grep__searchGitHub',
+      'mcp__context7__query-docs',
+      'mcp__context7__resolve-library-id',
+    ]),
+  ).toEqual([
+    { name: 'context7', tools: 2 },
+    { name: 'grep', tools: 1 },
+  ]);
+  // A plugin's server goes by its own name, in the pane and on a tool's line.
+  expect(serversOf(['mcp__plugin_playwright_playwright__browser_click'])).toEqual([
+    { name: 'playwright', tools: 1 },
+  ]);
+  expect(
+    toolRowOf('mcp__plugin_playwright_playwright__browser_click', { ref: 'e1' }, 'ok', ''),
+  ).toEqual({
+    kind: 'inline',
+    icon: '✓',
+    text: 'playwright browser_click [ref=e1]',
+  });
+  engine(on);
+  on('tool.list', () => ({
+    value: [
+      { name: 'Read', description: '', mcp: false },
+      { name: 'mcp__context7__query-docs', description: '', mcp: true },
+    ],
+  }));
+  await start($);
+  const ui = await $.ui.mount({ ...pane(66), surface: 'terminal' });
+  expect(await ui.find({ type: 'Text', text: /^ ▼ MCP $/ })).toBeDefined();
+  expect(await ui.find({ type: 'Text', text: /^• context7$/ })).toBeDefined();
+  expect(await ui.find({ type: 'Text', text: /^1 tool$/ })).toBeDefined();
+  await ui.press({ key: 'mcp' });
+  expect(await ui.find({ type: 'Text', text: /^• context7$/ })).toBeUndefined();
+  await ui.press({ key: 'mcp' });
+  await ui.unmount();
 });

@@ -9,7 +9,7 @@ import { atom, read, update } from 'claude-code';
 import type { ElementTable, EngineInterface, Register, RenderChildren } from 'claude-code';
 
 import type { Agent, Breakdown, Local, Main, Prompt, Rail, Status, Usage } from '../types';
-import type { Align, Left, Thumb, ToolRow } from './core';
+import type { Left, Thumb, ToolRow } from './core';
 import {
   BRANCH_ICON,
   ZERO,
@@ -20,7 +20,6 @@ import {
   changesOf,
   clean,
   clipLines,
-  columnsOf,
   fableOf,
   filled,
   fmtClock,
@@ -37,6 +36,7 @@ import {
   keptFable,
   lanes,
   level,
+  mentionsIn,
   merge,
   modeIn,
   modeLabel,
@@ -47,11 +47,13 @@ import {
   rowKey,
   sandboxOf,
   segments,
+  serversOf,
   shorten,
   spansOf,
   tally,
   thumbOf,
   tileOf,
+  tilde,
   tokenRate,
   toolRowOf,
   usageOf,
@@ -99,14 +101,10 @@ const INSET = 3;
 /** The lines of a command's output, and of a written file, a panel shows before it says how many more. */
 const SHOWN_LINES = 10;
 const SHOWN_EXPANDED = 200;
-/** An upright rule, and a thick bar's glyph (three eighths of a block: this font draws the heavy line `┃` thin): as many rows as a row could wrap to: clipped to the rows it has. */
-const UPRIGHT = Array.from({ length: 80 }, () => '│').join('\n');
+/** The lines of a command itself a panel shows: a script written into one is long. */
+const SHOWN_COMMAND = 3;
+/** The thick bar's glyph: three eighths of a block, as this font draws the heavy line `┃` thin. */
 const BAR = '▍';
-const JUSTIFY: Record<Align, 'flex-start' | 'center' | 'flex-end'> = {
-  left: 'flex-start',
-  center: 'center',
-  right: 'flex-end',
-};
 /** A thumbnail of a pasted image: this many rows of cells, and no wider than this many columns. */
 const THUMB_ROWS = 8;
 const THUMB_COLUMNS = 80;
@@ -123,8 +121,6 @@ const KEPT_SENT = 200;
 const KEPT_TYPED = 50;
 /** The footers whose figures are kept, the latest. */
 const KEPT_FOOTERS = 200;
-/** A column wider than this many cells is one that narrows when its table does not fit. */
-const WIDE = 24;
 /** Tools that can change the working tree: the uncommitted lines are counted again after one ran. */
 const WRITES = new Set(['Edit', 'Write', 'NotebookEdit', 'Bash']);
 
@@ -190,6 +186,7 @@ const footers = atom({ plugin: 'sidebar', key: 'footers' } as const, {});
 const fable = atom({ plugin: 'sidebar', key: 'fable' } as const, null);
 const isContextOpen = atom({ plugin: 'sidebar', key: 'isContextOpen' } as const, false);
 const isRailOpen = atom({ plugin: 'sidebar', key: 'isRailOpen' } as const, false);
+const isMcpOpen = atom({ plugin: 'sidebar', key: 'isMcpOpen' } as const, true);
 const isAgentsOpen = atom({ plugin: 'sidebar', key: 'isAgentsOpen' } as const, false);
 
 /** Whether a reading moved. One that did not is not written, so nothing is redrawn for it. */
@@ -519,13 +516,6 @@ const strip = async (
   );
 };
 
-/** A rule down the left edge of the Box it is put in, whatever rows that Box comes to. */
-const edge = ({ Box, Text }: ElementTable<'terminal'>, color: string, glyphs: string) => (
-  <Box position="absolute" top={0} bottom={0} left={0} width={1} overflow="hidden">
-    <Text color={color}>{glyphs}</Text>
-  </Box>
-);
-
 /** A raised panel: a column for a bar (a prompt has one, a tool's is left blank) and its content. */
 const panel = (
   els: ElementTable<'terminal'>,
@@ -577,6 +567,7 @@ const toolView = (
   const tone = call.isErrored ? 'error' : MUTED;
   // The ctrl+o transcript and a verbose session ask for everything: a panel then shows far more.
   const shown = call.isExpanded === true ? SHOWN_EXPANDED : SHOWN_LINES;
+  const more = call.isExpanded === true ? '' : ' · ctrl+o for more';
   if (row.kind === 'inline')
     return (
       <Box key={key} flexDirection="column" paddingLeft={INSET}>
@@ -603,8 +594,8 @@ const toolView = (
     );
   if (row.kind === 'shell')
     return panel(els, key, undefined, [
-      <Text>{`$ ${row.command}`}</Text>,
-      row.output === '' ? null : <Text color={tone}>{clipLines(row.output, shown)}</Text>,
+      <Text>{`$ ${clipLines(row.command, call.isExpanded === true ? SHOWN_EXPANDED : SHOWN_COMMAND, more)}`}</Text>,
+      row.output === '' ? null : <Text color={tone}>{clipLines(row.output, shown, more)}</Text>,
     ]);
   if (row.kind === 'diff')
     return panel(els, key, undefined, [
@@ -614,7 +605,7 @@ const toolView = (
   if (row.kind === 'file')
     return panel(els, key, undefined, [
       <Text color={MUTED}>{`# Wrote ${row.path}`}</Text>,
-      <Code source={clipLines(row.source, shown) || ' '} path={row.path} startLine={1} />,
+      <Code source={clipLines(row.source, shown, more) || ' '} path={row.path} startLine={1} />,
     ]);
   if (row.kind === 'questions')
     return panel(els, key, undefined, [
@@ -643,8 +634,11 @@ const toolView = (
 /** The rows each prompt's panel takes, as the transcript last told them, and the width it told them at. */
 const tall = new Map<string, { rows: number; columns: number | undefined }>();
 
-/** The working directory, which a tool's path is told from. */
+/** The working directory, which a tool's path is told from, and the person's home folder. */
 let workdir = '';
+let home = '';
+/** The project's folder, which the row under the prompt names. */
+let rootdir = '';
 
 let typedDraft = '';
 let watching: { cancel: () => void } | undefined;
@@ -683,6 +677,8 @@ export const register: Register = (on) => {
     void $.ui.open(OPEN);
     watchDraft($);
     workdir = e.cwd;
+    rootdir = await $.session.root().catch(() => e.cwd);
+    home = (await $.env.get('HOME').catch(() => undefined)) ?? '';
     const model = await $.session.model();
     await update($, main, (m) => ({ ...m, model }));
     await refresh($, true);
@@ -734,7 +730,7 @@ export const register: Register = (on) => {
         $.clock.after(0, () => void publish($));
       }
       // The terminal's row is ours: a raised panel behind a thick bar, the pasted images over the
-      // text. One still waiting in the queue is gray, bar and text.
+      // text and a badge under it for each file it names. One still waiting in the queue is gray.
       //
       // The bar is as many glyphs as the panel has rows, which the transcript tells once it has
       // drawn the row (`onScreen.of`, the row above the panel among them). A rule laid over the
@@ -746,6 +742,7 @@ export const register: Register = (on) => {
       if (part) tall.set(id, { rows: part.of - 1, columns });
       const measured = tall.get(id);
       const pasted = imagesIn(e.props.text);
+      const mentions = mentionsIn(e.props.text);
       const taken = (await read($, sent))[rowKey(id)];
       const entry = (await read($, typed)).findLast((t) => t.text === e.props.text.trim());
       const isQueued = taken === undefined && entry?.isQueued === true;
@@ -760,6 +757,18 @@ export const register: Register = (on) => {
         [
           pasted.length === 0 ? null : await strip($, els, pasted),
           <els.Text color={isQueued ? MUTED : 'text'}>{e.props.text}</els.Text>,
+          mentions.length === 0 ? null : (
+            <els.Box key="mentions" flexDirection="row" flexWrap="wrap" columnGap={1}>
+              {mentions.map((mention) => (
+                <els.Text>
+                  <els.Text backgroundColor={isQueued ? MUTED : FRAME} color="inverseText" bold>
+                    {` ${mention.kind} `}
+                  </els.Text>
+                  <els.Text color={MUTED}>{` ${mention.path}`}</els.Text>
+                </els.Text>
+              ))}
+            </els.Box>
+          ),
         ],
       );
     },
@@ -832,68 +841,13 @@ export const register: Register = (on) => {
     return next(e);
   });
 
-  // A reply: its text plain markdown set in three cells, with no bullet. A table in it is a grid, a
-  // rule between every two rows (a cell that wraps would otherwise run into the row under it):
-  // its cells are flex boxes of the columns' widths, so one wider than the transcript narrows
-  // every row alike and its cells wrap, the rules clipped to what is left. A code fence is its
-  // code, highlighted. A summary of a reply stays Claude Code's row, which marks it as one.
+  // A reply: its text plain markdown set in three cells, with no bullet. A table in it is a grid
+  // drawn by a surface module, which knows the width it has to fit (./grid.tsx). A code fence is
+  // its code, highlighted. A summary of a reply stays Claude Code's row, which marks it as one.
   on('ui.render', { component: 'AssistantMessage' }, ($, e, next) => {
     if (e.surface !== 'terminal' || e.props.isSummary === true || e.props.text.trim() === '')
       return next(e);
-    const els = $.ui.resolve(e);
-    const { Box, Code, Markdown, Text } = els;
-    const upright = edge(els, MUTED, UPRIGHT);
-    // A table too wide for the transcript narrows its wide columns only: a short one keeps its
-    // width, so a word in it is not broken. Where every column is short, they all give way.
-    const shrinkOf = (widths: readonly number[], c: number) =>
-      (widths[c] ?? 0) > WIDE || widths.every((w) => w <= WIDE) ? 1 : 0;
-    const rule = (
-      widths: readonly number[],
-      [left, mid, right]: readonly [string, string, string],
-    ) => (
-      <Box flexDirection="row">
-        {widths.map((w, c) => (
-          <Box width={w + 3} flexShrink={shrinkOf(widths, c)} height={1} overflow="hidden">
-            <Text color={MUTED}>{(c === 0 ? left : mid) + '─'.repeat(w + 2)}</Text>
-          </Box>
-        ))}
-        <Text color={MUTED}>{right}</Text>
-      </Box>
-    );
-    const row = (
-      cells: readonly string[],
-      widths: readonly number[],
-      align: readonly Align[],
-      isHead: boolean,
-    ) => (
-      <Box flexDirection="row">
-        {widths.map((w, c) => (
-          <Box
-            width={w + 3}
-            flexShrink={shrinkOf(widths, c)}
-            paddingLeft={2}
-            paddingRight={1}
-            justifyContent={JUSTIFY[align[c] ?? 'left']}
-          >
-            {upright}
-            <Text bold={isHead}>
-              {spansOf(cells[c] ?? '').map((s) =>
-                s.isCode ? (
-                  <Text color="permission">{s.text}</Text>
-                ) : s.isBold ? (
-                  <Text bold>{s.text}</Text>
-                ) : (
-                  s.text
-                ),
-              )}
-            </Text>
-          </Box>
-        ))}
-        <Box width={1} flexShrink={0}>
-          {upright}
-        </Box>
-      </Box>
-    );
+    const { Box, Client, Code, Markdown } = $.ui.resolve(e);
 
     return (
       <Box flexDirection="column" paddingLeft={INSET} marginTop={1} rowGap={1}>
@@ -905,18 +859,19 @@ export const register: Register = (on) => {
                 <Code source={piece.source === '' ? ' ' : piece.source} language={piece.language} />
               </Box>
             );
-          const widths = columnsOf(piece.head, piece.rows);
           return (
-            <Box key={`table-${i}`} flexDirection="column" flexShrink={1}>
-              {rule(widths, ['┌', '┬', '┐'])}
-              {row(piece.head, widths, piece.align, true)}
-              {rule(widths, ['├', '┼', '┤'])}
-              {piece.rows.map((cells, r) => [
-                r === 0 ? null : rule(widths, ['├', '┼', '┤']),
-                row(cells, widths, piece.align, false),
-              ])}
-              {rule(widths, ['└', '┴', '┘'])}
-            </Box>
+            <Client
+              key={`table-${i}`}
+              module="./grid.tsx"
+              width="100%"
+              props={{
+                head: piece.head.map(spansOf),
+                rows: piece.rows.map((cells) => cells.map(spansOf)),
+                align: piece.align,
+                rule: MUTED,
+                code: 'permission',
+              }}
+            />
           );
         })}
       </Box>
@@ -924,10 +879,19 @@ export const register: Register = (on) => {
   });
 
   // A tool call, in the ctrl+o transcript and a verbose session too: there its panel shows more.
-  on('ui.render', { component: 'ToolUse' }, ($, e, next) => {
+  on('ui.render', { component: 'ToolUse' }, async ($, e, next) => {
     if (e.surface !== 'terminal') return next(e);
     const row = toolRowOf(e.props.tool, e.props.input, e.props.output, workdir);
-    return row === null ? next(e) : toolView($.ui.resolve(e), 'tool', row, e.props);
+    if (row === null) return next(e);
+    if (row.kind !== 'inline' || (e.props.tool !== 'Agent' && e.props.tool !== 'Task'))
+      return toolView($.ui.resolve(e), 'tool', row, e.props);
+    // A subagent's line also says which model ran it and, once it has ended, how long it took.
+    const card = (await read($, agents)).findLast((a) => row.text.endsWith(a.title));
+    const told =
+      card === undefined
+        ? ''
+        : ` · ${prettyModel(card.model)}${card.endedAt === null ? '' : ` · ${fmtTook(card.endedAt - card.spawnedAt)}`}`;
+    return toolView($.ui.resolve(e), 'tool', { ...row, text: `${row.text}${told}` }, e.props);
   });
 
   // What a call answered is in its own row or panel above, so the row under it draws nothing.
@@ -1173,23 +1137,47 @@ export const register: Register = (on) => {
     return next(e);
   });
 
-  // The row under the prompt: the mode, the model and the effort, in place of Claude Code's own hints.
+  // Under the prompt, in place of Claude Code's own hints, one row: the model with who serves it
+  // and the effort, then on the terminal the project's folder with its branch and how full the
+  // context window is.
   on('ui.render', { component: 'PromptHint' }, async ($, e, next) => {
     const { Text } = $.ui.resolve(e);
     const m = await read($, main);
-    // Claude Code's line names the mode a shift+tab changed it to; otherwise the last prompt's stands.
-    const mode = modeIn(e.props.hint) ?? m.mode;
+    // Claude Code's own pill at the row's start names every mode but the default one (as after a
+    // shift+tab, before any prompt has reported it): only that one is left for this row to say.
+    const now = modeIn(e.props.hint) ?? m.mode;
+    const mode = now === 'default' ? modeLabel(now) : '';
+    const model = prettyModel(m.model);
+    const [here, u] = await Promise.all([read($, local), read($, usage)]);
+    const isTold = e.surface === 'terminal' && rootdir !== '' && model !== '';
+    const filled =
+      u.tokens === null
+        ? ''
+        : `${fmtTokens(u.tokens)}${u.percent === null ? '' : ` (${fmtPercent(u.percent)})`}`;
     const parts = [
-      { text: modeLabel(mode), color: 'bashBorder', isBold: false },
-      { text: prettyModel(m.model), color: 'text', isBold: false },
-      { text: m.effort, color: 'warning', isBold: true },
+      {
+        text: `${mode.charAt(0).toUpperCase()}${mode.slice(1)}`,
+        color: FRAME,
+        isBold: true,
+        lead: ' · ',
+      },
+      { text: model, color: 'text', isBold: false, lead: ' · ' },
+      { text: model === '' ? '' : 'Anthropic', color: MUTED, isBold: false, lead: ' ' },
+      { text: m.effort, color: 'warning', isBold: true, lead: ' · ' },
+      {
+        text: isTold ? `${tilde(rootdir, home)}${here.branch === '' ? '' : `:${here.branch}`}` : '',
+        color: MUTED,
+        isBold: false,
+        lead: ' · ',
+      },
+      { text: isTold ? filled : '', color: MUTED, isBold: false, lead: ' · ' },
     ].filter((part) => part.text !== '');
     if (parts.length === 0) return next(e);
 
     return (
       <Text wrap="truncate">
         {parts.map((part, i) => [
-          i === 0 ? null : <Text color="subtle">{' · '}</Text>,
+          i === 0 ? null : <Text color="subtle">{part.lead}</Text>,
           <Text color={part.color} bold={part.isBold}>
             {part.text}
           </Text>,
@@ -1201,22 +1189,39 @@ export const register: Register = (on) => {
   on('ui.render', { component: 'Pane', requestId: PANE }, async ($, e) => {
     const els = $.ui.resolve(e);
     const { Box, Text, Button } = els;
-    const [m, u, parts, isOpen, isRailed, isListed, here, sb, list, track, fableUsed, now, turns] =
-      await Promise.all([
-        read($, main),
-        read($, usage),
-        read($, breakdown),
-        read($, isContextOpen),
-        read($, isRailOpen),
-        read($, isAgentsOpen),
-        read($, local),
-        read($, sandbox),
-        read($, agents),
-        read($, rail),
-        read($, fable),
-        $.clock.now(),
-        $.session.turns(),
-      ]);
+    const [
+      m,
+      u,
+      parts,
+      isOpen,
+      isRailed,
+      isListed,
+      here,
+      sb,
+      list,
+      track,
+      fableUsed,
+      now,
+      turns,
+      isMcpListed,
+      tools,
+    ] = await Promise.all([
+      read($, main),
+      read($, usage),
+      read($, breakdown),
+      read($, isContextOpen),
+      read($, isRailOpen),
+      read($, isAgentsOpen),
+      read($, local),
+      read($, sandbox),
+      read($, agents),
+      read($, rail),
+      read($, fable),
+      $.clock.now(),
+      $.session.turns(),
+      read($, isMcpOpen),
+      $.tool.list().catch(() => []),
+    ]);
     // One cell of padding all around the pane: the body less a column each side.
     const W = Math.max(12, e.props.bodyColumns - PAD_X * 2);
     const viewed = e.props.view.agentId;
@@ -1491,6 +1496,35 @@ export const register: Register = (on) => {
     const promptRows =
       1 + (isRailed ? 1 : 0) + Math.max(1, to - from) + (earlier > 0 ? 1 : 0) + (later > 0 ? 1 : 0);
 
+    // ---- the MCP servers the session has tools from, and how many of each: the pane's last section,
+    // and no section without one.
+    const servers = serversOf(tools.map((tool) => tool.name));
+    const mcp =
+      servers.length === 0 ? null : (
+        <Box flexDirection="column">
+          {header(
+            'mcp',
+            'MCP',
+            isMcpListed,
+            () => update($, isMcpOpen, (open) => !open),
+            <Text color="inactive">{String(servers.length)}</Text>,
+          )}
+          <Box flexDirection="column" marginTop={isMcpListed ? 1 : 0}>
+            {(isMcpListed ? servers : []).map((server) => (
+              <Box justifyContent="space-between" columnGap={1}>
+                <Text wrap="truncate">
+                  <Text color="success">{'• '}</Text>
+                  {server.name}
+                </Text>
+                <Text color="inactive">{`${server.tools} ${server.tools === 1 ? 'tool' : 'tools'}`}</Text>
+              </Box>
+            ))}
+          </Box>
+        </Box>
+      );
+    // Its header, the space and a row a server once opened, and the gap that sets it off.
+    const mcpRows = servers.length === 0 ? 0 : 1 + (isMcpListed ? 1 + servers.length : 0) + 1;
+
     // ---- the subagents: how many run, are done and went wrong, and once opened, their timeline:
     // a lane a subagent on one time axis (its glyph, name, run and clock) over its agent type and model.
     const counts = tally(list);
@@ -1499,7 +1533,8 @@ export const register: Register = (on) => {
     // this one's own three rows (its header, the space under it and its counts), with one more kept
     // for the count of those left out. At most a lane a digit.
     const room =
-      e.props.scroll.bodyRows - (2 + 5 + 1 + 1 + contextRows + statsRows + promptRows + 3 + 1);
+      e.props.scroll.bodyRows -
+      (2 + 5 + 1 + 1 + contextRows + statsRows + promptRows + mcpRows + 3 + 1);
     const shown = isListed
       ? list.slice(-Math.max(3, Math.min(MAX_LANES, Math.floor(room / 2))))
       : [];
@@ -1588,6 +1623,7 @@ export const register: Register = (on) => {
         {stats}
         {prompts}
         {subagents}
+        {mcp}
       </Box>
     );
   });

@@ -667,12 +667,30 @@ export const pathIn = (path: string | undefined, cwd: string) =>
       : path;
 
 /** The first `max` lines of a text, and how many were left out. */
-export const clipLines = (text: string, max: number) => {
+export const clipLines = (text: string, max: number, more = '') => {
   const lines = text.replace(/\s+$/, '').split('\n');
   return lines.length <= max
     ? lines.join('\n')
-    : `${lines.slice(0, max).join('\n')}\n… +${lines.length - max} lines`;
+    : `${lines.slice(0, max).join('\n')}\n… +${lines.length - max} lines${more}`;
 };
+
+/** The files and folders a prompt names after an `@`, once each: a folder is one that ends in a slash. */
+export const mentionsIn = (text: string) =>
+  [
+    ...new Set(
+      [...text.matchAll(/(?:^|\s)@([^\s@]+)/g)].map((m) =>
+        (m[1] ?? '').replace(/[,.;:!?)\]]+$/, ''),
+      ),
+    ),
+  ]
+    .filter((path) => path !== '')
+    .map((path) => ({ path, kind: path.endsWith('/') ? ('dir' as const) : ('file' as const) }));
+
+/** A path with the person's home folder told as `~`. */
+export const tilde = (path: string, home: string) =>
+  home !== '' && (path === home || path.startsWith(`${home}/`))
+    ? `~${path.slice(home.length)}`
+    : path;
 
 /** An edit's stored patch as unified-diff hunks, which is what the highlighter draws; '' for none. */
 const diffOf = (patch: unknown) =>
@@ -686,6 +704,9 @@ const diffOf = (patch: unknown) =>
 
 const matches = (n: number | undefined) =>
   n === undefined ? '' : ` (${n} ${n === 1 ? 'match' : 'matches'})`;
+
+/** An MCP server as it is named in the thread and the pane: a plugin's (`plugin_<plugin>_<server>`) by its own name. */
+export const serverName = (id: string) => /^plugin_[^_]+_(.+)$/.exec(id)?.[1] ?? id;
 
 /** The tools whose rows stay Claude Code's own: each is a dialog more than a row. A question is one until it is answered. */
 const OWN = new Set(['ExitPlanMode', 'EnterPlanMode']);
@@ -800,12 +821,11 @@ export const toolRowOf = (
         .filter(([, value]) => ['string', 'number', 'boolean'].includes(typeof value))
         .map(([key, value]) => `${key}=${String(value)}`)
         .join(', ');
+      // Its mark is a tick once it has answered: a gear is drawn two cells wide by some fonts.
+      const name = tool.replace(/^mcp__(.+?)__/, (_, server: string) => `${serverName(server)} `);
       return inline(
-        '⚙',
-        shorten(
-          `${tool.replace(/^mcp__/, '').replaceAll('__', ' ')}${told === '' ? '' : ` [${told}]`}`,
-          160,
-        ),
+        output === undefined ? '›' : '✓',
+        shorten(`${name}${told === '' ? '' : ` [${told}]`}`, 160),
       );
     }
   }
@@ -826,4 +846,22 @@ export const footerOf = (turn: Turn | undefined) => {
     rate: turn.ms > 0 ? `${fmtRate(turn.output / (turn.ms / 1000))} tok/s` : '',
     tokens: `+ Tokens: ${turn.steps} ${turn.steps === 1 ? 'step' : 'steps'} · latest: ${grouped(fresh)} new · ${grouped(cached)} cached · ${grouped(fresh + cached + (turn.last?.output ?? 0))} total`,
   };
+};
+
+// ---------------------------------------------------------------- MCP
+
+/**
+ * The MCP servers the session has tools from, by name, and how many each: a tool of one is named
+ * `mcp__<server>__<tool>`. A server with no tool listed, a disconnected one among them, is not told.
+ */
+export const serversOf = (tools: readonly string[]) => {
+  const counts = new Map<string, number>();
+  for (const tool of tools) {
+    const server = /^mcp__(.+?)__/.exec(tool)?.[1];
+    if (server !== undefined)
+      counts.set(serverName(server), (counts.get(serverName(server)) ?? 0) + 1);
+  }
+  return [...counts]
+    .map(([name, count]) => ({ name, tools: count }))
+    .sort((a, b) => a.name.localeCompare(b.name));
 };
