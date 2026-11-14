@@ -1,7 +1,7 @@
 // The sidebar: a docked pane with the project, the session's vitals, its context window (a press
 // breaks it down by category), a rail of the person's prompts (a press scrolls the transcript to
-// one), its subagents (a press opens their timeline, and a press on a lane opens that subagent's
-// transcript) and the MCP servers it has tools from; and, under the prompt, the model, the effort,
+// one), its subagents on a timeline (a press on a lane opens that subagent's transcript) and the
+// MCP servers it has tools from; and, under the prompt, the model, the effort,
 // the project's folder and the context's fill in place of Claude Code's hint row. Above the prompt
 // it lists the prompts waiting for the running turn and previews the images pasted into the
 // draft. The thread is drawn after OpenCode's: prompts as raised panels, replies as plain text,
@@ -40,6 +40,7 @@ import {
   isPanel,
   keptFable,
   lanes,
+  lastResponseOf,
   level,
   mentionsIn,
   merge,
@@ -129,6 +130,8 @@ const DRAFT_EVERY_MS = 200;
 /** The prompts the conversation took in that are kept, the latest; and the typed ones kept, which are few. */
 const KEPT_SENT = 200;
 const KEPT_TYPED = 50;
+/** How often the transcripts of the subagents at work are read: a response of theirs raises no event that is always heard. */
+const AGENTS_EVERY_MS = 5000;
 /** The least characters of a waiting prompt that tell it apart inside a longer row. */
 const TOLD_APART = 8;
 /** The footers whose figures are kept, the latest. */
@@ -196,7 +199,7 @@ const breakdown = atom({ plugin: 'sidebar', key: 'breakdown' } as const, BREAKDO
 });
 const local = atom({ plugin: 'sidebar', key: 'local' } as const, LOCAL, { shape: 'local-3' });
 const sandbox = atom({ plugin: 'sidebar', key: 'sandbox' } as const, null, { shape: 'sandbox-2' });
-const agents = atom({ plugin: 'sidebar', key: 'agents' } as const, [], { shape: 'agents-4' });
+const agents = atom({ plugin: 'sidebar', key: 'agents' } as const, [], { shape: 'agents-5' });
 const rail = atom({ plugin: 'sidebar', key: 'rail' } as const, RAIL, { shape: 'rail-1' });
 const typed = atom({ plugin: 'sidebar', key: 'typed' } as const, []);
 const sent = atom({ plugin: 'sidebar', key: 'sent' } as const, {});
@@ -206,8 +209,8 @@ const footers = atom({ plugin: 'sidebar', key: 'footers' } as const, {}, { shape
 const fable = atom({ plugin: 'sidebar', key: 'fable' } as const, null);
 const isContextOpen = atom({ plugin: 'sidebar', key: 'isContextOpen' } as const, false);
 const isRailOpen = atom({ plugin: 'sidebar', key: 'isRailOpen' } as const, false);
-const isMcpOpen = atom({ plugin: 'sidebar', key: 'isMcpOpen' } as const, true);
-const isAgentsOpen = atom({ plugin: 'sidebar', key: 'isAgentsOpen' } as const, false);
+const isMcpOpen = atom({ plugin: 'sidebar', key: 'isMcpOpen' } as const, false);
+const isAgentsOpen = atom({ plugin: 'sidebar', key: 'isAgentsOpen' } as const, true);
 
 /** Whether a reading moved. One that did not is not written, so nothing is redrawn for it. */
 const differs = (known: unknown, next: unknown) => JSON.stringify(known) !== JSON.stringify(next);
@@ -234,17 +237,21 @@ const ORDER_AWK =
 let transcript: string | undefined;
 let isOrdered = false;
 
+/** The session's transcript file, looked for until it is there to find. */
+const transcriptOf = async ($: EngineInterface) =>
+  (transcript ??=
+    (await sh(
+      $,
+      'ls "$HOME"/.claude/projects/*/"$0".jsonl 2>/dev/null | head -1',
+      await $.session.id(),
+    )) || undefined);
+
 /** The prompts' ids in the order they were typed; undefined where the transcript cannot be read. */
 const orderOf = async ($: EngineInterface, ids: readonly string[]) => {
   try {
-    transcript ??=
-      (await sh(
-        $,
-        'ls "$HOME"/.claude/projects/*/"$0".jsonl 2>/dev/null | head -1',
-        await $.session.id(),
-      )) || undefined;
-    if (transcript === undefined || ids.length === 0) return undefined;
-    const ran = await $.process.run(['awk', '-v', `ids=${ids.join(',')}`, ORDER_AWK, transcript], {
+    const file = await transcriptOf($);
+    if (file === undefined || ids.length === 0) return undefined;
+    const ran = await $.process.run(['awk', '-v', `ids=${ids.join(',')}`, ORDER_AWK, file], {
       timeoutMs: 10_000,
     });
     return ran.exitCode === 0 ? ran.stdout.split('\n').filter((id) => id !== '') : undefined;
@@ -744,11 +751,53 @@ const patchAgent = async ($: EngineInterface, id: string, change: (a: Agent) => 
   await update($, agents, (list) => list.map((a) => (a.id === id ? change(a) : a)));
 };
 
+/**
+ * Brings the given subagents' effort and context up to date with the last response in each one's
+ * transcript, which the session keeps beside its own. A subagent's requests are not all heard
+ * (see `turn.step`), and its transcript holds every one.
+ */
+const measureAgents = async ($: EngineInterface, ids: readonly string[]) => {
+  const file = ids.length === 0 ? undefined : await transcriptOf($);
+  if (file === undefined) return;
+  await Promise.all(
+    ids.map(async (id) => {
+      const said = lastResponseOf(
+        await sh(
+          $,
+          `grep '"type":"assistant"' "$0" 2>/dev/null | tail -1`,
+          `${file.replace(/\.jsonl$/, '')}/subagents/agent-${id}.jsonl`,
+        ),
+      );
+      if (said !== null)
+        await patchAgent($, id, (a) =>
+          a.effort === said.effort && a.context === said.context ? a : { ...a, ...said },
+        );
+    }),
+  );
+};
+
+let measuring: { cancel: () => void } | undefined;
+
+/** Reads the transcripts of the subagents at work, so their figures move while they run. */
+const watchAgents = ($: EngineInterface) => {
+  measuring?.cancel();
+  measuring = $.clock.every(AGENTS_EVERY_MS, () => {
+    void (async () => {
+      const running = (await read($, agents)).filter((a) => a.status === 'running');
+      await measureAgents(
+        $,
+        running.map((a) => a.id),
+      );
+    })().catch(() => undefined);
+  });
+};
+
 export const register: Register = (on) => {
   on('session.start', async ($, e, next) => {
     await $.command.register({ name: 'sidebar', description: 'Open the session sidebar' });
     void $.ui.open(OPEN).catch(() => undefined);
     watchDraft($);
+    watchAgents($);
     workdir = e.cwd;
     rootdir = await $.session.root().catch(() => e.cwd);
     home = (await $.env.get('HOME').catch(() => undefined)) ?? '';
@@ -1230,7 +1279,8 @@ export const register: Register = (on) => {
 
   // The main loop's requests: its model and effort, what the prompt cache served and how fast it answers.
   // A subagent's requests are not all heard here (not those of one started while a response of the
-  // main loop was still arriving), so the pane takes nothing from them.
+  // main loop was still arriving), so the pane takes nothing from them: a subagent's effort and
+  // context are read off its transcript (`measureAgents`).
   on('turn.step', async function* ($, e, next) {
     if (e.agentId !== undefined) return yield* next(e);
     const effort = e.effort === undefined ? '' : String(e.effort);
@@ -1310,6 +1360,8 @@ export const register: Register = (on) => {
         endedAt: now,
         model: e.usage?.model ?? a.model,
       }));
+      // Its last response is in its transcript by now: the figures it ended on.
+      later($, () => measureAgents($, [id]));
     }
 
     return next(e);
@@ -1704,7 +1756,8 @@ export const register: Register = (on) => {
     const mcpRows = servers.length === 0 ? 0 : 1 + (isMcpListed ? 1 + servers.length : 0) + 1;
 
     // ---- the subagents: how many run, are done and went wrong, and once opened, their timeline:
-    // a lane a subagent on one time axis (its glyph, name, run and clock) over its agent type and model.
+    // a lane a subagent on one time axis (its glyph, name, run and clock) over its agent type, its
+    // model and its effort, with how full its context is at the row's end.
     const counts = tally(list);
     // As many as the room leaves at two rows each, so the timeline is not cut off at the bottom: the
     // padding's two rows, the five gaps between sections, the title, the model, the other sections and
@@ -1775,10 +1828,15 @@ export const register: Register = (on) => {
                 </Box>
               </Box>
               {/* Under the name, past the glyph and the lane's number. */}
-              <Box paddingLeft={5}>
+              <Box paddingLeft={5} justifyContent="space-between" columnGap={1}>
                 {say(
-                  [agentType(a.type), prettyModel(a.model)].filter(Boolean).join(' · '),
+                  [agentType(a.type), prettyModel(a.model), a.effort].filter(Boolean).join(' · '),
                   'inactive',
+                )}
+                {a.context === null ? null : (
+                  <Box flexShrink={0}>
+                    <Text color="inactive">{fmtTokens(a.context)}</Text>
+                  </Box>
                 )}
               </Box>
             </Box>

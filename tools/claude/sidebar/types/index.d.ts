@@ -89,6 +89,10 @@ export type Agent = {
   title: string;
   type: string;
   model: string;
+  /** '' until its transcript names one, and for a model that takes none. */
+  effort: string;
+  /** How full its context is: the input tokens its last response was answered over; null before one. */
+  context: number | null;
   status: Status;
   spawnedAt: number;
   endedAt: number | null;
@@ -123,9 +127,9 @@ declare module 'claude-code' {
       isContextOpen: boolean;
       /** Whether the person opened the rail of prompts. */
       isRailOpen: boolean;
-      /** Whether the person keeps the list of MCP servers open. */
+      /** Whether the person opened the list of MCP servers. */
       isMcpOpen: boolean;
-      /** Whether the person opened the list of subagents. */
+      /** Whether the person keeps the list of subagents open. */
       isAgentsOpen: boolean;
     };
   }

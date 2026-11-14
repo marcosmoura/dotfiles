@@ -366,10 +366,34 @@ export const newAgent = (a: {
   title: clean(a.title) || a.type,
   type: a.type,
   model: a.model,
+  effort: '',
+  context: null,
   status: 'running',
   spawnedAt: a.now,
   endedAt: null,
 });
+
+/**
+ * What a row of a subagent's transcript says of it, where the row is a response: the effort it was
+ * asked for and the input tokens it was answered over (uncached, cache-written and cache-read
+ * together, as the session's own context is counted). Null for any other row, and for a response
+ * that reports no input.
+ */
+export const lastResponseOf = (row: string): Pick<Agent, 'effort' | 'context'> | null => {
+  try {
+    const said = objectOf(JSON.parse(row));
+    const usage = objectOf(said.message).usage;
+    const context =
+      (numberAt(usage, 'input_tokens') ?? 0) +
+      (numberAt(usage, 'cache_read_input_tokens') ?? 0) +
+      (numberAt(usage, 'cache_creation_input_tokens') ?? 0);
+    return said.type === 'assistant' && context > 0
+      ? { effort: textAt(said, 'effort') ?? '', context }
+      : null;
+  } catch {
+    return null;
+  }
+};
 
 /** How many subagents run, are done, and ended any other way (failed, or stopped). */
 export const tally = (list: readonly Agent[]) => ({

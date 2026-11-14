@@ -23,6 +23,7 @@ import {
   hitRate,
   keptFable,
   lanes,
+  lastResponseOf,
   merge,
   modeIn,
   modeLabel,
@@ -424,6 +425,41 @@ test("the cards follow the engine's own list of agents", () => {
   expect(next[1]?.title).toBe('task a2');
 });
 
+/** A response as a subagent's transcript keeps it. */
+const response = (effort: string | undefined, input: number, read: number, written: number) =>
+  JSON.stringify({
+    type: 'assistant',
+    agentId: 'a1',
+    message: {
+      role: 'assistant',
+      content: [{ type: 'tool_use', name: 'Agent', input: { effort: 'low' } }],
+      usage: {
+        input_tokens: input,
+        cache_creation_input_tokens: written,
+        cache_read_input_tokens: read,
+        output_tokens: 58,
+      },
+    },
+    ...(effort === undefined ? {} : { effort }),
+  });
+
+test("a subagent's effort and context are those of the last response in its transcript", () => {
+  // The context is what the response was answered over: what it wrote is not in it.
+  expect(lastResponseOf(response('medium', 2, 4309, 2388))).toEqual({
+    effort: 'medium',
+    context: 6699,
+  });
+  // A model that takes no effort names none: the one a call inside the response asks for is not its own.
+  expect(lastResponseOf(response(undefined, 2, 0, 14_041))).toEqual({
+    effort: '',
+    context: 14_043,
+  });
+  // No response, one that reports no input (an API error's stand-in), and no row at all.
+  expect(lastResponseOf(JSON.stringify({ type: 'user', message: { content: 'hi' } }))).toBe(null);
+  expect(lastResponseOf(response('medium', 0, 0, 0))).toBe(null);
+  expect(lastResponseOf('')).toBe(null);
+});
+
 // ---------------------------------------------------------------- drawing
 
 const NOW = 1_800_000_000_000;
@@ -455,6 +491,8 @@ const engine = (on: On) => {
     usage: { status: 200, ok: true, headers: {}, text: usageReply(87) },
     asked: [] as unknown[],
     viewed: [] as (string | undefined)[],
+    /** The last response in each subagent's transcript, by the subagent's id. */
+    responses: {} as Record<string, string>,
   };
   let spawned = 0;
   mock.store(on);
@@ -492,6 +530,17 @@ const engine = (on: On) => {
   on('settings.read', () => ({ value: { sandbox: { enabled: true } } }));
   on('process.run', (_$, e) => {
     const args = e.argv.slice(1).join(' ');
+    const asked = /^-c grep .*\/subagents\/agent-(\w+)\.jsonl$/.exec(args)?.[1];
+    if (asked !== undefined)
+      return {
+        value: {
+          exitCode: 0,
+          stdout: world.responses[asked] ?? '',
+          stderr: '',
+          isStdoutTruncated: false,
+          isStderrTruncated: false,
+        },
+      };
     const stdout = args.startsWith('rev-parse')
       ? world.revParse
       : args === 'diff --shortstat'
@@ -621,8 +670,10 @@ test('a fresh session draws the header, the context, the grid and the subagents 
           'inactive',
         );
       }
-      // The subagents' section, closed: its header and one line of counts, a colour a kind.
-      await has(/^ ▶ Subagents $/);
+      // The subagents' section, open with none to draw: its header, one line of counts, a colour a
+      // kind, and a line that says so.
+      await has(/^ ▼ Subagents $/);
+      await has(/^no subagents yet$/);
       for (const [count, color] of [
         ['● 0 run', 'warning'],
         ['✓ 0 done', 'success'],
@@ -636,7 +687,7 @@ test('a fresh session draws the header, the context, the grid and the subagents 
       expect(
         await ui.find({
           type: 'Text',
-          text: /requests|read-denied|5h limit|last req|no subagents|running · /,
+          text: /requests|read-denied|5h limit|last req|running · /,
         }),
       ).toBeUndefined();
       // No prompt drawn yet: the rail says so.
@@ -676,7 +727,8 @@ test('the sections share one header: the same chip, the same hover, the same spa
         children: [text],
       },
     ];
-    expect(await chips()).toMatchObject([chip(' ▶ Context '), chip(' ▶ Subagents ')]);
+    // The context starts closed and the subagents open.
+    expect(await chips()).toMatchObject([chip(' ▶ Context '), chip(' ▼ Subagents ')]);
     // The surface applies a hover while the pointer is over the nearest keyed Box: each chip sits
     // alone in one, so only the chip itself lights it.
     for (const key of ['context', 'subagents']) {
@@ -684,12 +736,12 @@ test('the sections share one header: the same chip, the same hover, the same spa
         { type: 'Button', props: { key } },
       ]);
     }
-    expect(await gaps()).toEqual([0, 0]);
+    expect(await gaps()).toEqual([0, 1]);
 
     await ui.press({ key: 'context' });
     await ui.press({ key: 'subagents' });
-    expect(await chips()).toMatchObject([chip(' ▼ Context '), chip(' ▼ Subagents ')]);
-    expect(await gaps()).toEqual([1, 1]);
+    expect(await chips()).toMatchObject([chip(' ▼ Context '), chip(' ▶ Subagents ')]);
+    expect(await gaps()).toEqual([1, 0]);
 
     await ui.press({ key: 'context' });
     await ui.press({ key: 'subagents' });
@@ -1215,11 +1267,19 @@ test('a long rail draws a window around the prompt being read, and a /clear empt
   await cleared.unmount();
 });
 
-test('the subagents are counted, and once opened, drawn as a timeline with their agent type and model', async ($, on) => {
+test('the subagents are counted and drawn as a timeline with their agent type, model, effort and context', async ($, on) => {
   const { clock, world } = engine(on);
+  // The session has a transcript, and so its subagents theirs beside it: the first one's holds a
+  // response, the second's none yet.
+  on('session.id', () => ({ value: 'session-1' }));
   await start($);
+  world.responses.a1 = response('medium', 2, 4309, 2388);
   await $.agent.spawn(spawn('Inventory AX rows in the tiling config', 'general-purpose'));
   await clock.advance(60_000);
+  // While it runs its transcript is read every few seconds: the pane has its figures before it ends.
+  const running = await $.ui.mount({ ...pane(66), surface: 'terminal' });
+  expect(await running.find({ type: 'Text', text: /^7K$/ })).toBeDefined();
+  await running.unmount();
   await $.agent.spawn(spawn('Remove AX rows'));
   await clock.advance(60_000);
   // The run's own account names the model that answered: not the one it was started on.
@@ -1239,14 +1299,19 @@ test('the subagents are counted, and once opened, drawn as a timeline with their
     reason: 'answer',
     usage,
   });
+  // The one that ended is read once more, for the figures it ended on.
+  world.responses.a1 = response('medium', 2, 12_000, 2041);
+  await clock.settle();
 
-  // Closed: the counts alone.
+  // Closed by a press: the counts alone. Another opens it again.
   const closed = await $.ui.mount({ ...pane(66), surface: 'terminal' });
+  expect(await closed.find({ key: 'lane-a1' })).toBeDefined();
+  await closed.press({ key: 'subagents' });
+  expect(await closed.find({ type: 'Text', text: /^ ▶ Subagents $/ })).toBeDefined();
   for (const count of ['● 1 run', '✓ 1 done', '✕ 0 errors'])
     expect(await closed.find({ type: 'Text', text: new RegExp(`^${count}$`) })).toBeDefined();
   expect(await closed.find({ key: 'lane-a1' })).toBeUndefined();
   await closed.press({ key: 'subagents' });
-  expect(await closed.find({ type: 'Text', text: /^ ▼ Subagents $/ })).toBeDefined();
   await closed.unmount();
 
   for (const surface of ['terminal', 'desktop', 'vscode', 'mobile'] as const) {
@@ -1273,11 +1338,18 @@ test('the subagents are counted, and once opened, drawn as a timeline with their
       ['warning', 16],
     ]);
     expect(await ui.find({ type: 'Text', text: /^2:00$/ })).toBeDefined();
-    // Under each name: the agent type and the model.
+    // Under each name: the agent type, the model and the effort, and at the row's end how full
+    // the subagent's context is. One whose transcript holds no response yet says neither.
     expect(
-      (await ui.find({ type: 'Text', text: /^general-purpose · Opus 5\.5$/ }))?.props.color,
+      (await ui.find({ type: 'Text', text: /^general-purpose · Opus 5\.5 · medium$/ }))?.props
+        .color,
     ).toBe('inactive');
+    expect(
+      (await ui.find({ type: 'Box', text: /^general-purpose · Opus 5\.5 · medium14K$/ }))?.props,
+    ).toMatchObject({ justifyContent: 'space-between' });
+    expect((await ui.find({ type: 'Text', text: /^14K$/ }))?.props.color).toBe('inactive');
     expect(await ui.find({ type: 'Text', text: /^explore · Sonnet 5\.5$/ })).toBeDefined();
+    expect(await ui.find({ type: 'Box', text: /^explore · Sonnet 5\.5$/ })).toBeDefined();
     expect(await ui.find({ key: 'main' })).toBeUndefined();
 
     await ui.press({ key: 'lane-a2' });
@@ -1317,12 +1389,11 @@ test('a /clear starts the counters, the context and the subagents over', async (
   await ui.unmount();
 });
 
-test('the opened timeline draws as many lanes as the pane has room for, the latest subagents', async ($, on) => {
+test('the timeline draws as many lanes as the pane has room for, the latest subagents', async ($, on) => {
   const { clock } = engine(on);
   await start($);
-  // Opened with nothing to draw, it says so.
+  // With nothing to draw, it says so.
   const empty = await $.ui.mount({ ...pane(66), surface: 'terminal' });
-  await empty.press({ key: 'subagents' });
   expect(await empty.find({ type: 'Text', text: /^no subagents yet$/ })).toBeDefined();
   await empty.unmount();
 
@@ -1790,11 +1861,13 @@ test('the MCP servers the session has tools from are listed in the pane, with ho
   }));
   await start($);
   const ui = await $.ui.mount({ ...pane(66), surface: 'terminal' });
+  // Closed until a press: its header, with how many servers there are.
+  expect(await ui.find({ type: 'Text', text: /^ ▶ MCP $/ })).toBeDefined();
+  expect(await ui.find({ type: 'Text', text: /^• context7$/ })).toBeUndefined();
+  await ui.press({ key: 'mcp' });
   expect(await ui.find({ type: 'Text', text: /^ ▼ MCP $/ })).toBeDefined();
   expect(await ui.find({ type: 'Text', text: /^• context7$/ })).toBeDefined();
   expect(await ui.find({ type: 'Text', text: /^1 tool$/ })).toBeDefined();
-  await ui.press({ key: 'mcp' });
-  expect(await ui.find({ type: 'Text', text: /^• context7$/ })).toBeUndefined();
   await ui.press({ key: 'mcp' });
   await ui.unmount();
 });
