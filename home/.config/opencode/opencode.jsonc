@@ -131,7 +131,6 @@
   "plugins": [
     "~/Projects/dotfiles/tools/opencode/model-profiles",
     "@cortexkit/opencode-magic-context",
-    "opencode-subagent-statusline",
     {
       "package": "opencode-tps-meter",
       "options": {

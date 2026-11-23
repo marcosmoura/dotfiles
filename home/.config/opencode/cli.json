@@ -42,7 +42,7 @@
     "notifications": true,
     "sound": true
   },
-  "plugins": ["./herdr-opencode"],
+  "plugins": ["./herdr-opencode", "opencode-subagent-statusline"],
   "debug": {
     "devtools": false,
     "turn_tokens": true
