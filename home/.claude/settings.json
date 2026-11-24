@@ -104,6 +104,16 @@
         "hooks": [
           {
             "type": "command",
+            "command": "if [ -n \"${CORGI_PANE:-}\" ] && [ -n \"${CORGI_SOCKET:-}\" ] && [ -x \"${CORGI_BIN:-}\" ]; then \"$CORGI_BIN\" hook claude; fi",
+            "timeout": 2,
+            "statusMessage": "Reporting to Corgi"
+          }
+        ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
             "command": "/Users/marcosmoura/.local/share/opencode-console/cli/opencode-console",
             "args": [
               "hook",
@@ -115,6 +125,16 @@
       }
     ],
     "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "if [ -n \"${CORGI_PANE:-}\" ] && [ -n \"${CORGI_SOCKET:-}\" ] && [ -x \"${CORGI_BIN:-}\" ]; then \"$CORGI_BIN\" hook claude; fi",
+            "timeout": 2,
+            "statusMessage": "Reporting to Corgi"
+          }
+        ]
+      },
       {
         "hooks": [
           {
@@ -132,6 +152,16 @@
     ],
     "PreToolUse": [
       {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "if [ -n \"${CORGI_PANE:-}\" ] && [ -n \"${CORGI_SOCKET:-}\" ] && [ -x \"${CORGI_BIN:-}\" ]; then \"$CORGI_BIN\" hook claude; fi",
+            "timeout": 2,
+            "statusMessage": "Reporting to Corgi"
+          }
+        ]
+      },
+      {
         "matcher": "*",
         "hooks": [
           {
@@ -143,6 +173,114 @@
             ],
             "timeout": 30,
             "onFailure": "block"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "if [ -n \"${CORGI_PANE:-}\" ] && [ -n \"${CORGI_SOCKET:-}\" ] && [ -x \"${CORGI_BIN:-}\" ]; then \"$CORGI_BIN\" hook claude; fi",
+            "timeout": 2,
+            "statusMessage": "Reporting to Corgi"
+          }
+        ]
+      }
+    ],
+    "PermissionRequest": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "if [ -n \"${CORGI_PANE:-}\" ] && [ -n \"${CORGI_SOCKET:-}\" ] && [ -x \"${CORGI_BIN:-}\" ]; then \"$CORGI_BIN\" hook claude; fi",
+            "timeout": 2,
+            "statusMessage": "Reporting to Corgi"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "if [ -n \"${CORGI_PANE:-}\" ] && [ -n \"${CORGI_SOCKET:-}\" ] && [ -x \"${CORGI_BIN:-}\" ]; then \"$CORGI_BIN\" hook claude; fi",
+            "timeout": 2,
+            "statusMessage": "Reporting to Corgi"
+          }
+        ]
+      }
+    ],
+    "SessionEnd": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "if [ -n \"${CORGI_PANE:-}\" ] && [ -n \"${CORGI_SOCKET:-}\" ] && [ -x \"${CORGI_BIN:-}\" ]; then \"$CORGI_BIN\" hook claude; fi",
+            "timeout": 2,
+            "statusMessage": "Reporting to Corgi"
+          }
+        ]
+      }
+    ],
+    "PreCompact": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "if [ -n \"${CORGI_PANE:-}\" ] && [ -n \"${CORGI_SOCKET:-}\" ] && [ -x \"${CORGI_BIN:-}\" ]; then \"$CORGI_BIN\" hook claude; fi",
+            "timeout": 2,
+            "statusMessage": "Reporting to Corgi"
+          }
+        ]
+      }
+    ],
+    "Notification": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "if [ -n \"${CORGI_PANE:-}\" ] && [ -n \"${CORGI_SOCKET:-}\" ] && [ -x \"${CORGI_BIN:-}\" ]; then \"$CORGI_BIN\" hook claude; fi",
+            "timeout": 2,
+            "statusMessage": "Reporting to Corgi"
+          }
+        ]
+      }
+    ],
+    "PostToolUseFailure": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "if [ -n \"${CORGI_PANE:-}\" ] && [ -n \"${CORGI_SOCKET:-}\" ] && [ -x \"${CORGI_BIN:-}\" ]; then \"$CORGI_BIN\" hook claude; fi",
+            "timeout": 2,
+            "statusMessage": "Reporting to Corgi"
+          }
+        ]
+      }
+    ],
+    "SubagentStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "if [ -n \"${CORGI_PANE:-}\" ] && [ -n \"${CORGI_SOCKET:-}\" ] && [ -x \"${CORGI_BIN:-}\" ]; then \"$CORGI_BIN\" hook claude; fi",
+            "timeout": 2,
+            "statusMessage": "Reporting to Corgi"
+          }
+        ]
+      }
+    ],
+    "SubagentStop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "if [ -n \"${CORGI_PANE:-}\" ] && [ -n \"${CORGI_SOCKET:-}\" ] && [ -x \"${CORGI_BIN:-}\" ]; then \"$CORGI_BIN\" hook claude; fi",
+            "timeout": 2,
+            "statusMessage": "Reporting to Corgi"
           }
         ]
       }
