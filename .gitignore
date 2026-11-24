@@ -110,6 +110,5 @@ home/.config/opencode/herdr-opencode/
 # SOPS
 sops/
 
-# Swift
-home/.config/swiftpm/cache/
-home/.config/swiftpm/security/
+# Swift: SwiftPM links these into ~/Library; none of it is config
+home/.config/swiftpm/
