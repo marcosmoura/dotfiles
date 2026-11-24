@@ -114,6 +114,15 @@
         "hooks": [
           {
             "type": "command",
+            "command": "deck agent-event --agent claude",
+            "async": true
+          }
+        ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
             "command": "/Users/marcosmoura/.local/share/opencode-console/cli/opencode-console",
             "args": [
               "hook",
@@ -132,6 +141,15 @@
             "command": "if [ -n \"${CORGI_PANE:-}\" ] && [ -n \"${CORGI_SOCKET:-}\" ] && [ -x \"${CORGI_BIN:-}\" ]; then \"$CORGI_BIN\" hook claude; fi",
             "timeout": 2,
             "statusMessage": "Reporting to Corgi"
+          }
+        ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "deck agent-event --agent claude",
+            "async": true
           }
         ]
       },
@@ -187,6 +205,15 @@
             "statusMessage": "Reporting to Corgi"
           }
         ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "deck agent-event --agent claude",
+            "async": true
+          }
+        ]
       }
     ],
     "PermissionRequest": [
@@ -197,6 +224,15 @@
             "command": "if [ -n \"${CORGI_PANE:-}\" ] && [ -n \"${CORGI_SOCKET:-}\" ] && [ -x \"${CORGI_BIN:-}\" ]; then \"$CORGI_BIN\" hook claude; fi",
             "timeout": 2,
             "statusMessage": "Reporting to Corgi"
+          }
+        ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "deck agent-event --agent claude",
+            "async": true
           }
         ]
       }
@@ -211,6 +247,15 @@
             "statusMessage": "Reporting to Corgi"
           }
         ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "deck agent-event --agent claude",
+            "async": true
+          }
+        ]
       }
     ],
     "SessionEnd": [
@@ -221,6 +266,15 @@
             "command": "if [ -n \"${CORGI_PANE:-}\" ] && [ -n \"${CORGI_SOCKET:-}\" ] && [ -x \"${CORGI_BIN:-}\" ]; then \"$CORGI_BIN\" hook claude; fi",
             "timeout": 2,
             "statusMessage": "Reporting to Corgi"
+          }
+        ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "deck agent-event --agent claude",
+            "async": true
           }
         ]
       }
@@ -245,6 +299,15 @@
             "command": "if [ -n \"${CORGI_PANE:-}\" ] && [ -n \"${CORGI_SOCKET:-}\" ] && [ -x \"${CORGI_BIN:-}\" ]; then \"$CORGI_BIN\" hook claude; fi",
             "timeout": 2,
             "statusMessage": "Reporting to Corgi"
+          }
+        ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "deck agent-event --agent claude",
+            "async": true
           }
         ]
       }
