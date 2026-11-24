@@ -15,6 +15,7 @@ ignore = [
   { app_id = "com.apple.dock" },
   { app_id = "com.apple.loginwindow" },
   { app_id = "com.apple.notificationcenterui" },
+  { app_id = "com.apple.Preview" },
   { app_id = "com.apple.systempreferences" },
   { app_id = "com.apple.weather.menu" },
   { app_id = "com.tinycast.app" },
@@ -45,7 +46,7 @@ order = "above"
 
 # Focus animation: with `unfocused = false` the focused border grows in and
 # the previous one shrinks out; otherwise the colors cross-fade.
-transition = { duration = 250, easing = "ease_out" }
+transition = { duration = 225, easing = "ease_out_expo" }
 
 # Unfocused windows; `false` hides them.
 unfocused = false
@@ -53,27 +54,27 @@ unfocused = false
 # Focused windows.
 [borders.focused]
 color = "#f9e2af"
-width = 6
+width = 5
 
 # Windows in grid layout.
 [borders.grid]
 color = "#a6e3a1"
-width = 6
+width = 5
 
 # Windows in monocle layout.
 [borders.monocle]
 color = "#89b4fa"
-width = 6
+width = 5
 
 # Floating windows.
 [borders.floating]
 color = "#f5c2e7"
-width = 6
+width = 5
 
 # Windows in master layout.
 [borders.master]
 color = "#f9e2af"
-width = 6
+width = 5
 
 # Master layout settings.
 [master]
@@ -81,7 +82,7 @@ width = 6
 position = "left"
 
 # Master window size as a percentage, 0 to 100.
-ratio = 72
+ratio = 73
 
 # Floating window defaults and presets.
 # Default position for newly floating windows.
