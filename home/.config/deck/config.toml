@@ -1,0 +1,112 @@
+# deck configuration. Every key is optional; `deck config default` prints the defaults.
+# Check your file with `deck config check`. Most changes apply as soon as you save.
+
+# The key you press before every shortcut. M-Space is Option+Space (Alt+Space).
+# On macOS, set Option to act as Alt in your terminal.
+prefix = "M-Space"
+
+# The shell for new terminals. When unset, deck uses $SHELL.
+# shell = "/bin/zsh"
+shell_args = ["-l"]
+
+# How many lines of history each terminal keeps.
+scrollback_lines = 10000
+
+# The sidebar: shown or hidden, its width (20 to 60 columns),
+# and the blank rows between spaces (0 to 3).
+sidebar = true
+sidebar_width = 30
+sidebar_space_gap = 1
+
+# How deck alerts you when an agent needs you: "osc9" (desktop notification), "bell" or "none".
+notify = "osc9"
+
+# Reopen your coding agents' conversations after a restart or reboot.
+resume_agents = true
+
+# Shortcuts, pressed after the prefix. Use one key or a list of keys; [] turns a shortcut off.
+[keys]
+detach = "d" # Detach from the session
+sessions = "s" # Switch, create or kill sessions
+rename_session = "$" # Rename the session
+restore = "R" # Restore an agent session
+scroll = "[" # Scroll back through the history
+new_terminal = "t" # New terminal in the panel
+close_terminal = "x" # Close the focused terminal
+focus_left = ["Left", "h"] # Focus the terminal on the left
+focus_right = ["Right", "l"] # Focus the terminal on the right
+focus_up = ["Up", "k"] # Focus the terminal above
+focus_down = ["Down", "j"] # Focus the terminal below
+resize_left = "H" # Resize the focused terminal to the left
+resize_right = "L" # Resize the focused terminal to the right
+resize_up = "K" # Resize the focused terminal upward
+resize_down = "J" # Resize the focused terminal downward
+reset_layout = "=" # Reset the panel's terminal sizes
+new_panel = "c" # New panel
+next_panel = "n" # Next panel
+prev_panel = "p" # Previous panel
+panel_1 = "1" # Focus panel 1
+panel_2 = "2" # Focus panel 2
+panel_3 = "3" # Focus panel 3
+panel_4 = "4" # Focus panel 4
+panel_5 = "5" # Focus panel 5
+panel_6 = "6" # Focus panel 6
+panel_7 = "7" # Focus panel 7
+panel_8 = "8" # Focus panel 8
+panel_9 = "9" # Focus panel 9
+rename_panel = "," # Rename the panel
+close_panel = "X" # Close the panel
+new_space = "P" # New space
+new_menu = "N" # New panel menu: shell or agent
+rename_space = "." # Rename the space
+close_space = "Q" # Close the space
+toggle_sidebar = "b" # Show or hide the sidebar
+focus_sidebar = "Tab" # Move focus into the sidebar
+next_attention = "a" # Jump to the next agent that needs you
+help = "?" # This help
+
+# Colours of deck's own interface. A colour is "default" (your terminal's), a name such as
+# "blue" or "bright-black", a number from 0 to 255, "#rrggbb", or another role's name.
+[theme]
+accent = "blue" # focused border and title, active panel, session name
+muted = "bright-black" # hints, space names, exited terminals
+ok = "green" # success messages
+warning = "yellow" # PREFIX, SCROLL and RESIZE badges
+error = "red" # error messages
+border = "bright-black" # unfocused borders and the sidebar edge
+border_focused = "accent" # the focused terminal's border
+title = "default" # unfocused terminal titles
+sidebar_fg = "default" # sidebar text
+sidebar_bg = "default" # sidebar background
+status_fg = "default" # floating bar text
+status_bg = "default" # floating bar background
+selection_fg = "default" # selected row text
+selection_bg = "default" # selected row background
+overlay_bg = "default" # help and picker background
+hover = "bright-black" # row under the mouse pointer
+# Border shape: rounded, plain, thick or double.
+border_style = "rounded"
+
+# Coding agents. For each one:
+#   process        program names that mean this agent is running
+#   command        what a new agent panel runs
+#   resume         reopens a conversation by its id
+#   resume_latest  reopens the most recent conversation
+# Commands are plain words: no quotes or other shell syntax.
+[agents.claude]
+process = ["claude"] # Claude Code
+command = "claude"
+resume = "claude --resume {session_id}"
+resume_latest = "claude --continue"
+
+[agents.codex]
+process = ["codex"] # Codex
+command = "codex"
+resume = "codex resume {session_id}"
+resume_latest = "codex resume --last"
+
+[agents.opencode]
+process = ["opencode"] # OpenCode
+command = "opencode"
+resume = "opencode --session {session_id}"
+resume_latest = "opencode --continue"
