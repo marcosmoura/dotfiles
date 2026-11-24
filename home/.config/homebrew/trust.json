@@ -3,12 +3,15 @@
     "abue-ammar/tinycast",
     "can1357/tap",
     "eth-p/software",
-    "felixkratz/formulae",
     "githubutilities/tap",
-    "kgarner7/feishin",
     "marcosmoura/tap",
     "narugit/tap",
     "nextdns/tap"
   ],
-  "trustedcasks": ["abue-ammar/tinycast/tinycast", "tylergraydev/cctm/claude-code-tool-manager"]
+  "trustedcasks": [
+    "abue-ammar/tinycast/tinycast"
+  ],
+  "trustedformulae": [
+    "felixkratz/formulae/borders"
+  ]
 }
