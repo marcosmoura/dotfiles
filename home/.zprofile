@@ -34,6 +34,9 @@ export STARSHIP_CONFIG="$XDG_CONFIG_HOME/starship/starship.toml"
 export BUN_INSTALL="$HOME/.bun"
 export PNPM_HOME="$HOME/Library/pnpm"
 
+# No usage reports from turbo (it posts to telemetry.vercel.com on every run)
+export TURBO_TELEMETRY_DISABLED=1
+
 # Graphify: semantic extraction through the Claude Code plan, no API key
 export GRAPHIFY_BACKEND="claude-cli"
 export GRAPHIFY_CLAUDE_CLI_MODEL="haiku"

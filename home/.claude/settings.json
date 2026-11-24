@@ -13,7 +13,10 @@
     "CLAUDE_CODE_ENABLE_TELEMETRY": "0",
     "CLAUDE_CODE_NO_FLICKER": "1",
     "CLAUDE_CODE_SUBAGENT_MODEL": "sonnet",
-    "ENABLE_CLAUDEAI_MCP_SERVERS": "false"
+    "ENABLE_CLAUDEAI_MCP_SERVERS": "false",
+    "GIT_CONFIG_COUNT": "1",
+    "GIT_CONFIG_KEY_0": "core.fsmonitor",
+    "GIT_CONFIG_VALUE_0": "false"
   },
   "attribution": {
     "commit": "",
@@ -126,7 +129,43 @@
   },
   "outputStyle": "concise",
   "sandbox": {
-    "enabled": true
+    "enabled": true,
+    "excludedCommands": [
+      "xcodebuild *",
+      "xcrun simctl *",
+      "xcrun xcodebuild *"
+    ],
+    "filesystem": {
+      "allowWrite": [
+        "~/.local/state/mise/tracked-configs",
+        "~/.local/state/mise/tracked-configs.expiry-start",
+        "~/.cargo/registry",
+        "~/.cargo/git",
+        "~/.cargo/.package-cache",
+        "~/.cargo/.package-cache-mutate",
+        "~/.cargo/.global-cache",
+        "~/.bun/install/cache"
+      ]
+    },
+    "network": {
+      "allowedDomains": [
+        "registry.npmjs.org",
+        "crates.io",
+        "index.crates.io",
+        "static.crates.io",
+        "github.com",
+        "api.github.com",
+        "codeload.github.com",
+        "raw.githubusercontent.com",
+        "objects.githubusercontent.com",
+        "release-assets.githubusercontent.com",
+        "mise.jdx.dev",
+        "mise-versions.jdx.dev"
+      ],
+      "deniedDomains": [
+        "telemetry.vercel.com"
+      ]
+    }
   },
   "effortLevel": "medium",
   "modelSettings": {
@@ -153,6 +192,10 @@
     "environment": [
       "$defaults",
       "GitHub repos under marcosmoura/* are owned by the user"
+    ],
+    "soft_deny": [
+      "$defaults",
+      "System Paths Outside the Sandbox: A command run with dangerouslyDisableSandbox that deletes, moves, truncates, chmods or chowns anything under /System, /Library, /Applications, /usr, /bin, /sbin, /etc, /private, /opt/homebrew or ~/Library (except ~/Library/Developer/CoreSimulator/Devices and ~/Library/Developer/Xcode/DerivedData), or that runs rm on a path built from a variable or command substitution the same command does not guard (for example `rm -rf \"$DIR/x\"` without `${DIR:?}` and a prefix check). An empty variable turns such a path into a system folder."
     ]
   }
 }
