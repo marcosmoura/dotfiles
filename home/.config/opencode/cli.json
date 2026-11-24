@@ -15,7 +15,7 @@
   },
   "session": {
     "sidebar": "auto",
-    "scrollbar": true,
+    "scrollbar": false,
     "thinking": "show",
     "image_preview": true,
     "new_location": "inherit",
