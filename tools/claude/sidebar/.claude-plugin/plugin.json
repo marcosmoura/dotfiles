@@ -1,7 +1,7 @@
 {
   "name": "sidebar",
   "version": "0.1.0",
-  "description": "A docked sidebar (session vitals, the context window by category, a rail of prompts, subagents and MCP servers) and a thread drawn after OpenCode's: prompts as panels, replies as plain text, tool calls as quiet lines or panels, and a footer under each reply.",
+  "description": "A docked sidebar (session vitals, the context window by category, a rail of prompts, subagents and MCP servers), plus a status row under the prompt and a band above it for queued prompts and pasted images.",
   "author": { "name": "Marcos Moura" },
   "types": "./types/index.d.ts"
 }

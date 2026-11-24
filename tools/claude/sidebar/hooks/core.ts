@@ -10,7 +10,6 @@ import type {
   Sandbox,
   Status,
   Tokens,
-  Turn,
   Usage,
 } from '../types';
 
@@ -75,15 +74,6 @@ export const fmtClock = (ms: number) => {
   const mm = String(Math.floor((s % 3600) / 60));
   const ss = String(s % 60).padStart(2, '0');
   return h > 0 ? `${h}:${mm.padStart(2, '0')}:${ss}` : `${mm}:${ss}`;
-};
-
-/** How long a turn took, as a reply's footer says it: `840ms`, `28s`, `1m 9s`, `1h 2m`. */
-export const fmtTook = (ms: number) => {
-  if (ms < 1000) return `${Math.max(0, Math.round(ms))}ms`;
-  const s = Math.round(ms / 1000);
-  if (s < 60) return `${s}s`;
-  if (s < 3600) return `${Math.floor(s / 60)}m ${s % 60}s`;
-  return `${Math.floor(s / 3600)}h ${Math.floor((s % 3600) / 60)}m`;
 };
 
 /** The time left until a reset: `<1m`, `25m`, `2h 10m`, `1d 13h`. */
@@ -373,6 +363,17 @@ export const newAgent = (a: {
   endedAt: null,
 });
 
+const field = (value: unknown, key: string): unknown =>
+  typeof value === 'object' && value !== null ? (value as Record<string, unknown>)[key] : undefined;
+const textAt = (value: unknown, key: string) => {
+  const found = field(value, key);
+  return typeof found === 'string' ? found : undefined;
+};
+const numberAt = (value: unknown, key: string) => {
+  const found = field(value, key);
+  return typeof found === 'number' && Number.isFinite(found) ? found : undefined;
+};
+
 /**
  * What a row of a subagent's transcript says of it, where the row is a response: the effort it was
  * asked for and the input tokens it was answered over (uncached, cache-written and cache-read
@@ -427,122 +428,6 @@ export const merge = (cards: Agent[], listed: readonly AgentInfo[], now: number)
     next.push(newAgent({ id: a.id, title: a.description, type: a.name ?? a.type, model: '', now }));
   }
   return hasChanged ? next : cards;
-};
-
-// ---------------------------------------------------------------- replies
-
-export type Align = 'left' | 'center' | 'right';
-
-/** A stretch of a cell's text and how it is lettered. */
-export type Span = { text: string; isBold?: true; isCode?: true };
-
-/** A reply in the pieces it is drawn in: its prose, as markdown, each of its tables and each of its code fences. */
-export type Piece =
-  | { kind: 'prose'; text: string }
-  | { kind: 'table'; head: string[]; align: Align[]; rows: string[][] }
-  | { kind: 'code'; language: string | undefined; source: string };
-
-/** A fence's opening line: its indent, its run of marks and the language named after them. */
-const FENCE = /^(\s*)(`{3,}|~{3,})\s*([^\s`]*)/;
-const DIVIDER = /^\s*\|?\s*:?-+:?\s*(\|\s*:?-+:?\s*)*\|?\s*$/;
-
-/** A table row's cells: split at the bars that are neither escaped nor inside a code span. */
-const cellsOf = (line: string) => {
-  const cells: string[] = [];
-  let cell = '';
-  let isCode = false;
-  const row = line.trim().replace(/^\|/, '');
-  for (let i = 0; i < row.length; i += 1) {
-    const ch = row[i];
-    if (ch === '\\' && row[i + 1] === '|') {
-      cell += '|';
-      i += 1;
-    } else if (ch === '|' && !isCode) {
-      cells.push(cell.trim());
-      cell = '';
-    } else {
-      if (ch === '`') isCode = !isCode;
-      cell += ch;
-    }
-  }
-  if (cell.trim() !== '') cells.push(cell.trim());
-  return cells;
-};
-
-const alignOf = (mark: string): Align =>
-  mark.endsWith(':') ? (mark.startsWith(':') ? 'center' : 'right') : 'left';
-
-/**
- * Splits a reply's markdown at its tables and its code fences. A table is a row of cells, a divider
- * under it, and the rows that follow; a fence runs to the line that closes it, or to the end of a
- * reply still being written, and what looks like a table inside one is its code.
- */
-export const piecesOf = (markdown: string): Piece[] => {
-  const lines = markdown.split('\n');
-  const pieces: Piece[] = [];
-  let prose: string[] = [];
-  const flush = () => {
-    if (prose.join('\n').trim() !== '') pieces.push({ kind: 'prose', text: prose.join('\n') });
-    prose = [];
-  };
-  for (let i = 0; i < lines.length; i += 1) {
-    const line = lines[i] ?? '';
-    const fence = FENCE.exec(line);
-    if (fence !== null) {
-      const [, indent = '', marks = '', language = ''] = fence;
-      const isClosing = (l: string) =>
-        l.trim().startsWith(marks) && l.trim().replaceAll(marks[0] ?? '', '') === '';
-      const code: string[] = [];
-      for (i += 1; i < lines.length && !isClosing(lines[i] ?? ''); i += 1) {
-        const l = lines[i] ?? '';
-        code.push(l.startsWith(indent) ? l.slice(indent.length) : l.trimStart());
-      }
-      flush();
-      pieces.push({
-        kind: 'code',
-        language: language === '' ? undefined : language,
-        source: code.join('\n'),
-      });
-      continue;
-    }
-    const divider = lines[i + 1] ?? '';
-    if (!line.includes('|') || !divider.includes('-') || !DIVIDER.test(divider)) {
-      prose.push(line);
-      continue;
-    }
-    const head = cellsOf(line);
-    const align = cellsOf(divider).map(alignOf);
-    if (head.length === 0 || head.length !== align.length) {
-      prose.push(line);
-      continue;
-    }
-    const rows: string[][] = [];
-    i += 2;
-    for (; i < lines.length && (lines[i] ?? '').includes('|'); i += 1) {
-      const cells = cellsOf(lines[i] ?? '');
-      rows.push(head.map((_, c) => cells[c] ?? ''));
-    }
-    i -= 1;
-    flush();
-    pieces.push({ kind: 'table', head, align, rows });
-  }
-  flush();
-  return pieces;
-};
-
-/** A cell's inline markdown as lettered stretches: bold, code, and a link by its label. */
-export const spansOf = (cell: string): Span[] => {
-  const spans: Span[] = [];
-  let at = 0;
-  for (const m of cell.matchAll(/\*\*(.+?)\*\*|`([^`]+)`|\[([^\]]+)\]\([^)]*\)/g)) {
-    if (m.index > at) spans.push({ text: cell.slice(at, m.index) });
-    if (m[1] !== undefined) spans.push({ text: m[1], isBold: true });
-    else if (m[2] !== undefined) spans.push({ text: m[2], isCode: true });
-    else spans.push({ text: m[3] ?? '' });
-    at = m.index + m[0].length;
-  }
-  if (at < cell.length) spans.push({ text: cell.slice(at) });
-  return spans;
 };
 
 // ---------------------------------------------------------------- pictures
@@ -641,65 +526,7 @@ export const tileOf = (
     : { columns: maxColumns, rows: Math.max(1, Math.round((maxColumns * height) / width / ratio)) };
 };
 
-// ---------------------------------------------------------------- tools
-
-/**
- * A tool call as the thread draws it, after OpenCode: a small tool is one quiet line under an icon,
- * a shell command, an edit, a written file and a list of todos are panels.
- */
-export type ToolRow =
-  | { kind: 'inline'; icon: string; text: string }
-  | { kind: 'shell'; command: string; output: string }
-  | { kind: 'diff'; path: string; diff: string }
-  | { kind: 'file'; path: string; source: string }
-  | { kind: 'todos'; items: { text: string; status: string }[] }
-  | { kind: 'questions'; items: { question: string; answer: string }[] };
-
-const field = (value: unknown, key: string): unknown =>
-  typeof value === 'object' && value !== null ? (value as Record<string, unknown>)[key] : undefined;
-export const textAt = (value: unknown, key: string) => {
-  const found = field(value, key);
-  return typeof found === 'string' ? found : undefined;
-};
-const numberAt = (value: unknown, key: string) => {
-  const found = field(value, key);
-  return typeof found === 'number' && Number.isFinite(found) ? found : undefined;
-};
-
-/** A path as the thread names it: from the working directory where it is under it. */
-export const pathIn = (path: string | undefined, cwd: string) =>
-  path === undefined
-    ? ''
-    : cwd !== '' && path.startsWith(`${cwd}/`)
-      ? path.slice(cwd.length + 1)
-      : path;
-
-/** The cells of a line a panel shows before it cuts it. */
-const LONGEST_LINE = 500;
-
-/** The first `max` lines of a text, and how many were left out. */
-export const clipLines = (text: string, max: number, more = '') => {
-  // A line is cut too: one of a minified file or a blob of JSON would fill the panel by itself.
-  const lines = text
-    .replace(/\s+$/, '')
-    .split('\n')
-    .map((line) => shorten(line, LONGEST_LINE));
-  return lines.length <= max
-    ? lines.join('\n')
-    : `${lines.slice(0, max).join('\n')}\n… +${lines.length - max} lines${more}`;
-};
-
-/** The files and folders a prompt names after an `@`, once each: a folder is one that ends in a slash. */
-export const mentionsIn = (text: string) =>
-  [
-    ...new Set(
-      [...text.matchAll(/(?:^|\s)@([^\s@]+)/g)].map((m) =>
-        (m[1] ?? '').replace(/[,.;:!?)\]]+$/, ''),
-      ),
-    ),
-  ]
-    .filter((path) => path !== '')
-    .map((path) => ({ path, kind: path.endsWith('/') ? ('dir' as const) : ('file' as const) }));
+// ---------------------------------------------------------------- paths
 
 /** A path with the person's home folder told as `~`. */
 export const tilde = (path: string, home: string) =>
@@ -707,177 +534,10 @@ export const tilde = (path: string, home: string) =>
     ? `~${path.slice(home.length)}`
     : path;
 
-/** An edit's stored patch as unified-diff hunks, which is what the highlighter draws; '' for none. */
-const diffOf = (patch: unknown) =>
-  (Array.isArray(patch) ? patch : [])
-    .map((hunk: unknown) => {
-      const lines = field(hunk, 'lines');
-      const at = (key: string) => numberAt(hunk, key) ?? 0;
-      return `@@ -${at('oldStart')},${at('oldLines')} +${at('newStart')},${at('newLines')} @@\n${(Array.isArray(lines) ? lines : []).join('\n')}`;
-    })
-    .join('\n');
-
-const matches = (n: number | undefined) =>
-  n === undefined ? '' : ` (${n} ${n === 1 ? 'match' : 'matches'})`;
-
-/** The theme colours an agent type can be told by. Claude Code has its own for each, which a plugin is not told. */
-const AGENT_COLORS = ['ide', 'merged', 'success', 'warning', 'planMode', 'claude', 'bashBorder'];
-
-/** The colour a type of agent is drawn in while one runs: the same one each time for a type. */
-export const agentColor = (type: string) => {
-  let sum = 0;
-  for (const ch of type) sum = (sum * 31 + (ch.codePointAt(0) ?? 0)) % 9973;
-  return AGENT_COLORS[sum % AGENT_COLORS.length] ?? 'ide';
-};
-
-/** An MCP server as it is named in the thread and the pane: a plugin's (`plugin_<plugin>_<server>`) by its own name. */
-export const serverName = (id: string) => /^plugin_[^_]+_(.+)$/.exec(id)?.[1] ?? id;
-
-/** The tools whose rows stay Claude Code's own: each is a dialog more than a row. A question is one until it is answered. */
-const OWN = new Set(['ExitPlanMode', 'EnterPlanMode']);
-
-/** Whether the thread draws this tool's row itself, and so leaves no result row under it. */
-const isDrawn = (tool: string) => !OWN.has(tool);
-
-/** The tools drawn as a panel, which holds what the call answered: any other is one line. */
-const PANELS = new Set(['Bash', 'Edit', 'MultiEdit', 'Write', 'TodoWrite', 'AskUserQuestion']);
-export const isPanel = (tool: string) => PANELS.has(tool);
-
-/**
- * How a tool call is drawn, from its input and, once it has one, its result; null for a tool whose
- * row stays Claude Code's.
- */
-export const toolRowOf = (
-  tool: string,
-  input: unknown,
-  output: unknown,
-  cwd: string,
-): ToolRow | null => {
-  if (!isDrawn(tool)) return null;
-  const path = pathIn(
-    textAt(input, 'file_path') ?? textAt(input, 'path') ?? textAt(input, 'notebook_path'),
-    cwd,
-  );
-  const inline = (icon: string, text: string): ToolRow => ({
-    kind: 'inline',
-    icon,
-    text: clean(text),
-  });
-  const within =
-    textAt(input, 'path') === undefined ? '' : ` in ${pathIn(textAt(input, 'path'), cwd)}`;
-  switch (tool) {
-    case 'Bash':
-      return {
-        kind: 'shell',
-        command: textAt(input, 'command') ?? '',
-        output:
-          typeof output === 'string'
-            ? output
-            : [textAt(output, 'stdout'), textAt(output, 'stderr')]
-                .filter((part) => part !== undefined && part.trim() !== '')
-                .join('\n'),
-      };
-    case 'Read': {
-      const offset = numberAt(input, 'offset');
-      const limit = numberAt(input, 'limit');
-      const range =
-        offset === undefined && limit === undefined
-          ? ''
-          : `:${offset ?? 1}-${limit === undefined ? '' : (offset ?? 1) + limit - 1}`;
-      return inline('→', `Read ${path}${range}`);
-    }
-    case 'Edit':
-    case 'MultiEdit': {
-      const diff = diffOf(field(output, 'structuredPatch'));
-      return diff === '' ? inline('←', `Edit ${path}`) : { kind: 'diff', path, diff };
-    }
-    case 'Write': {
-      const source = textAt(input, 'content');
-      return output === undefined || typeof output === 'string' || source === undefined
-        ? inline('←', `Write ${path}`)
-        : { kind: 'file', path, source };
-    }
-    case 'Glob':
-      return inline(
-        '✱',
-        `Glob "${textAt(input, 'pattern') ?? ''}"${within}${matches(numberAt(output, 'numFiles'))}`,
-      );
-    case 'Grep':
-      return inline(
-        '✱',
-        `Grep "${textAt(input, 'pattern') ?? ''}"${within}${matches(numberAt(output, 'numMatches') ?? numberAt(output, 'numFiles'))}`,
-      );
-    case 'WebFetch':
-      return inline('%', `WebFetch ${textAt(input, 'url') ?? ''}`);
-    case 'WebSearch':
-      return inline('◈', `Web Search "${textAt(input, 'query') ?? ''}"`);
-    case 'Skill':
-      return inline('→', `Skill "${textAt(input, 'skill') ?? ''}"`);
-    case 'Agent':
-    case 'Task': {
-      const type = textAt(input, 'subagent_type') ?? 'general';
-      return inline(
-        output === undefined ? '│' : '✓',
-        `${type.charAt(0).toUpperCase()}${type.slice(1)} Task ${textAt(input, 'description') ?? ''}`,
-      );
-    }
-    case 'AskUserQuestion': {
-      const answers = field(output, 'answers');
-      const asked = field(input, 'questions');
-      if (typeof answers !== 'object' || answers === null) return null;
-      return {
-        kind: 'questions',
-        items: (Array.isArray(asked) ? asked : []).map((q: unknown) => {
-          const question = textAt(q, 'question') ?? '';
-          const answer = (answers as Record<string, unknown>)[question];
-          return { question, answer: typeof answer === 'string' ? answer : '' };
-        }),
-      };
-    }
-    case 'TodoWrite': {
-      const todos = field(input, 'todos');
-      return {
-        kind: 'todos',
-        items: (Array.isArray(todos) ? todos : []).map((todo: unknown) => ({
-          text: textAt(todo, 'content') ?? '',
-          status: textAt(todo, 'status') ?? 'pending',
-        })),
-      };
-    }
-    default: {
-      // Any other tool, an MCP server's among them: its name and what it was told, `[key=value, …]`.
-      const told = Object.entries(typeof input === 'object' && input !== null ? input : {})
-        .filter(([, value]) => ['string', 'number', 'boolean'].includes(typeof value))
-        .map(([key, value]) => `${key}=${String(value)}`)
-        .join(', ');
-      // Its mark is a tick once it has answered: a gear is drawn two cells wide by some fonts.
-      const name = tool.replace(/^mcp__(.+?)__/, (_, server: string) => `${serverName(server)} `);
-      return inline(
-        output === undefined ? '›' : '✓',
-        shorten(`${name}${told === '' ? '' : ` [${told}]`}`, 160),
-      );
-    }
-  }
-};
-
-/** A whole number with its thousands apart: `89,728`. */
-const grouped = (n: number) => String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-
-/**
- * What a reply's footer says of its turn after the model and the time: how fast it wrote, and under
- * that its requests and the last one's tokens. Empty where the turn made no request that was heard.
- */
-export const footerOf = (turn: Turn | undefined) => {
-  if (turn === undefined || turn.steps === 0) return { rate: '', tokens: '' };
-  const fresh = (turn.last?.input ?? 0) + (turn.last?.cacheWrite ?? 0);
-  const cached = turn.last?.cacheRead ?? 0;
-  return {
-    rate: turn.ms > 0 ? `${fmtRate(turn.output / (turn.ms / 1000))} tok/s` : '',
-    tokens: `+ Tokens: ${turn.steps} ${turn.steps === 1 ? 'step' : 'steps'} · latest: ${grouped(fresh)} new · ${grouped(cached)} cached · ${grouped(fresh + cached + (turn.last?.output ?? 0))} total`,
-  };
-};
-
 // ---------------------------------------------------------------- MCP
+
+/** An MCP server as the pane names it: a plugin's (`plugin_<plugin>_<server>`) by its own name. */
+export const serverName = (id: string) => /^plugin_[^_]+_(.+)$/.exec(id)?.[1] ?? id;
 
 /**
  * The MCP servers the session has tools from, by name, and how many each: a tool of one is named
@@ -894,16 +554,3 @@ export const serversOf = (tools: readonly string[]) => {
     .map(([name, count]) => ({ name, tools: count }))
     .sort((a, b) => a.name.localeCompare(b.name));
 };
-
-// ---------------------------------------------------------------- records
-
-/** A record with one more entry, the latest written last, and no more than `max` of them. */
-export const capped = <T>(
-  record: Record<string, T>,
-  key: string,
-  value: T,
-  max: number,
-): Record<string, T> =>
-  Object.fromEntries(
-    [...Object.entries(record).filter(([k]) => k !== key), [key, value] as const].slice(-max),
-  );

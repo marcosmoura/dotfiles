@@ -3,20 +3,15 @@ import { expect, mock, test } from 'claude-code/testing';
 import type { Engine } from 'claude-code/testing';
 
 import {
-  agentColor,
   agentType,
   alarm,
   breakdownOf,
   changesOf,
-  capped,
-  clipLines,
   fableOf,
   fmtClock,
   fmtLeft,
   fmtPercent,
   fmtRate,
-  fmtTook,
-  footerOf,
   fromBase64,
   imagesIn,
   fmtTokens,
@@ -27,14 +22,11 @@ import {
   merge,
   modeIn,
   modeLabel,
-  mentionsIn,
   newAgent,
-  piecesOf,
   thumbOf,
   tileOf,
   tilde,
   toBase64,
-  toolRowOf,
   prettyModel,
   railOf,
   sandboxOf,
@@ -46,7 +38,6 @@ import {
   whereOf,
   windowOf,
 } from '../hooks/core';
-import { layout } from '../hooks/grid';
 import type { Agent, Status } from '../types';
 
 // ---------------------------------------------------------------- pure behaviour
@@ -318,6 +309,10 @@ test('uncommitted lines add up over the unstaged and the staged diff', () => {
     ),
   ).toEqual({ added: 93, removed: 72 });
   expect(changesOf('\n')).toEqual({ added: 0, removed: 0 });
+});
+
+test("the row under the prompt names the project's folder from the person's home", () => {
+  expect(tilde('/Users/me/Projects/dotfiles', '/Users/me')).toBe('~/Projects/dotfiles');
 });
 
 test('the header is told where the session works: the project, its branch, and the worktree when it is in a linked one', () => {
@@ -1125,13 +1120,11 @@ test('the prompts the transcript draws make a rail: a thick tick on the one bein
     ...message('p3', 'Add a leading-edge option', { first: 0, last: 2, of: 3 }),
     surface: 'terminal',
   });
-  // On the terminal a prompt is a raised panel behind a thick bar.
-  expect(await p2.find({ type: 'Box', key: 'prompt-card' })).toMatchObject({
-    props: { backgroundColor: '#181825', paddingX: 2, paddingY: 1 },
+  // On the terminal a prompt is its text alone in a rounded box in the accent's colour.
+  expect(await p2.find({ type: 'Box', key: 'prompt-box' })).toMatchObject({
+    props: { borderStyle: 'round', borderColor: 'bashBorder' },
   });
-  expect(await p2.find({ type: 'Text', text: /^▍/ })).toMatchObject({
-    props: { color: 'bashBorder' },
-  });
+  expect(await p2.find({ type: 'Text', text: /^Write a TypeScript\n {2}implementation$/ })).toBeDefined();
   // A background task's notification is a user row too, and no prompt.
   const notice = await $.ui.mount({
     plugin: 'sidebar',
@@ -1144,13 +1137,6 @@ test('the prompts the transcript draws make a rail: a thick tick on the one bein
       isExpanded: false,
       onScreen: { first: 0, last: 1, of: 2 },
     },
-  });
-  // It is drawn as a quiet line under a tick, as a tool's line is.
-  expect(await notice.find({ type: 'Text', text: /^Agent "Ping 1" finished$/ })).toMatchObject({
-    props: { color: 'inactive' },
-  });
-  expect((await notice.find({ type: 'Box', key: 'notice' }))?.props).toMatchObject({
-    paddingLeft: 3,
   });
   // A drawing writes nothing: the rail is brought up to date right after it.
   await clock.settle();
@@ -1425,326 +1411,6 @@ test('the timeline draws as many lanes as the pane has room for, the latest suba
   expect(await drawnIn(20)).toEqual([3, 'lane-a12', '1', 'lane-a14', '3', '+11 earlier']);
 });
 
-test('a reply is split at its tables and its code fences, and a table in a fence is its code', () => {
-  const reply = [
-    'Two options:',
-    '',
-    '| Option | Rows |',
-    '| :-- | --: |',
-    '| **Card** | 2 |',
-    '| `bar` \\| rule | 0 |',
-    '',
-    'Pick one.',
-    '```',
-    '| a | b |',
-    '| - | - |',
-    '```',
-  ].join('\n');
-  expect(piecesOf(reply)).toEqual([
-    { kind: 'prose', text: 'Two options:\n' },
-    {
-      kind: 'table',
-      head: ['Option', 'Rows'],
-      align: ['left', 'right'],
-      rows: [
-        ['**Card**', '2'],
-        ['`bar` | rule', '0'],
-      ],
-    },
-    { kind: 'prose', text: '\nPick one.' },
-    { kind: 'code', language: undefined, source: '| a | b |\n| - | - |' },
-  ]);
-  // A fence in a list item loses the item's indent, and one still being written runs to the end.
-  expect(piecesOf('- step\n  ```ts\n  const a = 1\n    b()\n  ```\ndone\n~~~~sh\nls')).toEqual([
-    { kind: 'prose', text: '- step' },
-    { kind: 'code', language: 'ts', source: 'const a = 1\n  b()' },
-    { kind: 'prose', text: 'done' },
-    { kind: 'code', language: 'sh', source: 'ls' },
-  ]);
-  expect(piecesOf('No table here, a | b')).toEqual([
-    { kind: 'prose', text: 'No table here, a | b' },
-  ]);
-});
-
-test('a reply is plain markdown set in three cells, a table in it a grid fitted to the width it has', async ($, on) => {
-  engine(on);
-  await start($);
-  const ui = await $.ui.mount({
-    plugin: 'sidebar',
-    component: 'AssistantMessage',
-    requestId: 'a1',
-    surface: 'terminal',
-    props: {
-      text: 'Before\n\n| Name | Size |\n| --- | --: |\n| `core.ts` | 306 |\n\nAfter',
-      isFirstOfReply: true,
-    },
-  });
-  expect(await ui.find({ type: 'Markdown' })).toMatchObject({ props: { text: 'Before' } });
-  // The grid is drawn by a surface module, which is handed the cells as lettered stretches.
-  expect(await ui.find({ type: 'Client' })).toMatchObject({
-    props: {
-      module: 'hooks/grid.tsx',
-      props: {
-        head: [[{ text: 'Name' }], [{ text: 'Size' }]],
-        rows: [[[{ text: 'core.ts', isCode: true }], [{ text: '306' }]]],
-        align: ['left', 'right'],
-      },
-    },
-  });
-  await ui.unmount();
-
-  const table = {
-    head: [[{ text: 'Name' }], [{ text: 'What it holds' }]],
-    rows: [
-      [[{ text: 'core.ts', isCode: true as const }], [{ text: 'Pure helpers for the sidebar' }]],
-    ],
-    align: ['left' as const, 'right' as const],
-    rule: 'inactive',
-    code: 'permission',
-  };
-  const drawn = (columns: number) =>
-    layout(table, columns).map((line) => line.map((seg) => seg.text).join(''));
-  // With room to spare it is as wide as its cells, the second column set to the right.
-  expect(drawn(80)).toEqual([
-    '┌─────────┬──────────────────────────────┐',
-    '│ Name    │                What it holds │',
-    '├─────────┼──────────────────────────────┤',
-    '│ core.ts │ Pure helpers for the sidebar │',
-    '└─────────┴──────────────────────────────┘',
-  ]);
-  // Too wide for the room, its widest column gives way and its cells wrap; every row is as wide.
-  const narrow = drawn(30);
-  expect(narrow).toEqual([
-    '┌─────────┬──────────────────┐',
-    '│ Name    │    What it holds │',
-    '├─────────┼──────────────────┤',
-    '│ core.ts │ Pure helpers for │',
-    '│         │      the sidebar │',
-    '└─────────┴──────────────────┘',
-  ]);
-  expect(new Set(narrow.map((line) => line.length)).size).toBe(1);
-  // A wide character is two cells: its column is ruled as wide as it is drawn.
-  const wide = layout(
-    { ...table, head: [[{ text: '状態' }]], rows: [[[{ text: 'ok' }]]], align: ['left'] },
-    80,
-  );
-  expect(wide.map((line) => line.map((seg) => seg.text).join(''))).toEqual([
-    '┌──────┐',
-    '│ 状態 │',
-    '├──────┤',
-    '│ ok   │',
-    '└──────┘',
-  ]);
-});
-
-test('a code fence in a reply is its code, highlighted, with no frame', async ($, on) => {
-  engine(on);
-  await start($);
-  const ui = await $.ui.mount({
-    plugin: 'sidebar',
-    component: 'AssistantMessage',
-    requestId: 'a2',
-    surface: 'terminal',
-    props: { text: 'Run it:\n\n```bash\nclaude plugin test .\n```', isFirstOfReply: true },
-  });
-  expect((await ui.find({ type: 'Box', key: 'code-1' }))?.children).toMatchObject([
-    { type: 'Code', props: { source: 'claude plugin test .', language: 'bash' } },
-  ]);
-  await ui.unmount();
-});
-
-test('a prompt typed over a running turn is a gray panel until the conversation takes it in', async ($, on) => {
-  engine(on);
-  on('prompt.submit', (_, e) => ({ text: e.text }));
-  await start($);
-  await $.prompt.submit({
-    text: 'and run the tests',
-    turnId: 't1',
-    wait: false,
-    origin: { kind: 'composer' },
-  });
-  const part = { first: 0, last: 2, of: 3 };
-  const colours = async (ui: {
-    find: (query: { type: string; text: RegExp }) => Promise<{ props: unknown } | undefined>;
-  }) =>
-    Promise.all(
-      [/^▍/, /^and run the tests$/].map(
-        async (text) => (await ui.find({ type: 'Text', text }))?.props,
-      ),
-    );
-  const queued = await $.ui.mount({
-    ...message('q1', 'and run the tests', part),
-    surface: 'terminal',
-  });
-  expect(await colours(queued)).toMatchObject([{ color: 'inactive' }, { color: 'inactive' }]);
-  await queued.unmount();
-
-  await $.session.append({
-    message: { type: 'user', content: [{ type: 'text', text: 'and run the tests' }] },
-    door: 'prompt',
-    origin: { kind: 'composer' },
-    uuid: 'q1',
-  });
-  const taken = await $.ui.mount({
-    ...message('q1', 'and run the tests', part),
-    surface: 'terminal',
-  });
-  expect(await colours(taken)).toMatchObject([{ color: 'bashBorder' }, { color: 'text' }]);
-  await taken.unmount();
-});
-
-test('a tool call is one quiet line under an icon, or a panel for a command, an edit, a file and todos', async ($, on) => {
-  const cwd = '/work/dotfiles';
-  expect(
-    toolRowOf('Read', { file_path: `${cwd}/install.sh`, offset: 10, limit: 5 }, undefined, cwd),
-  ).toEqual({
-    kind: 'inline',
-    icon: '→',
-    text: 'Read install.sh:10-14',
-  });
-  expect(
-    toolRowOf('Grep', { pattern: 'retry', path: `${cwd}/installation` }, { numFiles: 4 }, cwd),
-  ).toEqual({
-    kind: 'inline',
-    icon: '✱',
-    text: 'Grep "retry" in installation (4 matches)',
-  });
-  expect(toolRowOf('mcp__context7__query-docs', { query: 'hooks' }, undefined, cwd)).toEqual({
-    kind: 'inline',
-    icon: '›',
-    text: 'context7 query-docs [query=hooks]',
-  });
-  expect(toolRowOf('Bash', { command: 'ls' }, { stdout: 'a\nb', stderr: '' }, cwd)).toEqual({
-    kind: 'shell',
-    command: 'ls',
-    output: 'a\nb',
-  });
-  // An edit is a line until it has a patch to show, then its diff.
-  expect(toolRowOf('Edit', { file_path: `${cwd}/a.ts` }, undefined, cwd)).toMatchObject({
-    kind: 'inline',
-    text: 'Edit a.ts',
-  });
-  expect(
-    toolRowOf(
-      'Edit',
-      { file_path: `${cwd}/a.ts` },
-      {
-        structuredPatch: [
-          { oldStart: 4, oldLines: 1, newStart: 4, newLines: 1, lines: ['-a', '+b'] },
-        ],
-      },
-      cwd,
-    ),
-  ).toEqual({ kind: 'diff', path: 'a.ts', diff: '@@ -4,1 +4,1 @@\n-a\n+b' });
-  // A question to the person stays Claude Code's own row until it is answered: then a panel.
-  expect(
-    toolRowOf(
-      'AskUserQuestion',
-      { questions: [{ question: 'Which?' }] },
-      { answers: { 'Which?': 'A' } },
-      cwd,
-    ),
-  ).toEqual({ kind: 'questions', items: [{ question: 'Which?', answer: 'A' }] });
-  expect(toolRowOf('AskUserQuestion', {}, undefined, cwd)).toBeNull();
-  expect(mentionsIn('compare @src/a.ts with @docs/ and @src/a.ts, mail me@x.io')).toEqual([
-    { path: 'src/a.ts', kind: 'file' },
-    { path: 'docs/', kind: 'dir' },
-  ]);
-  expect(tilde('/Users/me/Projects/dotfiles', '/Users/me')).toBe('~/Projects/dotfiles');
-  // An agent type has one colour, the same each time.
-  expect(agentColor('Explore')).toBe(agentColor('Explore'));
-  expect(['ide', 'merged', 'success', 'warning', 'planMode', 'claude', 'bashBorder']).toContain(
-    agentColor('Plan'),
-  );
-  expect(fmtTook(28_400)).toBe('28s');
-  expect(fmtTook(69_000)).toBe('1m 9s');
-  expect(
-    footerOf({
-      model: 'claude-fable-5-2',
-      steps: 5,
-      output: 800,
-      ms: 7500,
-      last: { input: 93, output: 0, cacheRead: 89_728, cacheWrite: 3800 },
-    }),
-  ).toEqual({
-    rate: '106.7 tok/s',
-    tokens: '+ Tokens: 5 steps · latest: 3,893 new · 89,728 cached · 93,621 total',
-  });
-  expect(footerOf(undefined)).toEqual({ rate: '', tokens: '' });
-  // A record keeps its latest entries, and a line of a panel is cut as well as its lines are counted.
-  expect(capped({ a: 1, b: 2 }, 'a', 3, 2)).toEqual({ b: 2, a: 3 });
-  expect(capped({ a: 1, b: 2 }, 'c', 3, 2)).toEqual({ b: 2, c: 3 });
-  expect(clipLines('x'.repeat(900), 10).length).toBe(500);
-
-  engine(on);
-  await start($);
-  const row = (tool: string, input: unknown, output?: unknown) => ({
-    plugin: 'sidebar',
-    component: 'ToolUse' as const,
-    requestId: 't1',
-    surface: 'terminal' as const,
-    props: {
-      tool_use_id: 't1',
-      tool,
-      input,
-      output,
-      isRunning: false,
-      isErrored: false,
-      isInterrupted: false,
-    },
-  });
-  const read = await $.ui.mount(row('Read', { file_path: '/etc/hosts' }));
-  expect(await read.find({ type: 'Text', text: /^Read \/etc\/hosts$/ })).toMatchObject({
-    props: { color: 'inactive' },
-  });
-  expect((await read.find({ type: 'Box', key: 'tool' }))?.props).toMatchObject({ paddingLeft: 3 });
-  await read.unmount();
-  const shell = await $.ui.mount(row('Bash', { command: 'ls' }, { stdout: 'a', stderr: '' }));
-  expect((await shell.find({ type: 'Box', key: 'tool' }))?.props).toMatchObject({
-    backgroundColor: '#181825',
-  });
-  expect(await shell.find({ type: 'Text', text: /^\$ ls$/ })).toBeDefined();
-  await shell.unmount();
-  // A verbose session marks every row expanded: it is still drawn here, with more of its output.
-  const long = Array.from({ length: 30 }, (_, i) => `line ${i}`).join('\n');
-  const verbose = await $.ui.mount(row('Bash', { command: 'seq' }, { stdout: long, stderr: '' }));
-  expect(
-    await verbose.find({ type: 'Text', text: /… \+20 lines · ctrl\+o for more$/ }),
-  ).toBeDefined();
-  await verbose.redraw({
-    ...row('Bash', { command: 'seq' }, { stdout: long, stderr: '' }).props,
-    isExpanded: true,
-  });
-  expect(await verbose.find({ type: 'Text', text: /line 29$/ })).toBeDefined();
-  await verbose.unmount();
-  // A script written into a command is cut to its first lines.
-  const script = await $.ui.mount(
-    row('Bash', { command: 'python3 - <<EOF\na\nb\nc\nd\nEOF' }, { stdout: '', stderr: '' }),
-  );
-  expect(
-    await script.find({
-      type: 'Text',
-      text: /^\$ python3 - <<EOF\na\nb\n… \+3 lines · ctrl\+o for more$/,
-    }),
-  ).toBeDefined();
-  await script.unmount();
-  // What the call answered is in the panel, so the result row under it is empty.
-  const result = await $.ui.mount({
-    plugin: 'sidebar',
-    component: 'ToolResult',
-    requestId: 't1',
-    surface: 'terminal',
-    props: {
-      tool_use_id: 't1',
-      tool: 'Bash',
-      output: { stdout: 'a', stderr: '' },
-      isErrored: false,
-    },
-  });
-  expect(await result.find({ type: 'Text' })).toBeUndefined();
-  await result.unmount();
-});
-
 test('a pasted image is found by its tag, and its thumbnail is the BMP in half blocks', () => {
   expect(imagesIn('compare [Image #2] with [Image #11], then [Image #2] again')).toEqual([2, 11]);
   expect(imagesIn('no image here')).toEqual([]);
@@ -1784,51 +1450,6 @@ test('a pasted image is found by its tag, and its thumbnail is the BMP in half b
   expect(tileOf(100, 100, 8, 80, 3)).toEqual({ columns: 24, rows: 8 });
 });
 
-test("the working line, the footer and a command's output are drawn in the thread's own way", async ($, on) => {
-  engine(on);
-  await start($);
-  const base = { plugin: 'sidebar', surface: 'terminal' as const };
-  const working = await $.ui.mount({
-    ...base,
-    component: 'Spinner',
-    requestId: 's1',
-    props: { word: 'Brewing', message: null, suffix: '…', mode: 'responding' },
-  });
-  expect(await working.find({ type: 'Text', text: /^Brewing…$/ })).toMatchObject({
-    props: { color: 'inactive' },
-  });
-  expect(await working.find({ type: 'Text', text: /^esc interrupt$/ })).toBeDefined();
-  expect((await working.find({ type: 'Box', key: 'working' }))?.props).toMatchObject({
-    paddingLeft: 3,
-  });
-  await working.unmount();
-
-  const footer = await $.ui.mount({
-    ...base,
-    component: 'TurnDuration',
-    requestId: 'd1',
-    props: { word: 'Baked', durationMs: 13_000 },
-  });
-  expect(await footer.find({ type: 'Text', text: /^Claude$/ })).toMatchObject({
-    props: { color: 'bashBorder', bold: true },
-  });
-  expect((await footer.find({ type: 'Box', key: 'footer' }))?.props).toMatchObject({
-    paddingLeft: 3,
-  });
-  await footer.unmount();
-
-  const output = await $.ui.mount({
-    ...base,
-    component: 'CommandOutput',
-    requestId: 'c1',
-    props: { command: 'cost', args: '', text: 'Total cost: $1.20', isErrored: false },
-  });
-  expect(await output.find({ type: 'Markdown' })).toMatchObject({
-    props: { text: 'Total cost: $1.20', dimColor: true },
-  });
-  await output.unmount();
-});
-
 test('the MCP servers the session has tools from are listed in the pane, with how many each', async ($, on) => {
   expect(
     serversOf([
@@ -1841,17 +1462,10 @@ test('the MCP servers the session has tools from are listed in the pane, with ho
     { name: 'context7', tools: 2 },
     { name: 'grep', tools: 1 },
   ]);
-  // A plugin's server goes by its own name, in the pane and on a tool's line.
+  // A plugin's server goes by its own name.
   expect(serversOf(['mcp__plugin_playwright_playwright__browser_click'])).toEqual([
     { name: 'playwright', tools: 1 },
   ]);
-  expect(
-    toolRowOf('mcp__plugin_playwright_playwright__browser_click', { ref: 'e1' }, 'ok', ''),
-  ).toEqual({
-    kind: 'inline',
-    icon: '✓',
-    text: 'playwright browser_click [ref=e1]',
-  });
   engine(on);
   on('tool.list', () => ({
     value: [
@@ -1870,67 +1484,4 @@ test('the MCP servers the session has tools from are listed in the pane, with ho
   expect(await ui.find({ type: 'Text', text: /^1 tool$/ })).toBeDefined();
   await ui.press({ key: 'mcp' });
   await ui.unmount();
-});
-
-test("a footer takes its turn's figures the first time it is drawn, and keeps that turn's model", async ($, on) => {
-  const { clock } = engine(on);
-  await start($);
-  await step($, clock, { turnId: 'T1', model: 'claude-fable-5-2', effort: 'max' });
-  const footer = (id: string) =>
-    $.ui.mount({
-      plugin: 'sidebar',
-      component: 'TurnDuration',
-      requestId: id,
-      surface: 'terminal',
-      props: { word: 'Baked', durationMs: 13_000 },
-    });
-  const said = async (ui: {
-    find: (query: { type: string; text: RegExp }) => Promise<{ text: string } | undefined>;
-  }) => (await ui.find({ type: 'Text', text: /^Claude · / }))?.text;
-
-  const first = await footer('d1');
-  expect(await said(first)).toMatch(/^Claude · Fable 5\.2 · 13s · [\d.]+ tok\/s$/);
-  await first.unmount();
-  await clock.settle();
-  // Another footer finds the turn's figures taken: it says only how long its own turn took.
-  const second = await footer('d2');
-  expect(await said(second)).toBe('Claude · 13s');
-  await second.unmount();
-  // The session moves to another model: the first footer still names the one that answered its turn.
-  await step($, clock, { turnId: 'T2', model: 'claude-sonnet-5-5' });
-  const again = await footer('d1');
-  expect(await said(again)).toMatch(/^Claude · Fable 5\.2 · 13s · /);
-  await again.unmount();
-});
-
-test("a one-line tool's result stays Claude Code's in the ctrl+o view, and a panel's stays in its panel", async ($, on) => {
-  engine(on);
-  on('ui.render', ($$, event) => {
-    const { Text } = $$.ui.resolve(event);
-    return <Text>engine</Text>;
-  });
-  await start($);
-  const answered = (tool: string, isExpanded: boolean) =>
-    $.ui.mount({
-      plugin: 'sidebar',
-      component: 'ToolResult',
-      requestId: 't1',
-      surface: 'terminal',
-      props: {
-        tool_use_id: 't1',
-        tool,
-        output: { stdout: 'a', stderr: '' },
-        isErrored: false,
-        isExpanded,
-      },
-    });
-  for (const [tool, isExpanded, drawn] of [
-    ['WebFetch', true, 'engine'],
-    ['WebFetch', false, undefined],
-    ['Bash', true, undefined],
-  ] as const) {
-    const ui = await answered(tool, isExpanded);
-    expect((await ui.find({ type: 'Text' }))?.text).toBe(drawn);
-    await ui.unmount();
-  }
 });
