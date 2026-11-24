@@ -87,7 +87,7 @@
     ],
     "defaultMode": "auto"
   },
-  "model": "fable",
+  "model": "opus",
   "hooks": {
     "SessionStart": [
       {
@@ -444,7 +444,7 @@
   "effortLevel": "medium",
   "modelSettings": {
     "claude-opus-5-5": {
-      "effortLevel": "medium"
+      "effortLevel": "high"
     },
     "claude-sonnet-5-5": {
       "effortLevel": "medium"
@@ -457,9 +457,10 @@
   "tui": "default",
   "timeFormat": "24-hour",
   "theme": "custom:catppuccin-mocha",
+  "editorMode": "normal",
   "verbose": false,
   "preferredNotifChannel": "ghostty",
-  "idleCompaction": false,
+  "idleCompaction": true,
   "showTurnDuration": true,
   "terminalProgressBarEnabled": true,
   "autoMode": {
