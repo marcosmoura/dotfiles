@@ -57,6 +57,9 @@ trust_level = "trusted"
 [projects."/Users/marcosmoura/Projects/budget"]
 trust_level = "trusted"
 
+[projects."/Users/marcosmoura/Projects/deck"]
+trust_level = "trusted"
+
 [features]
 hooks = true
 guardian_approval = true
@@ -97,3 +100,54 @@ trusted_hash = "sha256:13fa0c6678f3e3856f479ce3f4df6a853e4a7d56fe86489050a0ee697
 
 [hooks.state."/Users/marcosmoura/Projects/life-planner/.codex/hooks.json:pre_tool_use:0:0"]
 trusted_hash = "sha256:89651286aa669c01eb13cb6a2dde3e19a9d79c9996b1783663814036795c4f42"
+
+[hooks.state."/Users/marcosmoura/.codex/hooks.json:pre_tool_use:0:0"]
+trusted_hash = "sha256:50e6a7c04104b07d8eafe6c25c5bd904d3a4f85ec09c2c58aef7edcb33807e66"
+
+[hooks.state."/Users/marcosmoura/.codex/hooks.json:permission_request:0:0"]
+trusted_hash = "sha256:8eba94164f65be3a97e4b593f872ccbc44a569ccf7e6bf659a31aac8c028bf9d"
+
+[hooks.state."/Users/marcosmoura/.codex/hooks.json:permission_request:1:0"]
+trusted_hash = "sha256:d87e8da379c4d08546f4a12d8c85047a18884bb0b942f98a09e11ebd70ef00a7"
+
+[hooks.state."/Users/marcosmoura/.codex/hooks.json:post_tool_use:0:0"]
+trusted_hash = "sha256:acf2776c2acc72a34c220bd184471b7efb4056bd2a7fd0c124b3809b1bee0e35"
+
+[hooks.state."/Users/marcosmoura/.codex/hooks.json:post_tool_use:1:0"]
+trusted_hash = "sha256:9e1e51f75cbd8827c570c542e8f5ffafda459945ebfd344b100c1d5400e5ad61"
+
+[hooks.state."/Users/marcosmoura/.codex/hooks.json:pre_compact:0:0"]
+trusted_hash = "sha256:514cd8fc17652d014458e58827da2ed53d6a426add8b354c5af022005ec0c45c"
+
+[hooks.state."/Users/marcosmoura/.codex/hooks.json:post_compact:0:0"]
+trusted_hash = "sha256:04cebcd3cfacc5426abf5f7555f767b187dc9b5729e81b2e63fa4742900805b5"
+
+[hooks.state."/Users/marcosmoura/.codex/hooks.json:session_start:1:0"]
+trusted_hash = "sha256:567dad3d774ecf396ec9f501af59492df92f4b54b6e967f8b75f19a99b4e5fe3"
+
+[hooks.state."/Users/marcosmoura/.codex/hooks.json:session_start:2:0"]
+trusted_hash = "sha256:67b3e5c83a12eecede7382899edc088cee75a160e41711b15eb7971e774f1f05"
+
+[hooks.state."/Users/marcosmoura/.codex/hooks.json:session_end:0:0"]
+trusted_hash = "sha256:05552f179f06cc377d931825530d75102499cc657dd8184d684962f8d6e96aff"
+
+[hooks.state."/Users/marcosmoura/.codex/hooks.json:session_end:1:0"]
+trusted_hash = "sha256:2cb320654a895f54f413f8e4ffd8cb8aa04d4506525ad88f02e5827030640765"
+
+[hooks.state."/Users/marcosmoura/.codex/hooks.json:user_prompt_submit:0:0"]
+trusted_hash = "sha256:6e1082b2b7548e014f8bf171c786c0ede5d27a0c1495d42c526a725fdf52cc10"
+
+[hooks.state."/Users/marcosmoura/.codex/hooks.json:user_prompt_submit:1:0"]
+trusted_hash = "sha256:48e435f5428b177b9a16c5951dacf010e1483ffc8e74a204a7d800b6bc02ecc4"
+
+[hooks.state."/Users/marcosmoura/.codex/hooks.json:stop:0:0"]
+trusted_hash = "sha256:b323a6f4d3dffdba9acd493011fd21ccabd8776d85c3b40eeee88d0d5f487339"
+
+[hooks.state."/Users/marcosmoura/.codex/hooks.json:stop:1:0"]
+trusted_hash = "sha256:d473adf085106e517502a0f77269c32d754c2cb3970ca56c6201cf440d1e904d"
+
+[hooks.state."/Users/marcosmoura/.codex/hooks.json:interrupt:0:0"]
+trusted_hash = "sha256:743f918f048b826ec7594bca073e8a001d5251119d2f6c2d1325d879fb3c1d79"
+
+[hooks.state."/Users/marcosmoura/.codex/hooks.json:interrupt:1:0"]
+trusted_hash = "sha256:543c80730830201e2793bd07425938368fe762ba5d927e965152295d8e4ca9d3"
